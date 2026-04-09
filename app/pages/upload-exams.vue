@@ -1,0 +1,308 @@
+<script setup lang="ts">
+import { useDropZone } from "@vueuse/core";
+import courseCodes from "~/data/courseCodes.json";
+
+definePageMeta({ layout: "info" });
+
+useSeoMeta({
+  title: "Ladda upp tenta",
+  description: "Ladda upp gamla tentor och facit till LiU Tentor.",
+  robots: "index, follow",
+});
+
+const kurskod = ref("");
+const files = ref<File[]>([]);
+const loading = ref(false);
+const uploadStatus = ref<"success" | "error" | null>(null);
+const errorMessage = ref("");
+const dropZoneRef = ref<HTMLDivElement | null>(null);
+
+const { isOverDropZone } = useDropZone(dropZoneRef, {
+  onDrop: (droppedFiles) => {
+    if (!droppedFiles) return;
+    files.value = [
+      ...files.value,
+      ...Array.from(droppedFiles).filter((f) => f.type === "application/pdf"),
+    ];
+  },
+});
+
+function handleFileInput(e: Event) {
+  const input = e.target as HTMLInputElement;
+  if (!input.files) return;
+  files.value = [...files.value, ...Array.from(input.files)];
+}
+
+function removeFile(index: number) {
+  files.value = files.value.filter((_, i) => i !== index);
+}
+
+function parseDateFromFilename(name: string): string | null {
+  const fullDateMatch = name.match(/(\d{4})[-_]?(\d{2})[-_]?(\d{2})/);
+  if (
+    fullDateMatch &&
+    fullDateMatch[1] &&
+    fullDateMatch[2] &&
+    fullDateMatch[3]
+  ) {
+    const year = parseInt(fullDateMatch[1], 10);
+    const month = parseInt(fullDateMatch[2], 10);
+    const day = parseInt(fullDateMatch[3], 10);
+    if (
+      year > 1990 &&
+      year < 2050 &&
+      month >= 1 &&
+      month <= 12 &&
+      day >= 1 &&
+      day <= 31
+    ) {
+      return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    }
+  }
+  const shortDateMatch = name.match(/(?<!\d)(\d{2})(\d{2})(\d{2})(?!\d)/);
+  if (
+    shortDateMatch &&
+    shortDateMatch[1] &&
+    shortDateMatch[2] &&
+    shortDateMatch[3]
+  ) {
+    const year = parseInt(shortDateMatch[1], 10);
+    const month = parseInt(shortDateMatch[2], 10);
+    const day = parseInt(shortDateMatch[3], 10);
+    if (month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+      return `${2000 + year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    }
+  }
+  return null;
+}
+
+function isSolution(name: string): boolean {
+  const n = name.toLowerCase();
+  const keywords = [
+    "lösningsförslag",
+    "facit",
+    "solution",
+    "losning",
+    "sol",
+    "lsn",
+    "lösning",
+    "tenlsg",
+    "lf",
+    "svar",
+  ];
+  if (n.includes("tenta_och_svar")) return false;
+  return keywords.some((k) => n.includes(k));
+}
+
+async function handleUpload() {
+  if (!files.value.length || !kurskod.value) return;
+  loading.value = true;
+  errorMessage.value = "";
+  let successCount = 0;
+
+  for (const file of files.value) {
+    try {
+      const examDate = parseDateFromFilename(file.name);
+      if (!examDate)
+        throw new Error(`Kunde inte hitta ett datum i filnamnet: ${file.name}`);
+
+      const fileType = isSolution(file.name) ? "SOLUTION" : "EXAM";
+      const normalizedFilename = `${kurskod.value.toUpperCase().trim()}_${examDate}_${fileType}.pdf`;
+
+      await $fetch("/api/upload", {
+        method: "POST",
+        body: {
+          courseCode: kurskod.value.toUpperCase().trim(),
+          originalFilename: file.name,
+          normalizedFilename,
+          examDate,
+          fileType,
+        },
+      });
+      successCount++;
+    } catch (error) {
+      errorMessage.value = error instanceof Error ? error.message : "Okänt fel";
+      break;
+    }
+  }
+
+  loading.value = false;
+  uploadStatus.value =
+    successCount > 0 && successCount === files.value.length
+      ? "success"
+      : "error";
+  if (successCount > 0) {
+    files.value = [];
+    kurskod.value = "";
+  }
+}
+
+const typed = ref("");
+const exIndex = ref(Math.floor(Math.random() * courseCodes.length));
+const charIndex = ref(0);
+const deleting = ref(false);
+let typingTimer: ReturnType<typeof setTimeout> | null = null;
+const shuffledExamples = [...courseCodes].sort(() => Math.random() - 0.5);
+
+function runTyping() {
+  if (kurskod.value) return;
+  const current =
+    shuffledExamples[exIndex.value % shuffledExamples.length] ?? "";
+  const doneTyping = charIndex.value === current.length && !deleting.value;
+  const doneDeleting = charIndex.value === 0 && deleting.value;
+  const speed = deleting.value ? 30 : 55;
+  const pause = doneTyping ? 1200 : doneDeleting ? 500 : 0;
+  typingTimer = setTimeout(() => {
+    if (doneTyping) {
+      deleting.value = true;
+    } else if (doneDeleting) {
+      deleting.value = false;
+      exIndex.value = (exIndex.value + 1) % shuffledExamples.length;
+    } else {
+      charIndex.value += deleting.value ? -1 : 1;
+      typed.value = current.slice(0, charIndex.value);
+    }
+    runTyping();
+  }, pause || speed);
+}
+
+watch(kurskod, (val) => {
+  if (val && typingTimer) {
+    clearTimeout(typingTimer);
+    typingTimer = null;
+  } else if (!val && !typingTimer) runTyping();
+});
+
+onMounted(runTyping);
+onUnmounted(() => {
+  if (typingTimer) clearTimeout(typingTimer);
+});
+</script>
+
+<template>
+  <div class="w-full max-w-2xl">
+    <h1 class="text-3xl font-semibold text-foreground mb-2">Ladda upp tenta</h1>
+    <p class="text-sm font-normal text-muted-foreground mb-8">
+      Hjälp andra studenter genom att ladda upp gamla tentor och facit.
+    </p>
+
+    <div class="space-y-6">
+      <div class="space-y-2">
+        <label class="text-sm font-normal text-muted-foreground">Kurskod</label>
+        <input
+          :value="kurskod"
+          :placeholder="kurskod ? '' : typed"
+          :disabled="loading"
+          class="w-full bg-transparent font-normal outline-none border-0 border-b-2 border-foreground/20 text-center text-4xl focus:ring-0 focus:border-primary transition-colors p-2 placeholder:text-muted-foreground/40"
+          @input="
+            kurskod = ($event.target as HTMLInputElement).value.toUpperCase()
+          "
+        />
+      </div>
+
+      <div
+        ref="dropZoneRef"
+        class="relative border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all"
+        :class="
+          isOverDropZone
+            ? 'border-primary bg-primary/5 scale-105'
+            : 'border-muted hover:border-primary/50'
+        "
+        :style="loading ? 'opacity: 0.5; pointer-events: none' : ''"
+        @click="($refs.fileInput as HTMLInputElement).click()"
+      >
+        <input
+          ref="fileInput"
+          type="file"
+          accept="application/pdf"
+          multiple
+          class="hidden"
+          @change="handleFileInput"
+        />
+        <div
+          class="flex flex-col items-center justify-center gap-2 text-muted-foreground"
+        >
+          <LucideUpload class="h-8 w-8" />
+          <p class="font-normal">
+            Dra och släpp PDF-filer här, eller klicka för att välja
+          </p>
+        </div>
+      </div>
+
+      <div v-if="files.length > 0" class="space-y-3">
+        <div class="space-y-2 rounded-md border p-2">
+          <div
+            v-for="(file, index) in files"
+            :key="index"
+            class="flex items-center justify-between text-sm p-2 bg-muted/50 rounded"
+          >
+            <div class="flex items-center gap-2 overflow-hidden">
+              <LucideFileText class="h-4 w-4 shrink-0 text-muted-foreground" />
+              <span class="truncate">{{ file.name }}</span>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              class="h-6 w-6"
+              @click="removeFile(index)"
+            >
+              <LucideX class="h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+        <Button
+          class="w-full"
+          size="lg"
+          :disabled="!kurskod || loading"
+          @click="handleUpload"
+        >
+          <LucideLoader2 v-if="loading" class="h-5 w-5 animate-spin" />
+          <span v-else>Ladda upp</span>
+        </Button>
+      </div>
+
+      <div
+        class="p-4 bg-muted/50 border rounded-lg flex items-start gap-2 text-left"
+      >
+        <LucideInfo class="h-4 w-4 text-muted-foreground shrink-0" />
+        <p class="text-xs text-muted-foreground">
+          Uppladdade tentor granskas innan de blir tillgängliga för andra
+          studenter.
+        </p>
+      </div>
+    </div>
+
+    <AlertDialog :open="uploadStatus !== null">
+      <AlertDialogContent>
+        <AlertDialogHeader class="text-center">
+          <div class="flex justify-center mb-2">
+            <LucideCheckCircle
+              v-if="uploadStatus === 'success'"
+              class="h-12 w-12 text-green-500"
+            />
+            <LucideAlertCircle v-else class="h-12 w-12 text-red-500" />
+          </div>
+          <AlertDialogTitle class="text-xl">
+            {{
+              uploadStatus === "success"
+                ? "Uppladdning lyckades!"
+                : "Något gick fel"
+            }}
+          </AlertDialogTitle>
+          <AlertDialogDescription>
+            {{
+              uploadStatus === "success"
+                ? "Tack! Din tenta har laddats upp och granskas inom kort."
+                : errorMessage || "Ett fel uppstod vid uppladdningen."
+            }}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogAction class="w-full" @click="uploadStatus = null">
+            OK
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  </div>
+</template>
