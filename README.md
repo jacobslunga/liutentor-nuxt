@@ -1,75 +1,40 @@
-# Nuxt Minimal Starter
+<div align="center">
+  <img src="public/images/logo-light.svg" alt="LiU Tentor Logo" width="80" height="80">
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+# LiU Tentor
 
-## Setup
+Browse and study past exams from Linköping University.
 
-Make sure to install dependencies:
+</div>
+
+---
+
+## Stack
+
+- **Nuxt 4** + TypeScript
+- **Tailwind CSS** + shadcn-vue
+- **EmbedPDF** for PDF rendering
+- **Supabase** for storage and database
+- **Go API** — [jacobslunga/liutentor-go-api](https://github.com/jacobslunga/liutentor-go-api)
+
+## Getting started
 
 ```bash
-# npm
 npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
-```
-
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
 npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
 ```
 
-## Production
+Add a `.env` file: <br />
+`NUXT_PUBLIC_SUPABASE_URL`=<SUPABASE_URL> <br />
+`NUXT_PUBLIC_SUPABASE_KEY`=<SUPABASE_ANON_KEY>
 
-Build the application for production:
+## Contributing
 
-```bash
-# npm
-npm run build
+Branch naming: `feature/`, `fix/`, `chore/`, `docs/`
 
-# pnpm
-pnpm build
+Keep commits short and descriptive — `feat(search): add course autocomplete`.
+Open a PR against `main`, describe what changed and why, add screenshots for UI changes.
 
-# yarn
-yarn build
+## Contact
 
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+Questions? Open an issue or email [liutentor@gmail.com](mailto:liutentor@gmail.com)
