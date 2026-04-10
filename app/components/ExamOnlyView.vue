@@ -120,7 +120,7 @@ onUnmounted(() => {
       leave-to-class="translate-x-full opacity-0 blur-sm"
     >
       <div
-        v-if="hasFacit && isFacitVisible && !chatStore.isOpen"
+        v-show="hasFacit && isFacitVisible && !chatStore.isOpen"
         ref="panelRef"
         class="fixed right-0 top-0 h-full bg-background border-l shadow-2xl z-60 flex"
         :style="{ width: `${panelWidth}px` }"
@@ -145,7 +145,7 @@ onUnmounted(() => {
       leave-to-class="translate-x-full opacity-0 blur-sm"
     >
       <div
-        v-if="chatStore.isOpen"
+        v-show="chatStore.isOpen"
         class="fixed right-0 top-0 h-full bg-background border-l shadow-2xl z-60 flex"
         :style="{ width: `${panelWidth}px` }"
       >
