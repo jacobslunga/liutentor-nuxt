@@ -14,6 +14,10 @@ export default defineNuxtConfig({
   nitro: {
     preset: "netlify",
   },
+  colorMode: {
+    classSuffix: "",
+    storageKey: "color-mode",
+  },
   imports: {
     autoImport: true,
   },

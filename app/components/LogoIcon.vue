@@ -23,13 +23,16 @@ const src = computed(() => {
 </script>
 
 <template>
-  <img
-    :src="src"
-    alt="Logo"
-    :class="className"
-    :style="{
-      width: width ? width + 'px' : undefined,
-      height: height ? height + 'px' : undefined,
-    }"
-  />
+  <ClientOnly>
+    <img
+      :key="src"
+      :src="src"
+      alt="Logo"
+      :class="className"
+      :style="{
+        width: width ? width + 'px' : undefined,
+        height: height ? height + 'px' : undefined,
+      }"
+    />
+  </ClientOnly>
 </template>

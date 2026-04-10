@@ -1,9 +1,23 @@
 <script setup lang="ts">
 const props = defineProps<{
-  statistics: Record<string, number>;
+  statistics: Record<string, number> | null;
   date: string;
   passRate: number;
 }>();
+
+const total = computed(() =>
+  Object.values(props.statistics ?? {}).reduce((a, b) => a + b, 0),
+);
+
+const chartData = computed(() =>
+  gradeOrder
+    .filter((g) => ((props.statistics ?? {})[g] ?? 0) > 0)
+    .map((grade) => ({
+      grade,
+      count: (props.statistics ?? {})[grade] ?? 0,
+      color: gradeColors[grade] ?? "var(--chart-3)",
+    })),
+);
 
 const gradeOrder = ["3", "4", "5", "G", "VG", "U"];
 
@@ -15,20 +29,6 @@ const gradeColors: Record<string, string> = {
   "VG": "var(--chart-1)",
   "U": "var(--chart-1)",
 };
-
-const total = computed(() =>
-  Object.values(props.statistics).reduce((a, b) => a + b, 0),
-);
-
-const chartData = computed(() =>
-  gradeOrder
-    .filter((g) => (props.statistics[g] ?? 0) > 0)
-    .map((grade) => ({
-      grade,
-      count: props.statistics[grade] ?? 0,
-      color: gradeColors[grade] ?? "var(--chart-3)",
-    })),
-);
 
 const maxCount = computed(() =>
   Math.max(...chartData.value.map((d) => d.count)),

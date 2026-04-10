@@ -236,12 +236,6 @@ function passColor(rate: number) {
                 Statistik
               </Button>
             </NuxtLink>
-            <NuxtLink :to="`/quiz/${courseCode}`">
-              <Button variant="outline" size="sm">
-                <LucideLightbulb class="w-4.5 h-4.5 text-yellow-500" />
-                Quiz
-              </Button>
-            </NuxtLink>
           </div>
         </div>
       </div>
