@@ -34,37 +34,56 @@ const { engine, isLoading } = usePdfiumEngine();
 
 const isDark = computed(() => colorMode.value === "dark");
 
-const isMobile = ref(false);
-const windowWidth = ref(1200);
-
 const selectionColor = computed(() =>
   isDark.value
     ? "oklch(0.8332 0.088 144.73 / 0.35)"
     : "oklch(0.6193 0.1154 172.06 / 0.28)",
 );
 
-const plugins = computed(() => [
-  createPluginRegistration(DocumentManagerPluginPackage, {
-    initialDocuments: [{ url: props.pdfUrl }],
-  }),
-  createPluginRegistration(ViewportPluginPackage),
-  createPluginRegistration(ScrollPluginPackage),
-  createPluginRegistration(RenderPluginPackage),
-  createPluginRegistration(RotatePluginPackage),
-  createPluginRegistration(ZoomPluginPackage, {
-    defaultZoomLevel:
-      props.layoutMode === "exam-with-facit"
-        ? ZoomMode.FitWidth
-        : windowWidth.value < 1100
+const isMobile = ref(false);
+const windowWidth = ref(1200);
+
+onMounted(() => {
+  isMobile.value = window.innerWidth < 1024;
+  windowWidth.value = window.innerWidth;
+  window.addEventListener("resize", () => {
+    isMobile.value = window.innerWidth < 1024;
+    windowWidth.value = window.innerWidth;
+  });
+});
+
+const plugins = computed(() => {
+  const base = [
+    createPluginRegistration(DocumentManagerPluginPackage, {
+      initialDocuments: [{ url: props.pdfUrl }],
+    }),
+    createPluginRegistration(ViewportPluginPackage),
+    createPluginRegistration(ScrollPluginPackage),
+    createPluginRegistration(RenderPluginPackage),
+    createPluginRegistration(RotatePluginPackage),
+    createPluginRegistration(ZoomPluginPackage, {
+      defaultZoomLevel:
+        props.layoutMode === "exam-with-facit"
           ? ZoomMode.FitWidth
-          : ZoomMode.Automatic,
-  }),
-  createPluginRegistration(InteractionManagerPluginPackage),
-  createPluginRegistration(SelectionPluginPackage, {
-    toleranceFactor: 2.0,
-    minSelectionDragDistance: 5,
-  }),
-]);
+          : windowWidth.value < 1100
+            ? ZoomMode.FitWidth
+            : ZoomMode.Automatic,
+    }),
+  ];
+
+  if (isMobile.value) {
+    return base;
+  }
+
+  return [
+    ...base,
+    createPluginRegistration(InteractionManagerPluginPackage),
+    createPluginRegistration(SelectionPluginPackage, {
+      toleranceFactor: 2.0,
+      minSelectionDragDistance: 5,
+    }),
+  ];
+});
 </script>
 
 <template>
@@ -89,51 +108,62 @@ const plugins = computed(() => [
                   class="h-5 w-5 animate-spin text-muted-foreground"
                 />
               </div>
-              <PdfInner v-else>
-                <Viewport
-                  :document-id="activeDocumentId"
-                  class="h-full w-full bg-background"
-                >
-                  <ZoomGestureWrapper
-                    :document-id="activeDocumentId"
-                    :enable-pinch="isMobile"
-                    :enable-wheel="!isMobile"
-                  >
-                    <Scroller :document-id="activeDocumentId">
-                      <template #default="{ page }">
-                        <div
-                          :style="{
-                            width: `${page.width}px`,
-                            height: `${page.height}px`,
-                          }"
-                          class="relative mx-auto my-4 pdf-page-shell"
+
+              <Viewport
+                v-else
+                :document-id="activeDocumentId"
+                class="h-full w-full bg-background"
+              >
+                <template v-if="isMobile">
+                  <Scroller :document-id="activeDocumentId">
+                    <template #default="{ page }">
+                      <div
+                        :style="{
+                          width: `${page.width}px`,
+                          height: `${page.height}px`,
+                        }"
+                        class="relative mx-auto my-4 pdf-page-shell"
+                      >
+                        <Rotate
+                          :document-id="activeDocumentId"
+                          :page-index="page.pageIndex"
+                          class="relative h-full w-full"
                         >
-                          <template v-if="isMobile">
-                            <Rotate
+                          <div
+                            class="absolute inset-0 z-0 pdf-render-surface"
+                            :style="
+                              isDark
+                                ? { filter: 'invert(92%) hue-rotate(180deg)' }
+                                : {}
+                            "
+                          >
+                            <RenderLayer
                               :document-id="activeDocumentId"
                               :page-index="page.pageIndex"
-                              class="relative h-full w-full"
-                            >
-                              <div
-                                class="absolute inset-0 z-0 pdf-render-surface"
-                                :style="
-                                  isDark
-                                    ? {
-                                        filter:
-                                          'invert(92%) hue-rotate(180deg)',
-                                      }
-                                    : {}
-                                "
-                              >
-                                <RenderLayer
-                                  :document-id="activeDocumentId"
-                                  :page-index="page.pageIndex"
-                                />
-                              </div>
-                            </Rotate>
-                          </template>
+                            />
+                          </div>
+                        </Rotate>
+                      </div>
+                    </template>
+                  </Scroller>
+                </template>
 
-                          <template v-else>
+                <template v-else>
+                  <PdfInner>
+                    <ZoomGestureWrapper
+                      :document-id="activeDocumentId"
+                      :enable-pinch="false"
+                      :enable-wheel="true"
+                    >
+                      <Scroller :document-id="activeDocumentId">
+                        <template #default="{ page }">
+                          <div
+                            :style="{
+                              width: `${page.width}px`,
+                              height: `${page.height}px`,
+                            }"
+                            class="relative mx-auto my-4 pdf-page-shell"
+                          >
                             <PagePointerProvider
                               :document-id="activeDocumentId"
                               :page-index="page.pageIndex"
@@ -170,13 +200,13 @@ const plugins = computed(() => [
                                 </div>
                               </Rotate>
                             </PagePointerProvider>
-                          </template>
-                        </div>
-                      </template>
-                    </Scroller>
-                  </ZoomGestureWrapper>
-                </Viewport>
-              </PdfInner>
+                          </div>
+                        </template>
+                      </Scroller>
+                    </ZoomGestureWrapper>
+                  </PdfInner>
+                </template>
+              </Viewport>
             </template>
           </DocumentContent>
         </template>

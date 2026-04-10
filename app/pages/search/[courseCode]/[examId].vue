@@ -47,9 +47,22 @@ watch(
   },
 );
 
+const isMobile = ref(false);
 const solutionBlurred = ref(true);
 const splitPercent = ref(55);
 const isResizing = ref(false);
+
+onMounted(() => {
+  isMobile.value = window.innerWidth < 1024;
+  window.addEventListener("resize", () => {
+    isMobile.value = window.innerWidth < 1024;
+  });
+  document.addEventListener("keyup", handleKeyUp);
+});
+
+onUnmounted(() => {
+  document.removeEventListener("keyup", handleKeyUp);
+});
 
 function startResize() {
   isResizing.value = true;
@@ -70,19 +83,10 @@ function handleKeyUp(e: KeyboardEvent) {
   if (e.key === "c" && !chatStore.isOpen) {
     chatStore.open();
   }
-
   if (e.key === "e") {
     solutionBlurred.value = !solutionBlurred.value;
   }
 }
-
-onMounted(() => {
-  document.addEventListener("keyup", handleKeyUp);
-});
-
-onUnmounted(() => {
-  document.removeEventListener("keyup", handleKeyUp);
-});
 </script>
 
 <template>
@@ -116,8 +120,19 @@ onUnmounted(() => {
       </div>
 
       <template v-else-if="exam">
+        <!-- Mobile -->
+        <MobilePdfView
+          v-if="isMobile"
+          :exam-pdf-url="exam.pdf_url"
+          :solution-pdf-url="solutionPdfUrl"
+          :course-code="courseCode"
+          :exam-date="exam.exam_date"
+        />
+
+        <!-- Desktop -->
         <div
-          class="flex-1 hidden lg:flex flex-row overflow-hidden"
+          v-else
+          class="flex-1 flex flex-row overflow-hidden"
           :class="{ 'select-none': isResizing }"
         >
           <ExamOnlyView
@@ -237,15 +252,6 @@ onUnmounted(() => {
             </div>
           </template>
         </div>
-
-        <!-- Mobile -->
-        <MobilePdfView
-          v-if="exam"
-          :exam-pdf-url="exam.pdf_url"
-          :solution-pdf-url="solutionPdfUrl"
-          :course-code="courseCode"
-          :exam-date="exam.exam_date"
-        />
       </template>
 
       <LayoutSwitcher />

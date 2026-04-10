@@ -18,7 +18,7 @@ watch(
 </script>
 
 <template>
-  <div class="flex lg:hidden flex-col h-screen w-full bg-background relative">
+  <div class="flex flex-col h-screen w-full bg-background relative">
     <div
       class="absolute inset-x-0 top-0 z-40 flex items-center gap-3 px-3 h-12 bg-linear-to-b from-background to-transparent"
     >
@@ -29,7 +29,6 @@ watch(
       >
         <LucideArrowLeft class="w-4 h-4" />
       </NuxtLink>
-
       <div class="min-w-0 flex-1">
         <p class="text-sm font-bold text-foreground truncate leading-tight">
           {{ courseCode }}
@@ -38,7 +37,6 @@ watch(
           {{ examDate }}
         </p>
       </div>
-
       <button
         v-if="hasSolution"
         class="shrink-0 cursor-pointer inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-border bg-background text-foreground text-xs active:scale-95 transition-transform"
@@ -64,7 +62,7 @@ watch(
       leave-to-class="opacity-0 translate-y-4 scale-[0.99]"
     >
       <section
-        v-if="showSolution"
+        v-show="showSolution"
         class="fixed inset-0 z-50 h-screen w-screen bg-background flex flex-col overflow-hidden"
         role="dialog"
         aria-modal="true"
@@ -90,7 +88,6 @@ watch(
             <LucideX class="w-4 h-4" />
           </button>
         </div>
-
         <div class="h-full w-full overflow-hidden pt-12">
           <ClientOnly>
             <PdfRenderer v-if="solutionPdfUrl" :pdf-url="solutionPdfUrl" />
