@@ -41,7 +41,7 @@ watch(
 
       <button
         v-if="hasSolution"
-        class="shrink-0 inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-border bg-background text-foreground text-xs active:scale-95 transition-transform"
+        class="shrink-0 cursor-pointer inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-border bg-background text-foreground text-xs active:scale-95 transition-transform"
         @click="showSolution = true"
       >
         <LucideBookOpen class="w-3.5 h-3.5 text-primary" />
@@ -49,7 +49,7 @@ watch(
       </button>
     </div>
 
-    <div class="w-full h-full overflow-auto pt-12">
+    <div class="w-full h-full overflow-hidden pt-12">
       <ClientOnly>
         <PdfRenderer :pdf-url="examPdfUrl" />
       </ClientOnly>
@@ -83,7 +83,7 @@ watch(
             </p>
           </div>
           <button
-            class="shrink-0 inline-flex items-center justify-center h-8 w-8 rounded-lg border border-border bg-background text-foreground active:scale-95 transition-transform"
+            class="shrink-0 cursor-pointer inline-flex items-center justify-center h-8 w-8 rounded-lg border border-border bg-background text-foreground active:scale-95 transition-transform"
             aria-label="Stäng"
             @click="showSolution = false"
           >
@@ -91,7 +91,7 @@ watch(
           </button>
         </div>
 
-        <div class="h-full w-full overflow-auto pt-12">
+        <div class="h-full w-full overflow-hidden pt-12">
           <ClientOnly>
             <PdfRenderer v-if="solutionPdfUrl" :pdf-url="solutionPdfUrl" />
           </ClientOnly>
