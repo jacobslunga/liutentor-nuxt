@@ -111,37 +111,38 @@ onUnmounted(() => {
   </div>
 
   <Teleport to="body">
-    <div
-      v-if="hasFacit"
-      ref="panelRef"
-      class="fixed right-0 top-0 h-full bg-background border-l shadow-2xl z-60 flex transition-transform duration-75 ease-in-out"
-      :class="
-        isFacitVisible && !chatStore.isOpen
-          ? 'translate-x-0 pointer-events-auto'
-          : 'translate-x-full pointer-events-none'
-      "
-      :style="{ width: `${panelWidth}px` }"
+    <Transition
+      enter-active-class="transition-all duration-200 ease-[cubic-bezier(0.32,0.72,0,1)]"
+      enter-from-class="translate-x-full opacity-0 blur-sm"
+      enter-to-class="translate-x-0 opacity-100 blur-0"
+      leave-active-class="transition-all duration-200 ease-[cubic-bezier(0.32,0.72,0,1)]"
+      leave-from-class="translate-x-0 opacity-100 blur-0"
+      leave-to-class="translate-x-full opacity-0 blur-sm"
     >
       <div
-        v-if="isFacitVisible && !chatStore.isOpen"
-        class="relative w-0 shrink-0"
+        v-if="hasFacit && isFacitVisible && !chatStore.isOpen"
+        ref="panelRef"
+        class="fixed right-0 top-0 h-full bg-background border-l shadow-2xl z-60 flex"
+        :style="{ width: `${panelWidth}px` }"
       >
-        <ResizeHandle :is-resizing="isDragging" @start-resize="startResize" />
+        <div class="relative w-0 shrink-0">
+          <ResizeHandle :is-resizing="isDragging" @start-resize="startResize" />
+        </div>
+        <div class="flex-1 overflow-hidden">
+          <ClientOnly>
+            <PdfRenderer :pdf-url="solutionPdfUrl!" layout-mode="exam-only" />
+          </ClientOnly>
+        </div>
       </div>
-      <div class="flex-1 overflow-hidden">
-        <ClientOnly>
-          <PdfRenderer :pdf-url="solutionPdfUrl!" layout-mode="exam-only" />
-        </ClientOnly>
-      </div>
-    </div>
+    </Transition>
 
     <Transition
-      enter-active-class="transition-transform duration-75 ease-out"
-      enter-from-class="translate-x-full"
-      enter-to-class="translate-x-0"
-      leave-active-class="transition-transform duration-75 ease-in"
-      leave-from-class="translate-x-0"
-      leave-to-class="translate-x-full"
+      enter-active-class="transition-all duration-200 ease-[cubic-bezier(0.32,0.72,0,1)]"
+      enter-from-class="translate-x-full opacity-0 blur-sm"
+      enter-to-class="translate-x-0 opacity-100 blur-0"
+      leave-active-class="transition-all duration-200 ease-[cubic-bezier(0.32,0.72,0,1)]"
+      leave-from-class="translate-x-0 opacity-100 blur-0"
+      leave-to-class="translate-x-full opacity-0 blur-sm"
     >
       <div
         v-if="chatStore.isOpen"
