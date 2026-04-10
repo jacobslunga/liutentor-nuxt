@@ -3,17 +3,25 @@ definePageMeta({ layout: false });
 
 const route = useRoute();
 const { layoutMode } = useLayoutMode();
-const courseCode = route.params.courseCode as string;
-const examId = route.params.examId as string;
+const chatStore = useChatStore();
 
-const { data: examData, status } = useFetch(`/api/exams/detail/${examId}`);
+const examId = computed(() => route.params.examId as string);
+const courseCode = computed(() => route.params.courseCode as string);
 
-const { data: courseData } = useFetch(`/api/exams/${courseCode}`);
+const { data: examData, status } = useFetch(
+  () => `/api/exams/detail/${examId.value}`,
+);
+const { data: courseData } = useFetch(() => `/api/exams/${courseCode.value}`);
+
 const exams = computed(() => (courseData.value as any)?.data?.exams ?? []);
-
 const exam = computed(() => (examData.value as any)?.data?.exam);
 const solution = computed(() => (examData.value as any)?.data?.solution);
 const solutionPdfUrl = computed(() => solution.value?.pdf_url ?? null);
+
+const isLoading = computed(() => status.value === "pending");
+const isError = computed(
+  () => status.value === "error" || (!isLoading.value && !exam.value),
+);
 
 watchEffect(() => {
   if (!exam.value) return;
@@ -24,32 +32,57 @@ watchEffect(() => {
   });
 });
 
-const solutionBlurred = ref(true);
-const isLoading = computed(() => status.value === "pending");
-const isError = computed(
-  () => status.value === "error" || (!isLoading.value && !exam.value),
+onBeforeRouteUpdate((to, from) => {
+  if (to.params.examId !== from.params.examId) {
+    chatStore.close();
+    chatStore.clearChat();
+  }
+});
+
+watch(
+  () => route.params.examId,
+  () => {
+    chatStore.close();
+    chatStore.clearChat();
+  },
 );
 
+const solutionBlurred = ref(true);
 const splitPercent = ref(55);
 const isResizing = ref(false);
 
 function startResize() {
   isResizing.value = true;
-
   function onMouseMove(e: MouseEvent) {
     const percent = (e.clientX / window.innerWidth) * 100;
     splitPercent.value = Math.min(Math.max(percent, 20), 80);
   }
-
   function onMouseUp() {
     isResizing.value = false;
     window.removeEventListener("mousemove", onMouseMove);
     window.removeEventListener("mouseup", onMouseUp);
   }
-
   window.addEventListener("mousemove", onMouseMove);
   window.addEventListener("mouseup", onMouseUp);
 }
+
+function handleKeyUp(e: KeyboardEvent) {
+  if (e.key === "c" && !chatStore.isOpen) {
+    chatStore.open();
+  }
+
+  if (e.key === "e") {
+    solutionBlurred.value = !solutionBlurred.value;
+  }
+}
+
+onMounted(() => {
+  document.addEventListener("keyup", handleKeyUp);
+});
+
+onUnmounted(() => {
+  document.removeEventListener("keyup", handleKeyUp);
+});
 </script>
 
 <template>
@@ -60,6 +93,7 @@ function startResize() {
     :course-code="courseCode"
     :solution-pdf-url="solutionPdfUrl"
   />
+
   <div class="flex h-screen flex-col w-full overflow-hidden">
     <div
       v-if="isLoading"
@@ -92,8 +126,10 @@ function startResize() {
         />
 
         <template v-else>
-          <!-- Exam panel -->
-          <div class="h-full" :style="{ width: `${splitPercent}%` }">
+          <div
+            class="h-full overflow-hidden"
+            :style="{ width: `${splitPercent}%` }"
+          >
             <ClientOnly>
               <PdfRenderer
                 :pdf-url="exam.pdf_url"
@@ -102,7 +138,6 @@ function startResize() {
             </ClientOnly>
           </div>
 
-          <!-- Resize handle -->
           <div class="relative w-0 shrink-0">
             <ResizeHandle
               :is-resizing="isResizing"
@@ -110,77 +145,103 @@ function startResize() {
             />
           </div>
 
-          <!-- Solution panel -->
-          <div class="h-full flex-1 relative overflow-hidden">
-            <template v-if="solution">
+          <div
+            class="relative h-full flex-1 min-w-0 overflow-hidden bg-background"
+          >
+            <Transition name="panel-swap">
               <div
-                class="h-full"
-                @mouseenter="solutionBlurred = false"
-                @mouseleave="solutionBlurred = true"
+                v-show="!chatStore.isOpen"
+                class="absolute inset-0 z-0 h-full w-full flex flex-col"
               >
-                <ClientOnly>
-                  <PdfRenderer
-                    :pdf-url="solution.pdf_url"
-                    layout-mode="exam-with-facit"
-                  />
-                </ClientOnly>
-                <Transition name="fade">
+                <template v-if="solution">
                   <div
-                    v-if="solutionBlurred"
-                    class="absolute inset-0 backdrop-blur-md bg-background/30 flex items-center justify-center pointer-events-none"
+                    class="h-full relative"
+                    @mouseenter="solutionBlurred = false"
+                    @mouseleave="solutionBlurred = true"
                   >
-                    <p class="text-sm font-medium text-muted-foreground">
-                      Håll muspekaren för att visa facit
-                    </p>
-                  </div>
-                </Transition>
-              </div>
-            </template>
-
-            <div v-else class="flex h-full items-center justify-center p-6">
-              <div class="group relative w-full max-w-sm">
-                <div
-                  class="rounded-2xl border-2 border-dashed border-border/60 px-8 py-10 transition-colors group-hover:border-primary/30"
-                >
-                  <div class="flex flex-col items-center text-center gap-4">
-                    <div
-                      class="flex size-12 items-center justify-center rounded-2xl bg-muted/60 group-hover:bg-primary/10 transition-colors"
-                    >
-                      <LucideUpload
-                        class="size-6 text-muted-foreground group-hover:text-primary transition-colors"
+                    <ClientOnly>
+                      <PdfRenderer
+                        :pdf-url="solution.pdf_url"
+                        layout-mode="exam-with-facit"
                       />
-                    </div>
-                    <div>
-                      <p class="font-medium text-foreground/80">
-                        Inget facit tillgängligt
-                      </p>
-                      <p
-                        class="mt-1 text-xs text-muted-foreground/70 max-w-55 leading-relaxed"
+                    </ClientOnly>
+                    <Transition name="fade">
+                      <div
+                        v-if="solutionBlurred"
+                        class="absolute inset-0 backdrop-blur-md bg-background/30 flex items-center justify-center pointer-events-none"
                       >
-                        Hjälp andra studenter genom att ladda upp facit till
-                        denna tenta.
-                      </p>
+                        <p class="text-sm text-muted-foreground">
+                          Håll muspekaren för att visa facit
+                        </p>
+                      </div>
+                    </Transition>
+                  </div>
+                </template>
+
+                <div v-else class="flex h-full items-center justify-center p-6">
+                  <div class="group relative w-full max-w-sm">
+                    <div
+                      class="rounded-2xl border-2 border-dashed border-border/60 px-8 py-10 transition-colors group-hover:border-primary/30"
+                    >
+                      <div class="flex flex-col items-center text-center gap-4">
+                        <div
+                          class="flex size-12 items-center justify-center rounded-2xl bg-muted/60 group-hover:bg-primary/10 transition-colors"
+                        >
+                          <LucideUpload
+                            class="size-6 text-muted-foreground group-hover:text-primary transition-colors"
+                          />
+                        </div>
+                        <div>
+                          <p class="font-medium text-foreground/80">
+                            Inget facit tillgängligt
+                          </p>
+                          <p
+                            class="mt-1 text-xs text-muted-foreground/70 max-w-55 leading-relaxed"
+                          >
+                            Hjälp andra studenter genom att ladda upp facit till
+                            denna tenta.
+                          </p>
+                        </div>
+                        <NuxtLink to="/upload-exams">
+                          <Button size="sm" variant="outline">
+                            <LucideUpload class="size-3.5" />
+                            Ladda upp
+                          </Button>
+                        </NuxtLink>
+                      </div>
                     </div>
-                    <NuxtLink to="/upload-exams">
-                      <Button size="sm" variant="outline">
-                        <LucideUpload class="size-3.5" />
-                        Ladda upp
-                      </Button>
-                    </NuxtLink>
                   </div>
                 </div>
               </div>
-            </div>
+            </Transition>
+
+            <Transition name="panel-swap">
+              <ChatWindow
+                v-if="chatStore.isOpen"
+                key="chat"
+                :exam-id="examId"
+                :exam-url="exam.pdf_url"
+                :course-code="courseCode"
+                :solution-url="solutionPdfUrl"
+                :has-solution="!!solution"
+                class="absolute inset-0 z-10 h-full w-full bg-background"
+                @close="chatStore.close()"
+              />
+            </Transition>
           </div>
         </template>
       </div>
 
-      <div class="flex lg:hidden flex-col h-screen">
-        <ClientOnly>
-          <PdfRenderer :pdf-url="exam.pdf_url" />
-        </ClientOnly>
-      </div>
+      <!-- Mobile -->
+      <MobilePdfView
+        v-if="exam"
+        :exam-pdf-url="exam.pdf_url"
+        :solution-pdf-url="solutionPdfUrl"
+        :course-code="courseCode"
+        :exam-date="exam.exam_date"
+      />
     </template>
+
     <LayoutSwitcher />
   </div>
 </template>
@@ -193,5 +254,19 @@ function startResize() {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+.panel-swap-enter-active,
+.panel-swap-leave-active {
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+}
+.panel-swap-enter-from {
+  opacity: 0;
+  transform: translateX(16px);
+}
+.panel-swap-leave-to {
+  opacity: 0;
+  transform: translateX(16px);
 }
 </style>

@@ -72,9 +72,7 @@ function passColor(rate: number) {
               :key="grade"
               class="flex-1 flex flex-col items-center gap-1"
             >
-              <span class="text-[10px] font-mono text-muted-foreground">{{
-                count
-              }}</span>
+              <span class="text-[10px] text-muted-foreground">{{ count }}</span>
               <div
                 class="w-full rounded-t-sm"
                 :style="{
@@ -82,9 +80,7 @@ function passColor(rate: number) {
                   backgroundColor: color,
                 }"
               />
-              <span class="text-[11px] font-mono text-muted-foreground">{{
-                grade
-              }}</span>
+              <span class="text-[11px] text-muted-foreground">{{ grade }}</span>
             </div>
           </div>
         </div>
@@ -102,7 +98,7 @@ function passColor(rate: number) {
               />
               <span class="text-foreground">Betyg {{ grade }}</span>
             </div>
-            <span class="font-mono text-muted-foreground">
+            <span class="text-muted-foreground">
               {{ count }} ({{ ((count / total) * 100).toFixed(1) }}%)
             </span>
           </div>

@@ -25,22 +25,30 @@
     "@embedpdf/plugin-selection": "^2.14.0",
     "@embedpdf/plugin-viewport": "^2.14.0",
     "@embedpdf/plugin-zoom": "^2.14.0",
+    "@nuxt/icon": "^2.2.1",
     "@nuxtjs/color-mode": "^4.0.0",
     "@nuxtjs/google-fonts": "^3.2.0",
     "@nuxtjs/supabase": "^2.0.5",
+    "@pinia/nuxt": "^0.11.3",
     "@supabase/supabase-js": "^2.103.0",
     "@tailwindcss/vite": "^4.2.2",
+    "@vscode/markdown-it-katex": "^1.1.2",
     "@vueuse/core": "^14.2.1",
     "@vueuse/integrations": "^14.2.1",
     "class-variance-authority": "^0.7.1",
+    "dompurify": "^3.3.3",
+    "lucide-vue-next": "^1.0.0",
+    "markdown-it": "^14.1.1",
     "nuxt": "^4.4.2",
     "nuxt-lucide-icons": "^2.1.0",
+    "pinia": "^3.0.4",
     "reka-ui": "^2.9.5",
     "shadcn-nuxt": "^2.5.3",
     "tailwind-merge": "^3.5.0",
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
-    "@tailwindcss/typography": "^0.5.19"
+    "@tailwindcss/typography": "^0.5.19",
+    "@types/markdown-it": "^14.1.2"
   }
 }

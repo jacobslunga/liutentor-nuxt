@@ -1,16 +1,19 @@
 {
-  "name": "",
-  "short_name": "",
+  "name": "LiU Tentor",
+  "short_name": "LiUTentor",
+  "description": "Hitta och plugga gamla tentor från Linkopings Universitet.",
+  "start_url": "/",
+  "scope": "/",
   "icons": [
     {
-      "src": "/android-chrome-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png"
+      "src": "/images/logo-light.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
     },
     {
-      "src": "/android-chrome-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png"
+      "src": "/images/logo-dark.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
     }
   ],
   "theme_color": "#ffffff",

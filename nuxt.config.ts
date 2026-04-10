@@ -3,8 +3,17 @@ import tailwindcss from "@tailwindcss/vite";
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
-  devtools: { enabled: true },
-  modules: ["@nuxtjs/color-mode", "shadcn-nuxt", "nuxt-lucide-icons"],
+  devtools: { enabled: false },
+  modules: [
+    "@nuxtjs/color-mode",
+    "shadcn-nuxt",
+    "nuxt-lucide-icons",
+    "@pinia/nuxt",
+    "@nuxt/icon",
+  ],
+  nitro: {
+    preset: "netlify",
+  },
   imports: {
     autoImport: true,
   },
@@ -12,20 +21,57 @@ export default defineNuxtConfig({
     public: {
       supabaseUrl: "",
       supabaseKey: "",
+      siteUrl: "https://liutentor.se",
     },
   },
   app: {
     head: {
       titleTemplate: "%s | LiU Tentor",
+      htmlAttrs: {
+        lang: "sv",
+      },
+      charset: "utf-8",
+      viewport: "width=device-width, initial-scale=1",
       meta: [
         {
           name: "description",
           content:
             "Hitta och plugga på gamla tentor från Linköpings Universitet",
         },
+        { name: "robots", content: "index, follow" },
+        { name: "format-detection", content: "telephone=no" },
+        { property: "og:site_name", content: "LiU Tentor" },
+        { property: "og:type", content: "website" },
+        {
+          property: "og:title",
+          content: "LiU Tentor - Gamla tentor från Linköpings Universitet",
+        },
+        {
+          property: "og:description",
+          content:
+            "Hitta och plugga på gamla tentor från Linköpings Universitet",
+        },
+        { property: "og:locale", content: "sv_SE" },
+        { name: "twitter:card", content: "summary" },
+        {
+          name: "twitter:title",
+          content: "LiU Tentor - Gamla tentor från Linköpings Universitet",
+        },
+        {
+          name: "twitter:description",
+          content:
+            "Hitta och plugga på gamla tentor från Linköpings Universitet",
+        },
         { name: "theme-color", content: "#ffffff" },
       ],
-      link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }],
+      link: [
+        { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
+        { rel: "manifest", href: "/site.webmanifest" },
+        {
+          rel: "stylesheet",
+          href: "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css",
+        },
+      ],
     },
   },
   shadcn: {
@@ -43,7 +89,26 @@ export default defineNuxtConfig({
   vite: {
     plugins: [tailwindcss()],
     optimizeDeps: {
-      include: ["@vueuse/core", "@vue/devtools-core", "@vue/devtools-kit"],
+      include: [
+        "@vueuse/core",
+        "@vue/devtools-core",
+        "@vue/devtools-kit",
+        "class-variance-authority",
+        "reka-ui",
+        "clsx",
+        "tailwind-merge",
+        "@embedpdf/core",
+        "@embedpdf/core/vue",
+        "@embedpdf/engines/vue",
+        "@embedpdf/plugin-document-manager/vue",
+        "@embedpdf/plugin-viewport/vue",
+        "@embedpdf/plugin-scroll/vue",
+        "@embedpdf/plugin-render/vue",
+        "@embedpdf/plugin-zoom/vue",
+        "@embedpdf/plugin-interaction-manager/vue",
+        "@embedpdf/plugin-selection/vue",
+        "@embedpdf/plugin-rotate/vue",
+      ],
     },
   },
 });

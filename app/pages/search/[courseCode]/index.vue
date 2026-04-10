@@ -21,11 +21,20 @@ const courseData = computed(() => (data.value as any)?.data);
 const exams = computed<Exam[]>(() => courseData.value?.exams ?? []);
 
 watchEffect(() => {
-  if (!courseData.value) return;
-  useSeoMeta({
-    title: `${courseCode} - ${courseData.value.courseName}`,
-    description: `Plugga ${exams.value.length} tentor för ${courseCode} - ${courseData.value.courseName}`,
-  });
+  if (courseData.value) {
+    useSeoMeta({
+      title: `${courseCode} - ${courseData.value.courseName}`,
+      description: `Plugga ${exams.value.length} tentor för ${courseCode} - ${courseData.value.courseName}`,
+    });
+    return;
+  }
+
+  if (status.value === "success") {
+    useSeoMeta({
+      title: `${courseCode} - Inga tentor hittades`,
+      description: `Inga tentor hittades för ${courseCode}. Var den första att ladda upp tentor.`,
+    });
+  }
 });
 
 const sortOrder = ref<"asc" | "desc">("desc");
@@ -57,22 +66,16 @@ function toggleFilter(p: string) {
   activeFilters.value = next;
 }
 
-function passColor(rate: number) {
-  if (rate >= 50) return "text-green-500";
-  if (rate >= 30) return "text-amber-500";
-  return "text-red-500";
-}
-
 function passBarColor(rate: number) {
   if (rate >= 50) return "bg-green-500";
   if (rate >= 30) return "bg-amber-500";
   return "bg-red-500";
 }
 
-function formatStats(stats: Record<string, number>) {
-  return Object.entries(stats)
-    .map(([k, v]) => `${k}:${v}`)
-    .join("  ");
+function passColor(rate: number) {
+  if (rate >= 50) return "text-green-500";
+  if (rate >= 30) return "text-amber-500";
+  return "text-red-500";
 }
 </script>
 
@@ -85,102 +88,130 @@ function formatStats(stats: Record<string, number>) {
       <LucideLoader2 class="w-6 h-6 animate-spin text-muted-foreground" />
     </div>
 
-    <template v-else-if="courseData">
-      <div class="mb-6">
-        <div class="text-xs text-muted-foreground font-mono mb-1">
-          {{ courseCode }} / Tentor
-        </div>
-        <h1 class="text-2xl font-semibold text-foreground">
-          {{ courseData.courseName }}
-        </h1>
-        <p class="text-sm text-muted-foreground mt-1">
-          {{ exams.length }} tentor
+    <div
+      v-else-if="status === 'success' && !courseData"
+      class="flex flex-col items-center justify-center min-h-[60vh] text-center gap-4"
+    >
+      <LucideInbox class="w-10 h-10 text-muted-foreground" />
+      <div>
+        <p class="text-sm font-medium text-foreground">Inga tentor hittades</p>
+        <p class="text-xs text-muted-foreground mt-1">
+          Var den första att ladda upp tentor för {{ courseCode }}!
         </p>
       </div>
+      <NuxtLink to="/upload-exams">
+        <Button variant="default" size="sm">
+          <LucideUpload class="w-4 h-4" />
+          Ladda upp tenta
+        </Button>
+      </NuxtLink>
+    </div>
 
-      <div v-if="prefixes.length > 1" class="flex flex-wrap gap-2 mb-4">
-        <button
-          v-for="p in prefixes"
-          :key="p"
-          class="text-xs cursor-pointer font-mono px-3 py-1 rounded-md border transition-colors"
-          :class="
-            activeFilters.has(p)
-              ? 'bg-foreground text-background border-foreground'
-              : 'border-dashed border-border text-muted-foreground hover:text-foreground'
-          "
-          @click="toggleFilter(p)"
-        >
-          {{ p }}
-        </button>
-      </div>
+    <template v-else-if="courseData">
+      <div class="flex justify-center">
+        <div class="flex flex-col items-start w-full max-w-2xl">
+          <div class="mb-6 w-full">
+            <div class="text-xs text-muted-foreground font-mono mb-1">
+              {{ courseCode }} / Tentor
+            </div>
+            <h1
+              class="text-2xl font-semibold text-foreground whitespace-normal wrap-break-word leading-tight w-full"
+            >
+              {{ courseData.courseName }}
+            </h1>
+            <p class="text-sm text-muted-foreground mt-1">
+              {{ exams.length }} tentor
+            </p>
+          </div>
 
-      <div class="border border-border/50 rounded-xl overflow-hidden">
-        <div
-          class="grid grid-cols-[1fr_80px_72px] px-4 py-2 border-b border-border/30 bg-muted/40"
-        >
           <div
-            class="text-[11px] font-mono uppercase tracking-wider text-muted-foreground/70 flex items-center gap-1 cursor-pointer hover:text-foreground transition-colors"
-            @click="sortOrder = sortOrder === 'desc' ? 'asc' : 'desc'"
+            v-if="prefixes.length > 1"
+            class="flex flex-wrap gap-2 mb-4 w-full"
           >
-            Tentamen
-            <LucideArrowUpDown class="w-3 h-3" />
+            <button
+              v-for="p in prefixes"
+              :key="p"
+              class="text-xs cursor-pointer font-mono px-3 py-1 rounded-md border transition-colors"
+              :class="
+                activeFilters.has(p)
+                  ? 'bg-foreground text-background border-foreground'
+                  : 'border-dashed border-border text-muted-foreground hover:text-foreground'
+              "
+              @click="toggleFilter(p)"
+            >
+              {{ p }}
+            </button>
           </div>
-          <div
-            class="text-[11px] font-mono uppercase tracking-wider text-muted-foreground/70"
-          >
-            Typ
-          </div>
-          <div
-            class="text-[11px] font-mono uppercase tracking-wider text-muted-foreground/70 text-right"
-          >
-            Godkänd
-          </div>
-        </div>
 
-        <div
-          v-for="exam in filteredExams"
-          :key="exam.id"
-          target="_blank"
-          class="grid grid-cols-[1fr_80px_72px] cursor-pointer px-4 py-3 border-b border-border/20 last:border-0 hover:bg-muted/30 transition-colors items-center no-underline"
-          @click="navigateTo(`/search/${courseCode}/${exam.id}`)"
-        >
-          <div>
+          <div class="w-full overflow-x-auto rounded-xl">
             <div
-              class="flex items-center gap-2 text-sm font-medium text-foreground"
+              class="min-w-fit w-full border border-border/50 rounded-xl overflow-hidden"
             >
-              {{ exam.exam_name }}
-              <span
-                v-if="exam.has_solution"
-                class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-green-500/10 text-green-600 dark:text-green-400"
-              >
-                Lösning
-              </span>
-            </div>
-            <div class="text-xs font-mono text-muted-foreground mt-0.5">
-              {{ exam.exam_date }}
-            </div>
-          </div>
-
-          <div>
-            <span
-              class="text-[10px] font-mono px-2 py-0.5 rounded border border-dashed border-border text-muted-foreground"
-            >
-              {{ exam.exam_name.split(" ")[0] }}
-            </span>
-          </div>
-
-          <div class="text-right flex flex-col items-end gap-1">
-            <ExamStatsDialog
-              :statistics="exam.statistics"
-              :date="exam.exam_date"
-              :pass-rate="exam.pass_rate"
-            />
-            <div class="h-1 w-16 bg-border/40 rounded-full overflow-hidden">
               <div
-                class="h-full rounded-full"
-                :class="passBarColor(exam.pass_rate)"
-                :style="{ width: `${exam.pass_rate}%` }"
-              />
+                class="grid grid-cols-[1fr_80px_64px_72px] px-4 py-2 border-b border-border/30 bg-muted/40"
+              >
+                <div
+                  class="text-xs text-muted-foreground flex items-center gap-1 cursor-pointer hover:text-foreground transition-colors"
+                  @click="sortOrder = sortOrder === 'desc' ? 'asc' : 'desc'"
+                >
+                  Tentamen
+                  <LucideArrowDownWideNarrow
+                    v-if="sortOrder === 'asc'"
+                    class="w-3.5 h-3.5"
+                  />
+                  <LucideArrowUpWideNarrow
+                    v-if="sortOrder === 'desc'"
+                    class="w-3.5 h-3.5"
+                  />
+                </div>
+                <div class="text-xs text-muted-foreground">Typ</div>
+                <div class="text-xs text-muted-foreground text-center">
+                  Facit
+                </div>
+                <div class="text-xs text-muted-foreground text-right">
+                  Godkänd
+                </div>
+              </div>
+
+              <div
+                v-for="exam in filteredExams"
+                :key="exam.id"
+                class="grid grid-cols-[1fr_80px_64px_72px] cursor-pointer px-4 py-3 border-b border-border/20 last:border-0 hover:bg-muted/30 transition-colors items-center"
+                @click="navigateTo(`/search/${courseCode}/${exam.id}`)"
+              >
+                <div>
+                  <div class="text-sm font-medium text-foreground">
+                    {{ exam.exam_name }}
+                  </div>
+                  <div class="text-xs font-mono text-muted-foreground mt-0.5">
+                    {{ exam.exam_date }}
+                  </div>
+                </div>
+
+                <div>
+                  <span
+                    class="text-[10px] font-mono px-2 py-0.5 rounded border border-dashed border-border text-muted-foreground"
+                  >
+                    {{ exam.exam_name.split(" ")[0] }}
+                  </span>
+                </div>
+
+                <div class="flex justify-center">
+                  <LucideCircleCheck
+                    v-if="exam.has_solution"
+                    class="w-4 h-4 text-green-600 dark:text-green-400"
+                  />
+                  <LucideCircleX v-else class="w-4 h-4 text-muted-foreground" />
+                </div>
+
+                <div class="text-right flex flex-col items-end gap-1">
+                  <ExamStatsDialog
+                    :statistics="exam.statistics"
+                    :date="exam.exam_date"
+                    :pass-rate="exam.pass_rate"
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -195,19 +226,19 @@ function formatStats(stats: Record<string, number>) {
           >
             <NuxtLink to="/upload-exams">
               <Button variant="default" size="sm">
-                <LucideUpload class="w-3.5 h-3.5" />
+                <LucideUpload class="w-4.5 h-4.5" />
                 Ladda upp
               </Button>
             </NuxtLink>
             <NuxtLink :to="`/search/${courseCode}/stats`">
               <Button variant="outline" size="sm">
-                <LucidePieChart class="w-3.5 h-3.5" />
+                <LucideChartPie class="w-4.5 h-4.5" />
                 Statistik
               </Button>
             </NuxtLink>
             <NuxtLink :to="`/quiz/${courseCode}`">
               <Button variant="outline" size="sm">
-                <LucideLayoutGrid class="w-3.5 h-3.5" />
+                <LucideLightbulb class="w-4.5 h-4.5 text-yellow-500" />
                 Quiz
               </Button>
             </NuxtLink>

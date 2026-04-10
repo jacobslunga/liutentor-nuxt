@@ -29,7 +29,7 @@
 
       <NuxtLink to="/upload-exams">
         <Button variant="outline" size="sm">
-          <LucideUpload />
+          <LucideUpload class="w-4.5 h-4.5" />
           Ladda upp fler tentor
         </Button>
       </NuxtLink>

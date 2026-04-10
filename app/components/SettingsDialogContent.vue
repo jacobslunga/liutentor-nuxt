@@ -28,16 +28,11 @@ watch(textSize, (val) => {
 });
 
 const shortcuts = [
-  { action: "Flytta facit höger", key: "→", category: "navigation" },
-  { action: "Flytta facit vänster", key: "←", category: "navigation" },
   { action: "Visa/dölj facit", key: "E", category: "visibility" },
   { action: "Visa/dölj AI-chat", key: "C", category: "visibility" },
 ];
 
-const categories = [
-  { id: "navigation", label: "Navigering" },
-  { id: "visibility", label: "Synlighet" },
-];
+const categories = [{ id: "visibility", label: "Synlighet" }];
 </script>
 
 <template>
@@ -56,9 +51,9 @@ const categories = [
           "
           @click="theme = opt.id"
         >
-          <LucideSun v-if="opt.id === 'light'" class="w-5 h-5" />
-          <LucideMoon v-else-if="opt.id === 'dark'" class="w-5 h-5" />
-          <LucideMonitor v-else class="w-5 h-5" />
+          <LucideSun v-if="opt.id === 'light'" class="w-4.5 h-4.5" />
+          <LucideMoonStar v-else-if="opt.id === 'dark'" class="w-4.5 h-4.5" />
+          <LucideMonitor v-else class="w-4.5 h-4.5" />
           <span class="text-sm font-normal">{{ opt.label }}</span>
         </div>
       </div>
