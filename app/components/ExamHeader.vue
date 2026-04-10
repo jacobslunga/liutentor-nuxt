@@ -19,6 +19,7 @@ const props = defineProps<{
 
 const router = useRouter();
 const chatStore = useChatStore();
+const { startSession } = useLockInMode();
 
 const scrollRef = ref<HTMLDivElement | null>(null);
 const isVisible = ref(true);
@@ -26,7 +27,19 @@ const isHovering = ref(false);
 const isDropdownOpen = ref(false);
 const isDownloadOpen = ref(false);
 const isSettingsOpen = ref(false);
+const isLockInOpen = ref(false);
+const lockInDuration = ref<string | null>(null);
+const showLockInConfirm = ref(false);
 let hideTimer: ReturnType<typeof setTimeout> | null = null;
+
+const TIME_OPTIONS = [
+  { value: "30", label: "30 min" },
+  { value: "60", label: "1 timme" },
+  { value: "120", label: "2 timmar" },
+  { value: "180", label: "3 timmar" },
+  { value: "240", label: "4 timmar" },
+  { value: "300", label: "5 timmar" },
+];
 
 const sortedExams = computed(() =>
   [...props.exams].sort(
@@ -39,11 +52,20 @@ const selectedExam = computed(
 );
 
 const isInternalElementOpen = computed(
-  () => isDropdownOpen.value || isDownloadOpen.value || isSettingsOpen.value,
+  () =>
+    isDropdownOpen.value ||
+    isDownloadOpen.value ||
+    isSettingsOpen.value ||
+    isLockInOpen.value ||
+    showLockInConfirm.value,
 );
 
 const hasDownload = computed(
   () => !!selectedExam.value?.pdf_url || !!props.solutionPdfUrl,
+);
+
+const selectedDurationLabel = computed(
+  () => TIME_OPTIONS.find((o) => o.value === lockInDuration.value)?.label ?? "",
 );
 
 const startHideTimer = () => {
@@ -108,6 +130,24 @@ const downloadFile = async (url: string, filename: string) => {
   }
 };
 
+function selectLockInDuration(value: string) {
+  lockInDuration.value = value;
+  isLockInOpen.value = false;
+  showLockInConfirm.value = true;
+}
+
+function confirmLockIn() {
+  if (!selectedExam.value || !lockInDuration.value) return;
+  const session = startSession(
+    selectedExam.value.id.toString(),
+    selectedExam.value.course_code,
+    selectedExam.value.exam_name,
+    parseInt(lockInDuration.value),
+  );
+  showLockInConfirm.value = false;
+  router.push(`/lock-in/${session.examId}`);
+}
+
 onMounted(() => {
   window.addEventListener("mousemove", handleMouseMove);
   startHideTimer();
@@ -159,7 +199,6 @@ onUnmounted(() => {
             />
           </Button>
         </DropdownMenuTrigger>
-
         <DropdownMenuContent
           align="start"
           :side-offset="8"
@@ -220,6 +259,36 @@ onUnmounted(() => {
     <div
       class="flex items-center bg-background/80 backdrop-blur-md border border-border/60 rounded-full pointer-events-auto overflow-hidden"
     >
+      <DropdownMenu v-model:open="isLockInOpen">
+        <DropdownMenuTrigger as-child>
+          <Button
+            variant="ghost"
+            size="sm"
+            class="rounded-none h-8 px-3 font-normal border-r border-border/40 gap-1.5"
+            :disabled="!selectedExam"
+          >
+            <LucideLock class="w-3.5 h-3.5" />
+            <span class="text-xs">Lock in</span>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" :side-offset="8" class="w-44">
+          <div
+            class="px-2 py-1.5 text-[11px] font-medium text-muted-foreground border-b mb-1"
+          >
+            Välj varaktighet
+          </div>
+          <DropdownMenuItem
+            v-for="opt in TIME_OPTIONS"
+            :key="opt.value"
+            class="gap-2 text-sm cursor-pointer"
+            @click="selectLockInDuration(opt.value)"
+          >
+            <LucideTimer class="w-3.5 h-3.5 opacity-70" />
+            {{ opt.label }}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
       <DropdownMenu v-model:open="isDownloadOpen">
         <DropdownMenuTrigger as-child>
           <Button
@@ -294,4 +363,32 @@ onUnmounted(() => {
       </Dialog>
     </div>
   </div>
+
+  <AlertDialog
+    :open="showLockInConfirm"
+    @update:open="showLockInConfirm = $event"
+  >
+    <AlertDialogContent>
+      <AlertDialogHeader>
+        <AlertDialogTitle
+          >Är du säker på att du vill locka in?</AlertDialogTitle
+        >
+        <AlertDialogDescription>
+          Du startar en session på {{ selectedDurationLabel }}. Du kommer inte
+          kunna se lösningar under denna tid.
+        </AlertDialogDescription>
+      </AlertDialogHeader>
+      <AlertDialogFooter>
+        <AlertDialogCancel @click="showLockInConfirm = false"
+          >Avbryt</AlertDialogCancel
+        >
+        <AlertDialogAction
+          class="bg-destructive hover:bg-destructive/90"
+          @click="confirmLockIn"
+        >
+          Starta timer
+        </AlertDialogAction>
+      </AlertDialogFooter>
+    </AlertDialogContent>
+  </AlertDialog>
 </template>
