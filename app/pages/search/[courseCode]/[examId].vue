@@ -1,8 +1,11 @@
 <script setup lang="ts">
+import { useLayoutStore } from "~/stores/layout";
+
 definePageMeta({ layout: false });
 
 const route = useRoute();
-const { layoutMode } = useLayoutMode();
+const layoutStore = useLayoutStore();
+const { layoutMode } = storeToRefs(layoutStore);
 const chatStore = useChatStore();
 
 const examId = computed(() => route.params.examId as string);

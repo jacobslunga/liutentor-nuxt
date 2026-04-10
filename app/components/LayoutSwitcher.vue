@@ -1,5 +1,10 @@
 <script setup lang="ts">
-const { layoutMode, setLayoutMode } = useLayoutMode();
+import { useLayoutStore } from "~/stores/layout";
+
+const layoutStore = useLayoutStore();
+
+const { layoutMode } = storeToRefs(layoutStore);
+const { setLayoutMode } = layoutStore;
 
 const isVisible = ref(true);
 const isHovering = ref(false);
