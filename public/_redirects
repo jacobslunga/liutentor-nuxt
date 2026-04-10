@@ -1,3 +1,0 @@
-# Netlify redirects for Nuxt SSR (Nitro serverless function)
-/api/* /.netlify/functions/server 200
-/* /.netlify/functions/server 200
