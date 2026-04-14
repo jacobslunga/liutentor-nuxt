@@ -79,6 +79,16 @@ onMounted(() => {
 });
 
 defineExpose({ focus: () => textareaRef.value?.focus() });
+
+function toggleGiveDirectAnswer() {
+  emit("update:giveDirectAnswer", !props.giveDirectAnswer);
+  nextTick(() => textareaRef.value?.focus());
+}
+
+function pickModel(newModelId: string) {
+  emit("update:selectedModelId", newModelId);
+  nextTick(() => textareaRef.value?.focus());
+}
 </script>
 
 <template>
@@ -132,7 +142,7 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
                     v-for="m in models"
                     :key="m.id"
                     class="text-xs justify-between cursor-pointer"
-                    @click="emit('update:selectedModelId', m.id)"
+                    @click="pickModel(m.id)"
                   >
                     {{ m.name }}
                     <LucideCheck
@@ -148,15 +158,13 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
                   <TooltipTrigger as-child>
                     <button
                       type="button"
-                      class="flex cursor-pointer items-center gap-1.5 px-2 h-7 rounded-lg border text-[11px] font-medium transition-all"
+                      class="flex cursor-pointer items-center gap-1.5 px-2 h-6 rounded-lg border text-[11px] font-medium transition-all"
                       :class="
                         !giveDirectAnswer
                           ? 'bg-primary/10 text-primary border-primary/20'
                           : 'border-dashed border-border text-muted-foreground hover:bg-accent'
                       "
-                      @click="
-                        emit('update:giveDirectAnswer', !giveDirectAnswer)
-                      "
+                      @click="toggleGiveDirectAnswer"
                     >
                       <LucideLightbulb
                         v-if="giveDirectAnswer"
