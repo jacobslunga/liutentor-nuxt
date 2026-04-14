@@ -8,7 +8,7 @@ const { latest } = useRecentSearches();
       v-for="s in latest"
       :key="s.courseCode"
       :to="`/search/${s.courseCode}`"
-      class="flex items-center gap-1 px-2.5 py-1 rounded-full border border-border/60 text-xs text-muted-foreground hover:text-foreground hover:border-border transition-all duration-150"
+      class="flex items-center gap-1 px-2.5 py-1 rounded-lg border border-border/60 text-xs text-muted-foreground hover:text-foreground hover:border-border transition-all duration-150"
     >
       {{ s.courseCode }}
       <LucideArrowUpRight class="w-3 h-3" />

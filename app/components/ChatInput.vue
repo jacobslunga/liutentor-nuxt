@@ -111,8 +111,8 @@ function pickModel(newModelId: string) {
       </Transition>
 
       <div
-        class="relative border border-border bg-background dark:bg-secondary shadow-sm transition-all duration-200"
-        :class="isMultiline ? 'rounded-2xl' : 'rounded-[28px]'"
+        class="relative border border-border bg-background dark:bg-secondary transition-all duration-200"
+        :class="isMultiline ? 'rounded-lg' : 'rounded-[20px]'"
       >
         <div class="flex flex-col w-full p-2">
           <textarea
@@ -194,7 +194,7 @@ function pickModel(newModelId: string) {
                   key="stop"
                   variant="outline"
                   size="icon"
-                  class="size-8 rounded-full bg-secondary hover:bg-destructive/10 hover:text-destructive border-none"
+                  class="size-8 bg-secondary hover:bg-destructive/10 hover:text-destructive border-none"
                   @click="emit('cancel')"
                 >
                   <LucideSquare class="size-3.5 fill-current" />
@@ -202,8 +202,7 @@ function pickModel(newModelId: string) {
                 <Button
                   v-else
                   key="send"
-                  size="icon"
-                  class="size-8 rounded-full transition-transform active:scale-95"
+                  size="icon-sm"
                   :disabled="
                     !modelValue.trim() || modelValue.length > MAX_LENGTH
                   "

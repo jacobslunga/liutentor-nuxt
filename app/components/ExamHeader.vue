@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useChatStore } from "@/stores/chat";
+import ButtonGroup from "./ui/button-group/ButtonGroup.vue";
 
 interface Exam {
   id: number;
@@ -168,13 +169,10 @@ onUnmounted(() => {
     @mouseenter="isHovering = true"
     @mouseleave="isHovering = false"
   >
-    <div
-      class="group flex items-center bg-background/80 backdrop-blur-md border border-border/60 rounded-full pointer-events-auto"
-    >
+    <ButtonGroup class="pointer-events-auto">
       <Button
-        size="icon"
-        variant="ghost"
-        class="size-8 rounded-l-full rounded-r-none border-r border-border/40"
+        size="icon-sm"
+        variant="outline"
         @click="router.push(`/search/${courseCode}`)"
       >
         <LucideArrowLeft class="w-4 h-4" />
@@ -182,11 +180,7 @@ onUnmounted(() => {
 
       <DropdownMenu v-if="selectedExam" v-model:open="isDropdownOpen">
         <DropdownMenuTrigger as-child>
-          <Button
-            variant="ghost"
-            size="sm"
-            class="rounded-r-full rounded-l-none h-8 px-3 font-normal hover:bg-accent/50"
-          >
+          <Button variant="outline" size="sm">
             <span class="text-xs font-semibold">{{
               selectedExam.exam_name.replace(selectedExam.exam_date, "").trim()
             }}</span>
@@ -205,7 +199,7 @@ onUnmounted(() => {
           class="w-80 p-0 overflow-hidden"
         >
           <div
-            class="px-3 py-2 text-[11px] font-medium uppercase tracking-wider text-muted-foreground bg-muted/30 border-b"
+            class="px-3 py-2 text-[11px] font-medium text-muted-foreground bg-muted/30 border-b"
           >
             Välj tenta ({{ sortedExams.length }})
           </div>
@@ -224,18 +218,12 @@ onUnmounted(() => {
             >
               <div class="flex-1 min-w-0 pr-2">
                 <div class="font-medium truncate text-sm">
-                  {{ e.exam_name.replace(e.exam_date, "").trim() }}
+                  {{ e.exam_date }}
                 </div>
                 <div
                   class="text-[11px] text-muted-foreground mt-0.5 capitalize"
                 >
-                  {{
-                    new Intl.DateTimeFormat("sv-SE", {
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    }).format(new Date(e.exam_date))
-                  }}
+                  {{ e.exam_name.replace(e.exam_date, "").trim() }}
                 </div>
               </div>
               <div class="flex items-center gap-2">
@@ -243,9 +231,9 @@ onUnmounted(() => {
                   v-if="e.has_solution"
                   class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 border border-emerald-500/20"
                 >
-                  FACIT
+                  Facit
                 </span>
-                <LucideSquareCheck
+                <LucideCheck
                   v-if="e.id.toString() === examId"
                   class="w-4 h-4 text-primary"
                 />
@@ -254,19 +242,12 @@ onUnmounted(() => {
           </div>
         </DropdownMenuContent>
       </DropdownMenu>
-    </div>
+    </ButtonGroup>
 
-    <div
-      class="flex items-center bg-background/80 backdrop-blur-md border border-border/60 rounded-full pointer-events-auto overflow-hidden"
-    >
+    <ButtonGroup class="pointer-events-auto">
       <DropdownMenu v-model:open="isLockInOpen">
         <DropdownMenuTrigger as-child>
-          <Button
-            variant="ghost"
-            size="sm"
-            class="rounded-none h-8 px-3 font-normal border-r border-border/40 gap-1.5"
-            :disabled="!selectedExam"
-          >
+          <Button variant="outline" size="sm" :disabled="!selectedExam">
             <LucideLock class="w-3.5 h-3.5" />
             <span class="text-xs">Lock in</span>
           </Button>
@@ -291,12 +272,7 @@ onUnmounted(() => {
 
       <DropdownMenu v-model:open="isDownloadOpen">
         <DropdownMenuTrigger as-child>
-          <Button
-            variant="ghost"
-            size="sm"
-            class="rounded-none h-8 px-3 font-normal border-r border-border/40"
-            :disabled="!hasDownload"
-          >
+          <Button variant="outline" size="sm" :disabled="!hasDownload">
             <span class="text-xs">Ladda ned</span>
             <LucideChevronDown class="w-4 h-4 text-muted-foreground" />
           </Button>
@@ -329,12 +305,7 @@ onUnmounted(() => {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <Button
-        variant="ghost"
-        size="sm"
-        class="rounded-none h-8 px-3 gap-2 font-normal border-r border-border/40"
-        @click="chatStore.toggle()"
-      >
+      <Button variant="outline" size="sm" @click="chatStore.toggle()">
         <LucideLoader2
           v-if="chatStore.isLoading"
           class="size-3.5 animate-spin"
@@ -345,11 +316,7 @@ onUnmounted(() => {
 
       <Dialog v-model:open="isSettingsOpen">
         <DialogTrigger as-child>
-          <Button
-            variant="ghost"
-            size="icon"
-            class="size-8 rounded-none hover:bg-accent/50"
-          >
+          <Button variant="outline" size="icon-sm">
             <LucideSettings class="w-4.5 h-4.5" />
           </Button>
         </DialogTrigger>
@@ -361,7 +328,7 @@ onUnmounted(() => {
           <SettingsDialogContent />
         </DialogContent>
       </Dialog>
-    </div>
+    </ButtonGroup>
   </div>
 
   <AlertDialog
