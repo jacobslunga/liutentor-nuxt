@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ChatWindow from "./ChatWindow.vue";
 const props = defineProps<{
   examPdfUrl: string;
   solutionPdfUrl: string | null;
@@ -82,6 +83,12 @@ function handleKeyDown(e: KeyboardEvent) {
   }
 }
 
+const chatWindowRef = ref<InstanceType<typeof ChatWindow> | null>(null);
+
+function focusChat() {
+  chatWindowRef.value?.focusInput();
+}
+
 onMounted(() => {
   window.addEventListener("mousemove", handleMouseMove, { passive: true });
   window.addEventListener("keydown", handleKeyDown);
@@ -91,6 +98,20 @@ onUnmounted(() => {
   window.removeEventListener("mousemove", handleMouseMove);
   window.removeEventListener("keydown", handleKeyDown);
 });
+
+const chatHasBeenOpened = ref(false);
+
+watch(
+  () => chatStore.isOpen,
+  (open) => {
+    if (open) {
+      isFacitVisible.value = false;
+      isManual.value = false;
+      if (!chatHasBeenOpened.value) chatHasBeenOpened.value = true;
+      nextTick(() => focusChat());
+    }
+  },
+);
 </script>
 
 <template>
@@ -145,6 +166,7 @@ onUnmounted(() => {
       leave-to-class="translate-x-full opacity-0 blur-sm"
     >
       <div
+        v-if="chatHasBeenOpened"
         v-show="chatStore.isOpen"
         class="fixed right-0 top-0 h-full bg-background border-l shadow-2xl z-60 flex"
         :style="{ width: `${panelWidth}px` }"
@@ -154,6 +176,7 @@ onUnmounted(() => {
         </div>
         <div class="flex-1 overflow-hidden">
           <ChatWindow
+            ref="chatWindowRef"
             :exam-id="String(route.params.examId)"
             :exam-url="examPdfUrl"
             :course-code="String(route.params.courseCode)"

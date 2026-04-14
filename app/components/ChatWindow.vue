@@ -180,6 +180,8 @@ onMounted(() => {
 onUnmounted(() => {
   document.removeEventListener("keyup", handleKeyUp);
 });
+
+defineExpose({ focusInput: () => chatInputRef.value?.focus() });
 </script>
 
 <template>

@@ -121,6 +121,7 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
                 <DropdownMenuTrigger as-child>
                   <button
                     class="flex items-center gap-1 h-7 px-2 rounded-lg hover:bg-accent text-[11px] font-semibold text-muted-foreground transition-colors"
+                    type="button"
                   >
                     {{ selectedModel.name }}
                     <LucideChevronDown class="w-5 h-5 opacity-50" />
