@@ -11,7 +11,10 @@ const groupedLinks = [
   },
   {
     title: "Juridiskt",
-    links: [{ name: "Integritetspolicy", href: "/privacy-policy" }],
+    links: [
+      { name: "Integritetspolicy", href: "/privacy-policy" },
+      { name: "Upphovsrätt", href: "/copyright-policy" },
+    ],
   },
   {
     title: "Support",

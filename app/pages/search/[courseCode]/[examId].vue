@@ -13,8 +13,15 @@ const courseCode = computed(() => route.params.courseCode as string);
 
 const { data: examData, status } = useFetch(
   () => `/api/exams/detail/${examId.value}`,
+  {
+    key: () => `exam-detail-${examId.value}`,
+    lazy: true,
+  },
 );
-const { data: courseData } = useFetch(() => `/api/exams/${courseCode.value}`);
+const { data: courseData } = useFetch(() => `/api/exams/${courseCode.value}`, {
+  key: () => `course-exams-${courseCode.value}`,
+  lazy: true,
+});
 
 const exams = computed(() => (courseData.value as any)?.data?.exams ?? []);
 const exam = computed(() => (examData.value as any)?.data?.exam);

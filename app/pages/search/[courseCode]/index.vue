@@ -60,6 +60,22 @@ const filteredExams = computed<Exam[]>(() => {
   );
 });
 
+const prefetchedRoutes = new Set<string>();
+
+function examRoutePath(examId: number) {
+  return `/search/${courseCode}/${examId}`;
+}
+
+function prefetchExamRoute(examId: number) {
+  if (import.meta.server) return;
+  const path = examRoutePath(examId);
+  if (prefetchedRoutes.has(path)) return;
+  prefetchedRoutes.add(path);
+
+  // Warm up the destination page chunk before click.
+  void preloadRouteComponents(path);
+}
+
 function toggleFilter(p: string) {
   const next = new Set(activeFilters.value);
   next.has(p) ? next.delete(p) : next.add(p);
@@ -177,7 +193,9 @@ function passColor(rate: number) {
                 v-for="exam in filteredExams"
                 :key="exam.id"
                 class="grid grid-cols-[1fr_80px_64px_72px] cursor-pointer px-4 py-3 border-b border-border/20 last:border-0 hover:bg-muted/30 transition-colors items-center"
-                @click="navigateTo(`/search/${courseCode}/${exam.id}`)"
+                @mouseenter="prefetchExamRoute(exam.id)"
+                @focusin="prefetchExamRoute(exam.id)"
+                @click="navigateTo(examRoutePath(exam.id))"
               >
                 <div>
                   <div class="text-sm font-medium text-foreground">
