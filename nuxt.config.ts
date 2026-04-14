@@ -11,14 +11,9 @@ export default defineNuxtConfig({
     "@pinia/nuxt",
     "@nuxt/icon",
     "nuxt-gtag",
-    "@nuxt/scripts",
   ],
-  scripts: {
-    registry: {
-      clarity: {
-        trigger: "onNuxtReady",
-      },
-    },
+  gtag: {
+    enabled: process.env.NODE_ENV === "production",
   },
   nitro: {
     preset: "netlify",
@@ -101,27 +96,5 @@ export default defineNuxtConfig({
   css: ["~/assets/css/tailwind.css"],
   vite: {
     plugins: [tailwindcss()],
-    optimizeDeps: {
-      include: [
-        "@vueuse/core",
-        "@vue/devtools-core",
-        "@vue/devtools-kit",
-        "class-variance-authority",
-        "reka-ui",
-        "clsx",
-        "tailwind-merge",
-        "@embedpdf/core",
-        "@embedpdf/core/vue",
-        "@embedpdf/engines/vue",
-        "@embedpdf/plugin-document-manager/vue",
-        "@embedpdf/plugin-viewport/vue",
-        "@embedpdf/plugin-scroll/vue",
-        "@embedpdf/plugin-render/vue",
-        "@embedpdf/plugin-zoom/vue",
-        "@embedpdf/plugin-interaction-manager/vue",
-        "@embedpdf/plugin-selection/vue",
-        "@embedpdf/plugin-rotate/vue",
-      ],
-    },
   },
 });

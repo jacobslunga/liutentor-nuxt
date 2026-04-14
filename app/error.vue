@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const error = useError();
+console.log(error);
 
 const statusCode = computed(() => error.value?.statusCode ?? 500);
 const statusMessage = computed(
