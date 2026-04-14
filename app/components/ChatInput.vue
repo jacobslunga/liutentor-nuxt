@@ -147,6 +147,7 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
                 <Tooltip>
                   <TooltipTrigger as-child>
                     <button
+                      type="button"
                       class="flex cursor-pointer items-center gap-1.5 px-2 h-7 rounded-lg border text-[11px] font-medium transition-all"
                       :class="
                         !giveDirectAnswer
