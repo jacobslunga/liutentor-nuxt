@@ -90,7 +90,8 @@ function startResize() {
 }
 
 function handleKeyUp(e: KeyboardEvent) {
-  if (e.key === "c" && !chatStore.isOpen) {
+  if (chatStore.isOpen) return;
+  if (e.key === "c") {
     chatStore.open();
   }
   if (e.key === "e") {
