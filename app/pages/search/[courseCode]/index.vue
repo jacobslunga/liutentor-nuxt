@@ -239,27 +239,27 @@ function passColor(rate: number) {
         <div
           class="bg-linear-to-t from-background via-background/80 to-transparent pt-8 pb-10"
         >
-          <div
-            class="flex items-center justify-center gap-2 pointer-events-auto"
-          >
-            <NuxtLink to="/upload-exams">
-              <Button variant="default" size="sm">
-                <LucideUpload class="w-4.5 h-4.5" />
-                Ladda upp
+          <div class="flex items-center justify-center pointer-events-auto">
+            <ButtonGroup class="pointer-events-auto">
+              <Button variant="default" size="sm" as-child>
+                <NuxtLink to="/upload-exams">
+                  <LucideUpload class="w-4.5 h-4.5" />
+                  Ladda upp
+                </NuxtLink>
               </Button>
-            </NuxtLink>
-            <NuxtLink :to="`/search/${courseCode}/stats`">
-              <Button variant="outline" size="sm">
-                <LucideChartPie class="w-4.5 h-4.5" />
-                Statistik
+              <Button variant="outline" size="sm" as-child>
+                <NuxtLink :to="`/search/${courseCode}/stats`">
+                  <LucideChartPie class="w-4.5 h-4.5" />
+                  Statistik
+                </NuxtLink>
               </Button>
-            </NuxtLink>
-            <NuxtLink :to="`/quiz/${courseCode}`">
-              <Button variant="outline" size="sm">
-                <LucideLayers class="w-4.5 h-4.5" />
-                Quiz
+              <Button variant="outline" size="sm" as-child>
+                <NuxtLink :to="`/quiz/${courseCode}`">
+                  <LucideLayers class="w-4.5 h-4.5" />
+                  Quiz
+                </NuxtLink>
               </Button>
-            </NuxtLink>
+            </ButtonGroup>
           </div>
         </div>
       </div>
