@@ -10,6 +10,7 @@ export default defineNuxtConfig({
     "nuxt-lucide-icons",
     "@pinia/nuxt",
     "@nuxt/icon",
+    "nuxt-gtag",
   ],
   nitro: {
     preset: "netlify",
