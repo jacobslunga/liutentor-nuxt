@@ -11,7 +11,15 @@ export default defineNuxtConfig({
     "@pinia/nuxt",
     "@nuxt/icon",
     "nuxt-gtag",
+    "@nuxt/scripts",
   ],
+  scripts: {
+    registry: {
+      clarity: {
+        trigger: "onNuxtReady",
+      },
+    },
+  },
   nitro: {
     preset: "netlify",
   },
