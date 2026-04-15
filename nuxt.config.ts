@@ -34,7 +34,7 @@ export default defineNuxtConfig({
   },
   app: {
     head: {
-      titleTemplate: "%s | LiU Tentor",
+      titleTemplate: "LiU Tentor | %s",
       htmlAttrs: {
         lang: "sv",
       },
