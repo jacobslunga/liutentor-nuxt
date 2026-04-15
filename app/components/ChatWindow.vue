@@ -33,25 +33,8 @@ md.use(markdownItKatex, { throwOnError: false });
 const MAX_RENDER_CACHE = 200;
 const renderCache = new Map<string, string>();
 
-function normalizeLatexDelimiters(content: string): string {
-  // Replace \[...\] display math with $$...$$
-  content = content.replace(
-    /\\\[([\s\S]*?)\\\]/g,
-    (_m, inner) => `$$${inner}$$`,
-  );
-  // Replace \(...\) inline math with $...$
-  content = content.replace(/\\\(([\s\S]*?)\\\)/g, (_m, inner) => `$${inner}$`);
-  // Downgrade $$...$$ that has trailing text on the same line to inline $...$
-  // (display math must be on its own line; mixed-line $$ confuses the parser)
-  content = content.replace(
-    /\$\$([\s\S]*?)\$\$([^\n$])/g,
-    (_, inner, charAfter) => `$${inner.trim()}$${charAfter}`,
-  );
-  return content;
-}
-
 function renderMarkdown(content: string): string {
-  return DOMPurify.sanitize(md.render(normalizeLatexDelimiters(content)), {
+  return DOMPurify.sanitize(md.render(content), {
     ADD_TAGS: [
       "math",
       "semantics",
