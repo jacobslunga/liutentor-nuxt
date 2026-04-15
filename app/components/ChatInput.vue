@@ -94,7 +94,6 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
 
 function pickModel(newModelId: string) {
   emit("update:selectedModelId", newModelId);
-  nextTick(() => textareaRef.value?.focus());
 }
 </script>
 
@@ -134,24 +133,19 @@ function pickModel(newModelId: string) {
           />
 
           <!-- Toolbar -->
-          <div class="flex items-center justify-between px-2 py-1">
+          <div class="flex items-center justify-between px-3 py-2">
             <!-- Left: model picker -->
             <DropdownMenu>
               <DropdownMenuTrigger as-child>
                 <button
-                  class="flex items-center gap-1.5 h-7 px-2 rounded-lg hover:bg-accent text-[11px] font-medium text-muted-foreground transition-colors"
+                  class="flex items-center gap-1 h-8 px-2.5 rounded-lg hover:bg-accent text-xs font-medium text-muted-foreground transition-colors"
                   type="button"
                 >
-                  <img
-                    :src="selectedModel.logo"
-                    class="w-3.5 h-3.5 object-contain"
-                    alt=""
-                  />
                   {{ selectedModel.name }}
-                  <LucideChevronDown class="w-3 h-3 opacity-40" />
+                  <LucideChevronDown class="w-3 h-3 opacity-40 ml-0.5" />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" side="top" class="w-44 p-1">
+              <DropdownMenuContent align="start" side="top" class="w-44 p-1" @close-auto-focus.prevent="textareaRef?.focus()">
                 <DropdownMenuItem
                   v-for="m in models"
                   :key="m.id"
@@ -163,11 +157,6 @@ function pickModel(newModelId: string) {
                   "
                   @click="pickModel(m.id)"
                 >
-                  <img
-                    :src="m.logo"
-                    class="w-3.5 h-3.5 object-contain shrink-0"
-                    alt=""
-                  />
                   <span class="flex-1">{{ m.name }}</span>
                   <LucideCheck
                     v-if="m.id === selectedModelId"

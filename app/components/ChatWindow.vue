@@ -234,7 +234,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
               v-if="msg.role === 'user'"
               class="bg-muted text-foreground px-4 py-2.5 rounded-2xl max-w-[85%] w-fit"
             >
-              <p class="text-sm leading-relaxed whitespace-pre-wrap">
+              <p class="text-[15px] leading-relaxed whitespace-pre-wrap">
                 {{ msg.content }}
               </p>
             </div>
@@ -250,7 +250,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
               </div>
               <div
                 v-else
-                class="prose prose-sm dark:prose-invert max-w-none"
+                class="prose dark:prose-invert max-w-none"
                 v-html="renderedAssistantHtml[i]"
               />
             </div>

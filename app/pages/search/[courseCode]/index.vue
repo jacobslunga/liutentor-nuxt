@@ -39,9 +39,6 @@ watchEffect(() => {
 
 const sortOrder = ref<"asc" | "desc">("desc");
 const activeFilters = ref<Set<string>>(new Set());
-const showUnseenOnly = ref(false);
-
-const { isSeenExam } = useSeenExams();
 
 const prefixes = computed(() => {
   const all = exams.value.map((e) => e.exam_name.split(" ")[0]);
@@ -62,9 +59,6 @@ const filteredExams = computed<Exam[]>(() => {
     result = result.filter((e) =>
       activeFilters.value.has(e.exam_name.split(" ")[0] ?? ""),
     );
-  }
-  if (showUnseenOnly.value) {
-    result = result.filter((e) => !isSeenExam(e.id));
   }
   return result;
 });
@@ -166,18 +160,6 @@ function passColor(rate: number) {
             >
               {{ p }}
             </button>
-            <button
-              class="text-xs cursor-pointer font-mono px-3 py-1 rounded-md border transition-colors flex items-center gap-1.5"
-              :class="
-                showUnseenOnly
-                  ? 'bg-foreground text-background border-foreground'
-                  : 'border-dashed border-border text-muted-foreground hover:text-foreground'
-              "
-              @click="showUnseenOnly = !showUnseenOnly"
-            >
-              <LucideEye class="w-3 h-3" />
-              Ogjorda
-            </button>
           </div>
 
           <div class="w-full overflow-x-auto rounded-xl">
@@ -185,24 +167,8 @@ function passColor(rate: number) {
               class="min-w-fit w-full border border-border/50 rounded-xl overflow-hidden"
             >
               <div
-                class="grid grid-cols-[1fr_80px_64px_72px] lg:grid-cols-[52px_1fr_80px_64px_72px] gap-x-4 px-4 py-2 border-b border-border/30 bg-muted/40"
+                class="grid grid-cols-[1fr_80px_64px_72px] gap-x-4 px-4 py-2 border-b border-border/30 bg-muted/40"
               >
-                <div class="hidden lg:block text-xs text-muted-foreground text-center">
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger
-                        class="flex items-center justify-center gap-1 cursor-default"
-                      >
-                        Gjord
-                        <LucideInfo class="w-3 h-3 text-muted-foreground/60" />
-                      </TooltipTrigger>
-                      <TooltipContent class="max-w-60 text-center">
-                        Markeras efter att du spenderat minst 10 minuter på
-                        tentan
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
                 <div
                   class="text-xs text-muted-foreground flex items-center gap-1 cursor-pointer hover:text-foreground transition-colors"
                   @click="sortOrder = sortOrder === 'desc' ? 'asc' : 'desc'"
@@ -229,22 +195,11 @@ function passColor(rate: number) {
               <div
                 v-for="exam in filteredExams"
                 :key="exam.id"
-                class="grid grid-cols-[1fr_80px_64px_72px] lg:grid-cols-[52px_1fr_80px_64px_72px] gap-x-4 cursor-pointer px-4 py-3 border-b border-border/20 last:border-0 hover:bg-muted/30 transition-colors items-center"
+                class="grid grid-cols-[1fr_80px_64px_72px] gap-x-4 cursor-pointer px-4 py-3 border-b border-border/20 last:border-0 hover:bg-muted/30 transition-colors items-center"
                 @mouseenter="prefetchExamRoute(exam.id)"
                 @focusin="prefetchExamRoute(exam.id)"
                 @click="navigateTo(examRoutePath(exam.id))"
               >
-                <div class="hidden lg:flex justify-center">
-                  <LucideBadgeCheck
-                    v-if="isSeenExam(exam.id)"
-                    class="text-cyan-600 dark:text-cyan-500"
-                  />
-                  <LucideMinus
-                    v-else
-                    class="w-4 h-4 text-muted-foreground/40"
-                  />
-                </div>
-
                 <div>
                   <div class="text-sm font-medium text-foreground">
                     {{ exam.exam_name }}
