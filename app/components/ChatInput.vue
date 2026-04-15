@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import { useChatStore } from "@/stores/chat";
-
 interface Model {
   id: string;
   name: string;
-  logo?: string;
+  logo: string;
 }
 
 const props = defineProps<{
@@ -13,6 +11,8 @@ const props = defineProps<{
   giveDirectAnswer: boolean;
   selectedModelId: string;
   showScrollButton: boolean;
+  courseCode?: string;
+  hasSolution?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -29,9 +29,21 @@ const isMultiline = ref(false);
 const MAX_LENGTH = 4000;
 
 const models: Model[] = [
-  { id: "gemini-3.1-pro-preview", name: "Gemini 3.1 Pro" },
-  { id: "gemini-3.1-flash-lite-preview", name: "Gemini 3.1 Flash" },
-  { id: "gemini-2.5-pro", name: "Gemini 2.5 Pro (stable)" },
+  {
+    id: "gemini-3.1-pro-preview",
+    name: "Gemini 3.1 Pro",
+    logo: "/images/llm-logos/gemini.svg",
+  },
+  {
+    id: "gemini-3.1-flash-lite",
+    name: "Gemini Flash",
+    logo: "/images/llm-logos/gemini.svg",
+  },
+  {
+    id: "gemini-2.5-pro",
+    name: "Gemini 2.5 Pro",
+    logo: "/images/llm-logos/gemini.svg",
+  },
 ];
 
 const selectedModel = computed(
@@ -44,7 +56,7 @@ const updateHeight = () => {
   el.style.height = "auto";
   const newHeight = Math.min(el.scrollHeight, 200);
   el.style.height = `${newHeight}px`;
-  isMultiline.value = newHeight > 44;
+  isMultiline.value = newHeight > 64;
 };
 
 const handleInput = (e: Event) => {
@@ -80,11 +92,6 @@ onMounted(() => {
 
 defineExpose({ focus: () => textareaRef.value?.focus() });
 
-function toggleGiveDirectAnswer() {
-  emit("update:giveDirectAnswer", !props.giveDirectAnswer);
-  nextTick(() => textareaRef.value?.focus());
-}
-
 function pickModel(newModelId: string) {
   emit("update:selectedModelId", newModelId);
   nextTick(() => textareaRef.value?.focus());
@@ -111,90 +118,73 @@ function pickModel(newModelId: string) {
       </Transition>
 
       <div
-        class="relative border border-border bg-background dark:bg-secondary transition-all duration-200"
-        :class="isMultiline ? 'rounded-lg' : 'rounded-[20px]'"
+        class="relative border border-border bg-background transition-all duration-200 focus-within:border-primary/50 focus-within:ring-3 focus-within:ring-primary/10"
+        :class="isMultiline ? 'rounded-xl' : 'rounded-[20px]'"
       >
-        <div class="flex flex-col w-full p-2">
+        <div class="flex flex-col w-full">
+          <!-- Textarea -->
           <textarea
             ref="textareaRef"
             :value="modelValue"
-            placeholder="Fråga om tentan..."
-            class="w-full bg-background dark:bg-secondary outline-none border-0 focus:ring-0 resize-none px-3 pt-2 pb-1 text-sm leading-relaxed min-h-10 max-h-50 custom-scrollbar"
             rows="1"
+            placeholder="Fråga om tentan..."
+            class="w-full bg-transparent outline-none border-0 focus:ring-0 resize-none px-4 pt-3 pb-2 text-sm leading-relaxed max-h-50 custom-scrollbar"
             @input="handleInput"
             @keydown="handleKeyDown"
           />
 
-          <div class="flex items-center justify-between px-2 pb-1 pt-1">
-            <div class="flex items-center gap-1.5">
-              <DropdownMenu>
-                <DropdownMenuTrigger as-child>
-                  <button
-                    class="flex items-center gap-1 h-7 px-2 rounded-lg hover:bg-accent text-[11px] font-semibold text-muted-foreground transition-colors"
-                    type="button"
-                  >
-                    {{ selectedModel.name }}
-                    <LucideChevronDown class="w-5 h-5 opacity-50" />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" side="top" class="w-56">
-                  <DropdownMenuItem
-                    v-for="m in models"
-                    :key="m.id"
-                    class="text-xs justify-between cursor-pointer"
-                    @click="pickModel(m.id)"
-                  >
-                    {{ m.name }}
-                    <LucideCheck
-                      v-if="m.id === selectedModelId"
-                      class="w-5 h-5 text-primary"
-                    />
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+          <!-- Toolbar -->
+          <div class="flex items-center justify-between px-2 py-1">
+            <!-- Left: model picker -->
+            <DropdownMenu>
+              <DropdownMenuTrigger as-child>
+                <button
+                  class="flex items-center gap-1.5 h-7 px-2 rounded-lg hover:bg-accent text-[11px] font-medium text-muted-foreground transition-colors"
+                  type="button"
+                >
+                  <img
+                    :src="selectedModel.logo"
+                    class="w-3.5 h-3.5 object-contain"
+                    alt=""
+                  />
+                  {{ selectedModel.name }}
+                  <LucideChevronDown class="w-3 h-3 opacity-40" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" side="top" class="w-44 p-1">
+                <DropdownMenuItem
+                  v-for="m in models"
+                  :key="m.id"
+                  class="flex items-center gap-2 text-xs px-2 py-1.5 cursor-pointer rounded-md"
+                  :class="
+                    m.id === selectedModelId
+                      ? 'text-foreground'
+                      : 'text-muted-foreground'
+                  "
+                  @click="pickModel(m.id)"
+                >
+                  <img
+                    :src="m.logo"
+                    class="w-3.5 h-3.5 object-contain shrink-0"
+                    alt=""
+                  />
+                  <span class="flex-1">{{ m.name }}</span>
+                  <LucideCheck
+                    v-if="m.id === selectedModelId"
+                    class="w-3 h-3 text-primary shrink-0"
+                  />
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-              <TooltipProvider :delay-duration="0">
-                <Tooltip>
-                  <TooltipTrigger as-child>
-                    <button
-                      type="button"
-                      class="flex cursor-pointer items-center gap-1.5 px-2 h-6 rounded-lg border text-[11px] font-medium transition-all"
-                      :class="
-                        !giveDirectAnswer
-                          ? 'bg-primary/10 text-primary border-primary/20'
-                          : 'border-dashed border-border text-muted-foreground hover:bg-accent'
-                      "
-                      @click="toggleGiveDirectAnswer"
-                    >
-                      <LucideLightbulb
-                        v-if="giveDirectAnswer"
-                        class="w-4 h-4"
-                      />
-                      <LucideLightbulb v-else class="w-4 h-4" />
-                      <span class="hidden sm:inline">Hints</span>
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top" align="start">
-                    <p class="text-xs">
-                      {{
-                        !giveDirectAnswer
-                          ? "Pedagogiska ledtrådar på"
-                          : "Klicka för vägledning"
-                      }}
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-
-            <div class="flex items-center">
+            <!-- Right: hints + send -->
+            <div class="flex items-center gap-2.5">
               <Transition name="scale" mode="out-in">
                 <Button
                   v-if="isLoading"
                   key="stop"
-                  variant="outline"
                   size="icon"
-                  class="size-8 bg-secondary hover:bg-destructive/10 hover:text-destructive border-none"
+                  class="size-8"
                   @click="emit('cancel')"
                 >
                   <LucideSquare class="size-3.5 fill-current" />
@@ -202,7 +192,8 @@ function pickModel(newModelId: string) {
                 <Button
                   v-else
                   key="send"
-                  size="icon-sm"
+                  size="icon"
+                  class="size-8"
                   :disabled="
                     !modelValue.trim() || modelValue.length > MAX_LENGTH
                   "
@@ -218,7 +209,6 @@ function pickModel(newModelId: string) {
 
       <div class="flex justify-between items-center mt-2 px-3">
         <p class="text-[10px] text-muted-foreground/60">AI kan göra misstag.</p>
-        <p class="text-[10px] text-muted-foreground/60">Drivs av Gemini</p>
         <p
           v-if="modelValue.length > MAX_LENGTH * 0.8"
           class="text-[10px]"
@@ -257,7 +247,7 @@ function pickModel(newModelId: string) {
 
 textarea::placeholder {
   color: hsl(var(--muted-foreground));
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
 .custom-scrollbar::-webkit-scrollbar {

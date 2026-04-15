@@ -33,8 +33,25 @@ md.use(markdownItKatex, { throwOnError: false });
 const MAX_RENDER_CACHE = 200;
 const renderCache = new Map<string, string>();
 
+function normalizeLatexDelimiters(content: string): string {
+  // Replace \[...\] display math with $$...$$
+  content = content.replace(
+    /\\\[([\s\S]*?)\\\]/g,
+    (_m, inner) => `$$${inner}$$`,
+  );
+  // Replace \(...\) inline math with $...$
+  content = content.replace(/\\\(([\s\S]*?)\\\)/g, (_m, inner) => `$${inner}$`);
+  // Downgrade $$...$$ that has trailing text on the same line to inline $...$
+  // (display math must be on its own line; mixed-line $$ confuses the parser)
+  content = content.replace(
+    /\$\$([\s\S]*?)\$\$([^\n$])/g,
+    (_, inner, charAfter) => `$${inner.trim()}$${charAfter}`,
+  );
+  return content;
+}
+
 function renderMarkdown(content: string): string {
-  return DOMPurify.sanitize(md.render(content), {
+  return DOMPurify.sanitize(md.render(normalizeLatexDelimiters(content)), {
     ADD_TAGS: [
       "math",
       "semantics",
@@ -70,7 +87,7 @@ function getCachedMarkdown(content: string): string {
 }
 
 const giveDirectAnswer = ref(true);
-const selectedModelId = ref("gemini-3.1-pro-preview");
+const { selectedModelId } = useSelectedModel();
 const messagesEndRef = ref<HTMLDivElement | null>(null);
 const messagesContainer = ref<HTMLDivElement | null>(null);
 const chatInputRef = ref<{ focus: () => void } | null>(null);
@@ -147,8 +164,7 @@ async function handleSend() {
   const text = draftInput.value;
   draftInput.value = "";
   isUserScrolling.value = false;
-  await nextTick();
-  scrollToBottom("smooth");
+  isAtBottom.value = true;
   await send(text, {
     giveDirectAnswer: giveDirectAnswer.value,
     modelId: selectedModelId.value,
@@ -200,7 +216,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
           v-if="messages.length === 0"
           class="h-full flex flex-col items-center justify-center px-4 text-center pb-24"
         >
-          <h2 class="text-2xl font-medium mb-3 text-foreground tracking-tight">
+          <h2 class="text-2xl font-medium mb-3 text-foreground">
             Vad kan jag hjälpa till med?
           </h2>
 
@@ -272,6 +288,8 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
           :give-direct-answer="giveDirectAnswer"
           :selected-model-id="selectedModelId"
           :show-scroll-button="showScrollButton"
+          :course-code="courseCode"
+          :has-solution="hasSolution"
           class="pointer-events-auto"
           @send="handleSend"
           @cancel="handleCancel"

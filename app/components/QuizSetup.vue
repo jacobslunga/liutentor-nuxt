@@ -51,7 +51,7 @@ function handleGenerate() {
 
 <template>
   <div class="mx-auto max-w-4xl px-4 py-6 sm:py-8">
-    <h1 class="text-xl font-medium tracking-tight">Skapa ett quiz</h1>
+    <h1 class="text-xl font-medium">Skapa ett quiz</h1>
     <p class="mt-1 text-sm text-muted-foreground mb-6">
       Välj upp till 5 tentor att generera frågor från.
     </p>
@@ -59,7 +59,7 @@ function handleGenerate() {
     <div class="flex flex-col gap-6 lg:flex-row lg:items-start">
       <div class="flex-1 min-w-0">
         <p
-          class="mb-2 text-[10px] font-medium uppercase tracking-[.15em] text-muted-foreground/60"
+          class="mb-2 text-[10px] font-medium uppercase text-muted-foreground/60"
         >
           Tentor
         </p>
@@ -153,7 +153,7 @@ function handleGenerate() {
       >
         <div>
           <p
-            class="mb-2 text-[10px] font-medium uppercase tracking-[.15em] text-muted-foreground/60"
+            class="mb-2 text-[10px] font-medium uppercase text-muted-foreground/60"
           >
             Anpassa (valfritt)
           </p>

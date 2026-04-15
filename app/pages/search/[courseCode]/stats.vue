@@ -313,7 +313,7 @@ const donutOptions = computed(() => ({
                     </NuxtLink>
                   </Button>
                   <Button variant="outline" size="sm" as-child>
-                    <NuxtLink :to="`/search/${courseCode}/stats`">
+                    <NuxtLink :to="`/search/${courseCode}`">
                       <LucideBookA class="w-4.5 h-4.5" />
                       Visa tentor
                     </NuxtLink>

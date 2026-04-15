@@ -21,6 +21,21 @@ const props = defineProps<{
 const router = useRouter();
 const chatStore = useChatStore();
 const { startSession } = useLockInMode();
+const { isSeenExam, getSeenAt } = useSeenExams();
+
+function formatSeenAt(examId: string | number): string {
+  const ts = getSeenAt(examId);
+  if (!ts) return "";
+  const diff = Date.now() - ts;
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  if (days === 0) return "Idag";
+  if (days === 1) return "Igår";
+  if (days < 7) return `${days} dagar sedan`;
+  const weeks = Math.floor(days / 7);
+  if (weeks < 5) return `${weeks} ${weeks === 1 ? "vecka" : "veckor"} sedan`;
+  const months = Math.floor(days / 30);
+  return `${months} ${months === 1 ? "månad" : "månader"} sedan`;
+}
 
 const scrollRef = ref<HTMLDivElement | null>(null);
 const isVisible = ref(true);
@@ -196,49 +211,82 @@ onUnmounted(() => {
         <DropdownMenuContent
           align="start"
           :side-offset="8"
-          class="w-80 p-0 overflow-hidden"
+          class="w-76 p-0 overflow-hidden"
         >
-          <div
-            class="px-3 py-2 text-[11px] font-medium text-muted-foreground bg-muted/30 border-b"
-          >
-            Välj tenta ({{ sortedExams.length }})
+          <div class="px-3 py-2.5 flex items-center justify-between border-b">
+            <span
+              class="text-[11px] font-semibold text-foreground tracking-wide uppercase"
+              >Tentor</span
+            >
+            <span class="text-[11px] text-muted-foreground"
+              >{{ sortedExams.length }} st</span
+            >
           </div>
-          <div ref="scrollRef" class="max-h-87.5 overflow-y-auto p-1">
-            <DropdownMenuItem
+          <div
+            ref="scrollRef"
+            class="max-h-80 overflow-y-auto p-1.5 space-y-0.5"
+          >
+            <button
               v-for="e in sortedExams"
               :key="e.id"
               :data-current="e.id.toString() === examId"
-              class="flex items-center justify-between px-2 py-2.5 cursor-pointer rounded-md mb-0.5"
+              class="w-full text-left rounded-lg px-3 py-2.5 transition-colors cursor-pointer group"
               :class="
                 e.id.toString() === examId
-                  ? 'bg-primary/10 text-primary focus:bg-primary/15'
-                  : ''
+                  ? 'bg-primary/8 ring-1 ring-primary/20'
+                  : 'hover:bg-foreground/5'
               "
               @click="changeExam(e)"
             >
-              <div class="flex-1 min-w-0 pr-2">
-                <div class="font-medium truncate text-sm">
-                  {{ e.exam_date }}
+              <div class="flex items-start justify-between gap-2">
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2">
+                    <span
+                      class="font-semibold text-sm"
+                      :class="
+                        e.id.toString() === examId
+                          ? 'text-primary'
+                          : 'text-foreground'
+                      "
+                    >
+                      {{ e.exam_date }}
+                    </span>
+                    <span
+                      v-if="e.id.toString() === examId"
+                      class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-primary/15 text-primary"
+                    >
+                      Öppen
+                    </span>
+                  </div>
+                  <div
+                    class="text-[11px] text-muted-foreground mt-0.5 capitalize truncate"
+                  >
+                    {{ e.exam_name.replace(e.exam_date, "").trim() }}
+                  </div>
+                  <div
+                    v-if="isSeenExam(e.id)"
+                    class="flex items-center gap-1 mt-1"
+                  >
+                    <LucideCheck
+                      class="w-2.5 h-2.5 text-emerald-500 shrink-0"
+                    />
+                    <span
+                      class="text-[10px] text-emerald-600 dark:text-emerald-500"
+                    >
+                      Sedd · {{ formatSeenAt(e.id) }}
+                    </span>
+                  </div>
                 </div>
-                <div
-                  class="text-[11px] text-muted-foreground mt-0.5 capitalize"
-                >
-                  {{ e.exam_name.replace(e.exam_date, "").trim() }}
+                <div class="shrink-0 pt-0.5">
+                  <span
+                    v-if="e.has_solution"
+                    class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
+                  >
+                    Facit
+                  </span>
                 </div>
               </div>
-              <div class="flex items-center gap-2">
-                <span
-                  v-if="e.has_solution"
-                  class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 border border-emerald-500/20"
-                >
-                  Facit
-                </span>
-                <LucideCheck
-                  v-if="e.id.toString() === examId"
-                  class="w-4 h-4 text-primary"
-                />
-              </div>
-            </DropdownMenuItem>
+            </button>
           </div>
         </DropdownMenuContent>
       </DropdownMenu>

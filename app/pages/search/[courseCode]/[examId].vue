@@ -11,6 +11,8 @@ const chatStore = useChatStore();
 const examId = computed(() => route.params.examId as string);
 const courseCode = computed(() => route.params.courseCode as string);
 
+useSeenExamTimer(examId);
+
 const { data: examData, status } = useFetch(
   () => `/api/exams/detail/${examId.value}`,
   {

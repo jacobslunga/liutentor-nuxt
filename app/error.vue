@@ -34,7 +34,7 @@ const retry = () => clearError();
       <p class="text-xs font-mono text-muted-foreground">
         FEL {{ statusCode }}
       </p>
-      <h1 class="text-3xl md:text-4xl font-semibold tracking-tight">
+      <h1 class="text-3xl md:text-4xl font-semibold">
         {{ statusMessage }}
       </h1>
       <p class="text-sm text-muted-foreground max-w-md mx-auto">

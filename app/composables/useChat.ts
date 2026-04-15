@@ -1,8 +1,11 @@
 import { ref } from "vue";
-import { useChatStore } from "@/stores/chat"; // Adjust path if needed
+import { useChatStore } from "@/stores/chat";
 
 const CHAT_API_URL =
   "https://liutentor-api-production.up.railway.app/api/v1/chat/completion";
+
+// USE FOR LOCAL DEVELOPMENT
+// const CHAT_API_URL_LOCAL = "http://localhost:3001/api/v1/chat/completion";
 
 function getAnonymousId(): string {
   if (typeof window === "undefined") return "unknown";
