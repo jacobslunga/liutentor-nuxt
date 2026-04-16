@@ -2,7 +2,8 @@
 import { ref, watch, nextTick } from "vue";
 import { storeToRefs } from "pinia";
 import MarkdownIt from "markdown-it";
-import markdownItKatex from "@vscode/markdown-it-katex";
+import texmath from "markdown-it-texmath";
+import katex from "katex";
 import DOMPurify from "dompurify";
 import { useChatStore } from "@/stores/chat";
 import { useChat } from "@/composables/useChat";
@@ -28,7 +29,11 @@ const { send, cancelGeneration } = useChat({
 });
 
 const md = new MarkdownIt({ html: false, linkify: true, typographer: true });
-md.use(markdownItKatex, { throwOnError: false });
+md.use(texmath, {
+  engine: katex,
+  delimiters: "dollars",
+  katexOptions: { throwOnError: false },
+});
 
 const MAX_RENDER_CACHE = 200;
 const renderCache = new Map<string, string>();

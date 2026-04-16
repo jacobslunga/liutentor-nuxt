@@ -2,7 +2,8 @@
 interface Model {
   id: string;
   name: string;
-  logo: string;
+  logoLight: string;
+  logoDark: string;
 }
 
 const props = defineProps<{
@@ -24,27 +25,41 @@ const emit = defineEmits<{
   "update:selectedModelId": [value: string];
 }>();
 
+const colorMode = useColorMode();
 const textareaRef = ref<HTMLTextAreaElement | null>(null);
 const isMultiline = ref(false);
 const MAX_LENGTH = 4000;
 
 const models: Model[] = [
   {
+    id: "grok-4-1-fast-non-reasoning",
+    name: "Grok 4-1 Fast",
+    logoLight: "/images/llm-logos/grok-light.png",
+    logoDark: "/images/llm-logos/grok-dark.png",
+  },
+  {
     id: "gemini-3.1-pro-preview",
     name: "Gemini 3.1 Pro",
-    logo: "/images/llm-logos/gemini.svg",
+    logoLight: "/images/llm-logos/gemini.svg",
+    logoDark: "/images/llm-logos/gemini.svg",
   },
   {
     id: "gemini-3.1-flash-lite",
     name: "Gemini Flash",
-    logo: "/images/llm-logos/gemini.svg",
+    logoLight: "/images/llm-logos/gemini.svg",
+    logoDark: "/images/llm-logos/gemini.svg",
   },
   {
     id: "gemini-2.5-pro",
     name: "Gemini 2.5 Pro",
-    logo: "/images/llm-logos/gemini.svg",
+    logoLight: "/images/llm-logos/gemini.svg",
+    logoDark: "/images/llm-logos/gemini.svg",
   },
 ];
+
+function modelLogo(m: Model) {
+  return colorMode.value === "dark" ? m.logoDark : m.logoLight;
+}
 
 const selectedModel = computed(
   () => models.find((m) => m.id === props.selectedModelId) ?? models[0]!,
@@ -141,11 +156,21 @@ function pickModel(newModelId: string) {
                   class="flex items-center gap-1 h-8 px-2.5 rounded-lg hover:bg-accent text-xs font-medium text-muted-foreground transition-colors"
                   type="button"
                 >
+                  <img
+                    :src="modelLogo(selectedModel)"
+                    class="w-3.5 h-3.5 object-contain shrink-0"
+                    alt=""
+                  />
                   {{ selectedModel.name }}
                   <LucideChevronDown class="w-3 h-3 opacity-40 ml-0.5" />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" side="top" class="w-44 p-1" @close-auto-focus.prevent="textareaRef?.focus()">
+              <DropdownMenuContent
+                align="start"
+                side="top"
+                class="w-44 p-1"
+                @close-auto-focus.prevent="textareaRef?.focus()"
+              >
                 <DropdownMenuItem
                   v-for="m in models"
                   :key="m.id"
@@ -157,6 +182,11 @@ function pickModel(newModelId: string) {
                   "
                   @click="pickModel(m.id)"
                 >
+                  <img
+                    :src="modelLogo(m)"
+                    class="w-3.5 h-3.5 object-contain shrink-0"
+                    alt=""
+                  />
                   <span class="flex-1">{{ m.name }}</span>
                   <LucideCheck
                     v-if="m.id === selectedModelId"
