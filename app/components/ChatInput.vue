@@ -38,12 +38,6 @@ const models: Model[] = [
     logoDark: "/images/llm-logos/openai-dark.svg",
   },
   {
-    id: "grok-4-1-fast-non-reasoning",
-    name: "Grok",
-    logoLight: "/images/llm-logos/grok-light.png",
-    logoDark: "/images/llm-logos/grok-dark.png",
-  },
-  {
     id: "gemini-2.5-pro",
     name: "Gemini",
     logoLight: "/images/llm-logos/gemini.svg",

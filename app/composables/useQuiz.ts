@@ -3,6 +3,9 @@ import type { MultipleChoiceQuizResponse } from "@/types/quiz";
 const QUIZ_API_BASE =
   "https://liutentor-api-production.up.railway.app/api/v1/quiz";
 
+// USE FOR LOCAL DEVELOPMENT
+// const QUIZ_API_BASE_LOCAL = "http://localhost:3001/api/v1/quiz";
+
 function getAnonymousId(): string {
   if (typeof window === "undefined") return "unknown";
   const key = "liutentor_anonymous_id";

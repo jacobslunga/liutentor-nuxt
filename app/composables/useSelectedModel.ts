@@ -1,8 +1,4 @@
-const VALID_MODEL_IDS = [
-  "gemini-2.5-pro",
-  "grok-4-1-fast-non-reasoning",
-  "gpt-4o",
-];
+const VALID_MODEL_IDS = ["gemini-2.5-pro", "gpt-4o"];
 
 export function useSelectedModel() {
   const selectedModelId = useCookie("liutentor_selected_model_v3", {

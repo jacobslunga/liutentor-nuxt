@@ -31,8 +31,11 @@ const { send, cancelGeneration } = useChat({
 const md = new MarkdownIt({ html: true, linkify: true, typographer: true });
 md.use(texmath, {
   engine: katex,
-  delimiters: ["dollars", "brackets"],
-  katexOptions: { throwOnError: false },
+  delimiters: ["dollars"],
+  katexOptions: {
+    throwOnError: false,
+    errorColor: "inherit",
+  },
 });
 
 const MAX_RENDER_CACHE = 200;
@@ -249,7 +252,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
           >
             <div
               v-if="msg.role === 'user'"
-              class="bg-muted text-foreground px-4 py-2.5 rounded-2xl max-w-[85%] w-fit"
+              class="bg-primary/10 text-foreground px-4 py-2 rounded-2xl max-w-[85%] w-fit"
             >
               <p class="text-[15px] leading-relaxed whitespace-pre-wrap">
                 {{ msg.content }}
@@ -409,5 +412,15 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
 
 .prose :deep(a:hover) {
   text-decoration: underline;
+}
+
+.prose :deep(.katex-display) {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+
+.prose :deep(.katex) {
+  max-width: 100%;
 }
 </style>

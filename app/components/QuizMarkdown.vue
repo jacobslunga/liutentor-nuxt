@@ -1,12 +1,20 @@
 <script setup lang="ts">
 import MarkdownIt from "markdown-it";
-import markdownItKatex from "@vscode/markdown-it-katex";
+import texmath from "markdown-it-texmath";
+import katex from "katex";
 import DOMPurify from "dompurify";
 
 const props = defineProps<{ content: string }>();
 
-const md = new MarkdownIt({ html: false, linkify: true, typographer: true });
-md.use(markdownItKatex, { throwOnError: false });
+const md = new MarkdownIt({ html: true, linkify: true, typographer: true });
+md.use(texmath, {
+  engine: katex,
+  delimiters: ["dollars"],
+  katexOptions: {
+    throwOnError: false,
+    errorColor: "inherit",
+  },
+});
 
 const html = computed(() =>
   DOMPurify.sanitize(md.render(props.content), {
