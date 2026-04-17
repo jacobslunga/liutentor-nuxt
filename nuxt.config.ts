@@ -11,7 +11,23 @@ export default defineNuxtConfig({
     "@pinia/nuxt",
     "@nuxt/icon",
     "nuxt-gtag",
+    "nuxt-shiki",
   ],
+  shiki: {
+    bundledThemes: ["one-light", "one-dark-pro"],
+    bundledLangs: [
+      "typescript",
+      "javascript",
+      "python",
+      "json",
+      "java",
+      "jsx",
+      "tsx",
+      "vue",
+      "rust",
+    ],
+    defaultTheme: "one-light",
+  },
   gtag: {
     enabled: process.env.NODE_ENV === "production",
   },

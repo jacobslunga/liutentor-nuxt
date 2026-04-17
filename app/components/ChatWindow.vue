@@ -1,10 +1,19 @@
 <script setup lang="ts">
-import { ref, watch, nextTick } from "vue";
+import {
+  ref,
+  shallowRef,
+  computed,
+  watch,
+  nextTick,
+  onMounted,
+  onUnmounted,
+} from "vue";
 import { storeToRefs } from "pinia";
 import MarkdownIt from "markdown-it";
 import texmath from "markdown-it-texmath";
 import katex from "katex";
 import DOMPurify from "dompurify";
+import { getShikiHighlighter } from "#imports";
 import { useChatStore } from "@/stores/chat";
 import { useChat } from "@/composables/useChat";
 
@@ -28,21 +37,72 @@ const { send, cancelGeneration } = useChat({
   solutionUrl: props.solutionUrl,
 });
 
-const md = new MarkdownIt({ html: true, linkify: true, typographer: true });
-md.use(texmath, {
-  engine: katex,
-  delimiters: ["dollars"],
-  katexOptions: {
-    throwOnError: false,
-    errorColor: "inherit",
-  },
+DOMPurify.addHook("uponSanitizeAttribute", (_node, data) => {
+  if (data.attrName === "style") {
+    data.forceKeepAttr = true;
+  }
 });
+
+const md = shallowRef<MarkdownIt | null>(null);
+const mdReady = ref(false);
 
 const MAX_RENDER_CACHE = 200;
 const renderCache = new Map<string, string>();
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+async function initMarkdown() {
+  const instance = new MarkdownIt({
+    html: true,
+    linkify: true,
+    typographer: true,
+  });
+
+  instance.use(texmath, {
+    engine: katex,
+    delimiters: ["dollars"],
+    katexOptions: {
+      throwOnError: false,
+      errorColor: "inherit",
+    },
+  });
+
+  const highlighter = await getShikiHighlighter();
+  const loadedLangs = new Set(highlighter.getLoadedLanguages());
+
+  instance.options.highlight = (code, lang) => {
+    const language = lang && loadedLangs.has(lang as never) ? lang : "text";
+    try {
+      return highlighter.highlight(code, {
+        lang: language,
+        themes: {
+          light: "one-light",
+          dark: "one-dark-pro",
+        },
+        defaultColor: false,
+      });
+    } catch {
+      return `<pre><code>${escapeHtml(code)}</code></pre>`;
+    }
+  };
+
+  md.value = instance;
+  mdReady.value = true;
+  renderCache.clear();
+}
+
+initMarkdown();
+
 function renderMarkdown(content: string): string {
-  return DOMPurify.sanitize(md.render(content), {
+  if (!md.value) return "";
+  return DOMPurify.sanitize(md.value.render(content), {
     ADD_TAGS: [
       "math",
       "semantics",
@@ -58,7 +118,7 @@ function renderMarkdown(content: string): string {
       "mtext",
       "annotation",
     ],
-    ADD_ATTR: ["xmlns", "encoding"],
+    ADD_ATTR: ["xmlns", "encoding", "style", "class"],
   });
 }
 
@@ -67,6 +127,8 @@ function getCachedMarkdown(content: string): string {
   if (cached) return cached;
 
   const rendered = renderMarkdown(content);
+  if (!rendered) return "";
+
   renderCache.set(content, rendered);
 
   if (renderCache.size > MAX_RENDER_CACHE) {
@@ -86,6 +148,7 @@ const isAtBottom = ref(true);
 const showScrollButton = ref(false);
 
 const renderedAssistantHtml = computed(() => {
+  if (!mdReady.value) return messages.value.map(() => "");
   const lastIndex = messages.value.length - 1;
   return messages.value.map((msg, i) => {
     if (msg.role !== "assistant" || !msg.content) return "";
@@ -153,6 +216,12 @@ watch(
   },
   { deep: true },
 );
+
+watch(mdReady, (ready) => {
+  if (ready) {
+    nextTick(() => wrapTables());
+  }
+});
 
 onMounted(() => {
   if (chatStore.currentExamId !== props.examId) {
@@ -248,6 +317,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
               msg.role,
               msg.content,
               isLoading && i === messages.length - 1,
+              mdReady,
             ]"
           >
             <div
@@ -386,7 +456,42 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
   font-family: var(--font-mono, monospace);
 }
 
-.prose :deep(pre) {
+.prose :deep(pre.shiki) {
+  background-color: var(--shiki-light-bg);
+  color: var(--shiki-light);
+  border: 1px solid hsl(var(--border));
+  border-radius: 10px;
+  padding: 1rem;
+  overflow-x: auto;
+  font-size: 0.82rem;
+  font-family: var(--font-mono, monospace);
+  line-height: 1.6;
+}
+
+.prose :deep(pre.shiki span) {
+  color: var(--shiki-light);
+  background-color: var(--shiki-light-bg);
+}
+
+.dark .prose :deep(pre.shiki) {
+  background-color: var(--shiki-dark-bg);
+  color: var(--shiki-dark);
+}
+
+.dark .prose :deep(pre.shiki span) {
+  color: var(--shiki-dark);
+  background-color: var(--shiki-dark-bg);
+}
+
+.prose :deep(pre.shiki code) {
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  font-size: inherit;
+  font-family: inherit;
+}
+
+.prose :deep(pre:not(.shiki)) {
   background: hsl(var(--muted));
   border: 1px solid hsl(var(--border));
   border-radius: 10px;

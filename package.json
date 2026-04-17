@@ -45,9 +45,11 @@
     "nuxt": "^4.4.2",
     "nuxt-gtag": "^4.1.0",
     "nuxt-lucide-icons": "^2.1.0",
+    "nuxt-shiki": "^0.3.2",
     "pinia": "^3.0.4",
     "reka-ui": "^2.9.6",
     "shadcn-nuxt": "^2.5.3",
+    "shiki": "^4.0.2",
     "tailwind-merge": "^3.5.0",
     "tailwindcss-animate": "^1.0.7",
     "vue-chartjs": "^5.3.3"
