@@ -13,6 +13,7 @@ export const useChatStore = defineStore("chat", () => {
   const savedScrollPosition = ref(0);
   const messages = ref<Message[]>([]);
   const draftInput = ref("");
+  const currentExamId = ref<string | null>(null);
 
   function toggle() {
     isOpen.value = !isOpen.value;
@@ -35,6 +36,7 @@ export const useChatStore = defineStore("chat", () => {
     isLoading.value = false;
     savedScrollPosition.value = 0;
     draftInput.value = "";
+    currentExamId.value = null;
   }
 
   return {
@@ -43,6 +45,7 @@ export const useChatStore = defineStore("chat", () => {
     messages,
     savedScrollPosition,
     draftInput,
+    currentExamId,
     toggle,
     open,
     close,

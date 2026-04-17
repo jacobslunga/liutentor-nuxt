@@ -27,6 +27,42 @@ watch(textSize, (val) => {
   document.documentElement.style.fontSize = map[val];
 });
 
+type FontOption = "system" | "liu-tentor-sans";
+
+const fontOptions: { id: FontOption; label: string; preview: string; family: string }[] = [
+  {
+    id: "liu-tentor-sans",
+    label: "LiU Tentor Sans",
+    preview: "Aa",
+    family: "'LiU Tentor Sans', sans-serif",
+  },
+  {
+    id: "system",
+    label: "System",
+    preview: "Aa",
+    family: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+  },
+];
+
+const fontCookie = useCookie<FontOption>("font-preference", {
+  default: () => "liu-tentor-sans",
+  maxAge: 60 * 60 * 24 * 365,
+});
+
+const font = ref<FontOption>(fontCookie.value);
+
+const applyFont = (val: FontOption) => {
+  const chosen = fontOptions.find((f) => f.id === val);
+  document.body.style.fontFamily = chosen ? chosen.family : "";
+};
+
+watch(font, (val) => {
+  fontCookie.value = val;
+  applyFont(val);
+});
+
+onMounted(() => applyFont(font.value));
+
 const shortcuts = [
   { action: "Visa/dölj facit", key: "E", category: "visibility" },
   { action: "Visa/dölj AI-chat", key: "C", category: "visibility" },
@@ -80,6 +116,29 @@ const categories = [{ id: "visibility", label: "Synlighet" }];
               'text-xl': opt.id === 'stor',
             }"
           />
+          <span class="text-sm font-normal">{{ opt.label }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="space-y-3">
+      <h3 class="font-normal">Typsnitt</h3>
+      <div class="flex gap-2">
+        <div
+          v-for="opt in fontOptions"
+          :key="opt.id"
+          class="flex-1 cursor-pointer rounded-md border transition-all select-none flex flex-col items-center justify-center gap-2 py-4 hover:bg-primary/5 hover:border-primary"
+          :class="
+            font === opt.id
+              ? 'bg-primary/10 border-primary'
+              : 'bg-card border-border'
+          "
+          @click="font = opt.id"
+        >
+          <span
+            class="text-lg leading-none"
+            :style="{ fontFamily: opt.family }"
+          >{{ opt.preview }}</span>
           <span class="text-sm font-normal">{{ opt.label }}</span>
         </div>
       </div>

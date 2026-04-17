@@ -32,26 +32,20 @@ const MAX_LENGTH = 4000;
 
 const models: Model[] = [
   {
+    id: "gpt-4o",
+    name: "ChatGPT",
+    logoLight: "/images/llm-logos/openai-light.svg",
+    logoDark: "/images/llm-logos/openai-dark.svg",
+  },
+  {
     id: "grok-4-1-fast-non-reasoning",
-    name: "Grok 4-1 Fast",
+    name: "Grok",
     logoLight: "/images/llm-logos/grok-light.png",
     logoDark: "/images/llm-logos/grok-dark.png",
   },
   {
-    id: "gemini-3.1-pro-preview",
-    name: "Gemini 3.1 Pro",
-    logoLight: "/images/llm-logos/gemini.svg",
-    logoDark: "/images/llm-logos/gemini.svg",
-  },
-  {
-    id: "gemini-3.1-flash-lite",
-    name: "Gemini Flash",
-    logoLight: "/images/llm-logos/gemini.svg",
-    logoDark: "/images/llm-logos/gemini.svg",
-  },
-  {
     id: "gemini-2.5-pro",
-    name: "Gemini 2.5 Pro",
+    name: "Gemini",
     logoLight: "/images/llm-logos/gemini.svg",
     logoDark: "/images/llm-logos/gemini.svg",
   },
@@ -71,7 +65,7 @@ const updateHeight = () => {
   el.style.height = "auto";
   const newHeight = Math.min(el.scrollHeight, 200);
   el.style.height = `${newHeight}px`;
-  isMultiline.value = newHeight > 64;
+  isMultiline.value = newHeight > 44;
 };
 
 const handleInput = (e: Event) => {
@@ -132,97 +126,88 @@ function pickModel(newModelId: string) {
       </Transition>
 
       <div
-        class="relative border border-border bg-background transition-all duration-200 focus-within:border-primary/50 focus-within:ring-3 focus-within:ring-primary/10"
-        :class="isMultiline ? 'rounded-xl' : 'rounded-[20px]'"
+        class="relative border border-border bg-background transition-all duration-200 focus-within:border-primary/50 focus-within:ring-3 focus-within:ring-primary/10 rounded-xl"
       >
-        <div class="flex flex-col w-full">
-          <!-- Textarea -->
-          <textarea
-            ref="textareaRef"
-            :value="modelValue"
-            rows="1"
-            placeholder="Fråga om tentan..."
-            class="w-full bg-transparent outline-none border-0 focus:ring-0 resize-none px-4 pt-3 pb-2 text-sm leading-relaxed max-h-50 custom-scrollbar"
-            @input="handleInput"
-            @keydown="handleKeyDown"
-          />
+        <textarea
+          ref="textareaRef"
+          :value="modelValue"
+          rows="1"
+          placeholder="Fråga om tentan..."
+          class="w-full bg-transparent outline-none border-0 focus:ring-0 resize-none px-4 pt-3 pb-1 text-sm leading-relaxed max-h-50 custom-scrollbar"
+          @input="handleInput"
+          @keydown="handleKeyDown"
+        />
 
-          <!-- Toolbar -->
-          <div class="flex items-center justify-between px-3 py-2">
-            <!-- Left: model picker -->
-            <DropdownMenu>
-              <DropdownMenuTrigger as-child>
-                <button
-                  class="flex items-center gap-1 h-8 px-2.5 rounded-lg hover:bg-accent text-xs font-medium text-muted-foreground transition-colors"
-                  type="button"
-                >
-                  <img
-                    :src="modelLogo(selectedModel)"
-                    class="w-3.5 h-3.5 object-contain shrink-0"
-                    alt=""
-                  />
-                  {{ selectedModel.name }}
-                  <LucideChevronDown class="w-3 h-3 opacity-40 ml-0.5" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="start"
-                side="top"
-                class="w-44 p-1"
-                @close-auto-focus.prevent="textareaRef?.focus()"
+        <div class="flex items-center justify-between px-3 py-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger as-child>
+              <button
+                class="flex items-center gap-1 h-8 px-2.5 rounded-lg hover:bg-accent text-xs font-medium text-muted-foreground transition-colors shrink-0"
+                type="button"
               >
-                <DropdownMenuItem
-                  v-for="m in models"
-                  :key="m.id"
-                  class="flex items-center gap-2 text-xs px-2 py-1.5 cursor-pointer rounded-md"
-                  :class="
-                    m.id === selectedModelId
-                      ? 'text-foreground'
-                      : 'text-muted-foreground'
-                  "
-                  @click="pickModel(m.id)"
-                >
-                  <img
-                    :src="modelLogo(m)"
-                    class="w-3.5 h-3.5 object-contain shrink-0"
-                    alt=""
-                  />
-                  <span class="flex-1">{{ m.name }}</span>
-                  <LucideCheck
-                    v-if="m.id === selectedModelId"
-                    class="w-3 h-3 text-primary shrink-0"
-                  />
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                <img
+                  :src="modelLogo(selectedModel)"
+                  class="w-3.5 h-3.5 object-contain shrink-0"
+                  alt=""
+                />
+                {{ selectedModel.name }}
+                <LucideChevronDown class="w-3 h-3 opacity-40 ml-0.5" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="start"
+              side="top"
+              class="w-44 p-1"
+              @close-auto-focus.prevent="textareaRef?.focus()"
+            >
+              <DropdownMenuItem
+                v-for="m in models"
+                :key="m.id"
+                class="flex items-center gap-2 text-xs px-2 py-1.5 cursor-pointer rounded-md"
+                :class="
+                  m.id === selectedModelId
+                    ? 'text-foreground'
+                    : 'text-muted-foreground'
+                "
+                @click="pickModel(m.id)"
+              >
+                <img
+                  :src="modelLogo(m)"
+                  class="w-3.5 h-3.5 object-contain shrink-0"
+                  alt=""
+                />
+                <span class="flex-1">{{ m.name }}</span>
+                <LucideCheck
+                  v-if="m.id === selectedModelId"
+                  class="w-3 h-3 text-primary shrink-0"
+                />
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
 
-            <!-- Right: hints + send -->
-            <div class="flex items-center gap-2.5">
-              <Transition name="scale" mode="out-in">
-                <Button
-                  v-if="isLoading"
-                  key="stop"
-                  size="icon"
-                  class="size-8"
-                  @click="emit('cancel')"
-                >
-                  <LucideSquare class="size-3.5 fill-current" />
-                </Button>
-                <Button
-                  v-else
-                  key="send"
-                  size="icon"
-                  class="size-8"
-                  :disabled="
-                    !modelValue.trim() || modelValue.length > MAX_LENGTH
-                  "
-                  @click="emit('send')"
-                >
-                  <LucideArrowUp class="w-4 h-4" />
-                </Button>
-              </Transition>
-            </div>
-          </div>
+          <Transition name="scale" mode="out-in">
+            <Button
+              v-if="isLoading"
+              key="stop"
+              size="icon"
+              variant="secondary"
+              class="size-8 shrink-0"
+              @click="emit('cancel')"
+            >
+              <LucideSquare class="size-3.5 fill-current" />
+            </Button>
+            <Button
+              v-else
+              key="send"
+              size="icon"
+              variant="ghost"
+              class="size-8 shrink-0"
+              :disabled="!modelValue.trim() || modelValue.length > MAX_LENGTH"
+              @click="emit('send')"
+            >
+              <LucideCornerDownLeft />
+            </Button>
+          </Transition>
         </div>
       </div>
 

@@ -49,6 +49,10 @@ onBeforeRouteUpdate((to, from) => {
   }
 });
 
+onBeforeRouteLeave(() => {
+  chatStore.close();
+});
+
 watch(
   () => route.params.examId,
   () => {
