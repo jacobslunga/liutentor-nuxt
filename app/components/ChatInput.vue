@@ -136,7 +136,7 @@ function pickModel(newModelId: string) {
           <DropdownMenu>
             <DropdownMenuTrigger as-child>
               <button
-                class="flex items-center gap-1 h-8 px-2.5 rounded-lg hover:bg-accent text-xs font-medium text-muted-foreground transition-colors shrink-0"
+                class="flex cursor-pointer items-center gap-1 h-8 px-2.5 rounded-lg hover:bg-accent text-xs font-medium text-muted-foreground transition-colors shrink-0"
                 type="button"
               >
                 <img

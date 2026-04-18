@@ -100,9 +100,17 @@ async function initMarkdown() {
 
 initMarkdown();
 
+function normalizeMathDelimiters(content: string): string {
+  // Replace \[...\] with $$...$$ and \(...\) with $...$
+  // Use non-greedy match and handle multiline
+  return content
+    .replace(/\\\[([\s\S]*?)\\\]/g, (_m, inner) => `$$${inner}$$`)
+    .replace(/\\\(([\s\S]*?)\\\)/g, (_m, inner) => `$${inner}$`);
+}
+
 function renderMarkdown(content: string): string {
   if (!md.value) return "";
-  return DOMPurify.sanitize(md.value.render(content), {
+  return DOMPurify.sanitize(md.value.render(normalizeMathDelimiters(content)), {
     ADD_TAGS: [
       "math",
       "semantics",

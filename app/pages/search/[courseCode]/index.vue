@@ -201,7 +201,7 @@ function passColor(rate: number) {
                 @click="navigateTo(examRoutePath(exam.id))"
               >
                 <div>
-                  <div class="text-sm font-medium text-foreground">
+                  <div class="text-sm font-semibold text-foreground">
                     {{ exam.exam_name }}
                   </div>
                   <div class="text-xs font-mono text-muted-foreground mt-0.5">

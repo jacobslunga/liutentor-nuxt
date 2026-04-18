@@ -6,27 +6,7 @@ const layoutStore = useLayoutStore();
 const { layoutMode } = storeToRefs(layoutStore);
 const { setLayoutMode } = layoutStore;
 
-const isVisible = ref(true);
-const isHovering = ref(false);
-let hideTimer: ReturnType<typeof setTimeout> | null = null;
-
-function handleMouseMove() {
-  isVisible.value = true;
-  if (hideTimer) clearTimeout(hideTimer);
-  hideTimer = setTimeout(() => {
-    if (!isHovering.value) isVisible.value = false;
-  }, 2000);
-}
-
-onMounted(() => {
-  handleMouseMove();
-  window.addEventListener("mousemove", handleMouseMove, { passive: true });
-});
-
-onUnmounted(() => {
-  window.removeEventListener("mousemove", handleMouseMove);
-  if (hideTimer) clearTimeout(hideTimer);
-});
+const { isVisible, isHovering } = useHeaderVisibility();
 
 const modes = [
   { value: "exam-with-facit" as const, label: "Tenta & Facit", icon: "split" },
@@ -36,11 +16,11 @@ const modes = [
 
 <template>
   <div
-    class="fixed bottom-10 left-5 z-40 hidden md:flex rounded-lg p-1 transition-opacity duration-300"
+    class="fixed bottom-10 left-5 z-40 hidden md:flex rounded-lg p-1 transition-all duration-300 ease-in-out"
     :class="
       isVisible || isHovering
-        ? 'opacity-100 pointer-events-auto'
-        : 'opacity-0 pointer-events-none'
+        ? 'opacity-100 translate-y-0 pointer-events-auto'
+        : 'opacity-0 translate-y-2 pointer-events-none'
     "
     @mouseenter="isHovering = true"
     @mouseleave="isHovering = false"

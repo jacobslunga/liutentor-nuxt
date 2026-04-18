@@ -22,15 +22,12 @@ const router = useRouter();
 const chatStore = useChatStore();
 const { startSession } = useLockInMode();
 const scrollRef = ref<HTMLDivElement | null>(null);
-const isVisible = ref(true);
-const isHovering = ref(false);
 const isDropdownOpen = ref(false);
 const isDownloadOpen = ref(false);
 const isSettingsOpen = ref(false);
 const isLockInOpen = ref(false);
 const lockInDuration = ref<string | null>(null);
 const showLockInConfirm = ref(false);
-let hideTimer: ReturnType<typeof setTimeout> | null = null;
 
 const TIME_OPTIONS = [
   { value: "30", label: "30 min" },
@@ -68,37 +65,13 @@ const selectedDurationLabel = computed(
   () => TIME_OPTIONS.find((o) => o.value === lockInDuration.value)?.label ?? "",
 );
 
-const startHideTimer = () => {
-  if (hideTimer) clearTimeout(hideTimer);
-  hideTimer = setTimeout(() => {
-    if (!isHovering.value && !isInternalElementOpen.value) {
-      isVisible.value = false;
-    }
-  }, 2500);
-};
-
-function handleMouseMove(e: MouseEvent) {
-  if (e.clientY < 80 || isInternalElementOpen.value) {
-    isVisible.value = true;
-    startHideTimer();
-  }
-}
-
-watch(
-  () => chatStore.isOpen,
-  (isOpen) => {
-    isVisible.value = !isOpen;
-    if (isOpen && hideTimer) {
-      clearTimeout(hideTimer);
-      hideTimer = null;
-    }
-  },
+const { isVisible, isHovering, startHideTimer } = useHeaderVisibility(
+  () => isInternalElementOpen.value,
 );
 
 watch(isInternalElementOpen, (isOpen) => {
   if (isOpen) {
     isVisible.value = true;
-    if (hideTimer) clearTimeout(hideTimer);
   } else {
     startHideTimer();
   }
@@ -147,16 +120,6 @@ function confirmLockIn() {
   showLockInConfirm.value = false;
   router.push(`/lock-in/${session.examId}`);
 }
-
-onMounted(() => {
-  window.addEventListener("mousemove", handleMouseMove);
-  startHideTimer();
-});
-
-onUnmounted(() => {
-  window.removeEventListener("mousemove", handleMouseMove);
-  if (hideTimer) clearTimeout(hideTimer);
-});
 </script>
 
 <template>
@@ -168,10 +131,13 @@ onUnmounted(() => {
     @mouseenter="isHovering = true"
     @mouseleave="isHovering = false"
   >
+    <div
+      class="absolute inset-0 bg-background/80 backdrop-blur-xl -z-10 mask-[linear-gradient(to_bottom,black,transparent)]"
+    />
     <ButtonGroup class="pointer-events-auto">
       <Button
         size="icon-sm"
-        variant="outline"
+        variant="ghost"
         @click="router.push(`/search/${courseCode}`)"
       >
         <LucideArrowLeft class="w-4 h-4" />
@@ -179,7 +145,7 @@ onUnmounted(() => {
 
       <DropdownMenu v-if="selectedExam" v-model:open="isDropdownOpen">
         <DropdownMenuTrigger as-child>
-          <Button variant="outline" size="sm">
+          <Button variant="ghost" size="sm">
             <span class="text-xs font-semibold">{{
               selectedExam.exam_name.replace(selectedExam.exam_date, "").trim()
             }}</span>
@@ -257,7 +223,7 @@ onUnmounted(() => {
     <ButtonGroup class="pointer-events-auto">
       <DropdownMenu v-model:open="isLockInOpen">
         <DropdownMenuTrigger as-child>
-          <Button variant="outline" size="sm" :disabled="!selectedExam">
+          <Button variant="ghost" size="sm" :disabled="!selectedExam">
             <LucideLock class="w-3.5 h-3.5" />
             <span class="text-xs">Lock in</span>
           </Button>
@@ -282,7 +248,7 @@ onUnmounted(() => {
 
       <DropdownMenu v-model:open="isDownloadOpen">
         <DropdownMenuTrigger as-child>
-          <Button variant="outline" size="sm" :disabled="!hasDownload">
+          <Button variant="ghost" size="sm" :disabled="!hasDownload">
             <span class="text-xs">Ladda ned</span>
             <LucideChevronDown class="w-4 h-4 text-muted-foreground" />
           </Button>
@@ -315,7 +281,7 @@ onUnmounted(() => {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <Button variant="outline" size="sm" @click="chatStore.toggle()">
+      <Button variant="ghost" size="sm" class="not-[&:hover]:group-hover/btns:bg-foreground/5" @click="chatStore.toggle()">
         <LucideLoader2
           v-if="chatStore.isLoading"
           class="size-3.5 animate-spin"
@@ -326,7 +292,7 @@ onUnmounted(() => {
 
       <Dialog v-model:open="isSettingsOpen">
         <DialogTrigger as-child>
-          <Button variant="outline" size="icon-sm">
+          <Button variant="ghost" size="icon-sm" class="not-[&:hover]:group-hover/btns:bg-foreground/5">
             <LucideSettings class="w-4.5 h-4.5" />
           </Button>
         </DialogTrigger>

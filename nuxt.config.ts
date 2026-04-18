@@ -1,59 +1,24 @@
 import tailwindcss from "@tailwindcss/vite";
 
-// https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
-  devtools: { enabled: false },
+
   modules: [
+    "@nuxtjs/supabase",
     "@nuxtjs/color-mode",
-    "shadcn-nuxt",
-    "nuxt-lucide-icons",
     "@pinia/nuxt",
     "@nuxt/icon",
+    "shadcn-nuxt",
+    "nuxt-lucide-icons",
     "nuxt-gtag",
     "nuxt-shiki",
   ],
-  shiki: {
-    bundledThemes: ["one-light", "one-dark-pro"],
-    bundledLangs: [
-      "typescript",
-      "javascript",
-      "python",
-      "json",
-      "java",
-      "jsx",
-      "tsx",
-      "vue",
-      "rust",
-    ],
-    defaultTheme: "one-light",
-  },
-  gtag: {
-    enabled: process.env.NODE_ENV === "production",
-  },
-  nitro: {
-    preset: "netlify",
-  },
-  colorMode: {
-    classSuffix: "",
-    storageKey: "color-mode",
-  },
-  imports: {
-    autoImport: true,
-  },
-  runtimeConfig: {
-    public: {
-      supabaseUrl: "",
-      supabaseKey: "",
-      siteUrl: "https://liutentor.se",
-    },
-  },
+
+  // ─── App & Meta ───────────────────────────────────────────────
   app: {
     head: {
       titleTemplate: "LiU Tentor | %s",
-      htmlAttrs: {
-        lang: "sv",
-      },
+      htmlAttrs: { lang: "sv" },
       charset: "utf-8",
       viewport: "width=device-width, initial-scale=1",
       meta: [
@@ -64,6 +29,7 @@ export default defineNuxtConfig({
         },
         { name: "robots", content: "index, follow" },
         { name: "format-detection", content: "telephone=no" },
+        { name: "theme-color", content: "#ffffff" },
         { property: "og:site_name", content: "LiU Tentor" },
         { property: "og:type", content: "website" },
         {
@@ -86,7 +52,6 @@ export default defineNuxtConfig({
           content:
             "Hitta och plugga på gamla tentor från Linköpings Universitet",
         },
-        { name: "theme-color", content: "#ffffff" },
       ],
       link: [
         { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
@@ -98,19 +63,65 @@ export default defineNuxtConfig({
       ],
     },
   },
+
+  // ─── Runtime Config ───────────────────────────────────────────
+  runtimeConfig: {
+    public: {
+      supabaseUrl: "",
+      supabaseKey: "",
+      siteUrl: "https://liutentor.se",
+    },
+  },
+
+  // ─── Module Config ────────────────────────────────────────────
+  supabase: {
+    redirect: false,
+  },
+
+  colorMode: {
+    classSuffix: "",
+    storageKey: "color-mode",
+  },
+
   shadcn: {
-    /**
-     * Prefix for all the imported component
-     */
     prefix: "",
-    /**
-     * Directory that the component lives in.
-     * @default "./components/ui"
-     */
     componentDir: "./app/components/ui",
   },
+
+  shiki: {
+    bundledThemes: ["one-light", "one-dark-pro"],
+    bundledLangs: [
+      "typescript",
+      "javascript",
+      "python",
+      "json",
+      "java",
+      "jsx",
+      "tsx",
+      "vue",
+      "rust",
+    ],
+    defaultTheme: "one-light",
+  },
+
+  gtag: {
+    enabled: process.env.NODE_ENV === "production",
+  },
+
+  // ─── Build & Infra ────────────────────────────────────────────
+  nitro: {
+    preset: "netlify",
+  },
+
   css: ["~/assets/css/tailwind.css"],
+
   vite: {
     plugins: [tailwindcss()],
   },
+
+  imports: {
+    autoImport: true,
+  },
+
+  devtools: { enabled: false },
 });
