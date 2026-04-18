@@ -124,7 +124,7 @@ function confirmLockIn() {
 
 <template>
   <div
-    class="hidden lg:flex fixed top-0 left-0 right-0 z-50 px-4 pt-3 pointer-events-none items-start justify-between transition-all duration-300 ease-in-out"
+    class="hidden lg:flex fixed top-0 left-0 right-0 z-40 px-4 pt-3 pointer-events-none items-start justify-between transition-all duration-300 ease-in-out"
     :class="
       isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
     "
@@ -164,8 +164,7 @@ function confirmLockIn() {
           class="w-76 p-0 overflow-hidden"
         >
           <div class="px-3 py-2.5 flex items-center justify-between border-b">
-            <span
-              class="text-[11px] font-semibold text-foreground tracking-wide uppercase"
+            <span class="text-[11px] font-semibold text-foreground"
               >Tentor</span
             >
             <span class="text-[11px] text-muted-foreground"
@@ -281,7 +280,12 @@ function confirmLockIn() {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <Button variant="ghost" size="sm" class="not-[&:hover]:group-hover/btns:bg-foreground/5" @click="chatStore.toggle()">
+      <Button
+        variant="ghost"
+        size="sm"
+        class="not-[&:hover]:group-hover/btns:bg-foreground/5"
+        @click="chatStore.toggle()"
+      >
         <LucideLoader2
           v-if="chatStore.isLoading"
           class="size-3.5 animate-spin"
@@ -292,7 +296,11 @@ function confirmLockIn() {
 
       <Dialog v-model:open="isSettingsOpen">
         <DialogTrigger as-child>
-          <Button variant="ghost" size="icon-sm" class="not-[&:hover]:group-hover/btns:bg-foreground/5">
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            class="not-[&:hover]:group-hover/btns:bg-foreground/5"
+          >
             <LucideSettings class="w-4.5 h-4.5" />
           </Button>
         </DialogTrigger>

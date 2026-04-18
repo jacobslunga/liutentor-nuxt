@@ -29,9 +29,7 @@ const pct = computed(() =>
   <div class="mx-auto max-w-xl px-4 py-8">
     <div class="mb-6 flex items-end justify-between">
       <div>
-        <p
-          class="mb-1 text-[10px] font-medium uppercase tracking-[.15em] text-muted-foreground/60"
-        >
+        <p class="mb-1 text-[10px] font-medium text-muted-foreground/60">
           Resultat
         </p>
         <p class="text-4xl font-medium leading-none">
@@ -70,9 +68,7 @@ const pct = computed(() =>
       </div>
     </div>
 
-    <p
-      class="mb-3 text-[10px] font-medium uppercase tracking-[.15em] text-muted-foreground/60"
-    >
+    <p class="mb-3 text-[10px] font-medium text-muted-foreground/60">
       Genomgång
     </p>
 

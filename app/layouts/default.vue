@@ -1,6 +1,19 @@
 <script setup lang="ts">
 const route = useRoute();
 const router = useRouter();
+const user = useSupabaseUser();
+
+const AUTH_ROUTES = ["/logga-in", "/skapa-konto"];
+
+watch(
+  user,
+  (u) => {
+    if (u && AUTH_ROUTES.includes(route.path)) {
+      router.replace("/");
+    }
+  },
+  { immediate: true },
+);
 const { initializeExamMode, updateActivity, cleanupHistory } = useLockInMode();
 
 const hideFooter = computed(
