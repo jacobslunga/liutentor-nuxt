@@ -12,18 +12,6 @@
   font-display: swap;
 }
 
-@font-face {
-  font-family: "Uncut";
-  src: url("/fonts/UncutSans-Variable.ttf") format("truetype");
-  font-weight: 100 900;
-  font-feature-settings:
-    "ss01" on,
-    "ss02" on,
-    "ss03" on,
-    "ss05" on,
-    "ss06" on;
-}
-
 @theme {
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;

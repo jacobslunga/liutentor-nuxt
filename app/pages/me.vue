@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { toast } from "vue-sonner";
-import { COLORS } from "@/constants/avatarColors";
+import {
+  COLORS,
+  COLOR_BG_MAP,
+  COLOR_BORDER_MAP,
+} from "@/constants/avatarColors";
 
 definePageMeta({
   layout: "profile",
@@ -247,7 +251,10 @@ async function handleSignOut() {
           >
             <div
               v-if="avatarUrl"
-              class="w-14 h-14 rounded-full overflow-hidden"
+              :class="[
+                'w-14 h-14 rounded-full overflow-hidden border',
+                COLOR_BORDER_MAP[avatarColor],
+              ]"
             >
               <img
                 :src="avatarUrl"
@@ -267,7 +274,7 @@ async function handleSignOut() {
                 avatarUploading
                   ? 'opacity-40'
                   : 'group-hover:opacity-80 transition-opacity',
-                `bg-${avatarColor}`,
+                COLOR_BG_MAP[avatarColor],
               ]"
             >
               {{ initial }}
@@ -414,7 +421,7 @@ async function handleSignOut() {
                 :key="color"
                 :class="[
                   'w-5 h-5 rounded-full cursor-pointer transition-all',
-                  `bg-${color}`,
+                  COLOR_BG_MAP[color],
                   colorCookie === color
                     ? 'ring-2 ring-offset-2 ring-offset-background ring-foreground scale-110'
                     : 'opacity-60 hover:opacity-100',
