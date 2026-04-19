@@ -4,7 +4,7 @@ const QUIZ_API_BASE =
   "https://liutentor-api-production.up.railway.app/api/v1/quiz";
 
 // USE FOR LOCAL DEVELOPMENT
-// const QUIZ_API_BASE_LOCAL = "http://localhost:3001/api/v1/quiz";
+const QUIZ_API_BASE_LOCAL = "http://localhost:3001/api/v1/quiz";
 
 function getAnonymousId(): string {
   if (typeof window === "undefined") return "unknown";
@@ -22,6 +22,8 @@ export type QuizStatus = {
 };
 
 export function useQuiz(courseCode: Ref<string>) {
+  const user = useSupabaseUser();
+
   const quizData = ref<MultipleChoiceQuizResponse | null>(null);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
@@ -44,15 +46,20 @@ export function useQuiz(courseCode: Ref<string>) {
     status.value = null;
 
     try {
+      const userId = (user.value as any)?.id ?? (user.value as any)?.sub;
+
       const response = await fetch(
-        `${QUIZ_API_BASE}/multiple-choice/${courseCode.value}`,
+        `${QUIZ_API_BASE_LOCAL}/multiple-choice/${courseCode.value}`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             "x-anonymous-user-id": getAnonymousId(),
           },
-          body: JSON.stringify(payload),
+          body: JSON.stringify({
+            ...payload,
+            ...(userId ? { user_id: userId } : {}),
+          }),
           signal: abortController.signal,
         },
       );

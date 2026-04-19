@@ -17,6 +17,23 @@ useSeoMeta({
 const user = useSupabaseUser();
 const supabase = useSupabaseClient();
 
+type QuizActivityItem = {
+  id: string;
+  createdAt: string;
+  courseCode: string;
+  sourceCount: number;
+  questionCount: number;
+};
+
+type ConversationActivityItem = {
+  id: string;
+  title: string;
+  createdAt: string;
+  courseCode: string | null;
+  preview: string | null;
+  messageCount: number;
+};
+
 const colorCookie = useCookie<string>("user-avatar-color");
 
 const firstName = ref("");
@@ -31,6 +48,19 @@ const profileLoading = ref(true);
 const avatarUrl = ref<string | null>(null);
 const avatarUploading = ref(false);
 const fileInput = ref<HTMLInputElement | null>(null);
+const activityLoading = ref(false);
+const quizCount = ref(0);
+const conversationCount = ref(0);
+const chatMessageCount = ref(0);
+const recentQuizzes = ref<QuizActivityItem[]>([]);
+const recentConversations = ref<ConversationActivityItem[]>([]);
+
+const currentUserId = computed(
+  () =>
+    ((user.value as any)?.id ?? (user.value as any)?.sub ?? null) as
+      | string
+      | null,
+);
 
 const avatarColor = computed(() => colorCookie.value as string);
 
@@ -60,11 +90,126 @@ const hasChanges = computed(() => {
   );
 });
 
+function formatDateTime(value: string) {
+  return new Intl.DateTimeFormat("sv-SE", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(value));
+}
+
+async function loadActivity(userId: string) {
+  activityLoading.value = true;
+
+  try {
+    const [quizRes, conversationsRes] = await Promise.all([
+      (supabase as any)
+        .from("ai_quiz_logs")
+        .select("id, created_at, course_code, source_count, quiz", {
+          count: "exact",
+        })
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(6),
+      (supabase as any)
+        .from("conversations")
+        .select("id, title, created_at", { count: "exact" })
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(6),
+    ]);
+
+    quizCount.value = quizRes.count ?? 0;
+    conversationCount.value = conversationsRes.count ?? 0;
+
+    const quizRows = Array.isArray(quizRes.data) ? quizRes.data : [];
+    recentQuizzes.value = quizRows.map((row: any) => ({
+      id: row.id,
+      createdAt: row.created_at,
+      courseCode: row.course_code ?? "—",
+      sourceCount: row.source_count ?? 0,
+      questionCount: row.quiz?.quiz?.questions?.length ?? 0,
+    }));
+
+    const conversationRows = Array.isArray(conversationsRes.data)
+      ? conversationsRes.data
+      : [];
+    const conversationIds = conversationRows
+      .map((row: any) => row.id)
+      .filter(Boolean);
+
+    if (conversationIds.length === 0) {
+      chatMessageCount.value = 0;
+      recentConversations.value = [];
+      return;
+    }
+
+    const chatLogsRes = await (supabase as any)
+      .from("ai_chat_logs")
+      .select("conversation_id, content, role, created_at, course_code", {
+        count: "exact",
+      })
+      .in("conversation_id", conversationIds)
+      .order("created_at", { ascending: false });
+
+    chatMessageCount.value = chatLogsRes.count ?? 0;
+
+    const conversationMeta = new Map<
+      string,
+      {
+        courseCode: string | null;
+        preview: string | null;
+        messageCount: number;
+      }
+    >();
+
+    const logs = Array.isArray(chatLogsRes.data) ? chatLogsRes.data : [];
+    for (const row of logs) {
+      const id = row.conversation_id;
+      if (!id) continue;
+
+      const existing = conversationMeta.get(id) ?? {
+        courseCode: null,
+        preview: null,
+        messageCount: 0,
+      };
+
+      existing.messageCount += 1;
+
+      if (!existing.courseCode && row.course_code) {
+        existing.courseCode = row.course_code;
+      }
+
+      if (!existing.preview && row.role === "user" && row.content) {
+        existing.preview = row.content;
+      }
+
+      conversationMeta.set(id, existing);
+    }
+
+    recentConversations.value = conversationRows.map((row: any) => {
+      const meta = conversationMeta.get(row.id);
+      return {
+        id: row.id,
+        title: row.title || "Ny konversation",
+        createdAt: row.created_at,
+        courseCode: meta?.courseCode ?? null,
+        preview: meta?.preview ?? null,
+        messageCount: meta?.messageCount ?? 0,
+      };
+    });
+  } finally {
+    activityLoading.value = false;
+  }
+}
+
 onMounted(async () => {
   const { data: authData } = await supabase.auth.getUser();
   createdAt.value = authData.user?.created_at ?? null;
 
-  if (!user.value?.sub) {
+  if (!currentUserId.value) {
     profileLoading.value = false;
     return;
   }
@@ -72,7 +217,7 @@ onMounted(async () => {
   const { data: profile } = await (supabase as any)
     .from("profiles")
     .select("first_name, last_name, avatar_color, avatar_url")
-    .eq("id", user.value.sub)
+    .eq("id", currentUserId.value)
     .single();
 
   if (profile) {
@@ -90,20 +235,22 @@ onMounted(async () => {
     ] as string;
   }
 
+  await loadActivity(currentUserId.value);
+
   profileLoading.value = false;
 });
 
 const setColor = async (color: string) => {
   colorCookie.value = color;
-  if (!user.value?.sub) return;
+  if (!currentUserId.value) return;
   await (supabase as any)
     .from("profiles")
     .update({ avatar_color: color })
-    .eq("id", user.value.sub);
+    .eq("id", currentUserId.value);
 };
 
 async function saveProfile() {
-  if (!user.value?.sub || !hasChanges.value) return;
+  if (!currentUserId.value || !hasChanges.value) return;
   profileSaving.value = true;
 
   const { error } = await (supabase as any)
@@ -112,7 +259,7 @@ async function saveProfile() {
       first_name: firstNameInput.value.trim() || null,
       last_name: lastNameInput.value.trim() || null,
     })
-    .eq("id", user.value.sub);
+    .eq("id", currentUserId.value);
 
   profileSaving.value = false;
 
@@ -136,12 +283,12 @@ async function handleAvatarClick() {
 
 async function handleFileChange(event: Event) {
   const file = (event.target as HTMLInputElement).files?.[0];
-  if (!file || !user.value?.sub) return;
+  if (!file || !currentUserId.value) return;
 
   avatarUploading.value = true;
 
   const ext = file.name.split(".").pop();
-  const path = `${user.value.sub}/avatar.${ext}`;
+  const path = `${currentUserId.value}/avatar.${ext}`;
 
   const { error: uploadError } = await (supabase as any).storage
     .from("avatars")
@@ -168,7 +315,7 @@ async function handleFileChange(event: Event) {
   await (supabase as any)
     .from("profiles")
     .update({ avatar_url: publicUrl })
-    .eq("id", user.value.sub);
+    .eq("id", currentUserId.value);
 
   avatarUploading.value = false;
   toast.success("Profilbild uppdaterad!");
@@ -401,6 +548,130 @@ async function handleSignOut() {
             >
           </div>
         </div>
+      </section>
+
+      <section class="flex flex-col gap-3">
+        <h2
+          class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
+        >
+          Aktivitet
+        </h2>
+
+        <div
+          v-if="activityLoading"
+          class="border border-border rounded-xl p-5 grid grid-cols-1 sm:grid-cols-3 gap-3"
+        >
+          <div
+            v-for="i in 3"
+            :key="i"
+            class="rounded-lg border border-border/70 p-3 space-y-2"
+          >
+            <div class="h-3 w-20 rounded bg-muted animate-pulse" />
+            <div class="h-5 w-12 rounded bg-muted animate-pulse" />
+          </div>
+        </div>
+
+        <template v-else>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="rounded-lg border border-border/70 p-3">
+              <p class="text-[11px] text-muted-foreground">Quiz skapade</p>
+              <p class="mt-1 text-xl font-semibold tabular-nums">
+                {{ quizCount }}
+              </p>
+            </div>
+            <div class="rounded-lg border border-border/70 p-3">
+              <p class="text-[11px] text-muted-foreground">Konversationer</p>
+              <p class="mt-1 text-xl font-semibold tabular-nums">
+                {{ conversationCount }}
+              </p>
+            </div>
+            <div class="rounded-lg border border-border/70 p-3">
+              <p class="text-[11px] text-muted-foreground">Chatmeddelanden</p>
+              <p class="mt-1 text-xl font-semibold tabular-nums">
+                {{ chatMessageCount }}
+              </p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
+            <div class="rounded-xl border border-border/70">
+              <div class="px-4 py-3 border-b border-border/70">
+                <p class="text-sm font-medium">Senaste quiz</p>
+                <p class="text-xs text-muted-foreground">
+                  Dina senaste genererade quiz
+                </p>
+              </div>
+
+              <div v-if="recentQuizzes.length === 0" class="px-4 py-4">
+                <p class="text-xs text-muted-foreground">
+                  Inga quiz sparade ännu.
+                </p>
+              </div>
+
+              <div v-else class="divide-y divide-border/60">
+                <NuxtLink
+                  v-for="item in recentQuizzes"
+                  :key="item.id"
+                  :to="`/quiz/${item.courseCode}`"
+                  class="flex items-start justify-between gap-3 px-4 py-3 hover:bg-muted/30 transition-colors"
+                >
+                  <div class="min-w-0">
+                    <p class="text-sm font-medium">{{ item.courseCode }}</p>
+                    <p class="text-xs text-muted-foreground">
+                      {{ item.sourceCount }} tentor ·
+                      {{ item.questionCount }} frågor
+                    </p>
+                  </div>
+                  <p
+                    class="text-[11px] text-muted-foreground whitespace-nowrap"
+                  >
+                    {{ formatDateTime(item.createdAt) }}
+                  </p>
+                </NuxtLink>
+              </div>
+            </div>
+
+            <div class="rounded-xl border border-border/70">
+              <div class="px-4 py-3 border-b border-border/70">
+                <p class="text-sm font-medium">Senaste konversationer</p>
+                <p class="text-xs text-muted-foreground">
+                  Snabb överblick över din chatthistorik
+                </p>
+              </div>
+
+              <div v-if="recentConversations.length === 0" class="px-4 py-4">
+                <p class="text-xs text-muted-foreground">
+                  Inga konversationer ännu.
+                </p>
+              </div>
+
+              <div v-else class="divide-y divide-border/60">
+                <div
+                  v-for="item in recentConversations"
+                  :key="item.id"
+                  class="px-4 py-3"
+                >
+                  <div class="flex items-center justify-between gap-3">
+                    <p class="text-sm font-medium truncate">{{ item.title }}</p>
+                    <span
+                      v-if="item.courseCode"
+                      class="inline-flex items-center rounded-full border border-border/70 px-2 py-0.5 text-[10px] text-muted-foreground"
+                    >
+                      {{ item.courseCode }}
+                    </span>
+                  </div>
+                  <p class="mt-1 text-xs text-muted-foreground line-clamp-2">
+                    {{ item.preview || "Ingen förhandsvisning tillgänglig." }}
+                  </p>
+                  <p class="mt-1 text-[11px] text-muted-foreground">
+                    {{ item.messageCount }} meddelanden ·
+                    {{ formatDateTime(item.createdAt) }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
       </section>
 
       <section class="flex flex-col gap-3">

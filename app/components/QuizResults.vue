@@ -13,6 +13,7 @@ const emit = defineEmits<{
 }>();
 
 const questions = computed(() => props.quizData.quiz.questions);
+const quizMeta = computed(() => props.quizData?.meta ?? ({} as any));
 
 const score = computed(() =>
   questions.value.reduce((acc, q) => {
@@ -21,8 +22,21 @@ const score = computed(() =>
 );
 
 const pct = computed(() =>
-  Math.round((score.value / questions.value.length) * 100),
+  questions.value.length > 0
+    ? Math.round((score.value / questions.value.length) * 100)
+    : 0,
 );
+
+const sourceCountLabel = computed(() => {
+  const sourceCount =
+    quizMeta.value?.sourceCount ?? quizMeta.value?.source_count ?? null;
+  return typeof sourceCount === "number" ? `${sourceCount} tentor` : "Tentor";
+});
+
+const courseCodeLabel = computed(() => {
+  const value = quizMeta.value?.courseCode ?? quizMeta.value?.course_code;
+  return typeof value === "string" && value.length > 0 ? value : "Okänd kurs";
+});
 </script>
 
 <template>
@@ -39,8 +53,8 @@ const pct = computed(() =>
           >
         </p>
         <p class="mt-1.5 text-xs text-muted-foreground">
-          {{ quizData.meta.sourceCount }} tentor ·
-          {{ quizData.meta.courseCode }}
+          {{ sourceCountLabel }} ·
+          {{ courseCodeLabel }}
         </p>
       </div>
       <span class="text-3xl font-medium text-muted-foreground">{{ pct }}%</span>
@@ -79,9 +93,11 @@ const pct = computed(() =>
         class="rounded-xl border border-border/50 p-4"
       >
         <div class="mb-3 flex items-center gap-2">
-          <Badge variant="secondary" class="text-[10px] px-2 py-0.5">
+          <span
+            class="inline-flex items-center rounded-full border border-border/70 bg-muted/40 px-2 py-0.5 text-[10px]"
+          >
             Fråga {{ qi + 1 }}
-          </Badge>
+          </span>
           <span
             class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium border"
             :class="

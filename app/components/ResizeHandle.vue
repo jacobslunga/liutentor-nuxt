@@ -10,7 +10,7 @@ const emit = defineEmits<{
 
 <template>
   <div
-    class="absolute top-0 bottom-0 w-5 z-120 cursor-col-resize flex items-center justify-center group touch-none select-none outline-none left-0 -translate-x-1/2"
+    class="absolute top-0 bottom-0 w-5 z-80 cursor-col-resize flex items-center justify-center group touch-none select-none outline-none left-0 -translate-x-1/2"
     @mousedown.prevent="emit('startResize')"
   >
     <div

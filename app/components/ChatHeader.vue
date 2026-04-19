@@ -1,5 +1,5 @@
 <template>
-  <div class="shrink-0 flex items-center justify-between px-3 py-2 z-100">
+  <div class="shrink-0 flex items-center justify-between px-3 py-2 z-90">
     <div class="flex items-center gap-2">
       <Button variant="ghost" size="icon" class="size-8" @click="emit('close')">
         <LucideChevronRight />

@@ -27,12 +27,13 @@ const sections: Section[] = [
   {
     title: "Information vi samlar in",
     content:
-      "Vi samlar in begränsad information för att kunna tillhandahålla och förbättra tjänsten:",
+      "Vi samlar in information för att kunna tillhandahålla tjänsten och erbjuda personliga funktioner såsom sparade chattar:",
     items: [
+      "E-postadress för inloggade användare (via Supabase Auth)",
+      "Chattmeddelanden och konversationstitlar som sparas för att du ska kunna återse din historik",
+      "Quizresultat och statistik kopplat till din användarprofil",
       "Anonymiserad användningsstatistik för att förstå hur tjänsten används",
-      "Sökhistorik som sparas lokalt i din webbläsare – vi har inte tillgång till denna",
       "Tentamaterial som du frivilligt väljer att ladda upp och dela",
-      "Feedback som du frivilligt lämnar till oss",
     ],
   },
   {
@@ -40,73 +41,58 @@ const sections: Section[] = [
     content:
       "Vi behandlar dina personuppgifter med stöd av följande rättsliga grunder enligt GDPR artikel 6:",
     items: [
-      "Berättigat intresse (artikel 6.1 f) – för anonym analysstatistik i syfte att förbättra tjänsten",
-      "Samtycke (artikel 6.1 a) – när du frivilligt laddar upp material eller lämnar feedback",
-      "Avtal (artikel 6.1 b) – för uppgifter som är nödvändiga för att tillhandahålla tjänsten",
+      "Avtal (artikel 6.1 b) – För att kunna tillhandahålla ditt användarkonto och spara dina konversationer.",
+      "Berättigat intresse (artikel 6.1 f) – För anonym analysstatistik i syfte att förbättra tjänsten.",
+      "Samtycke (artikel 6.1 a) – När du frivilligt laddar upp material eller lämnar feedback.",
     ],
   },
   {
-    title: "Hur vi använder informationen",
+    title: "Tredjepartstjänster och dataöverföring",
     content:
-      "Vi använder informationen enbart för att förbättra tjänsten och ge dig en bättre upplevelse. Vi säljer aldrig dina personuppgifter till tredje part, och vi delar dem inte med externa aktörer utöver de tjänsteleverantörer som anges nedan.",
+      "Vi använder moderna molntjänster för att driva tjänsten och möjliggöra AI-funktionalitet:",
+    items: [
+      "Supabase: Vår databas och autentiseringstjänst. Din data lagras på servrar i Frankfurt, Tyskland (EU).",
+      "AI-leverantörer (Google, OpenAI): Vid användning av chatten skickas meddelanden och relevant tentainnehåll till dessa för att generera svar. Ingen personlig profilinformation (som din e-post) delas med dessa leverantörer.",
+      "Infrastruktur: Vi säljer aldrig dina personuppgifter till tredje part.",
+    ],
   },
   {
     title: "Lagringstid",
     content:
       "Vi lagrar dina personuppgifter endast så länge det är nödvändigt för de ändamål de samlades in för:",
     items: [
-      "Anonym analysdata lagras i upp till 12 månader",
-      "Uppladdade tentafiler lagras tills du eller vi begär att de tas bort",
-      "Sökhistorik lagras lokalt i din webbläsare och raderas när du rensar din webbläsardata",
+      "Kontoinformation och chatthistorik lagras så länge ditt konto är aktivt eller tills du själv raderar dem.",
+      "Anonym analysdata lagras i upp till 12 månader.",
+      "Uppladdade tentafiler lagras tills du eller vi begär att de tas bort.",
     ],
   },
   {
     title: "Cookies",
     content:
-      "Vi använder cookies för att spara inställningar och sökhistorik lokalt i din webbläsare. Dessa cookies lagras enbart på din enhet och skickas inte till oss. Du kan rensa dem när som helst via din webbläsares inställningar.",
-  },
-  {
-    title: "Tredjepartstjänster och dataöverföring",
-    content:
-      "Vi använder Supabase för lagring och autentisering. Supabase kan komma att lagra data på servrar utanför EU/EES. I sådana fall sker överföringen med stöd av EU:s standardavtalsklausuler (Standard Contractual Clauses) i enlighet med GDPR artikel 46. Vi använder även anonymiserade analysverktyg. Dessa leverantörer har egna integritetspolicyer och behandlar data för vår räkning som personuppgiftsbiträden.",
+      "Vi använder cookies för att hantera din inloggningssession samt för att spara vissa inställningar lokalt. Du kan styra användningen av cookies via din webbläsares inställningar.",
   },
   {
     title: "Dina rättigheter",
     content:
       "Enligt GDPR har du ett antal rättigheter avseende dina personuppgifter. Du har rätt att:",
     items: [
-      "Begära tillgång till de personuppgifter vi behandlar om dig",
+      "Begära tillgång till och utdrag av de personuppgifter vi behandlar om dig (dataportabilitet)",
       "Begära rättelse av felaktiga eller ofullständiga uppgifter",
-      "Begära radering av dina uppgifter ('rätten att bli bortglömd')",
+      "Begära radering av dina uppgifter eller hela ditt konto",
       "Invända mot behandling som grundar sig på berättigat intresse",
-      "Begära begränsning av behandlingen i vissa situationer",
-      "Återkalla ditt samtycke när som helst, utan att det påverkar lagligheten av tidigare behandling",
+      "Återkalla ditt samtycke när som helst",
     ],
-  },
-  {
-    title: "Rätt att klaga",
-    content:
-      "Om du anser att vår behandling av dina personuppgifter strider mot GDPR har du rätt att lämna in ett klagomål till Integritetsskyddsmyndigheten (IMY), som är tillsynsmyndighet i Sverige.",
-    items: [
-      "Webbplats: www.imy.se",
-      "E-post: imy@imy.se",
-      "Telefon: 08-657 61 00",
-    ],
-  },
-  {
-    title: "Automatiserat beslutsfattande",
-    content:
-      "Vi använder inte automatiserat beslutsfattande eller profilering som har rättsliga eller liknande betydande effekter för dig.",
   },
   {
     title: "Datasäkerhet",
     content:
-      "Vi vidtar lämpliga tekniska och organisatoriska säkerhetsåtgärder för att skydda dina personuppgifter mot obehörig åtkomst, förlust eller förstörelse. Bland annat använder vi krypterade anslutningar (HTTPS) och åtkomstkontroll för lagrade data.",
+      "Vi vidtar lämpliga tekniska säkerhetsåtgärder för att skydda dina data, inklusive krypterade anslutningar (HTTPS) och strikt åtkomstkontroll via Supabase RLS (Row Level Security) för att säkerställa att endast du kan komma åt dina privata chattar.",
   },
   {
-    title: "Ändringar i denna policy",
+    title: "Rätt att klaga",
     content:
-      "Vi kan komma att uppdatera denna integritetspolicy. Vid väsentliga förändringar meddelar vi dig via tjänsten. Datumet för senaste uppdatering framgår längst upp på denna sida.",
+      "Om du anser att vår behandling av dina personuppgifter strider mot GDPR har du rätt att lämna in ett klagomål till Integritetsskyddsmyndigheten (IMY).",
+    items: ["Webbplats: www.imy.se", "E-post: imy@imy.se"],
   },
 ];
 </script>
@@ -117,13 +103,13 @@ const sections: Section[] = [
       Integritetspolicy
     </h1>
     <p class="text-xs text-muted-foreground mb-6">
-      Senast uppdaterad: 2026/03/23
+      Senast uppdaterad: 2026-04-19
     </p>
     <p class="text-sm text-foreground/80 leading-relaxed mb-6">
       Hos LiU Tentor värnar vi om din integritet och behandlar dina
       personuppgifter i enlighet med EU:s dataskyddsförordning (GDPR). Denna
-      policy beskriver vilka uppgifter vi samlar in, varför vi gör det, och
-      vilka rättigheter du har.
+      policy beskriver vilka uppgifter vi samlar in, hur de hanteras säkert i
+      Frankfurt (EU), och vilka rättigheter du har som användare.
     </p>
 
     <Separator />
@@ -151,8 +137,8 @@ const sections: Section[] = [
         <h3 class="text-sm font-medium">Kontakta oss</h3>
       </div>
       <p class="text-sm text-muted-foreground">
-        Har du frågor om vår integritetspolicy eller vill utöva dina
-        rättigheter? Kontakta oss så svarar vi normalt inom 48 timmar.
+        Har du frågor om din data eller vill utöva dina rättigheter (t.ex.
+        radera ditt konto)? Kontakta oss så hjälper vi dig.
       </p>
       <Button size="sm" @click="openMail"> liutentor@gmail.com </Button>
     </div>

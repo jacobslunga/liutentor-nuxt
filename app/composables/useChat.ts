@@ -5,7 +5,7 @@ const CHAT_API_URL =
   "https://liutentor-api-production.up.railway.app/api/v1/chat/completion";
 
 // USE FOR LOCAL DEVELOPMENT
-// const CHAT_API_URL_LOCAL = "http://localhost:3001/api/v1/chat/completion";
+const CHAT_API_URL_LOCAL = "http://localhost:3001/api/v1/chat/completion";
 
 function getAnonymousId(): string {
   if (typeof window === "undefined") return "unknown";
@@ -24,6 +24,8 @@ export function useChat(options: {
   solutionUrl?: string | null;
 }) {
   const chatStore = useChatStore();
+  const user = useSupabaseUser();
+  const supabase = useSupabaseClient();
   const abortController = ref<AbortController | null>(null);
 
   function cancelGeneration(): string | null {
@@ -72,6 +74,24 @@ export function useChat(options: {
   ) {
     if (!content.trim() || chatStore.isLoading) return;
 
+    if (user.value && !chatStore.currentConversationId) {
+      try {
+        const { data, error } = await (supabase as any)
+          .from("conversations")
+          .insert({
+            user_id: user.value.sub,
+            title: content.trim().substring(0, 50),
+          })
+          .select("id")
+          .single();
+
+        if (error) throw error;
+        chatStore.currentConversationId = data.id;
+      } catch (e) {
+        console.error("Failed to initialize conversation history:", e);
+      }
+    }
+
     const {
       giveDirectAnswer = true,
       modelId = "gemini-2.5-pro",
@@ -84,7 +104,6 @@ export function useChat(options: {
       ...(context ? { context } : {}),
     };
 
-    // Update store state
     chatStore.messages.push(userMessage);
     chatStore.messages.push({ role: "assistant", content: "" });
     chatStore.setLoading(true);
@@ -93,7 +112,7 @@ export function useChat(options: {
 
     try {
       const recentMessages = chatStore.messages
-        .slice(0, -1) // exclude the empty assistant message we just added
+        .slice(0, -1)
         .slice(-10)
         .map((m) => ({
           role: m.role,
@@ -101,7 +120,7 @@ export function useChat(options: {
           ...(m.context ? { context: m.context } : {}),
         }));
 
-      const response = await fetch(`${CHAT_API_URL}/${options.examId}`, {
+      const response = await fetch(`${CHAT_API_URL_LOCAL}/${options.examId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -114,6 +133,8 @@ export function useChat(options: {
           courseCode: options.courseCode,
           solutionUrl: options.solutionUrl || undefined,
           modelId,
+          conversationId: chatStore.currentConversationId,
+          userId: user.value?.sub,
         }),
         signal: abortController.value.signal,
       });
@@ -147,7 +168,6 @@ export function useChat(options: {
         }
       }
 
-      // Final update
       const final = [...chatStore.messages];
       final[final.length - 1] = {
         role: "assistant",

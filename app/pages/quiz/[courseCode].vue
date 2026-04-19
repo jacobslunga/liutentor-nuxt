@@ -21,10 +21,15 @@ const stage = ref<Stage>("setup");
 const activeQuizData = ref<MultipleChoiceQuizResponse | null>(null);
 const activeQuizId = ref<string | null>(null);
 const completedAnswers = ref<Record<number, number>>({});
+const user = useSupabaseUser();
+const hasAutoLoadedLatest = ref(false);
+const historyEnabled = computed(() =>
+  Boolean((user.value as any)?.id ?? (user.value as any)?.sub),
+);
 
 const { quizData, isLoading, error, status, generateQuiz, reset } =
   useQuiz(courseCode);
-const { courseHistory, save, findById } = useQuizHistory(courseCode);
+const { courseHistory, findById, refresh } = useQuizHistory(courseCode);
 
 const { data: examsData, status: examsStatus } = useFetch<{
   data: { exams: Exam[] };
@@ -40,25 +45,38 @@ watch(courseCode, () => {
   activeQuizData.value = null;
   activeQuizId.value = null;
   completedAnswers.value = {};
+  hasAutoLoadedLatest.value = false;
   reset();
 });
 
-onMounted(() => {
-  if (courseHistory.value.length > 0) {
-    const latest = courseHistory.value[0];
-    if (latest) {
-      activeQuizData.value = latest.data;
-      activeQuizId.value = latest.id;
-      stage.value = "answering";
-    }
-  }
-});
+watch(
+  [courseHistory, historyEnabled],
+  ([history, enabled]) => {
+    if (!enabled) return;
+    if (hasAutoLoadedLatest.value) return;
+    const latest = history[0];
+    if (!latest) return;
 
-watch(quizData, (data) => {
+    activeQuizData.value = latest.data;
+    activeQuizId.value = latest.id;
+    stage.value = "answering";
+    hasAutoLoadedLatest.value = true;
+  },
+  { immediate: true },
+);
+
+watch(quizData, async (data) => {
   if (!data?.quiz?.questions?.length) return;
-  const entry = save(data);
   activeQuizData.value = data;
-  activeQuizId.value = entry.id;
+
+  if (historyEnabled.value) {
+    await refresh();
+    const latest = courseHistory.value[0];
+    activeQuizId.value = latest?.id ?? null;
+  } else {
+    activeQuizId.value = null;
+  }
+
   if (!isLoading.value) stage.value = "answering";
 });
 
@@ -111,6 +129,7 @@ function handleAdjustSetup() {
       :course-code="courseCode"
       :stage="stage"
       :history="courseHistory"
+      :history-enabled="historyEnabled"
       :active-quiz-id="activeQuizId"
       @load-history="handleLoadHistory"
       @new-quiz="handleNewQuiz"
