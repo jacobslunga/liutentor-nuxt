@@ -1,30 +1,19 @@
 <script setup lang="ts">
+import { COLORS } from "@/constants/avatarColors";
+
 const user = useSupabaseUser();
 const supabase = useSupabaseClient();
 
-const COLORS = [
-  "bg-rose-500",
-  "bg-orange-500",
-  "bg-amber-500",
-  "bg-emerald-500",
-  "bg-cyan-500",
-  "bg-blue-500",
-  "bg-violet-500",
-  "bg-pink-500",
-];
-
 const colorCookie = useCookie<string>("user-avatar-color");
-
 if (!colorCookie.value) {
   colorCookie.value = COLORS[
     Math.floor(Math.random() * COLORS.length)
   ] as string;
 }
-
 const avatarColor = computed(() => colorCookie.value as string);
-
 const firstName = ref("");
 const lastName = ref("");
+const avatarUrl = ref<string | null>(null);
 
 const initial = computed(() => {
   if (firstName.value && lastName.value) {
@@ -35,34 +24,32 @@ const initial = computed(() => {
   if (firstName.value) return (firstName.value[0] ?? "").toUpperCase();
   return user.value?.email?.[0]?.toUpperCase() ?? "?";
 });
-
 const displayName = computed(
   () =>
     [firstName.value, lastName.value].filter(Boolean).join(" ") ||
     user.value?.email,
 );
-
 watch(
-  () => user.value?.id,
+  () => user.value?.sub,
   async (id) => {
     if (!id || id === "undefined") return;
     const { data } = await (supabase as any)
       .from("profiles")
-      .select("first_name, last_name")
+      .select("first_name, last_name, avatar_url, avatar_color")
       .eq("id", id)
       .single();
     if (data) {
       firstName.value = data.first_name ?? "";
       lastName.value = data.last_name ?? "";
+      avatarUrl.value = data.avatar_url ?? null;
+      if (data.avatar_color) colorCookie.value = data.avatar_color;
     }
   },
   { immediate: true },
 );
-
 const signOut = async () => {
   await supabase.auth.signOut();
 };
-
 const gotoProfile = () => {
   navigateTo("/me");
 };
@@ -73,11 +60,17 @@ const gotoProfile = () => {
     <DropdownMenuTrigger as-child>
       <button
         :class="[
-          'w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium cursor-pointer transition-opacity hover:opacity-80',
-          avatarColor,
+          'w-8 h-8 rounded-full overflow-hidden flex items-center justify-center text-white text-sm font-medium cursor-pointer transition-opacity hover:opacity-80',
+          !avatarUrl && `bg-${avatarColor}`,
         ]"
       >
-        {{ initial }}
+        <img
+          v-if="avatarUrl"
+          :src="avatarUrl"
+          alt="Avatar"
+          class="w-full h-full object-cover"
+        />
+        <span v-else>{{ initial }}</span>
       </button>
     </DropdownMenuTrigger>
     <DropdownMenuContent align="end" class="w-56">
@@ -96,9 +89,7 @@ const gotoProfile = () => {
         <LucideUser class="w-4 h-4" />
         Profil
       </DropdownMenuItem>
-
       <DropdownMenuSeparator />
-
       <DropdownMenuItem
         class="cursor-pointer"
         @click="signOut"
