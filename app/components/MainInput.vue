@@ -234,7 +234,7 @@ function handleClickOutside(event: MouseEvent) {
         Laddar...
       </div>
 
-      <div class="px-3 pt-3 pb-1 text-muted-foreground font-normal">
+      <div class="px-3 pt-3 pb-1 text-muted-foreground font-medium">
         Alla kurser
       </div>
 

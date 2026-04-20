@@ -16,23 +16,107 @@ useSeoMeta({
 
 const user = useSupabaseUser();
 const supabase = useSupabaseClient();
+const chatStore = useChatStore();
 
-type QuizActivityItem = {
-  id: string;
-  createdAt: string;
-  courseCode: string;
-  sourceCount: number;
-  questionCount: number;
+type Tier = {
+  key: string;
+  name: string;
+  emoji: string;
+  min: number;
+  glow: string;
+  badgeBg: string;
+  badgeText: string;
+  badgeBorder: string;
+  gradientFrom: string;
+  gradientTo: string;
 };
 
-type ConversationActivityItem = {
-  id: string;
-  title: string;
-  createdAt: string;
-  courseCode: string | null;
-  preview: string | null;
-  messageCount: number;
-};
+const TIERS: Tier[] = [
+  {
+    key: "newbie",
+    name: "Newbie",
+    emoji: "🌱",
+    min: 0,
+    glow: "from-slate-400/30 to-slate-500/20",
+    badgeBg: "bg-slate-500/10",
+    badgeText: "text-slate-600 dark:text-slate-300",
+    badgeBorder: "border-slate-500/30",
+    gradientFrom: "from-slate-400",
+    gradientTo: "to-slate-500",
+  },
+  {
+    key: "larling",
+    name: "Lärling",
+    emoji: "📖",
+    min: 3,
+    glow: "from-emerald-400/40 to-green-500/30",
+    badgeBg: "bg-emerald-500/10",
+    badgeText: "text-emerald-700 dark:text-emerald-300",
+    badgeBorder: "border-emerald-500/30",
+    gradientFrom: "from-emerald-400",
+    gradientTo: "to-green-500",
+  },
+  {
+    key: "flitig",
+    name: "Flitig",
+    emoji: "⚡",
+    min: 10,
+    glow: "from-sky-400/40 to-blue-500/30",
+    badgeBg: "bg-sky-500/10",
+    badgeText: "text-sky-700 dark:text-sky-300",
+    badgeBorder: "border-sky-500/30",
+    gradientFrom: "from-sky-400",
+    gradientTo: "to-blue-500",
+  },
+  {
+    key: "skarpskytt",
+    name: "Skarpskytt",
+    emoji: "🎯",
+    min: 25,
+    glow: "from-violet-400/40 to-purple-500/30",
+    badgeBg: "bg-violet-500/10",
+    badgeText: "text-violet-700 dark:text-violet-300",
+    badgeBorder: "border-violet-500/30",
+    gradientFrom: "from-violet-400",
+    gradientTo: "to-purple-500",
+  },
+  {
+    key: "tankare",
+    name: "Tänkare",
+    emoji: "🧠",
+    min: 50,
+    glow: "from-fuchsia-400/40 to-pink-500/30",
+    badgeBg: "bg-fuchsia-500/10",
+    badgeText: "text-fuchsia-700 dark:text-fuchsia-300",
+    badgeBorder: "border-fuchsia-500/30",
+    gradientFrom: "from-fuchsia-400",
+    gradientTo: "to-pink-500",
+  },
+  {
+    key: "veteran",
+    name: "Veteran",
+    emoji: "🔥",
+    min: 100,
+    glow: "from-orange-400/40 to-red-500/30",
+    badgeBg: "bg-orange-500/10",
+    badgeText: "text-orange-700 dark:text-orange-300",
+    badgeBorder: "border-orange-500/30",
+    gradientFrom: "from-orange-400",
+    gradientTo: "to-red-500",
+  },
+  {
+    key: "legend",
+    name: "Legend",
+    emoji: "👑",
+    min: 250,
+    glow: "from-amber-400/50 to-yellow-500/40",
+    badgeBg: "bg-amber-500/15",
+    badgeText: "text-amber-700 dark:text-amber-300",
+    badgeBorder: "border-amber-500/40",
+    gradientFrom: "from-amber-400",
+    gradientTo: "to-yellow-500",
+  },
+];
 
 const colorCookie = useCookie<string>("user-avatar-color");
 
@@ -52,8 +136,6 @@ const activityLoading = ref(false);
 const quizCount = ref(0);
 const conversationCount = ref(0);
 const chatMessageCount = ref(0);
-const recentQuizzes = ref<QuizActivityItem[]>([]);
-const recentConversations = ref<ConversationActivityItem[]>([]);
 
 const currentUserId = computed(
   () =>
@@ -90,15 +172,42 @@ const hasChanges = computed(() => {
   );
 });
 
-function formatDateTime(value: string) {
-  return new Intl.DateTimeFormat("sv-SE", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(value));
-}
+const activityScore = computed(() => {
+  return (
+    quizCount.value +
+    conversationCount.value +
+    Math.floor(chatMessageCount.value / 10)
+  );
+});
+
+const currentTier = computed<Tier>(() => {
+  const score = activityScore.value;
+  let tier = TIERS[0]!;
+  for (const t of TIERS) {
+    if (score >= t.min) tier = t;
+  }
+  return tier;
+});
+
+const nextTier = computed<Tier | null>(() => {
+  const idx = TIERS.findIndex((t) => t.key === currentTier.value.key);
+  return idx >= 0 && idx < TIERS.length - 1 ? TIERS[idx + 1]! : null;
+});
+
+const tierProgress = computed(() => {
+  const current = currentTier.value;
+  const next = nextTier.value;
+  if (!next) return 100;
+  const span = next.min - current.min;
+  const gained = activityScore.value - current.min;
+  return Math.max(0, Math.min(100, Math.round((gained / span) * 100)));
+});
+
+const pointsToNext = computed(() => {
+  const next = nextTier.value;
+  if (!next) return 0;
+  return Math.max(0, next.min - activityScore.value);
+});
 
 async function loadActivity(userId: string) {
   activityLoading.value = true;
@@ -107,99 +216,34 @@ async function loadActivity(userId: string) {
     const [quizRes, conversationsRes] = await Promise.all([
       (supabase as any)
         .from("ai_quiz_logs")
-        .select("id, created_at, course_code, source_count, quiz", {
-          count: "exact",
-        })
-        .eq("user_id", userId)
-        .order("created_at", { ascending: false })
-        .limit(6),
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", userId),
       (supabase as any)
         .from("conversations")
-        .select("id, title, created_at", { count: "exact" })
-        .eq("user_id", userId)
-        .order("created_at", { ascending: false })
-        .limit(6),
+        .select("id", { count: "exact" })
+        .eq("user_id", userId),
     ]);
 
     quizCount.value = quizRes.count ?? 0;
     conversationCount.value = conversationsRes.count ?? 0;
 
-    const quizRows = Array.isArray(quizRes.data) ? quizRes.data : [];
-    recentQuizzes.value = quizRows.map((row: any) => ({
-      id: row.id,
-      createdAt: row.created_at,
-      courseCode: row.course_code ?? "—",
-      sourceCount: row.source_count ?? 0,
-      questionCount: row.quiz?.quiz?.questions?.length ?? 0,
-    }));
-
-    const conversationRows = Array.isArray(conversationsRes.data)
-      ? conversationsRes.data
-      : [];
-    const conversationIds = conversationRows
+    const conversationIds = (
+      Array.isArray(conversationsRes.data) ? conversationsRes.data : []
+    )
       .map((row: any) => row.id)
       .filter(Boolean);
 
     if (conversationIds.length === 0) {
       chatMessageCount.value = 0;
-      recentConversations.value = [];
       return;
     }
 
     const chatLogsRes = await (supabase as any)
       .from("ai_chat_logs")
-      .select("conversation_id, content, role, created_at, course_code", {
-        count: "exact",
-      })
-      .in("conversation_id", conversationIds)
-      .order("created_at", { ascending: false });
+      .select("id", { count: "exact", head: true })
+      .in("conversation_id", conversationIds);
 
     chatMessageCount.value = chatLogsRes.count ?? 0;
-
-    const conversationMeta = new Map<
-      string,
-      {
-        courseCode: string | null;
-        preview: string | null;
-        messageCount: number;
-      }
-    >();
-
-    const logs = Array.isArray(chatLogsRes.data) ? chatLogsRes.data : [];
-    for (const row of logs) {
-      const id = row.conversation_id;
-      if (!id) continue;
-
-      const existing = conversationMeta.get(id) ?? {
-        courseCode: null,
-        preview: null,
-        messageCount: 0,
-      };
-
-      existing.messageCount += 1;
-
-      if (!existing.courseCode && row.course_code) {
-        existing.courseCode = row.course_code;
-      }
-
-      if (!existing.preview && row.role === "user" && row.content) {
-        existing.preview = row.content;
-      }
-
-      conversationMeta.set(id, existing);
-    }
-
-    recentConversations.value = conversationRows.map((row: any) => {
-      const meta = conversationMeta.get(row.id);
-      return {
-        id: row.id,
-        title: row.title || "Ny konversation",
-        createdAt: row.created_at,
-        courseCode: meta?.courseCode ?? null,
-        preview: meta?.preview ?? null,
-        messageCount: meta?.messageCount ?? 0,
-      };
-    });
   } finally {
     activityLoading.value = false;
   }
@@ -323,6 +367,7 @@ async function handleFileChange(event: Event) {
 
 async function handleSignOut() {
   signOutLoading.value = true;
+  chatStore.resetOnLogout();
   await supabase.auth.signOut();
   await navigateTo("/", { replace: true });
 }
@@ -350,9 +395,7 @@ async function handleSignOut() {
     </template>
 
     <template v-else>
-      <section
-        class="relative overflow-hidden rounded-3xl border border-border/70 bg-card p-6 sm:p-8"
-      >
+      <section class="relative p-6 sm:p-8">
         <div class="relative z-10 flex flex-col items-center text-center">
           <button
             class="relative mt-4 cursor-pointer shrink-0 group"
@@ -360,9 +403,16 @@ async function handleSignOut() {
             @click="handleAvatarClick"
           >
             <div
+              :class="[
+                'absolute -inset-6 rounded-full blur-2xl opacity-80 bg-linear-to-br pointer-events-none transition-all duration-500',
+                currentTier.glow,
+              ]"
+            />
+
+            <div
               v-if="avatarUrl"
               :class="[
-                'h-30 w-30 sm:h-36 sm:w-36 rounded-full overflow-hidden border-4 shadow-lg',
+                'relative h-30 w-30 sm:h-36 sm:w-36 rounded-full overflow-hidden border-4 shadow-lg',
                 COLOR_BORDER_MAP[avatarColor],
               ]"
             >
@@ -381,7 +431,7 @@ async function handleSignOut() {
             <div
               v-else
               :class="[
-                'h-30 w-30 sm:h-36 sm:w-36 rounded-full flex items-center justify-center text-white text-5xl font-semibold border-4 shadow-lg',
+                'relative h-30 w-30 sm:h-36 sm:w-36 rounded-full flex items-center justify-center text-white text-5xl font-semibold border-4 shadow-lg',
                 avatarUploading
                   ? 'opacity-40'
                   : 'group-hover:opacity-85 transition-opacity',
@@ -394,7 +444,7 @@ async function handleSignOut() {
 
             <div
               v-if="avatarUploading"
-              class="absolute inset-0 flex items-center justify-center"
+              class="absolute inset-0 flex items-center justify-center z-10"
             >
               <LucideLoader2
                 class="h-7 w-7 text-white animate-spin drop-shadow"
@@ -402,7 +452,7 @@ async function handleSignOut() {
             </div>
 
             <div
-              class="absolute bottom-1 right-1 h-8 w-8 rounded-full bg-background border border-border flex items-center justify-center shadow-sm"
+              class="absolute bottom-1 right-1 h-8 w-8 rounded-full bg-background border border-border flex items-center justify-center shadow-sm z-10"
             >
               <LucideLoader2
                 v-if="avatarUploading"
@@ -425,112 +475,139 @@ async function handleSignOut() {
               [firstName, lastName].filter(Boolean).join(" ") || "Din profil"
             }}
           </h1>
-          <p class="mt-1 text-sm text-muted-foreground">{{ user?.email }}</p>
-          <p class="mt-1 text-xs text-muted-foreground/80">
+
+          <div
+            :class="[
+              'mt-2 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium',
+              currentTier.badgeBg,
+              currentTier.badgeText,
+              currentTier.badgeBorder,
+            ]"
+          >
+            <span class="text-sm leading-none">{{ currentTier.emoji }}</span>
+            <span>{{ currentTier.name }}</span>
+          </div>
+
+          <p class="mt-2 text-sm text-muted-foreground">{{ user?.email }}</p>
+          <p class="text-xs text-muted-foreground/80">
             Medlem sedan {{ memberSince }}
           </p>
 
-          <div
-            class="mt-6 grid w-full max-w-2xl grid-cols-3 gap-2 sm:gap-3"
-            :class="activityLoading ? 'opacity-70' : ''"
-          >
-            <div
-              class="rounded-xl border border-border/70 bg-background/70 p-3 sm:p-4"
-            >
-              <p class="text-[11px] text-muted-foreground">Quiz</p>
-              <p class="mt-1 text-xl sm:text-2xl font-semibold tabular-nums">
-                {{ activityLoading ? "..." : quizCount }}
-              </p>
-            </div>
-            <div
-              class="rounded-xl border border-border/70 bg-background/70 p-3 sm:p-4"
-            >
-              <p class="text-[11px] text-muted-foreground">Samtal</p>
-              <p class="mt-1 text-xl sm:text-2xl font-semibold tabular-nums">
-                {{ activityLoading ? "..." : conversationCount }}
-              </p>
-            </div>
-            <div
-              class="rounded-xl border border-border/70 bg-background/70 p-3 sm:p-4"
-            >
-              <p class="text-[11px] text-muted-foreground">Meddelanden</p>
-              <p class="mt-1 text-xl sm:text-2xl font-semibold tabular-nums">
-                {{ activityLoading ? "..." : chatMessageCount }}
-              </p>
+          <div class="mt-6 w-full max-w-2xl">
+            <div class="rounded-2xl border border-border/70 bg-card p-5 sm:p-6">
+              <div class="flex items-center justify-between gap-3 mb-3">
+                <div class="text-left">
+                  <p
+                    class="text-[11px] text-muted-foreground uppercase tracking-wide"
+                  >
+                    Nivå
+                  </p>
+                  <p class="text-sm font-semibold mt-0.5">
+                    {{ currentTier.emoji }} {{ currentTier.name }}
+                  </p>
+                </div>
+                <div class="text-right">
+                  <p
+                    v-if="nextTier"
+                    class="text-[11px] text-muted-foreground uppercase tracking-wide"
+                  >
+                    Nästa
+                  </p>
+                  <p
+                    v-else
+                    class="text-[11px] text-muted-foreground uppercase tracking-wide"
+                  >
+                    Högsta nivå
+                  </p>
+                  <p v-if="nextTier" class="text-sm font-semibold mt-0.5">
+                    {{ nextTier.emoji }} {{ nextTier.name }}
+                  </p>
+                  <p v-else class="text-sm font-semibold mt-0.5">Maxad! 🎉</p>
+                </div>
+              </div>
+
+              <div class="relative h-2.5 rounded-full bg-muted overflow-hidden">
+                <div
+                  :class="[
+                    'absolute inset-y-0 left-0 rounded-full bg-linear-to-r transition-all duration-700',
+                    currentTier.gradientFrom,
+                    currentTier.gradientTo,
+                  ]"
+                  :style="{ width: `${tierProgress}%` }"
+                />
+              </div>
+
+              <div
+                class="mt-2 flex items-center justify-between text-[11px] text-muted-foreground"
+              >
+                <span class="tabular-nums">{{ activityScore }} poäng</span>
+                <span v-if="nextTier" class="tabular-nums">
+                  {{ pointsToNext }} kvar till {{ nextTier.name }}
+                </span>
+                <span v-else>Du har nått toppen ✨</span>
+              </div>
+
+              <div class="mt-5 grid grid-cols-3 gap-2 sm:gap-3">
+                <div
+                  class="rounded-xl border border-border/70 bg-background/70 p-3 sm:p-4"
+                >
+                  <p class="text-[11px] text-muted-foreground">Quiz</p>
+                  <p
+                    class="mt-1 text-xl sm:text-2xl font-semibold tabular-nums"
+                  >
+                    {{ activityLoading ? "..." : quizCount }}
+                  </p>
+                </div>
+                <div
+                  class="rounded-xl border border-border/70 bg-background/70 p-3 sm:p-4"
+                >
+                  <p class="text-[11px] text-muted-foreground">Samtal</p>
+                  <p
+                    class="mt-1 text-xl sm:text-2xl font-semibold tabular-nums"
+                  >
+                    {{ activityLoading ? "..." : conversationCount }}
+                  </p>
+                </div>
+                <div
+                  class="rounded-xl border border-border/70 bg-background/70 p-3 sm:p-4"
+                >
+                  <p class="text-[11px] text-muted-foreground">Meddelanden</p>
+                  <p
+                    class="mt-1 text-xl sm:text-2xl font-semibold tabular-nums"
+                  >
+                    {{ activityLoading ? "..." : chatMessageCount }}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div class="rounded-2xl border border-border/70 bg-card">
-          <div class="px-4 py-3 border-b border-border/70">
-            <p class="text-sm font-medium">Senaste quiz</p>
-            <p class="text-xs text-muted-foreground">
-              Snabbt tillbaka till tidigare quiz
-            </p>
-          </div>
+      <section class="flex flex-col gap-3">
+        <h2
+          class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
+        >
+          Nivåer
+        </h2>
 
-          <div v-if="recentQuizzes.length === 0" class="px-4 py-5">
-            <p class="text-xs text-muted-foreground">Inga quiz sparade ännu.</p>
-          </div>
-
-          <div v-else class="divide-y divide-border/60">
-            <NuxtLink
-              v-for="item in recentQuizzes"
-              :key="item.id"
-              :to="`/quiz/${item.courseCode}`"
-              class="flex items-start justify-between gap-3 px-4 py-3 hover:bg-muted/30 transition-colors"
-            >
-              <div class="min-w-0">
-                <p class="text-sm font-medium">{{ item.courseCode }}</p>
-                <p class="text-xs text-muted-foreground">
-                  {{ item.sourceCount }} tentor ·
-                  {{ item.questionCount }} frågor
-                </p>
-              </div>
-              <p class="text-[11px] text-muted-foreground whitespace-nowrap">
-                {{ formatDateTime(item.createdAt) }}
-              </p>
-            </NuxtLink>
-          </div>
-        </div>
-
-        <div class="rounded-2xl border border-border/70 bg-card">
-          <div class="px-4 py-3 border-b border-border/70">
-            <p class="text-sm font-medium">Senaste konversationer</p>
-            <p class="text-xs text-muted-foreground">
-              Vad du nyligen har frågat om
-            </p>
-          </div>
-
-          <div v-if="recentConversations.length === 0" class="px-4 py-5">
-            <p class="text-xs text-muted-foreground">
-              Inga konversationer ännu.
-            </p>
-          </div>
-
-          <div v-else class="divide-y divide-border/60">
+        <div class="rounded-2xl border border-border/70 bg-card p-5">
+          <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
             <div
-              v-for="item in recentConversations"
-              :key="item.id"
-              class="px-4 py-3"
+              v-for="tier in TIERS"
+              :key="tier.key"
+              :class="[
+                'rounded-xl border p-3 text-center transition-all',
+                tier.key === currentTier.key
+                  ? `${tier.badgeBg} ${tier.badgeBorder} ring-2 ring-offset-2 ring-offset-background`
+                  : 'border-border/70 opacity-60',
+                tier.key === currentTier.key ? tier.badgeText : '',
+              ]"
             >
-              <div class="flex items-center justify-between gap-3">
-                <p class="text-sm font-medium truncate">{{ item.title }}</p>
-                <span
-                  v-if="item.courseCode"
-                  class="inline-flex items-center rounded-full border border-border/70 px-2 py-0.5 text-[10px] text-muted-foreground"
-                >
-                  {{ item.courseCode }}
-                </span>
-              </div>
-              <p class="mt-1 text-xs text-muted-foreground line-clamp-2">
-                {{ item.preview || "Ingen förhandsvisning tillgänglig." }}
-              </p>
-              <p class="mt-1 text-[11px] text-muted-foreground">
-                {{ item.messageCount }} meddelanden ·
-                {{ formatDateTime(item.createdAt) }}
+              <p class="text-xl">{{ tier.emoji }}</p>
+              <p class="text-xs font-medium mt-1">{{ tier.name }}</p>
+              <p class="text-[10px] text-muted-foreground mt-0.5 tabular-nums">
+                {{ tier.min }}+
               </p>
             </div>
           </div>

@@ -48,7 +48,7 @@ const courseCodeLabel = computed(() => {
         </p>
         <p class="text-4xl font-medium leading-none">
           {{ score }}
-          <span class="text-2xl text-muted-foreground font-normal">
+          <span class="text-2xl text-muted-foreground font-medium">
             / {{ questions.length }}</span
           >
         </p>

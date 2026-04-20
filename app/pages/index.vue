@@ -23,10 +23,10 @@ const user = useSupabaseUser();
         <UserDropdown />
       </template>
       <template v-else>
-        <Button size="sm" variant="secondary" as-child>
+        <Button size="sm" variant="outline" as-child>
           <NuxtLink to="/logga-in">Logga in</NuxtLink>
         </Button>
-        <Button size="sm" variant="ghost" as-child>
+        <Button size="sm" variant="default" as-child>
           <NuxtLink to="/skapa-konto">Skapa konto</NuxtLink>
         </Button>
       </template>
@@ -35,7 +35,7 @@ const user = useSupabaseUser();
     <div class="flex flex-col items-center space-y-2 mb-10">
       <div class="flex flex-row items-center justify-center space-x-2">
         <LogoIcon class="w-12 h-12 md:w-14 md:h-14 lg:w-24 lg:h-24" />
-        <h1 class="text-4xl lg:text-5xl font-normal font-logo tracking-tighter">
+        <h1 class="text-4xl lg:text-5xl font-medium font-logo tracking-tighter">
           LiU Tentor
         </h1>
       </div>

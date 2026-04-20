@@ -5,7 +5,7 @@ const CHAT_API_URL =
   "https://liutentor-api-production.up.railway.app/api/v1/chat/completion";
 
 // USE FOR LOCAL DEVELOPMENT
-const CHAT_API_URL_LOCAL = "http://localhost:3001/api/v1/chat/completion";
+// const CHAT_API_URL_LOCAL = "http://localhost:3001/api/v1/chat/completion";
 
 function getAnonymousId(): string {
   if (typeof window === "undefined") return "unknown";
@@ -26,7 +26,14 @@ export function useChat(options: {
   const chatStore = useChatStore();
   const user = useSupabaseUser();
   const supabase = useSupabaseClient();
+  const { getAuthHeaders } = useAuthHeaders();
   const abortController = ref<AbortController | null>(null);
+
+  function getUserId(): string | null {
+    return ((user.value as any)?.id ?? (user.value as any)?.sub ?? null) as
+      | string
+      | null;
+  }
 
   function cancelGeneration(): string | null {
     abortController.value?.abort();
@@ -74,19 +81,28 @@ export function useChat(options: {
   ) {
     if (!content.trim() || chatStore.isLoading) return;
 
-    if (user.value && !chatStore.currentConversationId) {
+    const trimmedContent = content.trim();
+    const userId = getUserId();
+
+    if (!chatStore.currentConversationTitle) {
+      chatStore.currentConversationTitle = trimmedContent.substring(0, 80);
+    }
+
+    if (userId && !chatStore.currentConversationId) {
       try {
+        const title = trimmedContent.substring(0, 50);
         const { data, error } = await (supabase as any)
           .from("conversations")
           .insert({
-            user_id: user.value.sub,
-            title: content.trim().substring(0, 50),
+            user_id: userId,
+            title,
           })
           .select("id")
           .single();
 
         if (error) throw error;
         chatStore.currentConversationId = data.id;
+        chatStore.currentConversationTitle = title;
       } catch (e) {
         console.error("Failed to initialize conversation history:", e);
       }
@@ -120,11 +136,14 @@ export function useChat(options: {
           ...(m.context ? { context: m.context } : {}),
         }));
 
-      const response = await fetch(`${CHAT_API_URL_LOCAL}/${options.examId}`, {
+      const authHeaders = await getAuthHeaders();
+
+      const response = await fetch(`${CHAT_API_URL}/${options.examId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "x-anonymous-user-id": getAnonymousId(),
+          ...authHeaders,
         },
         body: JSON.stringify({
           messages: recentMessages,
@@ -134,7 +153,6 @@ export function useChat(options: {
           solutionUrl: options.solutionUrl || undefined,
           modelId,
           conversationId: chatStore.currentConversationId,
-          userId: user.value?.sub,
         }),
         signal: abortController.value.signal,
       });
@@ -158,7 +176,6 @@ export function useChat(options: {
 
         if (now - lastUpdate >= STREAM_UPDATE_INTERVAL) {
           lastUpdate = now;
-          // Trigger Vue reactivity by assigning a new array
           const updated = [...chatStore.messages];
           updated[updated.length - 1] = {
             role: "assistant",

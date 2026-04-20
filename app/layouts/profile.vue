@@ -34,7 +34,7 @@ watch(
           class="flex items-center gap-2 hover:opacity-80 transition-opacity"
         >
           <LogoIcon class="w-7 h-7" />
-          <span class="font-normal tracking-tighter text-lg font-logo"
+          <span class="font-medium tracking-tighter text-lg font-logo"
             >LiU Tentor</span
           >
         </NuxtLink>

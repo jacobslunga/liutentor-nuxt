@@ -203,7 +203,7 @@ const iconSize = computed(
         "
         @mousedown="handleSelectCourse(suggestion)"
       >
-        <span class="flex-1 font-normal">{{ suggestion }}</span>
+        <span class="flex-1 font-medium">{{ suggestion }}</span>
         <LucideCornerDownLeft class="w-3.5 h-3.5 opacity-40" />
       </div>
     </div>

@@ -15,6 +15,8 @@ export const useChatStore = defineStore("chat", () => {
   const draftInput = ref("");
   const currentExamId = ref<string | null>(null);
   const currentConversationId = ref<string | null>(null);
+  const currentConversationTitle = ref<string | null>(null);
+  const isHistoryOpen = ref(false);
 
   function toggle() {
     isOpen.value = !isOpen.value;
@@ -39,6 +41,13 @@ export const useChatStore = defineStore("chat", () => {
     draftInput.value = "";
     currentExamId.value = null;
     currentConversationId.value = null;
+    currentConversationTitle.value = null;
+    isHistoryOpen.value = false;
+  }
+
+  function resetOnLogout() {
+    clearChat();
+    isOpen.value = false;
   }
 
   return {
@@ -49,10 +58,13 @@ export const useChatStore = defineStore("chat", () => {
     draftInput,
     currentExamId,
     currentConversationId,
+    currentConversationTitle,
+    isHistoryOpen,
     toggle,
     open,
     close,
     setLoading,
     clearChat,
+    resetOnLogout,
   };
 });

@@ -27,7 +27,7 @@ const mobileOpen = ref(false);
           class="flex items-center gap-2 hover:opacity-80 transition-opacity shrink-0"
         >
           <LogoIcon class="w-7 h-7" />
-          <span class="font-normal text-lg font-logo tracking-tighter"
+          <span class="font-medium text-lg font-logo tracking-tighter"
             >LiU Tentor</span
           >
         </NuxtLink>
@@ -37,7 +37,7 @@ const mobileOpen = ref(false);
             v-for="link in navLinks"
             :key="link.to"
             :to="link.to"
-            class="px-3 py-1.5 font-normal text-sm rounded-md transition-colors"
+            class="px-3 py-1.5 font-medium text-sm rounded-md transition-colors"
             :class="
               isCurrentPath(link.to)
                 ? 'bg-secondary text-foreground'
@@ -58,7 +58,7 @@ const mobileOpen = ref(false);
             <SheetHeader>
               <SheetTitle class="flex items-center gap-2">
                 <LogoIcon class="w-7 h-7" />
-                <span class="font-normal text-lg font-logo tracking-tighter"
+                <span class="font-medium text-lg font-logo tracking-tighter"
                   >LiU Tentor</span
                 >
               </SheetTitle>

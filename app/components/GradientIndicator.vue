@@ -73,7 +73,7 @@ onUnmounted(() => {
     >
       <div v-if="facitPdfUrl" class="flex items-center gap-2">
         <LucideArrowLeftToLine class="w-5 h-5 text-primary" />
-        <span class="text-xs font-normal text-primary hidden md:block">
+        <span class="text-xs font-medium text-primary hidden md:block">
           {{ label ?? "Facit" }}
         </span>
       </div>

@@ -3,6 +3,7 @@ import { COLOR_BORDER_MAP, COLORS } from "@/constants/avatarColors";
 
 const user = useSupabaseUser();
 const supabase = useSupabaseClient();
+const chatStore = useChatStore();
 const colorCookie = useCookie<string>("user-avatar-color");
 
 if (!colorCookie.value) {
@@ -65,6 +66,7 @@ watch(
 );
 
 const signOut = async () => {
+  chatStore.resetOnLogout();
   await supabase.auth.signOut();
 };
 

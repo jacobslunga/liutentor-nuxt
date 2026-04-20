@@ -34,7 +34,7 @@ const modes = [
         <Tooltip>
           <TooltipTrigger as-child>
             <button
-              class="flex border items-center gap-1.5 px-3 py-1.5 text-xs font-normal transition-colors cursor-pointer"
+              class="flex border items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer"
               :class="[
                 mode.value === 'exam-with-facit'
                   ? 'rounded-l-lg'

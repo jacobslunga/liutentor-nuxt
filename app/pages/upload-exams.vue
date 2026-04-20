@@ -182,18 +182,18 @@ onUnmounted(() => {
 <template>
   <div class="w-full max-w-2xl">
     <h1 class="text-3xl font-semibold text-foreground mb-2">Ladda upp tenta</h1>
-    <p class="text-sm font-normal text-muted-foreground mb-8">
+    <p class="text-sm font-medium text-muted-foreground mb-8">
       Hjälp andra studenter genom att ladda upp gamla tentor och facit.
     </p>
 
     <div class="space-y-6">
       <div class="space-y-2">
-        <label class="text-sm font-normal text-muted-foreground">Kurskod</label>
+        <label class="text-sm font-medium text-muted-foreground">Kurskod</label>
         <input
           :value="kurskod"
           :placeholder="kurskod ? '' : typed"
           :disabled="loading"
-          class="w-full bg-transparent font-normal outline-none border-0 border-b-2 border-foreground/20 text-center text-4xl focus:ring-0 focus:border-primary transition-colors p-2 placeholder:text-muted-foreground/40"
+          class="w-full bg-transparent font-medium outline-none border-0 border-b-2 border-foreground/20 text-center text-4xl focus:ring-0 focus:border-primary transition-colors p-2 placeholder:text-muted-foreground/40"
           @input="
             kurskod = ($event.target as HTMLInputElement).value.toUpperCase()
           "
@@ -223,7 +223,7 @@ onUnmounted(() => {
           class="flex flex-col items-center justify-center gap-2 text-muted-foreground"
         >
           <LucideUpload class="h-8 w-8" />
-          <p class="font-normal">
+          <p class="font-medium">
             Dra och släpp PDF-filer här, eller klicka för att välja
           </p>
         </div>

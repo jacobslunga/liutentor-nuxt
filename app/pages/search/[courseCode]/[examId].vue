@@ -212,7 +212,7 @@ function handleKeyUp(e: KeyboardEvent) {
                         v-if="solutionBlurred"
                         class="absolute inset-0 backdrop-blur-md bg-background/30 flex flex-col gap-2 items-center justify-center pointer-events-none"
                       >
-                        <p class="text-sm font-medium text-muted-foreground">
+                        <p class="text-sm font-normal text-muted-foreground">
                           Håll muspekaren för att visa facit
                         </p>
                         <LucidePointer

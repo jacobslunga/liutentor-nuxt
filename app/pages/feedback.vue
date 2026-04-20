@@ -69,7 +69,7 @@ async function handleSubmit() {
 <template>
   <div class="w-full max-w-2xl">
     <h1 class="text-3xl font-semibold text-foreground mb-2">Feedback</h1>
-    <p class="text-sm font-normal text-muted-foreground mb-6">
+    <p class="text-sm font-medium text-muted-foreground mb-6">
       Hjälp oss bli bättre – dela dina tankar och förslag.
     </p>
 
@@ -83,7 +83,7 @@ async function handleSubmit() {
         <LucideCheck class="h-6 w-6 text-green-600 dark:text-green-400" />
       </div>
       <div>
-        <h2 class="text-xl font-normal mb-1">Tack!</h2>
+        <h2 class="text-xl font-medium mb-1">Tack!</h2>
         <p class="text-sm text-muted-foreground">
           Vi har tagit emot din feedback och återkommer om det behövs.
         </p>
@@ -103,7 +103,7 @@ async function handleSubmit() {
         <LucideAlertCircle class="h-6 w-6 text-red-600 dark:text-red-400" />
       </div>
       <div>
-        <h2 class="text-xl font-normal mb-1">Något gick fel</h2>
+        <h2 class="text-xl font-medium mb-1">Något gick fel</h2>
         <p class="text-sm text-muted-foreground">
           Försök igen eller kontakta oss direkt på liutentor@gmail.com
         </p>
@@ -114,7 +114,7 @@ async function handleSubmit() {
     <form v-else class="space-y-5" @submit.prevent="handleSubmit">
       <div>
         <div class="flex items-center justify-between mb-2">
-          <span class="text-sm font-normal">Namn</span>
+          <span class="text-sm font-medium">Namn</span>
           <span class="text-sm text-muted-foreground">Valfritt</span>
         </div>
         <input
@@ -126,7 +126,7 @@ async function handleSubmit() {
 
       <div>
         <div class="flex items-center justify-between mb-2">
-          <span class="text-sm font-normal">LiU Mail</span>
+          <span class="text-sm font-medium">LiU Mail</span>
           <span class="text-destructive text-sm">*</span>
         </div>
         <input
@@ -145,7 +145,7 @@ async function handleSubmit() {
 
       <div>
         <div class="flex items-center justify-between mb-2">
-          <span class="text-sm font-normal">Del av hemsidan</span>
+          <span class="text-sm font-medium">Del av hemsidan</span>
           <span class="text-sm text-muted-foreground">Valfritt</span>
         </div>
         <input
@@ -157,7 +157,7 @@ async function handleSubmit() {
 
       <div>
         <div class="flex items-center justify-between mb-2">
-          <span class="text-sm font-normal">Meddelande</span>
+          <span class="text-sm font-medium">Meddelande</span>
           <span class="text-destructive text-sm">*</span>
         </div>
         <textarea

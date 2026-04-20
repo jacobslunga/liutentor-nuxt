@@ -4,7 +4,7 @@ const QUIZ_API_BASE =
   "https://liutentor-api-production.up.railway.app/api/v1/quiz";
 
 // USE FOR LOCAL DEVELOPMENT
-const QUIZ_API_BASE_LOCAL = "http://localhost:3001/api/v1/quiz";
+// const QUIZ_API_BASE_LOCAL = "http://localhost:3001/api/v1/quiz";
 
 function getAnonymousId(): string {
   if (typeof window === "undefined") return "unknown";
@@ -22,13 +22,11 @@ export type QuizStatus = {
 };
 
 export function useQuiz(courseCode: Ref<string>) {
-  const user = useSupabaseUser();
-
+  const { getAuthHeaders } = useAuthHeaders();
   const quizData = ref<MultipleChoiceQuizResponse | null>(null);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
   const status = ref<QuizStatus | null>(null);
-
   let abortController: AbortController | null = null;
 
   async function generateQuiz(payload: {
@@ -38,7 +36,6 @@ export function useQuiz(courseCode: Ref<string>) {
     if (abortController) {
       abortController.abort();
     }
-
     abortController = new AbortController();
     isLoading.value = true;
     error.value = null;
@@ -46,20 +43,18 @@ export function useQuiz(courseCode: Ref<string>) {
     status.value = null;
 
     try {
-      const userId = (user.value as any)?.id ?? (user.value as any)?.sub;
+      const authHeaders = await getAuthHeaders();
 
       const response = await fetch(
-        `${QUIZ_API_BASE_LOCAL}/multiple-choice/${courseCode.value}`,
+        `${QUIZ_API_BASE}/multiple-choice/${courseCode.value}`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             "x-anonymous-user-id": getAnonymousId(),
+            ...authHeaders,
           },
-          body: JSON.stringify({
-            ...payload,
-            ...(userId ? { user_id: userId } : {}),
-          }),
+          body: JSON.stringify(payload),
           signal: abortController.signal,
         },
       );
@@ -77,7 +72,6 @@ export function useQuiz(courseCode: Ref<string>) {
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-
         buffer += decoder.decode(value, { stream: true });
         const parts = buffer.split("\n\n");
         buffer = parts.pop() ?? "";
@@ -85,7 +79,6 @@ export function useQuiz(courseCode: Ref<string>) {
         for (const part of parts) {
           const eventMatch = part.match(/^event: (\w+)/m);
           const dataMatch = part.match(/^data: (.+)/m);
-
           if (!eventMatch || !dataMatch || !dataMatch[1]) continue;
 
           const eventType = eventMatch[1];

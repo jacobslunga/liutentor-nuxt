@@ -25,7 +25,7 @@ const categories = [{ id: "visibility", label: "Synlighet" }];
 <template>
   <div class="flex flex-col gap-6 pt-2">
     <div class="space-y-3">
-      <h3 class="font-normal">Tema</h3>
+      <h3 class="font-medium">Tema</h3>
       <div class="flex gap-2">
         <div
           v-for="opt in themeOptions"
@@ -41,13 +41,13 @@ const categories = [{ id: "visibility", label: "Synlighet" }];
           <LucideSun v-if="opt.id === 'light'" class="w-4.5 h-4.5" />
           <LucideMoonStar v-else-if="opt.id === 'dark'" class="w-4.5 h-4.5" />
           <LucideMonitor v-else class="w-4.5 h-4.5" />
-          <span class="text-sm font-normal">{{ opt.label }}</span>
+          <span class="text-sm font-medium">{{ opt.label }}</span>
         </div>
       </div>
     </div>
 
     <div class="space-y-3">
-      <h3 class="font-normal">Tangentbordsgenvägar</h3>
+      <h3 class="font-medium">Tangentbordsgenvägar</h3>
       <div class="space-y-4">
         <div v-for="cat in categories" :key="cat.id" class="space-y-2">
           <h4 class="text-sm text-muted-foreground">{{ cat.label }}</h4>
