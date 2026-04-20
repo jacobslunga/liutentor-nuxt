@@ -57,9 +57,6 @@
             </Button>
           </TooltipTrigger>
           <TooltipContent side="bottom" class="flex items-center gap-2">
-            <span>{{
-              historyOpen ? "Stäng chatthistorik" : "Chatthistorik"
-            }}</span>
             <kbd class="text-xs">{{ historyShortcutLabel }} + .</kbd>
           </TooltipContent>
         </Tooltip>

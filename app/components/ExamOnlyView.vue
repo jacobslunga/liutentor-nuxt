@@ -151,10 +151,10 @@ watch(
       <div
         v-show="hasFacit && isFacitVisible && !chatStore.isOpen"
         ref="panelRef"
-        class="fixed right-0 top-0 h-full bg-background border-l shadow-2xl z-60 flex"
+        class="fixed right-0 top-0 h-full bg-background border-l shadow-2xl z-20 flex"
         :style="{ width: `${panelWidth}px` }"
       >
-        <div class="relative w-0 shrink-0">
+        <div class="relative w-0 shrink-0 z-30">
           <ResizeHandle :is-resizing="isDragging" @start-resize="startResize" />
         </div>
         <div class="flex-1 overflow-hidden">
@@ -176,10 +176,10 @@ watch(
       <div
         v-if="chatHasBeenOpened"
         v-show="chatStore.isOpen"
-        class="fixed right-0 top-0 h-full bg-background border-l shadow-2xl z-60 flex"
+        class="fixed right-0 top-0 h-full bg-background border-l shadow-2xl z-20 flex"
         :style="{ width: `${panelWidth}px` }"
       >
-        <div class="relative w-0 shrink-0">
+        <div class="relative w-0 shrink-0 z-30">
           <ResizeHandle :is-resizing="isDragging" @start-resize="startResize" />
         </div>
         <div class="flex-1 overflow-hidden">

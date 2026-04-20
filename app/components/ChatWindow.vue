@@ -365,7 +365,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
 
 <template>
   <div
-    class="h-full w-full flex border-l bg-background overflow-hidden relative z-50"
+    class="h-full w-full flex border-l bg-background overflow-hidden relative"
   >
     <div
       class="flex-1 min-w-0 flex flex-col transition-all duration-300 ease-out"
