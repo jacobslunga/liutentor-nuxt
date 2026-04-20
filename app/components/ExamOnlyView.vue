@@ -71,12 +71,20 @@ function handleMouseMove(e: MouseEvent) {
 }
 
 function handleKeyDown(e: KeyboardEvent) {
+  if (e.defaultPrevented) return;
+
   if (e.key.toLowerCase() === "e") {
     if (chatStore.isOpen) return;
     isFacitVisible.value = !isFacitVisible.value;
     isManual.value = isFacitVisible.value;
   }
   if (e.key === "Escape") {
+    if (chatStore.isOpen && chatStore.isHistoryOpen) {
+      e.preventDefault();
+      chatStore.isHistoryOpen = false;
+      return;
+    }
+
     isManual.value = false;
     isFacitVisible.value = false;
     chatStore.close();
