@@ -263,7 +263,7 @@ function handleKeyUp(e: KeyboardEvent) {
                 <div
                   v-if="chatHasBeenOpened"
                   v-show="chatStore.isOpen"
-                  class="absolute inset-0 z-100 h-full w-full"
+                  class="absolute inset-0 z-20 h-full w-full"
                 >
                   <ChatWindow
                     :exam-id="examId"

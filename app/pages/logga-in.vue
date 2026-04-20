@@ -45,12 +45,16 @@ const signupForm = reactive({
   email: "",
   password: "",
   confirmPassword: "",
+  firstName: "",
+  lastName: "",
 });
 
 const signupErrors = reactive({
   email: "",
   password: "",
   confirmPassword: "",
+  firstName: "",
+  lastName: "",
 });
 
 const signupLoading = ref(false);
@@ -71,6 +75,12 @@ function validateLiuEmail(email: string): string {
 function validatePassword(password: string): string {
   if (!password) return "Lösenord krävs";
   if (password.length < 8) return "Minst 8 tecken krävs";
+  return "";
+}
+
+function validateName(name: string, label: string): string {
+  if (!name.trim()) return `${label} krävs`;
+  if (name.trim().length < 2) return `${label} måste vara minst 2 tecken`;
   return "";
 }
 
@@ -106,6 +116,8 @@ async function handleLogin() {
 async function handleSignup() {
   signupErrors.email = validateLiuEmail(signupForm.email);
   signupErrors.password = validatePassword(signupForm.password);
+  signupErrors.firstName = validateName(signupForm.firstName, "Förnamn");
+  signupErrors.lastName = validateName(signupForm.lastName, "Efternamn");
   signupErrors.confirmPassword =
     signupForm.confirmPassword !== signupForm.password
       ? "Lösenorden matchar inte"
@@ -116,7 +128,9 @@ async function handleSignup() {
   if (
     signupErrors.email ||
     signupErrors.password ||
-    signupErrors.confirmPassword
+    signupErrors.confirmPassword ||
+    signupErrors.firstName ||
+    signupErrors.lastName
   )
     return;
 
@@ -128,9 +142,8 @@ async function handleSignup() {
     password: signupForm.password,
   });
 
-  signupLoading.value = false;
-
   if (error) {
+    signupLoading.value = false;
     if (
       error.message.toLowerCase().includes("already registered") ||
       error.status === 422
@@ -142,6 +155,18 @@ async function handleSignup() {
     }
     return;
   }
+
+  if (data.user) {
+    await (supabase as any)
+      .from("profiles")
+      .update({
+        first_name: signupForm.firstName.trim(),
+        last_name: signupForm.lastName.trim(),
+      })
+      .eq("id", data.user.id);
+  }
+
+  signupLoading.value = false;
 
   if (data.session) {
     await navigateTo("/", { replace: true });
@@ -194,7 +219,7 @@ async function handleSignup() {
           class="flex flex-col space-y-4"
         >
           <div class="flex flex-col space-y-1.5">
-            <label class="text-sm font-medium">LiU-e-post</label>
+            <label class="text-sm font-medium">LiU mail</label>
             <Input
               v-model="loginForm.email"
               type="email"
@@ -300,8 +325,40 @@ async function handleSignup() {
           @submit.prevent="handleSignup"
           class="flex flex-col space-y-4"
         >
+          <div class="flex gap-3">
+            <div class="flex flex-col space-y-1.5 flex-1">
+              <label class="text-sm font-medium">Förnamn</label>
+              <Input
+                v-model="signupForm.firstName"
+                type="text"
+                placeholder="Förnamn"
+                autocomplete="given-name"
+                :aria-invalid="!!signupErrors.firstName"
+                :class="signupErrors.firstName ? 'border-destructive' : ''"
+              />
+              <p v-if="signupErrors.firstName" class="text-xs text-destructive">
+                {{ signupErrors.firstName }}
+              </p>
+            </div>
+
+            <div class="flex flex-col space-y-1.5 flex-1">
+              <label class="text-sm font-medium">Efternamn</label>
+              <Input
+                v-model="signupForm.lastName"
+                type="text"
+                placeholder="Efternamn"
+                autocomplete="family-name"
+                :aria-invalid="!!signupErrors.lastName"
+                :class="signupErrors.lastName ? 'border-destructive' : ''"
+              />
+              <p v-if="signupErrors.lastName" class="text-xs text-destructive">
+                {{ signupErrors.lastName }}
+              </p>
+            </div>
+          </div>
+
           <div class="flex flex-col space-y-1.5">
-            <label class="text-sm font-medium">LiU-e-post</label>
+            <label class="text-sm font-medium">LiU mail</label>
             <Input
               v-model="signupForm.email"
               type="email"
@@ -314,7 +371,7 @@ async function handleSignup() {
               {{ signupErrors.email }}
             </p>
             <p v-else class="text-xs text-muted-foreground">
-              Måste vara din LiU-studentadress (t.ex. abcde123@student.liu.se)
+              Måste vara din LiU mail (t.ex. abcde123@student.liu.se)
             </p>
           </div>
 

@@ -298,7 +298,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
           v-if="messages.length === 0"
           class="h-full flex flex-col items-center justify-center px-4 text-center pb-24"
         >
-          <h2 class="text-2xl font-medium mb-3 text-foreground">
+          <h2 class="text-2xl tracking-tight font-medium mb-3 text-foreground">
             Vad kan jag hjälpa till med?
           </h2>
           <p
@@ -308,7 +308,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
             lösningarna.
           </p>
           <NuxtLink
-            to="/privacy-policy"
+            to="/ai-policy"
             target="_blank"
             class="text-[11px] text-muted-foreground/60 hover:text-foreground transition-all duration-200 border-b border-transparent hover:border-foreground/30 pb-0.5"
           >

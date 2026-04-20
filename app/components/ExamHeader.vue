@@ -124,7 +124,7 @@ function confirmLockIn() {
 
 <template>
   <div
-    class="hidden lg:flex fixed top-0 left-0 right-0 z-40 px-4 pt-3 pointer-events-none items-start justify-between transition-all duration-300 ease-in-out"
+    class="hidden lg:flex fixed top-0 left-0 right-0 z-5 px-4 pt-3 pointer-events-none items-start justify-between transition-all duration-300 ease-in-out"
     :class="
       isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
     "

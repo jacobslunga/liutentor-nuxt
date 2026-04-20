@@ -1,5 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Rethink+Sans:ital,wght@0,400..800;1,400..800&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Gothic+A1:wght@100;200;300;400;500;600;700;800;900&display=swap");
 
 @import "tailwindcss";
 
@@ -69,7 +70,7 @@
 
 body {
   font-family:
-    "Rethink Sans",
+    "Gothic A1",
     system-ui,
     -apple-system,
     BlinkMacSystemFont,

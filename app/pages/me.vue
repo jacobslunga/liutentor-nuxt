@@ -330,98 +330,63 @@ async function handleSignOut() {
 
 <template>
   <div class="flex flex-col gap-8">
-    <div class="flex flex-col gap-1">
-      <h1 class="text-2xl font-semibold">Min profil</h1>
-      <p class="text-sm text-muted-foreground">
-        Hantera ditt konto och inställningar
-      </p>
-    </div>
-
     <template v-if="profileLoading">
-      <section class="flex flex-col gap-3">
-        <div class="h-3.5 w-16 rounded bg-muted animate-pulse" />
+      <section
+        class="relative overflow-hidden rounded-3xl border border-border/70 p-8"
+      >
+        <div class="h-8 w-40 rounded bg-muted animate-pulse mx-auto" />
         <div
-          class="border border-border rounded-xl p-5 flex items-center gap-4"
-        >
-          <div class="w-14 h-14 rounded-full bg-muted animate-pulse shrink-0" />
-          <div class="flex flex-col gap-2 flex-1 min-w-0">
-            <div class="h-4 w-32 rounded bg-muted animate-pulse" />
-            <div class="h-3.5 w-48 rounded bg-muted animate-pulse" />
-            <div class="h-3 w-36 rounded bg-muted animate-pulse" />
-          </div>
-        </div>
-      </section>
-
-      <section class="flex flex-col gap-3">
-        <div class="h-3.5 w-12 rounded bg-muted animate-pulse" />
-        <div class="border border-border rounded-xl divide-y divide-border">
-          <div class="flex items-center justify-between px-5 py-3.5">
-            <div class="h-3.5 w-20 rounded bg-muted animate-pulse" />
-            <div class="h-3.5 w-28 rounded bg-muted animate-pulse" />
-          </div>
-          <div class="flex items-center justify-between px-5 py-3.5">
-            <div class="h-3.5 w-20 rounded bg-muted animate-pulse" />
-            <div class="h-3.5 w-28 rounded bg-muted animate-pulse" />
-          </div>
-        </div>
-      </section>
-
-      <section class="flex flex-col gap-3">
-        <div class="h-3.5 w-24 rounded bg-muted animate-pulse" />
-        <div class="border border-border rounded-xl divide-y divide-border">
+          class="h-28 w-28 rounded-full bg-muted animate-pulse mx-auto mt-5"
+        />
+        <div class="h-4 w-56 rounded bg-muted animate-pulse mx-auto mt-4" />
+        <div class="grid grid-cols-3 gap-3 mt-6">
           <div
             v-for="i in 3"
             :key="i"
-            class="flex items-center justify-between px-5 py-3.5"
-          >
-            <div class="h-3.5 w-24 rounded bg-muted animate-pulse" />
-            <div class="h-3.5 w-32 rounded bg-muted animate-pulse" />
-          </div>
+            class="h-18 rounded-xl bg-muted animate-pulse"
+          />
         </div>
       </section>
     </template>
 
     <template v-else>
-      <section class="flex flex-col gap-3">
-        <h2
-          class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
-        >
-          Konto
-        </h2>
-        <div
-          class="border border-border rounded-xl p-5 flex items-center gap-4"
-        >
+      <section
+        class="relative overflow-hidden rounded-3xl border border-border/70 bg-card p-6 sm:p-8"
+      >
+        <div class="relative z-10 flex flex-col items-center text-center">
           <button
-            class="relative cursor-pointer shrink-0 group"
+            class="relative mt-4 cursor-pointer shrink-0 group"
             :disabled="avatarUploading"
             @click="handleAvatarClick"
           >
             <div
               v-if="avatarUrl"
               :class="[
-                'w-14 h-14 rounded-full overflow-hidden border',
+                'h-30 w-30 sm:h-36 sm:w-36 rounded-full overflow-hidden border-4 shadow-lg',
                 COLOR_BORDER_MAP[avatarColor],
               ]"
             >
               <img
                 :src="avatarUrl"
                 alt="Avatar"
-                class="w-full h-full object-cover"
+                class="h-full w-full object-cover"
                 :class="[
                   avatarUploading
                     ? 'opacity-40'
-                    : 'group-hover:opacity-80 transition-opacity',
+                    : 'group-hover:opacity-85 transition-opacity',
                 ]"
               />
             </div>
+
             <div
               v-else
               :class="[
-                'w-14 h-14 rounded-full flex items-center justify-center text-white text-xl font-semibold',
+                'h-30 w-30 sm:h-36 sm:w-36 rounded-full flex items-center justify-center text-white text-5xl font-semibold border-4 shadow-lg',
                 avatarUploading
                   ? 'opacity-40'
-                  : 'group-hover:opacity-80 transition-opacity',
+                  : 'group-hover:opacity-85 transition-opacity',
                 COLOR_BG_MAP[avatarColor],
+                COLOR_BORDER_MAP[avatarColor],
               ]"
             >
               {{ initial }}
@@ -432,18 +397,18 @@ async function handleSignOut() {
               class="absolute inset-0 flex items-center justify-center"
             >
               <LucideLoader2
-                class="w-5 h-5 text-white animate-spin drop-shadow"
+                class="h-7 w-7 text-white animate-spin drop-shadow"
               />
             </div>
 
             <div
-              class="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-background border border-border flex items-center justify-center shadow-sm"
+              class="absolute bottom-1 right-1 h-8 w-8 rounded-full bg-background border border-border flex items-center justify-center shadow-sm"
             >
               <LucideLoader2
                 v-if="avatarUploading"
-                class="w-3 h-3 animate-spin text-muted-foreground"
+                class="h-4 w-4 animate-spin text-muted-foreground"
               />
-              <LucidePlus v-else class="w-3 h-3 text-foreground" />
+              <LucidePlus v-else class="h-4 w-4 text-foreground" />
             </div>
           </button>
 
@@ -455,280 +420,236 @@ async function handleSignOut() {
             @change="handleFileChange"
           />
 
-          <div class="flex flex-col gap-0.5 min-w-0">
-            <p
-              v-if="firstName || lastName"
-              class="text-base font-semibold truncate"
-            >
-              {{ [firstName, lastName].filter(Boolean).join(" ") }}
-            </p>
-            <p
-              class="text-sm truncate"
-              :class="
-                firstName || lastName ? 'text-muted-foreground' : 'font-medium'
-              "
-            >
-              {{ user?.email }}
-            </p>
-            <p class="text-xs text-muted-foreground">
-              Medlem sedan {{ memberSince }}
-            </p>
-          </div>
-        </div>
-      </section>
+          <h1 class="mt-4 text-2xl font-semibold">
+            {{
+              [firstName, lastName].filter(Boolean).join(" ") || "Din profil"
+            }}
+          </h1>
+          <p class="mt-1 text-sm text-muted-foreground">{{ user?.email }}</p>
+          <p class="mt-1 text-xs text-muted-foreground/80">
+            Medlem sedan {{ memberSince }}
+          </p>
 
-      <section class="flex flex-col gap-3">
-        <h2
-          class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
-        >
-          Namn
-        </h2>
-        <div class="border border-border rounded-xl divide-y divide-border">
-          <div class="flex flex-col gap-1.5 px-5 py-3.5">
-            <label class="text-xs text-muted-foreground">Förnamn</label>
-            <input
-              v-model="firstNameInput"
-              type="text"
-              placeholder="Ditt förnamn"
-              class="text-sm font-medium bg-transparent outline-none placeholder:text-muted-foreground/40"
-            />
-          </div>
-          <div class="flex flex-col gap-1.5 px-5 py-3.5">
-            <label class="text-xs text-muted-foreground">Efternamn</label>
-            <input
-              v-model="lastNameInput"
-              type="text"
-              placeholder="Ditt efternamn"
-              class="text-sm font-medium bg-transparent outline-none placeholder:text-muted-foreground/40"
-            />
-          </div>
-        </div>
-        <div class="flex justify-end">
-          <Button
-            size="sm"
-            :disabled="profileSaving || !hasChanges"
-            @click="saveProfile"
-          >
-            <LucideLoader2 v-if="profileSaving" class="w-4 h-4 animate-spin" />
-            <LucideCheck v-else-if="profileSaved" class="w-4 h-4" />
-            <span>{{ profileSaved ? "Sparat!" : "Spara" }}</span>
-          </Button>
-        </div>
-      </section>
-
-      <section class="flex flex-col gap-3">
-        <h2
-          class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
-        >
-          Kontodetaljer
-        </h2>
-        <div class="border border-border rounded-xl divide-y divide-border">
-          <div class="flex items-center justify-between px-5 py-3.5">
-            <div class="flex items-center gap-3 text-sm text-muted-foreground">
-              <LucideMail class="w-4 h-4 shrink-0" />
-              <span>E-post</span>
-            </div>
-            <span class="text-sm font-medium">{{ user?.email ?? "—" }}</span>
-          </div>
-          <div class="flex items-center justify-between px-5 py-3.5">
-            <div class="flex items-center gap-3 text-sm text-muted-foreground">
-              <LucideCalendar class="w-4 h-4 shrink-0" />
-              <span>Registrerad</span>
-            </div>
-            <span class="text-sm font-medium">{{ memberSince }}</span>
-          </div>
-          <div class="flex items-center justify-between px-5 py-3.5">
-            <div class="flex items-center gap-3 text-sm text-muted-foreground">
-              <LucideShieldCheck class="w-4 h-4 shrink-0" />
-              <span>Kontostatus</span>
-            </div>
-            <span
-              class="text-xs font-medium text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-full"
-              >Aktiv</span
-            >
-          </div>
-        </div>
-      </section>
-
-      <section class="flex flex-col gap-3">
-        <h2
-          class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
-        >
-          Aktivitet
-        </h2>
-
-        <div
-          v-if="activityLoading"
-          class="border border-border rounded-xl p-5 grid grid-cols-1 sm:grid-cols-3 gap-3"
-        >
           <div
-            v-for="i in 3"
-            :key="i"
-            class="rounded-lg border border-border/70 p-3 space-y-2"
+            class="mt-6 grid w-full max-w-2xl grid-cols-3 gap-2 sm:gap-3"
+            :class="activityLoading ? 'opacity-70' : ''"
           >
-            <div class="h-3 w-20 rounded bg-muted animate-pulse" />
-            <div class="h-5 w-12 rounded bg-muted animate-pulse" />
-          </div>
-        </div>
-
-        <template v-else>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div class="rounded-lg border border-border/70 p-3">
-              <p class="text-[11px] text-muted-foreground">Quiz skapade</p>
-              <p class="mt-1 text-xl font-semibold tabular-nums">
-                {{ quizCount }}
+            <div
+              class="rounded-xl border border-border/70 bg-background/70 p-3 sm:p-4"
+            >
+              <p class="text-[11px] text-muted-foreground">Quiz</p>
+              <p class="mt-1 text-xl sm:text-2xl font-semibold tabular-nums">
+                {{ activityLoading ? "..." : quizCount }}
               </p>
             </div>
-            <div class="rounded-lg border border-border/70 p-3">
-              <p class="text-[11px] text-muted-foreground">Konversationer</p>
-              <p class="mt-1 text-xl font-semibold tabular-nums">
-                {{ conversationCount }}
+            <div
+              class="rounded-xl border border-border/70 bg-background/70 p-3 sm:p-4"
+            >
+              <p class="text-[11px] text-muted-foreground">Samtal</p>
+              <p class="mt-1 text-xl sm:text-2xl font-semibold tabular-nums">
+                {{ activityLoading ? "..." : conversationCount }}
               </p>
             </div>
-            <div class="rounded-lg border border-border/70 p-3">
-              <p class="text-[11px] text-muted-foreground">Chatmeddelanden</p>
-              <p class="mt-1 text-xl font-semibold tabular-nums">
-                {{ chatMessageCount }}
+            <div
+              class="rounded-xl border border-border/70 bg-background/70 p-3 sm:p-4"
+            >
+              <p class="text-[11px] text-muted-foreground">Meddelanden</p>
+              <p class="mt-1 text-xl sm:text-2xl font-semibold tabular-nums">
+                {{ activityLoading ? "..." : chatMessageCount }}
               </p>
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
-            <div class="rounded-xl border border-border/70">
-              <div class="px-4 py-3 border-b border-border/70">
-                <p class="text-sm font-medium">Senaste quiz</p>
-                <p class="text-xs text-muted-foreground">
-                  Dina senaste genererade quiz
-                </p>
-              </div>
-
-              <div v-if="recentQuizzes.length === 0" class="px-4 py-4">
-                <p class="text-xs text-muted-foreground">
-                  Inga quiz sparade ännu.
-                </p>
-              </div>
-
-              <div v-else class="divide-y divide-border/60">
-                <NuxtLink
-                  v-for="item in recentQuizzes"
-                  :key="item.id"
-                  :to="`/quiz/${item.courseCode}`"
-                  class="flex items-start justify-between gap-3 px-4 py-3 hover:bg-muted/30 transition-colors"
-                >
-                  <div class="min-w-0">
-                    <p class="text-sm font-medium">{{ item.courseCode }}</p>
-                    <p class="text-xs text-muted-foreground">
-                      {{ item.sourceCount }} tentor ·
-                      {{ item.questionCount }} frågor
-                    </p>
-                  </div>
-                  <p
-                    class="text-[11px] text-muted-foreground whitespace-nowrap"
-                  >
-                    {{ formatDateTime(item.createdAt) }}
-                  </p>
-                </NuxtLink>
-              </div>
-            </div>
-
-            <div class="rounded-xl border border-border/70">
-              <div class="px-4 py-3 border-b border-border/70">
-                <p class="text-sm font-medium">Senaste konversationer</p>
-                <p class="text-xs text-muted-foreground">
-                  Snabb överblick över din chatthistorik
-                </p>
-              </div>
-
-              <div v-if="recentConversations.length === 0" class="px-4 py-4">
-                <p class="text-xs text-muted-foreground">
-                  Inga konversationer ännu.
-                </p>
-              </div>
-
-              <div v-else class="divide-y divide-border/60">
-                <div
-                  v-for="item in recentConversations"
-                  :key="item.id"
-                  class="px-4 py-3"
-                >
-                  <div class="flex items-center justify-between gap-3">
-                    <p class="text-sm font-medium truncate">{{ item.title }}</p>
-                    <span
-                      v-if="item.courseCode"
-                      class="inline-flex items-center rounded-full border border-border/70 px-2 py-0.5 text-[10px] text-muted-foreground"
-                    >
-                      {{ item.courseCode }}
-                    </span>
-                  </div>
-                  <p class="mt-1 text-xs text-muted-foreground line-clamp-2">
-                    {{ item.preview || "Ingen förhandsvisning tillgänglig." }}
-                  </p>
-                  <p class="mt-1 text-[11px] text-muted-foreground">
-                    {{ item.messageCount }} meddelanden ·
-                    {{ formatDateTime(item.createdAt) }}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </template>
-      </section>
-
-      <section class="flex flex-col gap-3">
-        <h2
-          class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
-        >
-          Utseende
-        </h2>
-        <div class="border border-border rounded-xl divide-y divide-border">
-          <div class="flex items-center justify-between px-5 py-3.5">
-            <div class="flex items-center gap-3 text-sm">
-              <LucidePalette class="w-4 h-4 shrink-0 text-muted-foreground" />
-              <span>Avatarfärg</span>
-            </div>
-            <div class="flex items-center gap-2">
-              <button
-                v-for="color in COLORS"
-                :key="color"
-                :class="[
-                  'w-5 h-5 rounded-full cursor-pointer transition-all',
-                  COLOR_BG_MAP[color],
-                  colorCookie === color
-                    ? 'ring-2 ring-offset-2 ring-offset-background ring-foreground scale-110'
-                    : 'opacity-60 hover:opacity-100',
-                ]"
-                @click="setColor(color)"
-              />
             </div>
           </div>
         </div>
       </section>
 
-      <section class="flex flex-col gap-3">
-        <h2
-          class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
-        >
-          Sessionshantering
-        </h2>
-        <div
-          class="border border-border rounded-xl p-5 flex items-center justify-between"
-        >
-          <div class="flex flex-col gap-0.5">
-            <p class="text-sm font-medium">Logga ut</p>
+      <section class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div class="rounded-2xl border border-border/70 bg-card">
+          <div class="px-4 py-3 border-b border-border/70">
+            <p class="text-sm font-medium">Senaste quiz</p>
             <p class="text-xs text-muted-foreground">
-              Avsluta din nuvarande session
+              Snabbt tillbaka till tidigare quiz
             </p>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            :disabled="signOutLoading"
-            @click="handleSignOut"
+
+          <div v-if="recentQuizzes.length === 0" class="px-4 py-5">
+            <p class="text-xs text-muted-foreground">Inga quiz sparade ännu.</p>
+          </div>
+
+          <div v-else class="divide-y divide-border/60">
+            <NuxtLink
+              v-for="item in recentQuizzes"
+              :key="item.id"
+              :to="`/quiz/${item.courseCode}`"
+              class="flex items-start justify-between gap-3 px-4 py-3 hover:bg-muted/30 transition-colors"
+            >
+              <div class="min-w-0">
+                <p class="text-sm font-medium">{{ item.courseCode }}</p>
+                <p class="text-xs text-muted-foreground">
+                  {{ item.sourceCount }} tentor ·
+                  {{ item.questionCount }} frågor
+                </p>
+              </div>
+              <p class="text-[11px] text-muted-foreground whitespace-nowrap">
+                {{ formatDateTime(item.createdAt) }}
+              </p>
+            </NuxtLink>
+          </div>
+        </div>
+
+        <div class="rounded-2xl border border-border/70 bg-card">
+          <div class="px-4 py-3 border-b border-border/70">
+            <p class="text-sm font-medium">Senaste konversationer</p>
+            <p class="text-xs text-muted-foreground">
+              Vad du nyligen har frågat om
+            </p>
+          </div>
+
+          <div v-if="recentConversations.length === 0" class="px-4 py-5">
+            <p class="text-xs text-muted-foreground">
+              Inga konversationer ännu.
+            </p>
+          </div>
+
+          <div v-else class="divide-y divide-border/60">
+            <div
+              v-for="item in recentConversations"
+              :key="item.id"
+              class="px-4 py-3"
+            >
+              <div class="flex items-center justify-between gap-3">
+                <p class="text-sm font-medium truncate">{{ item.title }}</p>
+                <span
+                  v-if="item.courseCode"
+                  class="inline-flex items-center rounded-full border border-border/70 px-2 py-0.5 text-[10px] text-muted-foreground"
+                >
+                  {{ item.courseCode }}
+                </span>
+              </div>
+              <p class="mt-1 text-xs text-muted-foreground line-clamp-2">
+                {{ item.preview || "Ingen förhandsvisning tillgänglig." }}
+              </p>
+              <p class="mt-1 text-[11px] text-muted-foreground">
+                {{ item.messageCount }} meddelanden ·
+                {{ formatDateTime(item.createdAt) }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="flex flex-col gap-3">
+        <h2
+          class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
+        >
+          Inställningar
+        </h2>
+
+        <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
+          <div class="rounded-2xl border border-border/70 bg-card p-5">
+            <p class="text-sm font-medium mb-3">Namn</p>
+            <div class="space-y-3">
+              <div class="flex flex-col gap-1.5">
+                <label class="text-xs text-muted-foreground">Förnamn</label>
+                <input
+                  v-model="firstNameInput"
+                  type="text"
+                  placeholder="Ditt förnamn"
+                  class="h-10 rounded-lg border border-border bg-background px-3 text-sm outline-none focus:border-foreground/30"
+                />
+              </div>
+              <div class="flex flex-col gap-1.5">
+                <label class="text-xs text-muted-foreground">Efternamn</label>
+                <input
+                  v-model="lastNameInput"
+                  type="text"
+                  placeholder="Ditt efternamn"
+                  class="h-10 rounded-lg border border-border bg-background px-3 text-sm outline-none focus:border-foreground/30"
+                />
+              </div>
+            </div>
+
+            <div class="mt-4 flex justify-end">
+              <Button
+                size="sm"
+                :disabled="profileSaving || !hasChanges"
+                @click="saveProfile"
+              >
+                <LucideLoader2
+                  v-if="profileSaving"
+                  class="w-4 h-4 animate-spin"
+                />
+                <LucideCheck v-else-if="profileSaved" class="w-4 h-4" />
+                <span>{{ profileSaved ? "Sparat!" : "Spara" }}</span>
+              </Button>
+            </div>
+          </div>
+
+          <div
+            class="rounded-2xl border border-border/70 bg-card divide-y divide-border/70"
           >
-            <LucideLoader2 v-if="signOutLoading" class="w-4 h-4 animate-spin" />
-            <LucideLogOut v-else class="w-4 h-4" />
-            <span v-if="!signOutLoading">Logga ut</span>
-          </Button>
+            <div class="p-5">
+              <p class="text-sm font-medium mb-3">Kontodetaljer</p>
+              <div class="space-y-2 text-sm">
+                <p class="flex items-center justify-between gap-3">
+                  <span class="text-muted-foreground">E-post</span>
+                  <span class="font-medium truncate">{{
+                    user?.email ?? "—"
+                  }}</span>
+                </p>
+                <p class="flex items-center justify-between gap-3">
+                  <span class="text-muted-foreground">Registrerad</span>
+                  <span class="font-medium">{{ memberSince }}</span>
+                </p>
+                <p class="flex items-center justify-between gap-3">
+                  <span class="text-muted-foreground">Kontostatus</span>
+                  <span
+                    class="text-xs font-medium text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-full"
+                    >Aktiv</span
+                  >
+                </p>
+              </div>
+            </div>
+
+            <div class="p-5">
+              <p class="text-sm font-medium mb-3">Avatarfärg</p>
+              <div class="flex items-center gap-2">
+                <button
+                  v-for="color in COLORS"
+                  :key="color"
+                  :class="[
+                    'w-6 h-6 rounded-full cursor-pointer transition-all',
+                    COLOR_BG_MAP[color],
+                    colorCookie === color
+                      ? 'ring-2 ring-offset-2 ring-offset-background ring-foreground scale-110'
+                      : 'opacity-60 hover:opacity-100',
+                  ]"
+                  @click="setColor(color)"
+                />
+              </div>
+            </div>
+
+            <div class="p-5 flex items-center justify-between gap-3">
+              <div>
+                <p class="text-sm font-medium">Logga ut</p>
+                <p class="text-xs text-muted-foreground">
+                  Avsluta din nuvarande session
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                :disabled="signOutLoading"
+                @click="handleSignOut"
+              >
+                <LucideLoader2
+                  v-if="signOutLoading"
+                  class="w-4 h-4 animate-spin"
+                />
+                <LucideLogOut v-else class="w-4 h-4" />
+                <span v-if="!signOutLoading">Logga ut</span>
+              </Button>
+            </div>
+          </div>
         </div>
       </section>
     </template>

@@ -44,7 +44,7 @@ const groupedLinks = [
 
         <div class="md:col-span-3 grid grid-cols-2 sm:grid-cols-3 gap-8">
           <div v-for="section in groupedLinks" :key="section.title">
-            <h4 class="text-sm font-medium text-foreground/80 mb-3">
+            <h4 class="text-sm font-semibold text-foreground/80 mb-3">
               {{ section.title }}
             </h4>
             <ul class="space-y-2">
