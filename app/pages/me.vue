@@ -18,106 +18,6 @@ const user = useSupabaseUser();
 const supabase = useSupabaseClient();
 const chatStore = useChatStore();
 
-type Tier = {
-  key: string;
-  name: string;
-  emoji: string;
-  min: number;
-  glow: string;
-  badgeBg: string;
-  badgeText: string;
-  badgeBorder: string;
-  gradientFrom: string;
-  gradientTo: string;
-};
-
-const TIERS: Tier[] = [
-  {
-    key: "newbie",
-    name: "Newbie",
-    emoji: "🌱",
-    min: 0,
-    glow: "from-slate-400/30 to-slate-500/20",
-    badgeBg: "bg-slate-500/10",
-    badgeText: "text-slate-600 dark:text-slate-300",
-    badgeBorder: "border-slate-500/30",
-    gradientFrom: "from-slate-400",
-    gradientTo: "to-slate-500",
-  },
-  {
-    key: "larling",
-    name: "Lärling",
-    emoji: "📖",
-    min: 3,
-    glow: "from-emerald-400/40 to-green-500/30",
-    badgeBg: "bg-emerald-500/10",
-    badgeText: "text-emerald-700 dark:text-emerald-300",
-    badgeBorder: "border-emerald-500/30",
-    gradientFrom: "from-emerald-400",
-    gradientTo: "to-green-500",
-  },
-  {
-    key: "flitig",
-    name: "Flitig",
-    emoji: "⚡",
-    min: 10,
-    glow: "from-sky-400/40 to-blue-500/30",
-    badgeBg: "bg-sky-500/10",
-    badgeText: "text-sky-700 dark:text-sky-300",
-    badgeBorder: "border-sky-500/30",
-    gradientFrom: "from-sky-400",
-    gradientTo: "to-blue-500",
-  },
-  {
-    key: "skarpskytt",
-    name: "Skarpskytt",
-    emoji: "🎯",
-    min: 25,
-    glow: "from-violet-400/40 to-purple-500/30",
-    badgeBg: "bg-violet-500/10",
-    badgeText: "text-violet-700 dark:text-violet-300",
-    badgeBorder: "border-violet-500/30",
-    gradientFrom: "from-violet-400",
-    gradientTo: "to-purple-500",
-  },
-  {
-    key: "tankare",
-    name: "Tänkare",
-    emoji: "🧠",
-    min: 50,
-    glow: "from-fuchsia-400/40 to-pink-500/30",
-    badgeBg: "bg-fuchsia-500/10",
-    badgeText: "text-fuchsia-700 dark:text-fuchsia-300",
-    badgeBorder: "border-fuchsia-500/30",
-    gradientFrom: "from-fuchsia-400",
-    gradientTo: "to-pink-500",
-  },
-  {
-    key: "veteran",
-    name: "Veteran",
-    emoji: "🔥",
-    min: 100,
-    glow: "from-orange-400/40 to-red-500/30",
-    badgeBg: "bg-orange-500/10",
-    badgeText: "text-orange-700 dark:text-orange-300",
-    badgeBorder: "border-orange-500/30",
-    gradientFrom: "from-orange-400",
-    gradientTo: "to-red-500",
-  },
-  {
-    key: "legend",
-    name: "Legend",
-    emoji: "👑",
-    min: 250,
-    glow: "from-amber-400/50 to-yellow-500/40",
-    badgeBg: "bg-amber-500/15",
-    badgeText: "text-amber-700 dark:text-amber-300",
-    badgeBorder: "border-amber-500/40",
-    gradientFrom: "from-amber-400",
-    gradientTo: "to-yellow-500",
-  },
-];
-
 const colorCookie = useCookie<string>("user-avatar-color");
 
 const firstName = ref("");
@@ -170,43 +70,6 @@ const hasChanges = computed(() => {
     firstNameInput.value.trim() !== firstName.value ||
     lastNameInput.value.trim() !== lastName.value
   );
-});
-
-const activityScore = computed(() => {
-  return (
-    quizCount.value +
-    conversationCount.value +
-    Math.floor(chatMessageCount.value / 10)
-  );
-});
-
-const currentTier = computed<Tier>(() => {
-  const score = activityScore.value;
-  let tier = TIERS[0]!;
-  for (const t of TIERS) {
-    if (score >= t.min) tier = t;
-  }
-  return tier;
-});
-
-const nextTier = computed<Tier | null>(() => {
-  const idx = TIERS.findIndex((t) => t.key === currentTier.value.key);
-  return idx >= 0 && idx < TIERS.length - 1 ? TIERS[idx + 1]! : null;
-});
-
-const tierProgress = computed(() => {
-  const current = currentTier.value;
-  const next = nextTier.value;
-  if (!next) return 100;
-  const span = next.min - current.min;
-  const gained = activityScore.value - current.min;
-  return Math.max(0, Math.min(100, Math.round((gained / span) * 100)));
-});
-
-const pointsToNext = computed(() => {
-  const next = nextTier.value;
-  if (!next) return 0;
-  return Math.max(0, next.min - activityScore.value);
 });
 
 async function loadActivity(userId: string) {
@@ -403,13 +266,6 @@ async function handleSignOut() {
             @click="handleAvatarClick"
           >
             <div
-              :class="[
-                'absolute -inset-6 rounded-full blur-2xl opacity-80 bg-linear-to-br pointer-events-none transition-all duration-500',
-                currentTier.glow,
-              ]"
-            />
-
-            <div
               v-if="avatarUrl"
               :class="[
                 'relative h-30 w-30 sm:h-36 sm:w-36 rounded-full overflow-hidden border-4 shadow-lg',
@@ -476,18 +332,6 @@ async function handleSignOut() {
             }}
           </h1>
 
-          <div
-            :class="[
-              'mt-2 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium',
-              currentTier.badgeBg,
-              currentTier.badgeText,
-              currentTier.badgeBorder,
-            ]"
-          >
-            <span class="text-sm leading-none">{{ currentTier.emoji }}</span>
-            <span>{{ currentTier.name }}</span>
-          </div>
-
           <p class="mt-2 text-sm text-muted-foreground">{{ user?.email }}</p>
           <p class="text-xs text-muted-foreground/80">
             Medlem sedan {{ memberSince }}
@@ -495,59 +339,7 @@ async function handleSignOut() {
 
           <div class="mt-6 w-full max-w-2xl">
             <div class="rounded-2xl border border-border/70 bg-card p-5 sm:p-6">
-              <div class="flex items-center justify-between gap-3 mb-3">
-                <div class="text-left">
-                  <p
-                    class="text-[11px] text-muted-foreground uppercase tracking-wide"
-                  >
-                    Nivå
-                  </p>
-                  <p class="text-sm font-semibold mt-0.5">
-                    {{ currentTier.emoji }} {{ currentTier.name }}
-                  </p>
-                </div>
-                <div class="text-right">
-                  <p
-                    v-if="nextTier"
-                    class="text-[11px] text-muted-foreground uppercase tracking-wide"
-                  >
-                    Nästa
-                  </p>
-                  <p
-                    v-else
-                    class="text-[11px] text-muted-foreground uppercase tracking-wide"
-                  >
-                    Högsta nivå
-                  </p>
-                  <p v-if="nextTier" class="text-sm font-semibold mt-0.5">
-                    {{ nextTier.emoji }} {{ nextTier.name }}
-                  </p>
-                  <p v-else class="text-sm font-semibold mt-0.5">Maxad! 🎉</p>
-                </div>
-              </div>
-
-              <div class="relative h-2.5 rounded-full bg-muted overflow-hidden">
-                <div
-                  :class="[
-                    'absolute inset-y-0 left-0 rounded-full bg-linear-to-r transition-all duration-700',
-                    currentTier.gradientFrom,
-                    currentTier.gradientTo,
-                  ]"
-                  :style="{ width: `${tierProgress}%` }"
-                />
-              </div>
-
-              <div
-                class="mt-2 flex items-center justify-between text-[11px] text-muted-foreground"
-              >
-                <span class="tabular-nums">{{ activityScore }} poäng</span>
-                <span v-if="nextTier" class="tabular-nums">
-                  {{ pointsToNext }} kvar till {{ nextTier.name }}
-                </span>
-                <span v-else>Du har nått toppen ✨</span>
-              </div>
-
-              <div class="mt-5 grid grid-cols-3 gap-2 sm:gap-3">
+              <div class="grid grid-cols-3 gap-2 sm:gap-3">
                 <div
                   class="rounded-xl border border-border/70 bg-background/70 p-3 sm:p-4"
                 >
@@ -561,7 +353,7 @@ async function handleSignOut() {
                 <div
                   class="rounded-xl border border-border/70 bg-background/70 p-3 sm:p-4"
                 >
-                  <p class="text-[11px] text-muted-foreground">Samtal</p>
+                  <p class="text-[11px] text-muted-foreground">AI Chattar</p>
                   <p
                     class="mt-1 text-xl sm:text-2xl font-semibold tabular-nums"
                   >
@@ -579,36 +371,6 @@ async function handleSignOut() {
                   </p>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="flex flex-col gap-3">
-        <h2
-          class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
-        >
-          Nivåer
-        </h2>
-
-        <div class="rounded-2xl border border-border/70 bg-card p-5">
-          <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
-            <div
-              v-for="tier in TIERS"
-              :key="tier.key"
-              :class="[
-                'rounded-xl border p-3 text-center transition-all',
-                tier.key === currentTier.key
-                  ? `${tier.badgeBg} ${tier.badgeBorder} ring-2 ring-offset-2 ring-offset-background`
-                  : 'border-border/70 opacity-60',
-                tier.key === currentTier.key ? tier.badgeText : '',
-              ]"
-            >
-              <p class="text-xl">{{ tier.emoji }}</p>
-              <p class="text-xs font-medium mt-1">{{ tier.name }}</p>
-              <p class="text-[10px] text-muted-foreground mt-0.5 tabular-nums">
-                {{ tier.min }}+
-              </p>
             </div>
           </div>
         </div>
