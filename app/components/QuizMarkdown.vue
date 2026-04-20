@@ -6,6 +6,16 @@ import DOMPurify from "dompurify";
 
 const props = defineProps<{ content: string }>();
 
+function normalizeMathDelimiters(content: string): string {
+  return content
+    .replace(/\\\[([\s\S]*?)\\\]/g, (_m, inner) => `$$${inner.trim()}$$`)
+    .replace(/\\\(([\s\S]*?)\\\)/g, (_m, inner) => `$${inner.trim()}$`)
+    .replace(
+      /\$\s+([^$\n][\s\S]*?[^$\n])\s+\$/g,
+      (_m, inner) => `$${inner.trim()}$`,
+    );
+}
+
 const md = new MarkdownIt({ html: true, linkify: true, typographer: true });
 md.use(texmath, {
   engine: katex,
@@ -17,7 +27,7 @@ md.use(texmath, {
 });
 
 const html = computed(() =>
-  DOMPurify.sanitize(md.render(props.content), {
+  DOMPurify.sanitize(md.render(normalizeMathDelimiters(props.content)), {
     ADD_TAGS: [
       "math",
       "semantics",
