@@ -3,6 +3,7 @@ import { useChatStore } from "@/stores/chat";
 
 const CHAT_API_URL =
   "https://liutentor-api-production.up.railway.app/api/v1/chat/completion";
+const GEMINI_MODEL_ID = "gemini-3.1-flash-lite-preview";
 
 // USE FOR LOCAL DEVELOPMENT
 // const CHAT_API_URL_LOCAL = "http://localhost:3001/api/v1/chat/completion";
@@ -110,9 +111,11 @@ export function useChat(options: {
 
     const {
       giveDirectAnswer = true,
-      modelId = "gemini-2.5-pro",
+      modelId = GEMINI_MODEL_ID,
       context,
     } = opts;
+    const resolvedModelId =
+      modelId === GEMINI_MODEL_ID ? modelId : GEMINI_MODEL_ID;
 
     const userMessage = {
       role: "user" as const,
@@ -151,7 +154,7 @@ export function useChat(options: {
           examUrl: options.examUrl,
           courseCode: options.courseCode,
           solutionUrl: options.solutionUrl || undefined,
-          modelId,
+          modelId: resolvedModelId,
           conversationId: chatStore.currentConversationId,
         }),
         signal: abortController.value.signal,

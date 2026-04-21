@@ -101,28 +101,17 @@ const historyOptions = computed(() =>
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <TooltipProvider v-else :delay-duration="100">
-        <Tooltip>
-          <TooltipTrigger as-child>
-            <span class="inline-flex">
-              <Button
-                variant="outline"
-                size="sm"
-                class="gap-1.5 border-border/50 shadow-none text-xs"
-                disabled
-              >
-                Historik
-                <LucideChevronDown
-                  class="h-3.5 w-3.5 text-muted-foreground transition-transform duration-200"
-                />
-              </Button>
-            </span>
-          </TooltipTrigger>
-          <TooltipContent side="bottom">
-            <p>Logga in för att se quizhistorik.</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <Button
+        variant="outline"
+        size="sm"
+        class="gap-1.5 border-border/50 shadow-none text-xs"
+        disabled
+      >
+        Historik
+        <LucideChevronDown
+          class="h-3.5 w-3.5 text-muted-foreground transition-transform duration-200"
+        />
+      </Button>
 
       <Button
         variant="outline"

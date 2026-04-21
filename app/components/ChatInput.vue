@@ -32,13 +32,7 @@ const MAX_LENGTH = 4000;
 
 const models: Model[] = [
   {
-    id: "gpt-4o",
-    name: "ChatGPT",
-    logoLight: "/images/llm-logos/openai-light.svg",
-    logoDark: "/images/llm-logos/openai-dark.svg",
-  },
-  {
-    id: "gemini-2.5-pro",
+    id: "gemini-3.1-flash-lite-preview",
     name: "Gemini",
     logoLight: "/images/llm-logos/gemini.svg",
     logoDark: "/images/llm-logos/gemini.svg",
@@ -94,10 +88,6 @@ onMounted(() => {
 });
 
 defineExpose({ focus: () => textareaRef.value?.focus() });
-
-function pickModel(newModelId: string) {
-  emit("update:selectedModelId", newModelId);
-}
 </script>
 
 <template>
@@ -137,51 +127,16 @@ function pickModel(newModelId: string) {
         />
 
         <div class="flex items-center justify-between px-3 py-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger as-child>
-              <button
-                class="flex cursor-pointer items-center gap-1 h-8 px-2.5 rounded-xl hover:bg-accent text-xs font-medium text-muted-foreground transition-colors shrink-0"
-                type="button"
-              >
-                <img
-                  :src="modelLogo(selectedModel)"
-                  class="w-3.5 h-3.5 object-contain shrink-0"
-                  alt=""
-                />
-                {{ selectedModel.name }}
-                <LucideChevronDown class="w-3 h-3 opacity-40 ml-0.5" />
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="start"
-              side="top"
-              class="w-44 p-1"
-              @close-auto-focus.prevent="textareaRef?.focus()"
-            >
-              <DropdownMenuItem
-                v-for="m in models"
-                :key="m.id"
-                class="flex items-center gap-2 text-xs px-2 py-1.5 cursor-pointer rounded-md"
-                :class="
-                  m.id === selectedModelId
-                    ? 'text-foreground'
-                    : 'text-muted-foreground'
-                "
-                @click="pickModel(m.id)"
-              >
-                <img
-                  :src="modelLogo(m)"
-                  class="w-3.5 h-3.5 object-contain shrink-0"
-                  alt=""
-                />
-                <span class="flex-1">{{ m.name }}</span>
-                <LucideCheck
-                  v-if="m.id === selectedModelId"
-                  class="w-3 h-3 text-primary shrink-0"
-                />
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <div
+            class="flex items-center gap-1 h-8 px-2.5 rounded-xl text-xs font-medium text-muted-foreground shrink-0"
+          >
+            <img
+              :src="modelLogo(selectedModel)"
+              class="w-3.5 h-3.5 object-contain shrink-0"
+              alt="Gemini"
+            />
+            {{ selectedModel.name }}
+          </div>
 
           <Transition name="scale" mode="out-in">
             <Button

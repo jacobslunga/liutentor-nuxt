@@ -82,10 +82,11 @@ async function initMarkdown() {
 
   instance.use(texmath, {
     engine: katex,
-    delimiters: ["dollars"],
+    delimiters: ["dollars", "brackets"],
     katexOptions: {
       throwOnError: false,
       errorColor: "inherit",
+      strict: "ignore",
     },
   });
 
@@ -117,7 +118,8 @@ initMarkdown();
 
 function renderMarkdown(content: string): string {
   if (!md.value) return "";
-  return DOMPurify.sanitize(md.value.render(content), {
+  const normalized = content;
+  return DOMPurify.sanitize(md.value.render(normalized), {
     ADD_TAGS: [
       "math",
       "semantics",
@@ -231,12 +233,13 @@ function wrapTables() {
 watch(
   messages,
   () => {
-    if (isAtBottom.value) {
-      nextTick(() => {
+    nextTick(() => {
+      // Do not force-scroll while the assistant is streaming tokens.
+      if (!isLoading.value && isAtBottom.value) {
         scrollToBottom("auto");
-        wrapTables();
-      });
-    }
+      }
+      wrapTables();
+    });
   },
   { deep: true },
 );
@@ -475,6 +478,37 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
 </template>
 
 <style scoped>
+.prose :deep(h1) {
+  font-size: 1.55rem;
+  line-height: 1.25;
+  font-weight: 700;
+  margin: 1.25rem 0 0.75rem;
+}
+
+.prose :deep(h2) {
+  font-size: 1.3rem;
+  line-height: 1.3;
+  font-weight: 650;
+  margin: 1.1rem 0 0.65rem;
+}
+
+.prose :deep(h3) {
+  font-size: 1.1rem;
+  line-height: 1.35;
+  font-weight: 600;
+  margin: 1rem 0 0.55rem;
+}
+
+.prose :deep(h1:first-child),
+.prose :deep(h2:first-child),
+.prose :deep(h3:first-child) {
+  margin-top: 0;
+}
+
+.prose :deep(p) {
+  line-height: 1.75;
+}
+
 .prose :deep(.table-outer) {
   position: relative;
   background-color: hsl(var(--card, var(--background)));
@@ -626,5 +660,45 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
 
 .prose :deep(.katex) {
   max-width: 100%;
+  white-space: nowrap;
+}
+
+.prose :deep(p .katex) {
+  display: inline-block;
+  vertical-align: baseline;
+}
+
+.prose :deep(p) {
+  line-height: 1.75;
+  text-wrap: pretty;
+  hanging-punctuation: allow-end;
+}
+
+.prose :deep(.katex) {
+  max-width: 100%;
+}
+
+.prose :deep(.katex-display) {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+  margin: 1rem 0;
+  padding: 0.25rem 0;
+}
+
+.prose :deep(.katex-display > .katex) {
+  white-space: normal;
+  max-width: 100%;
+}
+
+.prose :deep(p .katex:not(.katex-display)) {
+  display: inline;
+  white-space: normal;
+}
+
+.prose :deep(p) {
+  line-height: 1.75;
+  text-wrap: pretty;
+  overflow-wrap: break-word;
 }
 </style>

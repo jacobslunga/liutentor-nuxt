@@ -213,7 +213,7 @@ function passColor(rate: number) {
               >
                 <div class="min-w-0">
                   <div
-                    class="text-sm font-medium text-foreground group-hover:text-foreground/80 transition-colors truncate"
+                    class="text-sm font-semibold text-foreground group-hover:text-foreground/80 transition-colors truncate"
                   >
                     {{ exam.exam_name }}
                   </div>
