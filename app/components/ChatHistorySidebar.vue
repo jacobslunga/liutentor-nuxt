@@ -314,7 +314,7 @@ onUnmounted(() => {
   />
 
   <aside
-    class="absolute inset-y-0 right-0 z-100 h-full w-80 border-l border-border bg-card shadow-xl transition-transform duration-250 ease-[cubic-bezier(0.32,0.72,0,1)]"
+    class="absolute inset-y-0 right-0 z-100 h-full w-80 border-l border-border bg-background shadow-xl transition-transform duration-250 ease-[cubic-bezier(0.32,0.72,0,1)]"
     :class="open ? 'translate-x-0' : 'translate-x-full'"
     aria-label="Konversationshistorik"
   >
@@ -373,7 +373,7 @@ onUnmounted(() => {
                 ]"
                 :style="itemMotionStyle(item.id)"
               >
-                <div class="flex items-start gap-1">
+                <div class="flex items-center gap-1">
                   <button
                     class="min-w-0 flex-1 cursor-pointer text-left rounded-md px-1 py-1"
                     :disabled="isOpeningConversation || isDeletingConversation"
@@ -408,6 +408,10 @@ onUnmounted(() => {
   <AlertDialog v-model:open="showDeleteConfirm">
     <AlertDialogContent>
       <AlertDialogHeader>
+        <div
+          class="pointer-events-none absolute inset-y-0 -left-8 w-8 bg-linear-to-l from-card via-card/75 to-transparent"
+        />
+
         <AlertDialogTitle>Är du säker?</AlertDialogTitle>
         <AlertDialogDescription>
           Den här chatten kommer att raderas permanent och kan inte ångras.

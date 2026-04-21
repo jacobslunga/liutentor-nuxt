@@ -1,23 +1,15 @@
 <template>
   <div
-    class="shrink-0 relative flex items-center justify-between px-3 py-2 z-90"
+    class="shrink-0 relative flex items-center justify-between px-3 py-2 z-90 overflow-visible"
   >
+    <div
+      class="pointer-events-none absolute inset-x-0 top-0 -bottom-6 -z-10 bg-linear-to-b from-background/85 via-background/55 to-transparent"
+    ></div>
+
     <div class="flex items-center gap-2 min-w-0">
       <Button variant="ghost" size="icon" class="size-8" @click="emit('close')">
         <LucideChevronRight />
       </Button>
-      <div
-        class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] cursor-default shrink-0"
-        :class="
-          hasSolution
-            ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-            : 'bg-muted/50 text-muted-foreground'
-        "
-      >
-        <LucideCircleCheck v-if="hasSolution" class="w-3.5 h-3.5" />
-        <LucideSquareX v-else class="w-3.5 h-3.5" />
-        <span class="font-medium">Lösning</span>
-      </div>
     </div>
 
     <p

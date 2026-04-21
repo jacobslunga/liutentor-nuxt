@@ -44,7 +44,7 @@ function passColor(rate: number) {
 <template>
   <Dialog>
     <DialogTrigger
-      class="font-mono text-sm cursor-pointer px-2 py-1 rounded-md hover:bg-foreground/5 transition-colors duration-150"
+      class="text-sm cursor-pointer px-2 py-1 rounded-md hover:bg-foreground/5 transition-colors duration-150"
       :class="passColor(passRate)"
       @click.prevent.stop
     >

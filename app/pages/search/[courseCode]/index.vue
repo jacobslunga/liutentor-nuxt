@@ -130,7 +130,7 @@ function passColor(rate: number) {
           <div class="w-full">
             <div class="flex items-center gap-2 mb-3">
               <span
-                class="text-xs font-mono text-muted-foreground/60 tracking-wide uppercase"
+                class="text-xs text-muted-foreground/60 tracking-wide uppercase"
               >
                 {{ courseCode }}
               </span>
@@ -217,14 +217,14 @@ function passColor(rate: number) {
                   >
                     {{ exam.exam_name }}
                   </div>
-                  <div class="text-xs font-mono text-muted-foreground mt-0.5">
+                  <div class="text-xs text-muted-foreground mt-0.5">
                     {{ exam.exam_date }}
                   </div>
                 </div>
 
                 <div>
                   <span
-                    class="text-[10px] font-mono px-2 py-0.5 rounded-md border border-border/50 bg-muted/40 text-muted-foreground"
+                    class="text-[10px] px-2 py-0.5 rounded-md border border-border/50 bg-muted/40 text-muted-foreground"
                   >
                     {{ exam.exam_name.split(" ")[0] }}
                   </span>

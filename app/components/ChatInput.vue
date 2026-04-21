@@ -102,6 +102,10 @@ function pickModel(newModelId: string) {
 
 <template>
   <div class="px-4 bg-transparent relative w-full pointer-events-auto z-10">
+    <div
+      class="pointer-events-none absolute inset-x-0 -top-10 -bottom-25 -z-10 bg-linear-to-t from-background via-background to-transparent"
+    />
+
     <div class="max-w-2xl mx-auto relative">
       <Transition name="fade-up">
         <div
@@ -120,7 +124,7 @@ function pickModel(newModelId: string) {
       </Transition>
 
       <div
-        class="relative border border-border bg-background transition-all duration-200 focus-within:border-primary/50 focus-within:ring-3 focus-within:ring-primary/10 rounded-xl"
+        class="relative border border-border bg-background transition-all duration-200 focus-within:border-primary/50 focus-within:ring-3 focus-within:ring-primary/10 rounded-3xl"
       >
         <textarea
           ref="textareaRef"
@@ -136,7 +140,7 @@ function pickModel(newModelId: string) {
           <DropdownMenu>
             <DropdownMenuTrigger as-child>
               <button
-                class="flex cursor-pointer items-center gap-1 h-8 px-2.5 rounded-lg hover:bg-accent text-xs font-medium text-muted-foreground transition-colors shrink-0"
+                class="flex cursor-pointer items-center gap-1 h-8 px-2.5 rounded-xl hover:bg-accent text-xs font-medium text-muted-foreground transition-colors shrink-0"
                 type="button"
               >
                 <img

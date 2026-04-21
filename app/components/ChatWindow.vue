@@ -362,19 +362,22 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
     <div
       class="flex-1 min-w-0 flex flex-col transition-all duration-300 ease-out"
     >
-      <ChatHeader
-        :has-solution="hasSolution"
-        :title="chatHeaderTitle"
-        :history-open="isHistoryOpen"
-        @close="emit('close')"
-        @open-history="toggleHistory"
-        @new-chat="startNewChat"
-      />
-
       <div class="flex-1 min-h-0 relative">
+        <div class="absolute inset-x-0 top-0 z-20 pointer-events-none">
+          <ChatHeader
+            class="pointer-events-auto"
+            :has-solution="hasSolution"
+            :title="chatHeaderTitle"
+            :history-open="isHistoryOpen"
+            @close="emit('close')"
+            @open-history="toggleHistory"
+            @new-chat="startNewChat"
+          />
+        </div>
+
         <div
           ref="messagesContainer"
-          class="h-full w-full overflow-y-auto overflow-x-hidden px-4 pt-4 custom-scrollbar"
+          class="h-full w-full overflow-y-auto overflow-x-hidden px-4 pt-20 custom-scrollbar"
           @scroll="handleScroll"
         >
           <div
@@ -445,7 +448,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
         </div>
 
         <div
-          class="absolute bottom-0 left-0 right-0 pt-10 pb-4 bg-linear-to-t from-background via-background/95 to-transparent pointer-events-none z-10"
+          class="absolute bottom-0 left-0 right-0 pt-10 pb-4 pointer-events-none z-10"
         >
           <ChatInput
             ref="chatInputRef"
