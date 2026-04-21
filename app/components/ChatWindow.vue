@@ -202,34 +202,6 @@ function handleScroll() {
   chatStore.savedScrollPosition = el.scrollTop;
 }
 
-function wrapTables() {
-  const container = messagesContainer.value;
-  if (!container) return;
-  container.querySelectorAll("table").forEach((table) => {
-    if (table.parentElement?.classList.contains("table-scroll")) return;
-
-    const outer = document.createElement("div");
-    outer.className = "table-outer";
-
-    const scroll = document.createElement("div");
-    scroll.className = "table-scroll";
-
-    const fade = document.createElement("div");
-    fade.className = "table-fade";
-
-    outer.appendChild(scroll);
-    outer.appendChild(fade);
-    table.parentNode!.insertBefore(outer, table);
-    scroll.appendChild(table);
-
-    scroll.addEventListener("scroll", () => {
-      const atEnd =
-        scroll.scrollLeft + scroll.clientWidth >= scroll.scrollWidth - 4;
-      fade.style.opacity = atEnd ? "0" : "1";
-    });
-  });
-}
-
 watch(
   messages,
   () => {
@@ -238,24 +210,16 @@ watch(
       if (!isLoading.value && isAtBottom.value) {
         scrollToBottom("auto");
       }
-      wrapTables();
     });
   },
   { deep: true },
 );
-
-watch(mdReady, (ready) => {
-  if (ready) {
-    nextTick(() => wrapTables());
-  }
-});
 
 watch(
   () => chatStore.currentConversationId,
   () => {
     nextTick(() => {
       scrollToBottom("auto");
-      wrapTables();
     });
   },
 );
@@ -287,7 +251,6 @@ onMounted(() => {
     } else {
       scrollToBottom("auto");
     }
-    wrapTables();
   });
 });
 
@@ -297,6 +260,10 @@ async function handleSend() {
   draftInput.value = "";
   isUserScrolling.value = false;
   isAtBottom.value = true;
+  showScrollButton.value = false;
+
+  nextTick(() => scrollToBottom("smooth"));
+
   await send(text, {
     giveDirectAnswer: giveDirectAnswer.value,
     modelId: selectedModelId.value,
@@ -433,13 +400,13 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
                   v-if="!msg.content && isLoading && i === messages.length - 1"
                   class="flex items-center gap-2 h-6"
                 >
-                  <span class="text-sm text-muted-foreground animate-pulse"
-                    >Tänker...</span
-                  >
+                  <span class="text-sm text-muted-foreground animate-pulse">
+                    Tänker...
+                  </span>
                 </div>
                 <div
                   v-else
-                  class="prose dark:prose-invert max-w-none"
+                  class="prose dark:prose-invert max-w-none wrap-break-word"
                   v-html="renderedAssistantHtml[i]"
                 />
               </div>
@@ -478,127 +445,25 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
 </template>
 
 <style scoped>
-.prose :deep(h1) {
-  font-size: 1.55rem;
-  line-height: 1.25;
-  font-weight: 700;
-  margin: 1.25rem 0 0.75rem;
-}
-
-.prose :deep(h2) {
-  font-size: 1.3rem;
-  line-height: 1.3;
-  font-weight: 650;
-  margin: 1.1rem 0 0.65rem;
-}
-
-.prose :deep(h3) {
-  font-size: 1.1rem;
-  line-height: 1.35;
-  font-weight: 600;
-  margin: 1rem 0 0.55rem;
-}
-
-.prose :deep(h1:first-child),
-.prose :deep(h2:first-child),
-.prose :deep(h3:first-child) {
-  margin-top: 0;
-}
-
-.prose :deep(p) {
-  line-height: 1.75;
-}
-
-.prose :deep(.table-outer) {
-  position: relative;
-  background-color: hsl(var(--card, var(--background)));
-  border: 1px solid hsl(var(--border));
-  border-radius: 12px;
-  box-shadow: 0 2px 8px hsl(var(--foreground) / 0.05);
-  margin: 1.5rem 0;
-  overflow: hidden;
-}
-
-.prose :deep(.table-scroll) {
+.prose :deep(.katex-display) {
   overflow-x: auto;
-  width: 100%;
+  overflow-y: hidden;
+  max-width: 100%;
+  margin: 1em 0;
 }
 
-.prose :deep(.table-fade) {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: 56px;
-  background: linear-gradient(
-    to right,
-    transparent,
-    hsl(var(--card, var(--background)) / 0.95)
-  );
-  pointer-events: none;
-  opacity: 1;
-  transition: opacity 0.2s ease;
+.prose :deep(.katex) {
+  max-width: 100%;
 }
 
-.prose :deep(table) {
-  width: 100%;
-  min-width: max-content;
-  border-collapse: collapse;
-  font-size: 0.875rem;
-  background: transparent;
-}
-
-.prose :deep(thead) {
-  background-color: hsl(var(--muted) / 0.5);
-  border-bottom: 1px solid hsl(var(--border));
-}
-
-.prose :deep(th) {
-  padding: 0.875rem 1.25rem;
-  text-align: left;
-  font-weight: 600;
-  color: hsl(var(--foreground) / 0.8);
-  white-space: nowrap;
-}
-
-.prose :deep(td) {
-  padding: 0.875rem 1.25rem;
-  border-bottom: 1px solid hsl(var(--border) / 0.4);
-  vertical-align: middle;
-  line-height: 1.6;
-}
-
-.prose :deep(tbody tr:last-child td) {
-  border-bottom: none;
-}
-
-.prose :deep(tbody tr) {
-  transition: background-color 0.15s ease;
-}
-
-.prose :deep(tbody tr:hover td) {
-  background-color: hsl(var(--muted) / 0.3);
-}
-
-.prose :deep(code:not(pre code)) {
+.prose :deep(pre) {
   background: hsl(var(--muted));
-  color: hsl(var(--foreground));
-  padding: 0.15em 0.4em;
-  border-radius: 5px;
-  font-size: 0.82em;
-  font-family: var(--font-mono, monospace);
+  border: 1px solid hsl(var(--border));
 }
 
 .prose :deep(pre.shiki) {
   background-color: var(--shiki-light-bg);
   color: var(--shiki-light);
-  border: 1px solid hsl(var(--border));
-  border-radius: 10px;
-  padding: 1rem;
-  overflow-x: auto;
-  font-size: 0.82rem;
-  font-family: var(--font-mono, monospace);
-  line-height: 1.6;
 }
 
 .prose :deep(pre.shiki span) {
@@ -614,91 +479,5 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
 .dark .prose :deep(pre.shiki span) {
   color: var(--shiki-dark);
   background-color: var(--shiki-dark-bg);
-}
-
-.prose :deep(pre.shiki code) {
-  background: transparent;
-  padding: 0;
-  border-radius: 0;
-  font-size: inherit;
-  font-family: inherit;
-}
-
-.prose :deep(pre:not(.shiki)) {
-  background: hsl(var(--muted));
-  border: 1px solid hsl(var(--border));
-  border-radius: 10px;
-  padding: 1rem;
-  overflow-x: auto;
-  font-size: 0.82rem;
-}
-
-.prose :deep(blockquote) {
-  border-left: 3px solid hsl(var(--primary));
-  background: hsl(var(--muted) / 0.4);
-  border-radius: 0 8px 8px 0;
-  padding: 0.6rem 1rem;
-  margin: 0;
-  color: hsl(var(--muted-foreground));
-  font-style: normal;
-}
-
-.prose :deep(a) {
-  color: hsl(var(--primary));
-  text-decoration: none;
-}
-
-.prose :deep(a:hover) {
-  text-decoration: underline;
-}
-
-.prose :deep(.katex-display) {
-  overflow-x: auto;
-  overflow-y: hidden;
-  max-width: 100%;
-}
-
-.prose :deep(.katex) {
-  max-width: 100%;
-  white-space: nowrap;
-}
-
-.prose :deep(p .katex) {
-  display: inline-block;
-  vertical-align: baseline;
-}
-
-.prose :deep(p) {
-  line-height: 1.75;
-  text-wrap: pretty;
-  hanging-punctuation: allow-end;
-}
-
-.prose :deep(.katex) {
-  max-width: 100%;
-}
-
-.prose :deep(.katex-display) {
-  overflow-x: auto;
-  overflow-y: hidden;
-  max-width: 100%;
-  margin: 1rem 0;
-  padding: 0.25rem 0;
-}
-
-.prose :deep(.katex-display > .katex) {
-  white-space: normal;
-  max-width: 100%;
-}
-
-.prose :deep(p .katex:not(.katex-display)) {
-  display: inline;
-  white-space: normal;
-}
-
-.prose :deep(p) {
-  line-height: 1.75;
-  text-wrap: pretty;
-  overflow-wrap: break-word;
 }
 </style>

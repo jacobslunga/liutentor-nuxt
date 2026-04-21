@@ -31,7 +31,7 @@
               <LucidePlus class="w-4 h-4" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent side="bottom">Ny chatt</TooltipContent>
+          <TooltipContent side="left">Ny chatt</TooltipContent>
         </Tooltip>
       </TooltipProvider>
 
