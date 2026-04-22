@@ -19,40 +19,24 @@
     </p>
 
     <div class="flex items-center gap-1">
-      <TooltipProvider :delay-duration="100">
-        <Tooltip>
-          <TooltipTrigger as-child>
-            <Button
-              variant="ghost"
-              size="icon"
-              class="size-8"
-              @click="emit('newChat')"
-            >
-              <LucidePlus class="w-4 h-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="left">Ny chatt</TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <Button
+        variant="ghost"
+        size="icon"
+        class="size-8"
+        @click="emit('newChat')"
+      >
+        <LucidePlus class="w-4 h-4" />
+      </Button>
 
-      <TooltipProvider v-if="isSignedIn" :delay-duration="100">
-        <Tooltip>
-          <TooltipTrigger as-child>
-            <Button
-              variant="ghost"
-              size="icon"
-              class="size-8"
-              @click="emit('openHistory')"
-            >
-              <LucidePanelRightDashed v-if="historyOpen" class="w-4 h-4" />
-              <LucidePanelRight v-else class="w-4 h-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="bottom" class="flex items-center gap-2">
-            <kbd class="text-xs">{{ historyShortcutLabel }} + .</kbd>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <Button
+        variant="ghost"
+        size="icon"
+        class="size-8"
+        @click="emit('openHistory')"
+      >
+        <LucidePanelRightDashed v-if="historyOpen" class="w-4 h-4" />
+        <LucidePanelRight v-else class="w-4 h-4" />
+      </Button>
     </div>
   </div>
 </template>

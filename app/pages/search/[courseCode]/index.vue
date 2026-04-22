@@ -138,7 +138,7 @@ function passColor(rate: number) {
               <span class="text-xs text-muted-foreground/60">Tentor</span>
             </div>
             <h1
-              class="text-3xl sm:text-4xl font-semibold text-foreground leading-tight tracking-tight w-full wrap-break-word"
+              class="text-3xl sm:text-4xl font-semibold text-foreground leading-tight w-full wrap-break-word"
             >
               {{ courseData.courseName }}
             </h1>

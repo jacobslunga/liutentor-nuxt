@@ -184,7 +184,7 @@ function formatTime(ms: number): string {
         <div class="p-4 rounded-lg bg-yellow-500/10 mb-2">
           <LucidePause class="w-16 h-16 text-yellow-500 fill-current" />
         </div>
-        <h2 class="text-4xl font-medium tracking-tight">PAUSAD</h2>
+        <h2 class="text-4xl font-medium">PAUSAD</h2>
         <div class="flex flex-col items-center gap-2">
           <p class="text-muted-foreground text-lg">{{ exam?.course_code }}</p>
           <p class="font-mono text-2xl">

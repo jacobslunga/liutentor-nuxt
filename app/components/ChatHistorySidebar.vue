@@ -352,7 +352,7 @@ onUnmounted(() => {
           Inga chattar hittades.
         </div>
 
-        <div v-else class="space-y-5">
+        <div v-else class="space-y-6">
           <section v-for="group in groupedConversations" :key="group.label">
             <h3
               class="px-2 pb-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/80"
@@ -364,10 +364,10 @@ onUnmounted(() => {
               <div
                 v-for="item in group.items"
                 :key="item.id"
-                class="group rounded-lg border px-1 py-1 transition-[opacity,background-color,border-color] ease-out"
+                class="group rounded-2xl border px-1 py-1 transition-[opacity,background-color,border-color] ease-out"
                 :class="[
                   item.id === chatStore.currentConversationId
-                    ? 'bg-muted/70 border-primary/40'
+                    ? 'shadow-sm border-border dark:bg-secondary'
                     : 'bg-transparent border-transparent hover:bg-muted/40',
                   open && contentReady ? 'opacity-100' : 'opacity-0',
                 ]"

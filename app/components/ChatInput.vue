@@ -1,11 +1,4 @@
 <script setup lang="ts">
-interface Model {
-  id: string;
-  name: string;
-  logoLight: string;
-  logoDark: string;
-}
-
 const props = defineProps<{
   modelValue: string;
   isLoading: boolean;
@@ -25,35 +18,14 @@ const emit = defineEmits<{
   "update:selectedModelId": [value: string];
 }>();
 
-const colorMode = useColorMode();
 const textareaRef = ref<HTMLTextAreaElement | null>(null);
-const isMultiline = ref(false);
 const MAX_LENGTH = 4000;
-
-const models: Model[] = [
-  {
-    id: "gemini-3.1-flash-lite-preview",
-    name: "Gemini",
-    logoLight: "/images/llm-logos/gemini.svg",
-    logoDark: "/images/llm-logos/gemini.svg",
-  },
-];
-
-function modelLogo(m: Model) {
-  return colorMode.value === "dark" ? m.logoDark : m.logoLight;
-}
-
-const selectedModel = computed(
-  () => models.find((m) => m.id === props.selectedModelId) ?? models[0]!,
-);
 
 const updateHeight = () => {
   const el = textareaRef.value;
   if (!el) return;
   el.style.height = "auto";
-  const newHeight = Math.min(el.scrollHeight, 200);
-  el.style.height = `${newHeight}px`;
-  isMultiline.value = newHeight > 44;
+  el.style.height = `${Math.min(el.scrollHeight, 200)}px`;
 };
 
 const handleInput = (e: Event) => {
@@ -114,32 +86,26 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
       </Transition>
 
       <div
-        class="relative border border-border bg-background transition-all duration-200 focus-within:border-primary/50 focus-within:ring-3 focus-within:ring-primary/10 rounded-3xl"
+        class="relative border border-border bg-background rounded-3xl focus-within:border-primary/50 focus-within:ring-3 focus-within:ring-primary/10"
       >
         <textarea
           ref="textareaRef"
           :value="modelValue"
           rows="1"
           placeholder="Fråga om tentan..."
-          class="w-full bg-transparent outline-none border-0 focus:ring-0 resize-none px-4 pt-3 pb-1 text-sm leading-relaxed max-h-50 custom-scrollbar"
+          class="chat-textarea w-full bg-transparent outline-none border-0 focus:ring-0 resize-none block pl-5 pr-12 py-2.75 text-sm leading-relaxed max-h-50 custom-scrollbar"
           @input="handleInput"
           @keydown="handleKeyDown"
         />
 
-        <div class="flex items-center justify-between px-3 py-2">
-          <div
-            class="flex items-center gap-1 h-8 px-2.5 rounded-xl text-xs font-medium text-muted-foreground shrink-0"
-          >
-            {{ selectedModel.name }}
-          </div>
-
+        <div class="absolute bottom-1.5 right-1.5">
           <Transition name="scale" mode="out-in">
             <Button
               v-if="isLoading"
               key="stop"
               size="icon"
               variant="secondary"
-              class="size-8 shrink-0"
+              class="size-8 rounded-full"
               @click="emit('cancel')"
             >
               <LucideSquare class="size-3.5 fill-current" />
@@ -148,11 +114,11 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
               v-else
               key="send"
               size="icon"
-              class="size-8 shrink-0"
+              class="size-8 rounded-full"
               :disabled="!modelValue.trim() || modelValue.length > MAX_LENGTH"
               @click="emit('send')"
             >
-              <LucideArrowUp />
+              <LucideArrowUp class="size-4" />
             </Button>
           </Transition>
         </div>
@@ -177,6 +143,10 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
 </template>
 
 <style scoped>
+.chat-textarea {
+  transition: height 0.15s ease-out;
+}
+
 .fade-up-enter-active,
 .fade-up-leave-active {
   transition: all 0.2s ease;

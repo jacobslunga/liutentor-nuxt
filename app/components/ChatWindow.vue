@@ -354,9 +354,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
             v-if="messages.length === 0"
             class="h-full flex flex-col items-center justify-center px-4 text-center pb-24"
           >
-            <h2
-              class="text-2xl tracking-tight font-medium mb-3 text-foreground"
-            >
+            <h2 class="text-2xl font-medium mb-3 text-foreground">
               Vad kan jag hjälpa till med?
             </h2>
             <p
@@ -374,7 +372,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
             </NuxtLink>
           </div>
 
-          <div v-else class="space-y-6 max-w-2xl mx-auto w-full">
+          <div v-else class="space-y-6 max-w-xl mx-auto w-full">
             <div
               v-for="(msg, i) in messages"
               :key="i"
@@ -388,7 +386,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
             >
               <div
                 v-if="msg.role === 'user'"
-                class="bg-primary/5 text-foreground px-4 py-2 rounded-3xl max-w-[85%] w-fit"
+                class="bg-primary/10 text-foreground px-4 py-2 rounded-3xl max-w-[85%] w-fit"
               >
                 <p class="text-[15px] leading-relaxed whitespace-pre-wrap">
                   {{ msg.content }}
@@ -407,14 +405,14 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
                 </div>
                 <div
                   v-else
-                  class="prose dark:prose-invert prose-hr:border-foreground/10 marker:text-foreground marker:font-bold"
+                  class="prose dark:prose-invert prose-neutral prose-hr:border-foreground/10 marker:text-foreground marker:font-bold"
                   v-html="renderedAssistantHtml[i]"
                 />
               </div>
             </div>
 
             <div ref="messagesEndRef" class="h-px w-full" />
-            <div class="h-40 w-full shrink-0" />
+            <div class="h-24 w-full shrink-0" />
           </div>
         </div>
 
