@@ -19,13 +19,26 @@ const emit = defineEmits<{
 }>();
 
 const textareaRef = ref<HTMLTextAreaElement | null>(null);
+const currentRows = ref(1);
 const MAX_LENGTH = 4000;
 
 const updateHeight = () => {
   const el = textareaRef.value;
   if (!el) return;
+
+  const style = getComputedStyle(el);
+  const lineHeight = Number.parseFloat(style.lineHeight) || 24;
+  const paddingTop = Number.parseFloat(style.paddingTop) || 0;
+  const paddingBottom = Number.parseFloat(style.paddingBottom) || 0;
   el.style.height = "auto";
   el.style.height = `${Math.min(el.scrollHeight, 200)}px`;
+
+  // scrollHeight includes vertical padding, so subtract it to estimate text rows.
+  const contentHeight = Math.max(
+    0,
+    el.scrollHeight - paddingTop - paddingBottom,
+  );
+  currentRows.value = Math.max(1, Math.ceil(contentHeight / lineHeight));
 };
 
 const handleInput = (e: Event) => {
@@ -86,7 +99,7 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
       </Transition>
 
       <div
-        class="relative border border-border bg-background rounded-xl focus-within:border-primary/50 focus-within:ring-3 focus-within:ring-primary/10"
+        class="relative border border-border bg-background rounded-3xl focus-within:border-foreground/30 transition-colors duration-200"
       >
         <textarea
           ref="textareaRef"

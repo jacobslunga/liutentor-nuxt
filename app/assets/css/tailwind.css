@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
 
 @import "tailwindcss";
 
@@ -9,34 +9,6 @@
   font-family: "Logo";
   src: url("/fonts/GT-Super-Text-Medium.otf") format("opentype");
   font-display: swap;
-}
-
-@font-face {
-  font-family: "LiU Tentor Sans";
-  src: url("/fonts/StyreneA-Regular.otf") format("opentype");
-  font-weight: 400;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "LiU Tentor Sans";
-  src: url("/fonts/StyreneA-Medium.otf") format("opentype");
-  font-weight: 500;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "LiU Tentor Sans";
-  src: url("/fonts/StyreneA-Medium.otf") format("opentype");
-  font-weight: 600;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: "LiU Tentor Sans";
-  src: url("/fonts/StyreneA-Bold.otf") format("opentype");
-  font-weight: 700;
-  font-style: normal;
 }
 
 @theme {
@@ -101,7 +73,7 @@
 
 body {
   font-family:
-    "Onest",
+    "Inter",
     system-ui,
     -apple-system,
     BlinkMacSystemFont,
@@ -227,7 +199,7 @@ body {
   --accent-foreground: #ececec;
   --destructive: oklch(0.704 0.191 22.216);
   --border: #2e2e2e;
-  --input: #262626;
+  --input: #2f2f2f;
   --ring: #4a4a4a;
   --chart-1: oklch(0.911 0.0453 168.18);
   --chart-2: oklch(0.8072 0.1109 164.79);

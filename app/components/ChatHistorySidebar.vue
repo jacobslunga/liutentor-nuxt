@@ -419,10 +419,6 @@ onUnmounted(() => {
   <AlertDialog v-model:open="showDeleteConfirm">
     <AlertDialogContent>
       <AlertDialogHeader>
-        <div
-          class="pointer-events-none absolute inset-y-0 -left-8 w-8 bg-linear-to-l from-card via-card/75 to-transparent"
-        />
-
         <AlertDialogTitle>Är du säker?</AlertDialogTitle>
         <AlertDialogDescription>
           Den här chatten kommer att raderas permanent och kan inte ångras.

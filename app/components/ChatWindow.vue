@@ -206,7 +206,6 @@ watch(
   messages,
   () => {
     nextTick(() => {
-      // Do not force-scroll while the assistant is streaming tokens.
       if (!isLoading.value && isAtBottom.value) {
         scrollToBottom("auto");
       }
@@ -265,7 +264,6 @@ async function handleSend() {
   nextTick(() => scrollToBottom("smooth"));
 
   await send(text, {
-    giveDirectAnswer: giveDirectAnswer.value,
     modelId: selectedModelId.value,
   });
 }
@@ -386,7 +384,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
             >
               <div
                 v-if="msg.role === 'user'"
-                class="bg-primary/10 text-foreground px-4 py-2 rounded-md max-w-[85%] w-fit"
+                class="bg-primary/10 text-foreground px-4 py-2 rounded-3xl max-w-[85%] w-fit"
               >
                 <p class="text-[15px] leading-relaxed whitespace-pre-wrap">
                   {{ msg.content }}

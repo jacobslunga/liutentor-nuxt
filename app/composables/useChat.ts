@@ -75,7 +75,6 @@ export function useChat(options: {
   async function send(
     content: string,
     opts: {
-      giveDirectAnswer?: boolean;
       modelId?: string;
       context?: string;
     } = {},
@@ -109,11 +108,7 @@ export function useChat(options: {
       }
     }
 
-    const {
-      giveDirectAnswer = true,
-      modelId = GEMINI_MODEL_ID,
-      context,
-    } = opts;
+    const { modelId = GEMINI_MODEL_ID, context } = opts;
     const resolvedModelId =
       modelId === GEMINI_MODEL_ID ? modelId : GEMINI_MODEL_ID;
 
@@ -150,7 +145,6 @@ export function useChat(options: {
         },
         body: JSON.stringify({
           messages: recentMessages,
-          giveDirectAnswer,
           examUrl: options.examUrl,
           courseCode: options.courseCode,
           solutionUrl: options.solutionUrl || undefined,
