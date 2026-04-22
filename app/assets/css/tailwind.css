@@ -62,18 +62,23 @@
 }
 
 ::-webkit-scrollbar {
-  width: 4px;
-  height: 4px;
+  width: 2px;
+  height: 2px;
   background-color: transparent;
 }
 ::-webkit-scrollbar-track {
-  background-color: transparent;
+  background-color: color-mix(
+    in srgb,
+    var(--muted-foreground),
+    transparent 94%
+  );
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb {
   background-color: color-mix(
     in srgb,
     var(--muted-foreground),
-    transparent 70%
+    transparent 58%
   );
   border-radius: 9999px;
 }
@@ -81,7 +86,7 @@
   background-color: color-mix(
     in srgb,
     var(--muted-foreground),
-    transparent 50%
+    transparent 36%
   );
 }
 ::-webkit-scrollbar-corner {
@@ -89,7 +94,7 @@
 }
 * {
   scrollbar-width: thin;
-  scrollbar-color: color-mix(in srgb, var(--muted-foreground), transparent 70%)
+  scrollbar-color: color-mix(in srgb, var(--muted-foreground), transparent 58%)
     transparent;
 }
 
@@ -230,49 +235,61 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
 
-  @layer base {
-    .prose {
-      --tw-prose-body: var(--foreground);
-      --tw-prose-headings: var(--foreground);
-      --tw-prose-lead: var(--muted-foreground);
-      --tw-prose-links: var(--primary);
-      --tw-prose-bold: var(--foreground);
-      --tw-prose-counters: var(--muted-foreground);
-      --tw-prose-bullets: var(--muted-foreground);
-      --tw-prose-hr: var(--border);
-      --tw-prose-quotes: var(--foreground);
-      --tw-prose-quote-borders: var(--border);
-      --tw-prose-captions: var(--muted-foreground);
-      --tw-prose-kbd: var(--foreground);
-      --tw-prose-kbd-shadows: var(--foreground);
-      --tw-prose-code: var(--foreground);
-      --tw-prose-pre-code: var(--foreground);
-      --tw-prose-pre-bg: var(--muted);
-      --tw-prose-th-borders: var(--border);
-      --tw-prose-td-borders: var(--border);
-    }
+.variable-spin {
+  animation: variable-spin 4s infinite;
+  transform-origin: center;
+  width: 16px;
+  height: 16px;
+  color: var(--muted-foreground);
+}
 
-    .prose.dark\:prose-invert:is(.dark *),
-    .dark .prose {
-      --tw-prose-body: var(--foreground);
-      --tw-prose-headings: var(--foreground);
-      --tw-prose-lead: var(--muted-foreground);
-      --tw-prose-links: var(--primary);
-      --tw-prose-bold: var(--foreground);
-      --tw-prose-counters: var(--muted-foreground);
-      --tw-prose-bullets: var(--muted-foreground);
-      --tw-prose-hr: var(--border);
-      --tw-prose-quotes: var(--foreground);
-      --tw-prose-quote-borders: var(--border);
-      --tw-prose-captions: var(--muted-foreground);
-      --tw-prose-kbd: var(--foreground);
-      --tw-prose-kbd-shadows: var(--foreground);
-      --tw-prose-code: var(--foreground);
-      --tw-prose-pre-code: var(--foreground);
-      --tw-prose-pre-bg: var(--muted);
-      --tw-prose-th-borders: var(--border);
-      --tw-prose-td-borders: var(--border);
-    }
+@keyframes variable-spin {
+  0% {
+    transform: rotate(0deg);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  25% {
+    transform: rotate(180deg);
+    animation-timing-function: cubic-bezier(0.8, 0, 0.2, 1);
+  }
+  50% {
+    transform: rotate(360deg);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.6, 1);
+  }
+  75% {
+    transform: rotate(540deg);
+    animation-timing-function: cubic-bezier(0.8, 0, 0.2, 1);
+  }
+  100% {
+    transform: rotate(720deg);
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+.shimmer-text {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--muted-foreground), transparent 40%) 0%,
+    color-mix(in srgb, var(--muted-foreground), transparent 40%) 35%,
+    var(--foreground) 50%,
+    color-mix(in srgb, var(--muted-foreground), transparent 40%) 65%,
+    color-mix(in srgb, var(--muted-foreground), transparent 40%) 100%
+  );
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer-sweep 3.2s linear infinite;
+}
+
+@keyframes shimmer-sweep {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
   }
 }

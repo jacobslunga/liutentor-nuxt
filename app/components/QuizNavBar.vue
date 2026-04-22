@@ -106,6 +106,7 @@ const historyOptions = computed(() =>
         size="sm"
         class="gap-1.5 border-border/50 shadow-none text-xs"
         disabled
+        v-else
       >
         Historik
         <LucideChevronDown

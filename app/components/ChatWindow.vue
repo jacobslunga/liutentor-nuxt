@@ -374,7 +374,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
             </NuxtLink>
           </div>
 
-          <div v-else class="space-y-6 max-w-xl mx-auto w-full">
+          <div v-else class="space-y-6 max-w-2xl mx-auto w-full">
             <div
               v-for="(msg, i) in messages"
               :key="i"
@@ -388,7 +388,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
             >
               <div
                 v-if="msg.role === 'user'"
-                class="bg-primary/10 text-foreground px-4 py-2 rounded-2xl max-w-[85%] w-fit"
+                class="bg-primary/5 text-foreground px-4 py-2 rounded-3xl max-w-[85%] w-fit"
               >
                 <p class="text-[15px] leading-relaxed whitespace-pre-wrap">
                   {{ msg.content }}
@@ -400,20 +400,21 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
                   v-if="!msg.content && isLoading && i === messages.length - 1"
                   class="flex items-center gap-2 h-6"
                 >
-                  <span class="text-sm text-muted-foreground animate-pulse">
-                    Tänker...
-                  </span>
+                  <LucideLoader
+                    class="variable-spin w-4 h-4 text-muted-foreground"
+                  />
+                  <span class="shimmer-text text-sm">Tänker...</span>
                 </div>
                 <div
                   v-else
-                  class="prose dark:prose-invert max-w-none wrap-break-word"
+                  class="prose dark:prose-invert prose-hr:border-foreground/10 marker:text-foreground marker:font-bold"
                   v-html="renderedAssistantHtml[i]"
                 />
               </div>
             </div>
 
             <div ref="messagesEndRef" class="h-px w-full" />
-            <div class="h-32 w-full shrink-0" />
+            <div class="h-40 w-full shrink-0" />
           </div>
         </div>
 
@@ -449,35 +450,33 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
   overflow-x: auto;
   overflow-y: hidden;
   max-width: 100%;
-  margin: 1em 0;
+  padding: 0.5rem 0;
+}
+
+.prose :deep(.katex-display) > .katex {
+  max-width: none;
+  white-space: normal;
 }
 
 .prose :deep(.katex) {
   max-width: 100%;
 }
 
-.prose :deep(pre) {
-  background: hsl(var(--muted));
-  border: 1px solid hsl(var(--border));
+.prose :deep(p) {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 }
 
-.prose :deep(pre.shiki) {
-  background-color: var(--shiki-light-bg);
-  color: var(--shiki-light);
+.prose :deep(.katex-display)::-webkit-scrollbar {
+  height: 4px;
 }
 
-.prose :deep(pre.shiki span) {
-  color: var(--shiki-light);
-  background-color: var(--shiki-light-bg);
+.prose :deep(.katex-display)::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 2px;
 }
 
-.dark .prose :deep(pre.shiki) {
-  background-color: var(--shiki-dark-bg);
-  color: var(--shiki-dark);
-}
-
-.dark .prose :deep(pre.shiki span) {
-  color: var(--shiki-dark);
-  background-color: var(--shiki-dark-bg);
+.prose :deep(.katex-display)::-webkit-scrollbar-track {
+  background: transparent;
 }
 </style>

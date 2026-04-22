@@ -130,11 +130,6 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
           <div
             class="flex items-center gap-1 h-8 px-2.5 rounded-xl text-xs font-medium text-muted-foreground shrink-0"
           >
-            <img
-              :src="modelLogo(selectedModel)"
-              class="w-3.5 h-3.5 object-contain shrink-0"
-              alt="Gemini"
-            />
             {{ selectedModel.name }}
           </div>
 
@@ -153,12 +148,11 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
               v-else
               key="send"
               size="icon"
-              variant="ghost"
               class="size-8 shrink-0"
               :disabled="!modelValue.trim() || modelValue.length > MAX_LENGTH"
               @click="emit('send')"
             >
-              <LucideCornerDownLeft />
+              <LucideArrowUp />
             </Button>
           </Transition>
         </div>
