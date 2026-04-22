@@ -164,7 +164,7 @@ function passColor(rate: number) {
             <button
               v-for="p in prefixes"
               :key="p"
-              class="text-xs cursor-pointer font-mono px-3 py-1.5 rounded-lg border transition-all"
+              class="text-xs cursor-pointer font-mono px-3 py-1.5 rounded-md border transition-all"
               :class="
                 activeFilters.has(p)
                   ? 'bg-foreground text-background border-foreground shadow-sm'
@@ -177,9 +177,9 @@ function passColor(rate: number) {
           </div>
 
           <div
-            class="w-full overflow-x-auto rounded-2xl border border-border/50"
+            class="w-full overflow-x-auto rounded-md border border-border/50"
           >
-            <div class="min-w-fit w-full rounded-2xl overflow-hidden">
+            <div class="min-w-fit w-full rounded-md overflow-hidden">
               <div
                 class="grid grid-cols-[1fr_80px_64px_72px] gap-x-4 px-5 py-3 border-b border-border/40 bg-muted/30"
               >

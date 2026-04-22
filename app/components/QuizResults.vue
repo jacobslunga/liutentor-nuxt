@@ -60,7 +60,7 @@ const courseCodeLabel = computed(() => {
       <span class="text-3xl font-medium text-muted-foreground">{{ pct }}%</span>
     </div>
 
-    <div class="mb-8 rounded-xl border border-dashed border-border/60 p-4">
+    <div class="mb-8 rounded-md border border-dashed border-border/60 p-4">
       <p class="text-sm font-medium mb-0.5">Nästa?</p>
       <p class="text-xs text-muted-foreground mb-4">
         Gör om quizet eller skapa ett nytt med nya tentor.
@@ -90,7 +90,7 @@ const courseCodeLabel = computed(() => {
       <div
         v-for="(question, qi) in questions"
         :key="question.id"
-        class="rounded-xl border border-border/50 p-4"
+        class="rounded-md border border-border/50 p-4"
       >
         <div class="mb-3 flex items-center gap-2">
           <span
@@ -118,7 +118,7 @@ const courseCodeLabel = computed(() => {
           <div
             v-for="(option, oi) in question.options"
             :key="`${question.id}-${oi}`"
-            class="rounded-lg border px-3 py-2 text-xs"
+            class="rounded-md border px-3 py-2 text-xs"
             :class="[
               oi === question.answer
                 ? 'border-emerald-500/40 bg-emerald-500/8 font-medium'

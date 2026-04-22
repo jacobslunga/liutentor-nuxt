@@ -202,7 +202,7 @@ onUnmounted(() => {
 
       <div
         ref="dropZoneRef"
-        class="relative border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all"
+        class="relative border-2 border-dashed rounded-md p-8 text-center cursor-pointer transition-all"
         :class="
           isOverDropZone
             ? 'border-primary bg-primary/5 scale-105'
@@ -262,7 +262,7 @@ onUnmounted(() => {
       </div>
 
       <div
-        class="p-4 bg-muted/50 border rounded-lg flex items-start gap-2 text-left"
+        class="p-4 bg-muted/50 border rounded-md flex items-start gap-2 text-left"
       >
         <LucideInfo class="h-4 w-4 text-muted-foreground shrink-0" />
         <p class="text-xs text-muted-foreground">

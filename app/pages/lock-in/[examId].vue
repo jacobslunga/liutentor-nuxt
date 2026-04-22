@@ -162,7 +162,7 @@ function formatTime(ms: number): string {
     </div>
 
     <div class="flex-1 w-full h-full pt-14 pb-4 px-4 overflow-hidden">
-      <div class="w-full h-full rounded-xl overflow-hidden shadow-2xl border">
+      <div class="w-full h-full rounded-md overflow-hidden shadow-2xl border">
         <ClientOnly>
           <PdfRenderer v-if="exam" :pdf-url="exam.pdf_url" />
         </ClientOnly>
@@ -181,7 +181,7 @@ function formatTime(ms: number): string {
         v-if="paused"
         class="absolute inset-0 z-50 bg-background/60 backdrop-blur-xl flex flex-col items-center justify-center gap-6"
       >
-        <div class="p-4 rounded-lg bg-yellow-500/10 mb-2">
+        <div class="p-4 rounded-md bg-yellow-500/10 mb-2">
           <LucidePause class="w-16 h-16 text-yellow-500 fill-current" />
         </div>
         <h2 class="text-4xl font-medium">PAUSAD</h2>

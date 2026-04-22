@@ -176,7 +176,7 @@ function confirmLockIn() {
               v-for="e in sortedExams"
               :key="e.id"
               :data-current="e.id.toString() === examId"
-              class="w-full text-left rounded-lg px-3 py-2.5 transition-colors cursor-pointer group"
+              class="w-full text-left rounded-md px-3 py-2.5 transition-colors cursor-pointer group"
               :class="
                 e.id.toString() === examId
                   ? 'bg-primary/8 ring-1 ring-primary/20'
@@ -304,7 +304,7 @@ function confirmLockIn() {
             <LucideSettings class="w-4.5 h-4.5" />
           </Button>
         </DialogTrigger>
-        <DialogContent class="max-w-md rounded-xl">
+        <DialogContent class="max-w-md">
           <DialogHeader>
             <DialogTitle>Inställningar</DialogTitle>
             <DialogDescription>Anpassa din studieupplevelse</DialogDescription>

@@ -109,7 +109,7 @@ function handleGenerate() {
 
         <div
           v-if="examsLoading"
-          class="rounded-xl border border-border/50 overflow-hidden p-4 space-y-2"
+          class="rounded-md border border-border/50 overflow-hidden p-4 space-y-2"
         >
           <div class="h-4 w-36 rounded bg-muted animate-pulse" />
           <div class="h-3 w-full rounded bg-muted animate-pulse" />
@@ -125,7 +125,7 @@ function handleGenerate() {
 
         <div
           v-else
-          class="rounded-xl border border-border/50 bg-background p-4"
+          class="rounded-md border border-border/50 bg-background p-4"
         >
           <div class="flex items-start justify-between gap-3">
             <div>
@@ -266,7 +266,7 @@ function handleGenerate() {
           >
             Anpassa (valfritt)
           </p>
-          <div class="rounded-xl border border-border/50 bg-background p-3">
+          <div class="rounded-md border border-border/50 bg-background p-3">
             <textarea
               v-model="customPrompt"
               :maxlength="MAX_PROMPT_LENGTH"

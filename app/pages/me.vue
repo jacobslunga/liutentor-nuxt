@@ -240,7 +240,7 @@ async function handleSignOut() {
   <div class="flex flex-col gap-8">
     <template v-if="profileLoading">
       <section
-        class="relative overflow-hidden rounded-3xl border border-border/70 p-8"
+        class="relative overflow-hidden rounded-md border border-border/70 p-8"
       >
         <div class="h-8 w-40 rounded bg-muted animate-pulse mx-auto" />
         <div
@@ -251,7 +251,7 @@ async function handleSignOut() {
           <div
             v-for="i in 3"
             :key="i"
-            class="h-18 rounded-xl bg-muted animate-pulse"
+            class="h-18 rounded-md bg-muted animate-pulse"
           />
         </div>
       </section>
@@ -338,10 +338,10 @@ async function handleSignOut() {
           </p>
 
           <div class="mt-6 w-full max-w-2xl">
-            <div class="rounded-2xl border border-border/70 bg-card p-5 sm:p-6">
+            <div class="rounded-md border border-border/70 bg-card p-5 sm:p-6">
               <div class="grid grid-cols-3 gap-2 sm:gap-3">
                 <div
-                  class="rounded-xl border border-border/70 bg-background/70 p-3 sm:p-4"
+                  class="rounded-md border border-border/70 bg-background/70 p-3 sm:p-4"
                 >
                   <p class="text-[11px] text-muted-foreground">Quiz</p>
                   <p
@@ -351,7 +351,7 @@ async function handleSignOut() {
                   </p>
                 </div>
                 <div
-                  class="rounded-xl border border-border/70 bg-background/70 p-3 sm:p-4"
+                  class="rounded-md border border-border/70 bg-background/70 p-3 sm:p-4"
                 >
                   <p class="text-[11px] text-muted-foreground">AI Chattar</p>
                   <p
@@ -361,7 +361,7 @@ async function handleSignOut() {
                   </p>
                 </div>
                 <div
-                  class="rounded-xl border border-border/70 bg-background/70 p-3 sm:p-4"
+                  class="rounded-md border border-border/70 bg-background/70 p-3 sm:p-4"
                 >
                   <p class="text-[11px] text-muted-foreground">Meddelanden</p>
                   <p
@@ -384,7 +384,7 @@ async function handleSignOut() {
         </h2>
 
         <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
-          <div class="rounded-2xl border border-border/70 bg-card p-5">
+          <div class="rounded-md border border-border/70 bg-card p-5">
             <p class="text-sm font-medium mb-3">Namn</p>
             <div class="space-y-3">
               <div class="flex flex-col gap-1.5">
@@ -393,7 +393,7 @@ async function handleSignOut() {
                   v-model="firstNameInput"
                   type="text"
                   placeholder="Ditt förnamn"
-                  class="h-10 rounded-lg border border-border bg-background px-3 text-sm outline-none focus:border-foreground/30"
+                  class="h-10 rounded-md border border-border bg-background px-3 text-sm outline-none focus:border-foreground/30"
                 />
               </div>
               <div class="flex flex-col gap-1.5">
@@ -402,7 +402,7 @@ async function handleSignOut() {
                   v-model="lastNameInput"
                   type="text"
                   placeholder="Ditt efternamn"
-                  class="h-10 rounded-lg border border-border bg-background px-3 text-sm outline-none focus:border-foreground/30"
+                  class="h-10 rounded-md border border-border bg-background px-3 text-sm outline-none focus:border-foreground/30"
                 />
               </div>
             </div>
@@ -424,7 +424,7 @@ async function handleSignOut() {
           </div>
 
           <div
-            class="rounded-2xl border border-border/70 bg-card divide-y divide-border/70"
+            class="rounded-md border border-border/70 bg-card divide-y divide-border/70"
           >
             <div class="p-5">
               <p class="text-sm font-medium mb-3">Kontodetaljer</p>

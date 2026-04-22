@@ -23,7 +23,7 @@ const emit = defineEmits<{
         :key="`${question.id}-${i}`"
         role="button"
         tabindex="0"
-        class="group flex w-full items-center gap-3 rounded-2xl border px-4 py-3 text-left text-sm transition-all duration-150 cursor-pointer select-none"
+        class="group flex w-full items-center gap-3 rounded-md border px-4 py-3 text-left text-sm transition-all duration-150 cursor-pointer select-none"
         :class="
           selectedAnswer === i
             ? 'border-primary/40 bg-primary/5 ring-1 ring-primary/20'

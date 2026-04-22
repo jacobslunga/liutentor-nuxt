@@ -234,7 +234,7 @@ const donutOptions = computed(() => ({
           </div>
 
           <div
-            class="rounded-2xl border border-border bg-card overflow-hidden shadow-sm"
+            class="rounded-md border border-border bg-card overflow-hidden shadow-sm"
           >
             <div class="p-5 border-b border-border/60 bg-muted/20">
               <div class="flex items-center gap-2 mb-1">
@@ -255,7 +255,7 @@ const donutOptions = computed(() => ({
           </div>
 
           <div
-            class="rounded-2xl border border-border bg-card overflow-hidden shadow-sm"
+            class="rounded-md border border-border bg-card overflow-hidden shadow-sm"
           >
             <div class="p-5 border-b border-border/60 bg-muted/20">
               <div class="flex items-center gap-2 mb-1">
@@ -276,7 +276,7 @@ const donutOptions = computed(() => ({
                 <div
                   v-for="d in aggregate.entries"
                   :key="d.key"
-                  class="flex items-center justify-between py-2 px-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+                  class="flex items-center justify-between py-2 px-3 rounded-md bg-muted/30 hover:bg-muted/50 transition-colors"
                 >
                   <div class="flex items-center gap-3">
                     <span

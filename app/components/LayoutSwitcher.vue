@@ -16,7 +16,7 @@ const modes = [
 
 <template>
   <div
-    class="fixed bottom-10 left-5 z-40 hidden md:flex rounded-lg p-1 transition-all duration-300 ease-in-out"
+    class="fixed bottom-10 left-5 z-40 hidden md:flex rounded-md p-1 transition-all duration-300 ease-in-out"
     :class="
       isVisible || isHovering
         ? 'opacity-100 translate-y-0 pointer-events-auto'

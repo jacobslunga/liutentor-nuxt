@@ -279,7 +279,7 @@ function handleCancel() {
 }
 
 function toggleHistory() {
-  if (!chatStore.isOpen || !currentUserId.value) return;
+  if (!chatStore.isOpen) return;
   isHistoryOpen.value = !isHistoryOpen.value;
 }
 
@@ -386,7 +386,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
             >
               <div
                 v-if="msg.role === 'user'"
-                class="bg-primary/10 text-foreground px-4 py-2 rounded-3xl max-w-[85%] w-fit"
+                class="bg-primary/10 text-foreground px-4 py-2 rounded-md max-w-[85%] w-fit"
               >
                 <p class="text-[15px] leading-relaxed whitespace-pre-wrap">
                   {{ msg.content }}
@@ -405,7 +405,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
                 </div>
                 <div
                   v-else
-                  class="prose dark:prose-invert prose-neutral prose-hr:border-foreground/10 marker:text-foreground marker:font-bold"
+                  class="prose dark:prose-invert prose-hr:border-foreground/10 marker:text-foreground marker:font-bold"
                   v-html="renderedAssistantHtml[i]"
                 />
               </div>

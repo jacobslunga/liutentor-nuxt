@@ -15,9 +15,17 @@ defineOptions({
   inheritAttrs: false,
 });
 
-const props = defineProps<
-  DialogContentProps & { class?: HTMLAttributes["class"] }
->();
+const props = withDefaults(
+  defineProps<
+    DialogContentProps & {
+      class?: HTMLAttributes["class"];
+      showCloseButton?: boolean;
+    }
+  >(),
+  {
+    showCloseButton: true,
+  },
+);
 const emits = defineEmits<DialogContentEmits>();
 
 const delegatedProps = reactiveOmit(props, "class");
@@ -33,7 +41,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
       <DialogContent
         :class="
           cn(
-            'relative z-50 grid w-full max-w-lg my-8 gap-4 border border-border bg-background p-6 shadow-lg duration-200 sm:rounded-[calc(var(--radius)+0.5rem)] md:w-full',
+            'relative z-50 grid w-full max-w-lg my-8 gap-4 border border-border bg-background p-6 shadow-lg duration-200 sm:rounded-lg md:w-full',
             props.class,
           )
         "
@@ -54,7 +62,8 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
         <slot />
 
         <DialogClose
-          class="absolute top-4 right-4 p-0.5 transition-colors rounded-lg hover:bg-secondary"
+          v-if="showCloseButton"
+          class="absolute top-4 right-4 p-0.5 transition-colors rounded-md hover:bg-secondary"
         >
           <LucideX class="w-4 h-4" />
           <span class="sr-only">Close</span>

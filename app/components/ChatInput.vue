@@ -86,7 +86,7 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
       </Transition>
 
       <div
-        class="relative border border-border bg-background rounded-3xl focus-within:border-primary/50 focus-within:ring-3 focus-within:ring-primary/10"
+        class="relative border border-border bg-background rounded-xl focus-within:border-primary/50 focus-within:ring-3 focus-within:ring-primary/10"
       >
         <textarea
           ref="textareaRef"

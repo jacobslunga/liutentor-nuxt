@@ -38,6 +38,10 @@ const userId = computed(
       | null,
 );
 
+const requiresLoginMessage = computed(
+  () => !userId.value && !isLoading.value && !loadError.value,
+);
+
 function sameDay(a: Date, b: Date): boolean {
   return (
     a.getFullYear() === b.getFullYear() &&
@@ -346,6 +350,13 @@ onUnmounted(() => {
         </div>
 
         <div
+          v-else-if="requiresLoginMessage"
+          class="px-2 py-4 text-sm text-muted-foreground"
+        >
+          Logga in för att se din chatthistorik.
+        </div>
+
+        <div
           v-else-if="groupedConversations.length === 0"
           class="px-2 py-4 text-sm text-muted-foreground"
         >
@@ -364,10 +375,10 @@ onUnmounted(() => {
               <div
                 v-for="item in group.items"
                 :key="item.id"
-                class="group rounded-2xl border px-1 py-1 transition-[opacity,background-color,border-color] ease-out"
+                class="group rounded-md border px-1 py-1 transition-[opacity,background-color,border-color] ease-out"
                 :class="[
                   item.id === chatStore.currentConversationId
-                    ? 'shadow-sm border-border dark:bg-secondary'
+                    ? 'border-border bg-secondary'
                     : 'bg-transparent border-transparent hover:bg-muted/40',
                   open && contentReady ? 'opacity-100' : 'opacity-0',
                 ]"

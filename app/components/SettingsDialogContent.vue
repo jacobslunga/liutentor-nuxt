@@ -51,7 +51,7 @@ const categories = [{ id: "visibility", label: "Synlighet" }];
       <div class="space-y-4">
         <div v-for="cat in categories" :key="cat.id" class="space-y-2">
           <h4 class="text-sm text-muted-foreground">{{ cat.label }}</h4>
-          <div class="rounded-lg border bg-card">
+          <div class="rounded-md border bg-card">
             <table class="w-full">
               <tbody class="divide-y divide-border">
                 <tr

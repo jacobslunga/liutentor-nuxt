@@ -226,11 +226,11 @@ function handleKeyUp(e: KeyboardEvent) {
                 <div v-else class="flex h-full items-center justify-center p-6">
                   <div class="group relative w-full max-w-sm">
                     <div
-                      class="rounded-2xl border-2 border-dashed border-border/60 px-8 py-10 transition-colors group-hover:border-primary/30"
+                      class="rounded-md border-2 border-dashed border-border/60 px-8 py-10 transition-colors group-hover:border-primary/30"
                     >
                       <div class="flex flex-col items-center text-center gap-4">
                         <div
-                          class="flex size-12 items-center justify-center rounded-2xl bg-muted/60 group-hover:bg-primary/10 transition-colors"
+                          class="flex size-12 items-center justify-center rounded-md bg-muted/60 group-hover:bg-primary/10 transition-colors"
                         >
                           <LucideUpload
                             class="size-6 text-muted-foreground group-hover:text-primary transition-colors"

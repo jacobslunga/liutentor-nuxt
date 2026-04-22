@@ -65,7 +65,7 @@ function passColor(rate: number) {
           </span>
         </div>
 
-        <div class="border border-border rounded-lg p-3">
+        <div class="border border-border rounded-md p-3">
           <div class="flex items-end gap-2 h-32">
             <div
               v-for="{ grade, count, color } in chartData"
@@ -93,7 +93,7 @@ function passColor(rate: number) {
           >
             <div class="flex items-center gap-2">
               <div
-                class="w-2 h-2 rounded-sm"
+                class="w-2 h-2 rounded-md"
                 :style="{ backgroundColor: color }"
               />
               <span class="text-foreground">Betyg {{ grade }}</span>

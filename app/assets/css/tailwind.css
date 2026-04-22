@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Onest:wght@100..900&display=swap");
+
 @import "tailwindcss";
 
 @plugin "tailwindcss-animate";
@@ -9,33 +11,32 @@
   font-display: swap;
 }
 
-/* @font-face {
-  font-family: "LiU Tentor Sans";
-  src: url("/fonts/CameraPlainVariable.woff2") format("woff2");
-  font-weight: 100 900;
-  font-style: normal;
-} */
-
 @font-face {
   font-family: "LiU Tentor Sans";
-  src: url("/fonts/OpenAISans-Regular.woff2") format("woff2");
+  src: url("/fonts/StyreneA-Regular.otf") format("opentype");
   font-weight: 400;
+  font-style: normal;
 }
 
 @font-face {
   font-family: "LiU Tentor Sans";
-  src: url("/fonts/OpenAISans-Medium.woff2") format("woff2");
+  src: url("/fonts/StyreneA-Medium.otf") format("opentype");
   font-weight: 500;
+  font-style: normal;
 }
+
 @font-face {
   font-family: "LiU Tentor Sans";
-  src: url("/fonts/OpenAISans-Semibold.woff2") format("woff2");
+  src: url("/fonts/StyreneA-Medium.otf") format("opentype");
   font-weight: 600;
+  font-style: normal;
 }
+
 @font-face {
   font-family: "LiU Tentor Sans";
-  src: url("/fonts/OpenAISans-Bold.woff2") format("woff2");
+  src: url("/fonts/StyreneA-Bold.otf") format("opentype");
   font-weight: 700;
+  font-style: normal;
 }
 
 @theme {
@@ -100,6 +101,7 @@
 
 body {
   font-family:
+    "Onest",
     system-ui,
     -apple-system,
     BlinkMacSystemFont,
@@ -174,7 +176,7 @@ body {
 }
 
 :root {
-  --radius: clamp(0.875rem, 0.78rem + 0.5vw, 1.125rem);
+  --radius: 0.7rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(0.99 0 0);

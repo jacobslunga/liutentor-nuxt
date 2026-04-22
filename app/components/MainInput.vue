@@ -228,7 +228,7 @@ function handleClickOutside(event: MouseEvent) {
 
     <div
       v-if="showSuggestions && suggestions.length > 0"
-      class="absolute w-full left-0 mt-2 bg-background rounded-2xl border shadow-md z-40 max-h-72 overflow-hidden text-sm"
+      class="absolute w-full left-0 mt-2 bg-background rounded-md border shadow-md z-40 max-h-72 overflow-hidden text-sm"
     >
       <div v-if="isLoading" class="p-3 text-sm text-muted-foreground">
         Laddar...
