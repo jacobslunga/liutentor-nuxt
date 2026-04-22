@@ -1,5 +1,5 @@
 #! /bin/bash
 
-rm -rf .nuxt .netlify .dist
-bun run build
-rm -rf .nuxt .netlify .dist
+rm -rf .netlify .dist
+npm run build
+rm -rf .netlify .dist
