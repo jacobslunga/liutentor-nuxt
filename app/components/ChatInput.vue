@@ -85,7 +85,7 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
       <Transition name="fade-up">
         <div
           v-if="showScrollButton"
-          class="absolute -top-12 left-1/2 -translate-x-1/2 z-20"
+          class="absolute -top-12 right-0 -translate-x-1/2 z-20"
         >
           <Button
             variant="outline"
@@ -93,7 +93,7 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
             class="rounded-full shadow-md bg-background"
             @click="emit('scrollToBottom')"
           >
-            <LucideArrowDown class="w-5 h-5" />
+            <LucideChevronDown class="w-5 h-5" />
           </Button>
         </div>
       </Transition>
