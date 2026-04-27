@@ -142,21 +142,6 @@ function passColor(rate: number) {
             >
               {{ courseData.courseName }}
             </h1>
-            <div class="flex items-center gap-3 mt-3">
-              <span
-                class="inline-flex items-center gap-1.5 text-sm text-muted-foreground"
-              >
-                <LucideFileText class="w-3.5 h-3.5" />
-                {{ exams.length }} tentor
-              </span>
-              <span class="text-border">·</span>
-              <span
-                class="inline-flex items-center gap-1.5 text-sm text-muted-foreground"
-              >
-                <LucideCheckCircle class="w-3.5 h-3.5" />
-                {{ exams.filter((e) => e.has_solution).length }} med facit
-              </span>
-            </div>
           </div>
 
           <!-- Filters -->
@@ -206,14 +191,14 @@ function passColor(rate: number) {
               <div
                 v-for="exam in filteredExams"
                 :key="exam.id"
-                class="grid grid-cols-[1fr_80px_64px_72px] gap-x-4 cursor-pointer px-5 py-4 border-b border-border/20 last:border-0 hover:bg-muted/20 transition-colors items-center group"
+                class="grid grid-cols-[1fr_80px_64px_72px] gap-x-4 cursor-pointer px-5 py-2 border-b border-border/20 last:border-0 hover:bg-muted/20 transition-colors items-center group"
                 @mouseenter="prefetchExamRoute(exam.id)"
                 @focusin="prefetchExamRoute(exam.id)"
                 @click="navigateTo(examRoutePath(exam.id))"
               >
                 <div class="min-w-0">
                   <div
-                    class="text-sm font-semibold text-foreground group-hover:text-foreground/80 transition-colors truncate"
+                    class="text-sm font-medium text-foreground group-hover:text-foreground/80 transition-colors truncate"
                   >
                     {{ exam.exam_name }}
                   </div>
@@ -231,20 +216,11 @@ function passColor(rate: number) {
                 </div>
 
                 <div class="flex justify-center">
-                  <div
+                  <LucideCheck
                     v-if="exam.has_solution"
-                    class="w-5 h-5 rounded-full bg-green-500/10 flex items-center justify-center"
-                  >
-                    <LucideCheck
-                      class="w-3 h-3 text-green-600 dark:text-green-400"
-                    />
-                  </div>
-                  <div
-                    v-else
-                    class="w-5 h-5 rounded-full bg-destructive/10 flex items-center justify-center"
-                  >
-                    <LucideX class="w-3 h-3 text-destructive" />
-                  </div>
+                    class="w-5 h-5 text-green-600 dark:text-green-400"
+                  />
+                  <LucideX v-else class="w-5 h-5 text-destructive" />
                 </div>
 
                 <div class="text-right flex flex-col items-end gap-1">
