@@ -62,6 +62,18 @@ const filteredExams = computed<Exam[]>(() => {
   return result;
 });
 
+const avgPassRate = computed(() => {
+  const valid = exams.value.filter((e) => e.pass_rate != null);
+  if (!valid.length) return null;
+  return Math.round(
+    valid.reduce((sum, e) => sum + e.pass_rate, 0) / valid.length,
+  );
+});
+
+const examsWithSolutions = computed(
+  () => exams.value.filter((e) => e.has_solution).length,
+);
+
 const prefetchedRoutes = new Set<string>();
 
 function examRoutePath(examId: number) {
@@ -80,12 +92,6 @@ function toggleFilter(p: string) {
   const next = new Set(activeFilters.value);
   next.has(p) ? next.delete(p) : next.add(p);
   activeFilters.value = next;
-}
-
-function passBarColor(rate: number) {
-  if (rate >= 50) return "bg-green-500";
-  if (rate >= 30) return "bg-amber-500";
-  return "bg-red-500";
 }
 
 function passColor(rate: number) {
@@ -131,21 +137,61 @@ function passColor(rate: number) {
             <div class="flex items-center gap-2 mb-3">
               <span
                 class="text-xs text-muted-foreground/60 tracking-wide uppercase"
+                >{{ courseCode }}</span
               >
-                {{ courseCode }}
-              </span>
               <span class="text-muted-foreground/30">/</span>
               <span class="text-xs text-muted-foreground/60">Tentor</span>
             </div>
             <h1
-              class="text-3xl sm:text-4xl font-semibold text-foreground leading-tight w-full wrap-break-word"
+              class="text-3xl sm:text-4xl font-semibold text-foreground leading-tight w-full wrap-break-word mb-5"
             >
               {{ courseData.courseName }}
             </h1>
+
+            <!-- Meta stats -->
+            <div class="flex flex-wrap gap-3">
+              <div
+                class="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/40 border border-border/50"
+              >
+                <LucideFileText class="w-3.5 h-3.5 text-muted-foreground" />
+                <span class="text-xs text-muted-foreground">
+                  <span class="font-medium text-foreground">{{
+                    exams.length
+                  }}</span>
+                  tentor
+                </span>
+              </div>
+              <div
+                class="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/40 border border-border/50"
+              >
+                <LucideCheckCircle class="w-3.5 h-3.5 text-muted-foreground" />
+                <span class="text-xs text-muted-foreground">
+                  <span class="font-medium text-foreground">{{
+                    examsWithSolutions
+                  }}</span>
+                  med facit
+                </span>
+              </div>
+              <div
+                v-if="avgPassRate !== null"
+                class="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/40 border border-border/50"
+              >
+                <LucideTrendingUp class="w-3.5 h-3.5 text-muted-foreground" />
+                <span class="text-xs text-muted-foreground">
+                  Snitt godkänd
+                  <span class="font-medium" :class="passColor(avgPassRate)"
+                    >{{ avgPassRate }}%</span
+                  >
+                </span>
+              </div>
+            </div>
           </div>
 
           <!-- Filters -->
-          <div v-if="prefixes.length > 1" class="flex flex-wrap gap-2 w-full">
+          <div
+            v-if="prefixes.length > 1"
+            class="flex flex-wrap gap-2 w-full -mt-4"
+          >
             <button
               v-for="p in prefixes"
               :key="p"
@@ -161,12 +207,13 @@ function passColor(rate: number) {
             </button>
           </div>
 
+          <!-- Table -->
           <div
-            class="w-full overflow-x-auto rounded-md border border-border/50"
+            class="w-full overflow-x-auto rounded-xl border border-border/60 -mt-4"
           >
-            <div class="min-w-fit w-full rounded-md overflow-hidden">
+            <div class="min-w-fit w-full rounded-xl overflow-hidden">
               <div
-                class="grid grid-cols-[1fr_80px_64px_72px] gap-x-4 px-5 py-3 border-b border-border/40 bg-muted/30"
+                class="grid grid-cols-[1fr_80px_64px_80px] gap-x-4 px-6 py-3.5 border-b border-border/50 bg-muted/30"
               >
                 <button
                   class="text-xs text-muted-foreground flex items-center gap-1.5 hover:text-foreground transition-colors w-fit"
@@ -191,7 +238,7 @@ function passColor(rate: number) {
               <div
                 v-for="exam in filteredExams"
                 :key="exam.id"
-                class="grid grid-cols-[1fr_80px_64px_72px] gap-x-4 cursor-pointer px-5 py-2 border-b border-border/20 last:border-0 hover:bg-muted/20 transition-colors items-center group"
+                class="grid grid-cols-[1fr_80px_64px_80px] gap-x-4 cursor-pointer px-6 py-4 border-b border-border/20 last:border-0 hover:bg-muted/20 transition-colors items-center group"
                 @mouseenter="prefetchExamRoute(exam.id)"
                 @focusin="prefetchExamRoute(exam.id)"
                 @click="navigateTo(examRoutePath(exam.id))"
@@ -202,14 +249,14 @@ function passColor(rate: number) {
                   >
                     {{ exam.exam_name }}
                   </div>
-                  <div class="text-xs text-muted-foreground mt-0.5">
+                  <div class="text-xs text-muted-foreground/70 mt-0.5">
                     {{ exam.exam_date }}
                   </div>
                 </div>
 
                 <div>
                   <span
-                    class="text-[10px] px-2 py-0.5 rounded-md border border-border/50 bg-muted/40 text-muted-foreground"
+                    class="text-[10px] px-2 py-0.5 rounded-md border border-border/50 bg-muted/40 text-muted-foreground font-mono"
                   >
                     {{ exam.exam_name.split(" ")[0] }}
                   </span>
@@ -218,9 +265,12 @@ function passColor(rate: number) {
                 <div class="flex justify-center">
                   <LucideCheck
                     v-if="exam.has_solution"
-                    class="w-5 h-5 text-green-600 dark:text-green-400"
+                    class="w-4 h-4 text-green-500"
                   />
-                  <LucideX v-else class="w-5 h-5 text-destructive" />
+                  <LucideMinus
+                    v-else
+                    class="w-4 h-4 text-muted-foreground/30"
+                  />
                 </div>
 
                 <div class="text-right flex flex-col items-end gap-1">

@@ -137,7 +137,7 @@ function confirmLockIn() {
     <ButtonGroup class="pointer-events-auto">
       <Button
         size="icon-sm"
-        variant="ghost"
+        variant="outline"
         @click="router.push(`/search/${courseCode}`)"
       >
         <LucideArrowLeft class="w-4 h-4" />
@@ -145,7 +145,7 @@ function confirmLockIn() {
 
       <DropdownMenu v-if="selectedExam" v-model:open="isDropdownOpen">
         <DropdownMenuTrigger as-child>
-          <Button variant="ghost" size="sm">
+          <Button variant="outline" size="sm">
             <span class="text-xs font-semibold">{{
               selectedExam.exam_name.replace(selectedExam.exam_date, "").trim()
             }}</span>
@@ -222,7 +222,7 @@ function confirmLockIn() {
     <ButtonGroup class="pointer-events-auto">
       <DropdownMenu v-model:open="isLockInOpen">
         <DropdownMenuTrigger as-child>
-          <Button variant="ghost" size="sm" :disabled="!selectedExam">
+          <Button variant="outline" size="sm" :disabled="!selectedExam">
             <LucideLock class="w-3.5 h-3.5" />
             <span class="text-xs">Lock in</span>
           </Button>
@@ -247,7 +247,7 @@ function confirmLockIn() {
 
       <DropdownMenu v-model:open="isDownloadOpen">
         <DropdownMenuTrigger as-child>
-          <Button variant="ghost" size="sm" :disabled="!hasDownload">
+          <Button variant="outline" size="sm" :disabled="!hasDownload">
             <span class="text-xs">Ladda ned</span>
             <LucideChevronDown class="w-4 h-4 text-muted-foreground" />
           </Button>
@@ -281,7 +281,7 @@ function confirmLockIn() {
       </DropdownMenu>
 
       <Button
-        variant="ghost"
+        variant="outline"
         size="sm"
         class="not-[&:hover]:group-hover/btns:bg-foreground/5"
         @click="chatStore.toggle()"
@@ -297,7 +297,7 @@ function confirmLockIn() {
       <Dialog v-model:open="isSettingsOpen">
         <DialogTrigger as-child>
           <Button
-            variant="ghost"
+            variant="outline"
             size="icon-sm"
             class="not-[&:hover]:group-hover/btns:bg-foreground/5"
           >

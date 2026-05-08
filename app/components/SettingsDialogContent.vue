@@ -30,7 +30,7 @@ const categories = [{ id: "visibility", label: "Synlighet" }];
         <div
           v-for="opt in themeOptions"
           :key="opt.id"
-          class="flex-1 cursor-pointer rounded-md border transition-all select-none flex flex-col items-center justify-center gap-2 py-4 hover:bg-primary/5 hover:border-primary"
+          class="flex-1 cursor-pointer rounded-3xl border transition-all select-none flex flex-col items-center justify-center gap-2 py-4 hover:bg-primary/5 hover:border-primary"
           :class="
             theme === opt.id
               ? 'bg-primary/5 border-primary'
@@ -51,7 +51,7 @@ const categories = [{ id: "visibility", label: "Synlighet" }];
       <div class="space-y-4">
         <div v-for="cat in categories" :key="cat.id" class="space-y-2">
           <h4 class="text-sm text-muted-foreground">{{ cat.label }}</h4>
-          <div class="rounded-md border bg-card">
+          <div class="rounded-2xl border bg-card">
             <table class="w-full">
               <tbody class="divide-y divide-border">
                 <tr

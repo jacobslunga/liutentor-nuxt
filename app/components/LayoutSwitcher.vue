@@ -37,8 +37,8 @@ const modes = [
               class="flex border items-center gap-1.5 px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer"
               :class="[
                 mode.value === 'exam-with-facit'
-                  ? 'rounded-l-lg'
-                  : 'rounded-r-lg',
+                  ? 'rounded-l-xl'
+                  : 'rounded-r-xl',
                 layoutMode === mode.value
                   ? 'bg-primary text-primary-foreground border-transparent'
                   : 'bg-background text-muted-foreground border-border hover:bg-accent hover:text-foreground',
