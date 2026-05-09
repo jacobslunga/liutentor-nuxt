@@ -25,9 +25,11 @@ const conversations = ref<ConversationItem[]>([]);
 const isLoading = ref(false);
 const isOpeningConversation = ref(false);
 const isDeletingConversation = ref(false);
+const isDeletingAll = ref(false);
 const loadError = ref<string | null>(null);
 const contentReady = ref(false);
 const showDeleteConfirm = ref(false);
+const showDeleteAllConfirm = ref(false);
 const pendingDeleteConversation = ref<ConversationItem | null>(null);
 let contentRevealTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -238,7 +240,6 @@ async function confirmDeleteConversation() {
   loadError.value = null;
 
   try {
-    // Remove chat logs first in case FK cascade is not configured.
     const { error: logsError } = await (supabase as any)
       .from("ai_chat_logs")
       .delete()
@@ -264,9 +265,7 @@ async function confirmDeleteConversation() {
       chatStore.setLoading(false);
     }
 
-    toast.success("Chatten raderades", {
-      position: "top-center",
-    });
+    toast.success("Chatten raderades", { position: "top-center" });
 
     showDeleteConfirm.value = false;
     pendingDeleteConversation.value = null;
@@ -274,6 +273,47 @@ async function confirmDeleteConversation() {
     loadError.value = "Kunde inte radera chatten.";
   } finally {
     isDeletingConversation.value = false;
+  }
+}
+
+async function confirmDeleteAllConversations() {
+  if (!userId.value || isDeletingAll.value) return;
+
+  isDeletingAll.value = true;
+  loadError.value = null;
+
+  try {
+    const ids = conversations.value.map((c) => c.id);
+
+    if (ids.length > 0) {
+      const { error: logsError } = await (supabase as any)
+        .from("ai_chat_logs")
+        .delete()
+        .in("conversation_id", ids);
+
+      if (logsError) throw logsError;
+
+      const { error: conversationsError } = await (supabase as any)
+        .from("conversations")
+        .delete()
+        .eq("user_id", userId.value);
+
+      if (conversationsError) throw conversationsError;
+    }
+
+    conversations.value = [];
+    chatStore.messages = [];
+    chatStore.currentConversationId = null;
+    chatStore.currentConversationTitle = null;
+    chatStore.savedScrollPosition = 0;
+    chatStore.setLoading(false);
+
+    toast.success("Alla chattar raderades", { position: "top-center" });
+    showDeleteAllConfirm.value = false;
+  } catch {
+    loadError.value = "Kunde inte radera alla chattar.";
+  } finally {
+    isDeletingAll.value = false;
   }
 }
 
@@ -318,23 +358,33 @@ onUnmounted(() => {
   />
 
   <aside
-    class="absolute inset-y-0 right-0 z-100 h-full w-80 border-l border-border bg-background shadow-xl transition-transform duration-250 ease-[cubic-bezier(0.32,0.72,0,1)]"
+    class="absolute inset-y-0 right-0 z-100 h-full w-80 border-l border-border bg-background transition-transform duration-250 ease-[cubic-bezier(0.32,0.72,0,1)]"
     :class="open ? 'translate-x-0' : 'translate-x-full'"
     aria-label="Konversationshistorik"
   >
     <div class="flex h-full min-h-0 flex-col">
       <div class="border-b px-4 py-3 flex items-center justify-between gap-2">
-        <div>
-          <h2 class="text-sm font-semibold">Chatthistorik</h2>
+        <h2 class="text-sm font-semibold">Chatthistorik</h2>
+        <div class="flex items-center gap-1">
+          <Button
+            v-if="conversations.length > 0"
+            variant="ghost"
+            size="icon"
+            class="size-7 shrink-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+            :disabled="isDeletingAll || isDeletingConversation"
+            @click="showDeleteAllConfirm = true"
+          >
+            <LucideTrash2 class="w-3.5 h-3.5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            class="size-7 shrink-0"
+            @click="emit('update:open', false)"
+          >
+            <LucideX class="w-4 h-4" />
+          </Button>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          class="size-7 shrink-0"
-          @click="emit('update:open', false)"
-        >
-          <LucideX class="w-4 h-4" />
-        </Button>
       </div>
 
       <div
@@ -434,6 +484,28 @@ onUnmounted(() => {
           @click="confirmDeleteConversation"
         >
           {{ isDeletingConversation ? "Raderar..." : "Radera" }}
+        </AlertDialogAction>
+      </AlertDialogFooter>
+    </AlertDialogContent>
+  </AlertDialog>
+
+  <AlertDialog v-model:open="showDeleteAllConfirm">
+    <AlertDialogContent>
+      <AlertDialogHeader>
+        <AlertDialogTitle>Radera all historik?</AlertDialogTitle>
+        <AlertDialogDescription>
+          Alla {{ conversations.length }} chattar kommer att raderas permanent.
+          Det går inte att ångra.
+        </AlertDialogDescription>
+      </AlertDialogHeader>
+      <AlertDialogFooter>
+        <AlertDialogCancel :disabled="isDeletingAll">Avbryt</AlertDialogCancel>
+        <AlertDialogAction
+          class="bg-destructive text-white hover:bg-destructive/90"
+          :disabled="isDeletingAll"
+          @click="confirmDeleteAllConversations"
+        >
+          {{ isDeletingAll ? "Raderar..." : `Radera alla` }}
         </AlertDialogAction>
       </AlertDialogFooter>
     </AlertDialogContent>

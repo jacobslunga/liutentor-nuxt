@@ -151,7 +151,7 @@ function passColor(rate: number) {
             <!-- Meta stats -->
             <div class="flex flex-wrap gap-3">
               <div
-                class="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/40 border border-border/50"
+                class="flex items-center gap-2 px-3 py-2 rounded-2xl bg-muted/40 border border-border/50"
               >
                 <LucideFileText class="w-3.5 h-3.5 text-muted-foreground" />
                 <span class="text-xs text-muted-foreground">
@@ -162,7 +162,7 @@ function passColor(rate: number) {
                 </span>
               </div>
               <div
-                class="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/40 border border-border/50"
+                class="flex items-center gap-2 px-3 py-2 rounded-2xl bg-muted/40 border border-border/50"
               >
                 <LucideCheckCircle class="w-3.5 h-3.5 text-muted-foreground" />
                 <span class="text-xs text-muted-foreground">
@@ -174,7 +174,7 @@ function passColor(rate: number) {
               </div>
               <div
                 v-if="avgPassRate !== null"
-                class="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/40 border border-border/50"
+                class="flex items-center gap-2 px-3 py-2 rounded-2xl bg-muted/40 border border-border/50"
               >
                 <LucideTrendingUp class="w-3.5 h-3.5 text-muted-foreground" />
                 <span class="text-xs text-muted-foreground">
@@ -209,9 +209,9 @@ function passColor(rate: number) {
 
           <!-- Table -->
           <div
-            class="w-full overflow-x-auto rounded-xl border border-border/60 -mt-4"
+            class="w-full overflow-x-auto rounded-2xl border border-border/60 -mt-4"
           >
-            <div class="min-w-fit w-full rounded-xl overflow-hidden">
+            <div class="min-w-fit w-full rounded-2xl overflow-hidden">
               <div
                 class="grid grid-cols-[1fr_80px_64px_80px] gap-x-4 px-6 py-3.5 border-b border-border/50 bg-muted/30"
               >
@@ -238,7 +238,7 @@ function passColor(rate: number) {
               <div
                 v-for="exam in filteredExams"
                 :key="exam.id"
-                class="grid grid-cols-[1fr_80px_64px_80px] gap-x-4 cursor-pointer px-6 py-4 border-b border-border/20 last:border-0 hover:bg-muted/20 transition-colors items-center group"
+                class="grid grid-cols-[1fr_80px_64px_80px] gap-x-4 cursor-pointer px-3 py-2 border-b border-border/20 last:border-0 hover:bg-muted/20 transition-colors items-center group"
                 @mouseenter="prefetchExamRoute(exam.id)"
                 @focusin="prefetchExamRoute(exam.id)"
                 @click="navigateTo(examRoutePath(exam.id))"

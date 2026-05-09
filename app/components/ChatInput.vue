@@ -98,7 +98,7 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
           :value="modelValue"
           rows="1"
           placeholder="Fråga om tentan..."
-          class="w-full bg-transparent outline-none border-0 focus:ring-0 resize-none block pl-4 pr-12 py-3 text-sm leading-relaxed max-h-50 placeholder:text-muted-foreground/50"
+          class="w-full bg-transparent outline-none border-0 focus:ring-0 resize-none block pl-4 pr-12 py-3 text-sm leading-relaxed max-h-50 placeholder:text-muted"
           @input="handleInput"
           @keydown="handleKeyDown"
         />
