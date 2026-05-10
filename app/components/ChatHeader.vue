@@ -57,8 +57,8 @@ const emit = defineEmits<{
 .liquid-glass-bg {
   height: calc(100% + 1.5rem);
 
-  backdrop-filter: blur(16px) saturate(180%) brightness(1.05);
-  -webkit-backdrop-filter: blur(16px) saturate(180%) brightness(1.05);
+  backdrop-filter: blur(2px) saturate(180%) brightness(1.05);
+  -webkit-backdrop-filter: blur(2px) saturate(180%) brightness(1.05);
 
   background: linear-gradient(
     to bottom,

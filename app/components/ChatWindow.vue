@@ -403,7 +403,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
                 </div>
                 <div
                   v-else
-                  class="prose dark:prose-invert prose-hr:border-foreground/10 marker:text-foreground marker:font-bold"
+                  class="prose dark:prose-invert prose-hr:border-foreground/10 marker:text-foreground marker:font-semibold"
                   v-html="renderedAssistantHtml[i]"
                 />
               </div>

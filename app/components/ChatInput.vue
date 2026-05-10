@@ -84,14 +84,19 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
           v-if="showScrollButton"
           class="absolute -top-12 left-1/2 -translate-x-1/2 z-20"
         >
-          <Button variant="outline" size="icon" @click="emit('scrollToBottom')">
+          <Button
+            class="bg-background/50 backdrop-blur-[2px] dark:bg-background/50"
+            variant="outline"
+            size="icon"
+            @click="emit('scrollToBottom')"
+          >
             <LucideArrowDown class="w-4 h-4" />
           </Button>
         </div>
       </Transition>
 
       <div
-        class="relative bg-background border border-border rounded-2xl shadow-sm hover:shadow-md hover:border-foreground/20 focus-within:shadow-md focus-within:border-foreground/30 transition-all duration-200"
+        class="relative bg-background border border-border rounded-full shadow-sm hover:shadow-md hover:border-foreground/20 focus-within:shadow-md focus-within:border-foreground/20 transition-all duration-200"
       >
         <textarea
           ref="textareaRef"
