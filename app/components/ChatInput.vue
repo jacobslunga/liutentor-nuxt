@@ -96,7 +96,7 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
       </Transition>
 
       <div
-        class="relative bg-background border border-border rounded-full shadow-sm hover:shadow-md hover:border-foreground/20 focus-within:shadow-md focus-within:border-foreground/20 transition-all duration-200"
+        class="relative bg-background border border-border rounded-2xl shadow-sm hover:shadow-md hover:border-foreground/20 focus-within:shadow-md focus-within:border-foreground/20 transition-all duration-200"
       >
         <textarea
           ref="textareaRef"
