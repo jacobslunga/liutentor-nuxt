@@ -75,7 +75,7 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
 <template>
   <div class="px-4 bg-transparent relative w-full pointer-events-auto z-10">
     <div
-      class="pointer-events-none absolute inset-x-0 -top-10 -bottom-25 -z-10 bg-linear-to-t from-background via-background to-transparent"
+      class="pointer-events-none absolute inset-x-0 -top-12 -bottom-6 -z-10 bg-linear-to-t from-background via-background/95 to-transparent"
     />
 
     <div class="max-w-2xl mx-auto relative">
@@ -96,7 +96,7 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
       </Transition>
 
       <div
-        class="relative bg-background border border-border rounded-2xl shadow-sm hover:shadow-md hover:border-foreground/20 focus-within:shadow-md focus-within:border-foreground/20 transition-all duration-200"
+        class="relative rounded-2xl bg-card/80 shadow-[0_8px_28px_color-mix(in_srgb,var(--foreground),transparent_94%)] ring-1 ring-border/50 backdrop-blur-sm transition-all duration-200 hover:ring-border focus-within:ring-foreground/20"
       >
         <textarea
           ref="textareaRef"

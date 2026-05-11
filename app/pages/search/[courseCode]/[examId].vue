@@ -116,18 +116,18 @@ function handleKeyUp(e: KeyboardEvent) {
 
 <template>
   <ClientOnly>
-    <ExamHeader
-      v-if="exam"
-      :exams="exams"
-      :exam-id="examId"
-      :course-code="courseCode"
-      :solution-pdf-url="solutionPdfUrl"
-    />
-
     <div class="flex h-screen flex-col w-full overflow-hidden">
+      <ExamHeader
+        v-if="exam"
+        :exams="exams"
+        :exam-id="examId"
+        :course-code="courseCode"
+        :solution-pdf-url="solutionPdfUrl"
+      />
+
       <div
         v-if="isLoading"
-        class="flex h-screen items-center justify-center flex-col gap-2"
+        class="flex flex-1 items-center justify-center flex-col gap-2"
       >
         <LucideLoader2 class="w-8 h-8 animate-spin text-muted-foreground" />
         <p class="text-sm text-muted-foreground">Laddar tenta...</p>
@@ -135,7 +135,7 @@ function handleKeyUp(e: KeyboardEvent) {
 
       <div
         v-else-if="isError"
-        class="flex h-screen items-center justify-center flex-col gap-2"
+        class="flex flex-1 items-center justify-center flex-col gap-2"
       >
         <p class="text-2xl text-foreground/80">Något gick fel!</p>
         <p class="text-sm text-muted-foreground">

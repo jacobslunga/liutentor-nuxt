@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { useChatStore } from "@/stores/chat";
-import ButtonGroup from "./ui/button-group/ButtonGroup.vue";
 
 interface Exam {
   id: number;
@@ -21,13 +20,15 @@ const props = defineProps<{
 const router = useRouter();
 const chatStore = useChatStore();
 const { startSession } = useLockInMode();
-const scrollRef = ref<HTMLDivElement | null>(null);
-const isDropdownOpen = ref(false);
+const isExamSidebarOpen = ref(false);
+const sidebarContentReady = ref(false);
+const examListRef = ref<HTMLDivElement | null>(null);
 const isDownloadOpen = ref(false);
 const isSettingsOpen = ref(false);
 const isLockInOpen = ref(false);
 const lockInDuration = ref<string | null>(null);
 const showLockInConfirm = ref(false);
+let sidebarRevealTimer: ReturnType<typeof setTimeout> | null = null;
 
 const TIME_OPTIONS = [
   { value: "30", label: "30 min" },
@@ -48,15 +49,6 @@ const selectedExam = computed(
   () => sortedExams.value.find((e) => e.id.toString() === props.examId) ?? null,
 );
 
-const isInternalElementOpen = computed(
-  () =>
-    isDropdownOpen.value ||
-    isDownloadOpen.value ||
-    isSettingsOpen.value ||
-    isLockInOpen.value ||
-    showLockInConfirm.value,
-);
-
 const hasDownload = computed(
   () => !!selectedExam.value?.pdf_url || !!props.solutionPdfUrl,
 );
@@ -65,29 +57,73 @@ const selectedDurationLabel = computed(
   () => TIME_OPTIONS.find((o) => o.value === lockInDuration.value)?.label ?? "",
 );
 
-const { isVisible, isHovering, startHideTimer } = useHeaderVisibility(
-  () => isInternalElementOpen.value,
-);
+function isTypingTarget(target: EventTarget | null) {
+  if (!(target instanceof HTMLElement)) return false;
+  return (
+    target.tagName === "INPUT" ||
+    target.tagName === "TEXTAREA" ||
+    target.isContentEditable
+  );
+}
 
-watch(isInternalElementOpen, (isOpen) => {
-  if (isOpen) {
-    isVisible.value = true;
-  } else {
-    startHideTimer();
+function handleKeyDown(event: KeyboardEvent) {
+  if (event.key === "Escape" && isExamSidebarOpen.value) {
+    isExamSidebarOpen.value = false;
+    return;
   }
-});
 
-watch(isDropdownOpen, async (val) => {
-  if (!val) return;
-  await nextTick();
-  const activeEl = scrollRef.value?.querySelector('[data-current="true"]');
-  activeEl?.scrollIntoView({ block: "center" });
-});
+  if (
+    event.key.toLowerCase() === "t" &&
+    !event.metaKey &&
+    !event.ctrlKey &&
+    !event.altKey &&
+    !event.repeat &&
+    !isTypingTarget(event.target)
+  ) {
+    isExamSidebarOpen.value = !isExamSidebarOpen.value;
+  }
+}
 
 const changeExam = (e: Exam) => {
-  isDropdownOpen.value = false;
+  if (e.id.toString() === props.examId) {
+    isExamSidebarOpen.value = false;
+    return;
+  }
+  isExamSidebarOpen.value = false;
   router.push(`/search/${props.courseCode}/${e.id}`);
 };
+
+watch(isExamSidebarOpen, (open) => {
+  if (sidebarRevealTimer) {
+    clearTimeout(sidebarRevealTimer);
+    sidebarRevealTimer = null;
+  }
+
+  if (!open) {
+    sidebarContentReady.value = false;
+    return;
+  }
+
+  sidebarRevealTimer = setTimeout(() => {
+    sidebarContentReady.value = true;
+    nextTick(() => {
+      const activeEl = examListRef.value?.querySelector('[data-current="true"]');
+      activeEl?.scrollIntoView({ block: "center" });
+    });
+  }, 110);
+});
+
+onUnmounted(() => {
+  if (sidebarRevealTimer) {
+    clearTimeout(sidebarRevealTimer);
+    sidebarRevealTimer = null;
+  }
+  window.removeEventListener("keydown", handleKeyDown);
+});
+
+onMounted(() => {
+  window.addEventListener("keydown", handleKeyDown);
+});
 
 const downloadFile = async (url: string, filename: string) => {
   try {
@@ -124,105 +160,50 @@ function confirmLockIn() {
 
 <template>
   <div
-    class="hidden lg:flex fixed top-0 left-0 right-0 z-5 px-4 pt-3 pointer-events-none items-start justify-between transition-all duration-300 ease-in-out"
-    :class="
-      isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2'
-    "
-    @mouseenter="isHovering = true"
-    @mouseleave="isHovering = false"
+    class="hidden lg:flex h-14 shrink-0 items-center justify-between border-b border-border bg-background px-4"
   >
-    <div
-      class="absolute inset-0 bg-background/80 backdrop-blur-xl -z-10 mask-[linear-gradient(to_bottom,black,transparent)]"
-    />
-    <ButtonGroup class="pointer-events-auto">
+    <div class="flex items-center gap-1">
       <Button
         size="icon-sm"
-        variant="outline"
+        variant="ghost"
         @click="router.push(`/search/${courseCode}`)"
       >
-        <LucideArrowLeft class="w-4 h-4" />
+        <LucideArrowLeft class="size-5.5" />
       </Button>
 
-      <DropdownMenu v-if="selectedExam" v-model:open="isDropdownOpen">
-        <DropdownMenuTrigger as-child>
-          <Button variant="outline" size="sm">
-            <span class="text-xs font-semibold">{{
-              selectedExam.exam_name.replace(selectedExam.exam_date, "").trim()
-            }}</span>
-            <span class="text-muted-foreground text-xs">{{
-              selectedExam.exam_date
-            }}</span>
-            <LucideChevronDown
-              class="w-5 h-5 text-muted-foreground transition-transform duration-200"
-              :class="{ 'rotate-180': isDropdownOpen }"
-            />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent
-          align="start"
-          :side-offset="8"
-          class="w-76 p-0 overflow-hidden"
-        >
-          <div class="px-3 py-2.5 flex items-center justify-between border-b">
-            <span class="text-[11px] font-semibold text-foreground"
-              >Tentor</span
+      <TooltipProvider v-if="selectedExam" :delay-duration="0">
+        <Tooltip>
+          <TooltipTrigger as-child>
+            <Button
+              variant="ghost"
+              size="icon"
+              class="focus-visible:border-transparent focus-visible:ring-0"
+              aria-label="Visa tentor"
+              @click="isExamSidebarOpen = !isExamSidebarOpen"
             >
-            <span class="text-[11px] text-muted-foreground"
-              >{{ sortedExams.length }} st</span
-            >
-          </div>
-          <div ref="scrollRef" class="max-h-80 overflow-y-auto p-1.5 space-y-2">
-            <button
-              v-for="e in sortedExams"
-              :key="e.id"
-              :data-current="e.id.toString() === examId"
-              class="w-full text-left rounded-md px-3 py-2.5 transition-colors cursor-pointer group"
-              :class="
-                e.id.toString() === examId
-                  ? 'bg-primary/8 ring-1 ring-primary/20'
-                  : 'hover:bg-foreground/5'
-              "
-              @click="changeExam(e)"
-            >
-              <div class="flex items-start justify-between gap-2">
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center gap-2">
-                    <span
-                      class="font-semibold text-sm"
-                      :class="
-                        e.id.toString() === examId
-                          ? 'text-primary'
-                          : 'text-foreground'
-                      "
-                    >
-                      {{ e.exam_date }}
-                    </span>
-                  </div>
-                  <div
-                    class="text-[11px] text-muted-foreground mt-0.5 capitalize truncate"
-                  >
-                    {{ e.exam_name.replace(e.exam_date, "").trim() }}
-                  </div>
-                </div>
-                <div class="shrink-0 pt-0.5">
-                  <span
-                    v-if="e.has_solution"
-                    class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
-                  >
-                    Facit
-                  </span>
-                </div>
-              </div>
-            </button>
-          </div>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </ButtonGroup>
+              <LucidePanelLeft class="size-5.5" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>{{ isExamSidebarOpen ? "Stäng tentor" : "Visa tentor" }}</p>
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
 
-    <ButtonGroup class="pointer-events-auto">
+      <div v-if="selectedExam" class="min-w-0 max-w-96 px-2">
+        <p class="truncate text-xs font-semibold leading-none">
+          {{ selectedExam.exam_name.replace(selectedExam.exam_date, "").trim() }}
+        </p>
+        <p class="mt-1 text-xs leading-none text-muted-foreground">
+          {{ selectedExam.exam_date }}
+        </p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-1">
       <DropdownMenu v-model:open="isLockInOpen">
         <DropdownMenuTrigger as-child>
-          <Button variant="outline" size="sm" :disabled="!selectedExam">
+          <Button variant="ghost" size="sm" :disabled="!selectedExam">
             <LucideLock class="w-3.5 h-3.5" />
             <span class="text-xs">Lock in</span>
           </Button>
@@ -247,7 +228,7 @@ function confirmLockIn() {
 
       <DropdownMenu v-model:open="isDownloadOpen">
         <DropdownMenuTrigger as-child>
-          <Button variant="outline" size="sm" :disabled="!hasDownload">
+          <Button variant="ghost" size="sm" :disabled="!hasDownload">
             <span class="text-xs">Ladda ned</span>
             <LucideChevronDown class="w-4 h-4 text-muted-foreground" />
           </Button>
@@ -281,9 +262,8 @@ function confirmLockIn() {
       </DropdownMenu>
 
       <Button
-        variant="outline"
+        variant="ghost"
         size="sm"
-        class="not-[&:hover]:group-hover/btns:bg-foreground/5"
         @click="chatStore.toggle()"
       >
         <LucideLoader2
@@ -297,9 +277,8 @@ function confirmLockIn() {
       <Dialog v-model:open="isSettingsOpen">
         <DialogTrigger as-child>
           <Button
-            variant="outline"
+            variant="ghost"
             size="icon-sm"
-            class="not-[&:hover]:group-hover/btns:bg-foreground/5"
           >
             <LucideSettings class="w-4.5 h-4.5" />
           </Button>
@@ -312,8 +291,105 @@ function confirmLockIn() {
           <SettingsDialogContent />
         </DialogContent>
       </Dialog>
-    </ButtonGroup>
+    </div>
   </div>
+
+  <Teleport to="body">
+    <div
+      class="fixed inset-x-0 top-14 bottom-0 z-90 transition-opacity duration-200 ease-out"
+      :class="
+        isExamSidebarOpen
+          ? 'opacity-100 pointer-events-auto'
+          : 'opacity-0 pointer-events-none'
+      "
+      aria-hidden="true"
+      @click="isExamSidebarOpen = false"
+    />
+
+    <aside
+      class="fixed top-14 left-0 z-100 h-[calc(100vh-3.5rem)] w-86 border-r border-border bg-background transition-transform duration-250 ease-[cubic-bezier(0.32,0.72,0,1)]"
+      :class="isExamSidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+      aria-label="Välj tenta"
+    >
+      <div class="flex h-full min-h-0 flex-col">
+        <div class="border-b px-4 py-3 flex items-center justify-between gap-2">
+          <div class="min-w-0">
+            <h2 class="text-sm font-semibold">Tentor</h2>
+            <p class="text-xs text-muted-foreground">
+              {{ sortedExams.length }} tentor
+            </p>
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            class="size-7 shrink-0"
+            @click="isExamSidebarOpen = false"
+          >
+            <LucideX class="w-4 h-4" />
+          </Button>
+        </div>
+
+        <div
+          ref="examListRef"
+          class="flex-1 min-h-0 overflow-y-auto px-2 py-2 custom-scrollbar transition-opacity duration-150 ease-out"
+          :class="
+            isExamSidebarOpen && sidebarContentReady ? 'opacity-100' : 'opacity-0'
+          "
+        >
+          <div
+            v-if="sortedExams.length === 0"
+            class="px-2 py-4 text-sm text-muted-foreground"
+          >
+            Inga tentor hittades.
+          </div>
+
+          <div v-else class="space-y-1">
+            <button
+              v-for="e in sortedExams"
+              :key="e.id"
+              :data-current="e.id.toString() === examId"
+              class="group w-full cursor-pointer rounded-md border px-3 py-3 text-left transition-colors"
+              :class="
+                e.id.toString() === examId
+                  ? 'border-primary/25 bg-primary/8'
+                  : 'border-transparent hover:bg-muted/40'
+              "
+              @click="changeExam(e)"
+            >
+              <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-center gap-2">
+                    <span class="text-sm font-semibold text-foreground">
+                      {{ e.exam_date }}
+                    </span>
+                    <span
+                      v-if="e.id.toString() === examId"
+                      class="shrink-0 rounded-full border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-[9px] font-bold text-primary"
+                    >
+                      Aktiv
+                    </span>
+                    <span
+                      v-if="e.has_solution"
+                      class="shrink-0 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-bold text-emerald-600 dark:text-emerald-400"
+                    >
+                      Facit
+                    </span>
+                  </div>
+                  <p class="mt-0.5 truncate text-xs capitalize text-muted-foreground">
+                    {{ e.exam_name.replace(e.exam_date, "").trim() }}
+                  </p>
+                </div>
+                <LucideChevronRight
+                  v-if="e.id.toString() !== examId"
+                  class="mt-1 h-4 w-4 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100"
+                />
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </Teleport>
 
   <AlertDialog
     :open="showLockInConfirm"

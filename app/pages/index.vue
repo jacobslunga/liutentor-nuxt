@@ -44,7 +44,7 @@ const user = useSupabaseUser();
     <div class="w-full max-w-150 flex flex-col items-center space-y-6 mb-20">
       <div class="relative w-full">
         <div
-          class="w-full border border-foreground/20 bg-background flex flex-row items-center justify-center rounded-full transition-all duration-200 text-sm text-foreground/80 outline-none"
+          class="w-full border border-foreground/20 bg-secondary flex flex-row items-center justify-center rounded-full transition-all duration-200 text-sm text-foreground/80 outline-none"
           :class="
             focusInput
               ? 'border-primary ring-1 ring-primary'
@@ -58,8 +58,8 @@ const user = useSupabaseUser();
       <RecentSearches />
 
       <NuxtLink to="/upload-exams">
-        <Button variant="outline" size="sm">
-          <LucideUpload class="w-4.5 h-4.5" />
+        <Button variant="outline">
+          <LucideUpload />
           Ladda upp fler tentor
         </Button>
       </NuxtLink>

@@ -33,6 +33,9 @@ const colorMode = useColorMode();
 const { engine, isLoading } = usePdfiumEngine();
 
 const isDark = computed(() => colorMode.value === "dark");
+const pdfRenderStyle = computed(() =>
+  isDark.value ? { filter: "invert(100%) hue-rotate(180deg)" } : {},
+);
 
 const selectionColor = computed(() =>
   isDark.value
@@ -42,6 +45,8 @@ const selectionColor = computed(() =>
 
 const isMobile = ref(false);
 const windowWidth = ref(1200);
+const viewportEl = ref<HTMLElement | null>(null);
+const showScrollTop = ref(false);
 
 onMounted(() => {
   isMobile.value = window.innerWidth < 1024;
@@ -51,6 +56,16 @@ onMounted(() => {
     windowWidth.value = window.innerWidth;
   });
 });
+
+function handleViewportScroll(event: Event) {
+  const target = event.currentTarget as HTMLElement;
+  viewportEl.value = target;
+  showScrollTop.value = target.scrollTop > 320;
+}
+
+function scrollToTop() {
+  viewportEl.value?.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+}
 
 const plugins = computed(() => {
   const base = [
@@ -87,7 +102,7 @@ const plugins = computed(() => {
 </script>
 
 <template>
-  <div class="h-full w-full overflow-hidden bg-background">
+  <div class="relative h-full w-full overflow-hidden bg-background">
     <div
       v-if="isLoading || !engine"
       class="flex h-full w-full items-center justify-center"
@@ -112,7 +127,8 @@ const plugins = computed(() => {
               <Viewport
                 v-else
                 :document-id="activeDocumentId"
-                class="h-full w-full bg-background"
+                class="h-full w-full bg-background pdf-viewport"
+                @scroll="handleViewportScroll"
               >
                 <template v-if="isMobile">
                   <Scroller :document-id="activeDocumentId">
@@ -122,7 +138,7 @@ const plugins = computed(() => {
                           width: `${page.width}px`,
                           height: `${page.height}px`,
                         }"
-                        class="relative mx-auto my-4 pdf-page-shell"
+                        class="relative mx-auto my-4 bg-background pdf-page-shell"
                       >
                         <Rotate
                           :document-id="activeDocumentId"
@@ -131,11 +147,7 @@ const plugins = computed(() => {
                         >
                           <div
                             class="absolute inset-0 z-0 pdf-render-surface"
-                            :style="
-                              isDark
-                                ? { filter: 'invert(92%) hue-rotate(180deg)' }
-                                : {}
-                            "
+                            :style="pdfRenderStyle"
                           >
                             <RenderLayer
                               :document-id="activeDocumentId"
@@ -162,7 +174,7 @@ const plugins = computed(() => {
                               width: `${page.width}px`,
                               height: `${page.height}px`,
                             }"
-                            class="relative mx-auto my-4 pdf-page-shell"
+                            class="relative mx-auto my-4 bg-background pdf-page-shell"
                           >
                             <PagePointerProvider
                               :document-id="activeDocumentId"
@@ -175,14 +187,7 @@ const plugins = computed(() => {
                               >
                                 <div
                                   class="absolute inset-0 z-0 pdf-render-surface"
-                                  :style="
-                                    isDark
-                                      ? {
-                                          filter:
-                                            'invert(92%) hue-rotate(180deg)',
-                                        }
-                                      : {}
-                                  "
+                                  :style="pdfRenderStyle"
                                 >
                                   <RenderLayer
                                     :document-id="activeDocumentId"
@@ -207,6 +212,26 @@ const plugins = computed(() => {
                   </PdfInner>
                 </template>
               </Viewport>
+
+              <Transition
+                enter-active-class="transition-all duration-200 ease-out"
+                enter-from-class="opacity-0 translate-y-2 scale-95"
+                enter-to-class="opacity-100 translate-y-0 scale-100"
+                leave-active-class="transition-all duration-150 ease-in"
+                leave-from-class="opacity-100 translate-y-0 scale-100"
+                leave-to-class="opacity-0 translate-y-2 scale-95"
+              >
+                <Button
+                  v-if="showScrollTop"
+                  variant="ghost"
+                  size="icon-sm"
+                  class="absolute bottom-4 right-4 z-30 border border-border bg-background/90 shadow-sm backdrop-blur"
+                  aria-label="Scrolla till toppen"
+                  @click="scrollToTop"
+                >
+                  <LucideArrowUp class="h-4 w-4" />
+                </Button>
+              </Transition>
             </template>
           </DocumentContent>
         </template>
@@ -214,3 +239,16 @@ const plugins = computed(() => {
     </EmbedPDF>
   </div>
 </template>
+
+<style scoped>
+.pdf-viewport {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.pdf-viewport::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+</style>

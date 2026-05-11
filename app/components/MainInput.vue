@@ -25,6 +25,9 @@ const suggestions = ref<string[]>([]);
 const showSuggestions = ref(false);
 const selectedIndex = ref(-1);
 const searchMethod = ref<"tentor" | "stats">("tentor");
+const searchMethodLabel = computed(() =>
+  searchMethod.value === "stats" ? "Statistik" : "Tentor",
+);
 const { add } = useRecentSearches();
 
 const inputRef = ref<HTMLInputElement | null>(null);
@@ -95,6 +98,11 @@ function handleSelectCourse(course: string) {
       ? `/search/${searchCode}/stats`
       : `/search/${searchCode}`,
   );
+}
+
+function selectSearchMethod(method: "tentor" | "stats") {
+  searchMethod.value = method;
+  inputRef.value?.focus();
 }
 
 function handleKeyDown(e: KeyboardEvent) {
@@ -192,16 +200,7 @@ function handleClickOutside(event: MouseEvent) {
 <template>
   <div class="relative w-full">
     <div class="w-full relative flex flex-row items-center justify-center px-4">
-      <select
-        v-model="searchMethod"
-        class="shrink-0 w-20 rounded-full text-foreground/60 hover:text-foreground bg-transparent border-none outline-none cursor-pointer"
-        @change="inputRef?.focus()"
-      >
-        <option value="tentor">Tentor</option>
-        <option value="stats">Statistik</option>
-      </select>
-
-      <div class="shrink-0 h-6.25 w-px bg-foreground/10 ml-4" />
+      <LucideSearch class="text-gray-500" />
 
       <input
         ref="inputRef"
@@ -214,8 +213,43 @@ function handleClickOutside(event: MouseEvent) {
         @blur="emit('update:focusInput', false)"
       />
 
+      <DropdownMenu>
+        <DropdownMenuTrigger as-child>
+          <Button
+            variant="ghost"
+            size="sm"
+            class="shrink-0 gap-1.5 px-2 text-foreground/60 hover:text-foreground"
+          >
+            {{ searchMethodLabel }}
+            <LucideChevronDown class="h-3.5 w-3.5" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" :side-offset="8" class="w-36">
+          <DropdownMenuItem
+            class="cursor-pointer"
+            @click="selectSearchMethod('tentor')"
+          >
+            <LucideCheck
+              class="h-4 w-4"
+              :class="searchMethod === 'tentor' ? 'opacity-100' : 'opacity-0'"
+            />
+            Tentor
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            class="cursor-pointer"
+            @click="selectSearchMethod('stats')"
+          >
+            <LucideCheck
+              class="h-4 w-4"
+              :class="searchMethod === 'stats' ? 'opacity-100' : 'opacity-0'"
+            />
+            Statistik
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
       <Button
-        class="absolute right-3"
+        class="shrink-0 ml-2"
         variant="outline"
         size="icon-sm"
         :disabled="!courseCode"

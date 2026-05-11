@@ -1,19 +1,16 @@
 <template>
-  <DropdownMenu>
-    <DropdownMenuTrigger as-child>
+  <Dialog>
+    <DialogTrigger as-child>
       <Button variant="ghost" size="icon">
         <LucideSettings class="w-4.5 h-4.5" />
       </Button>
-    </DropdownMenuTrigger>
-    <DropdownMenuContent
-      align="end"
-      class="w-90 p-4 max-h-[80vh] overflow-y-auto"
-    >
-      <div class="mb-4">
-        <p class="text-base font-semibold">Inställningar</p>
-        <p class="text-sm text-muted-foreground">Anpassa din upplevelse</p>
-      </div>
+    </DialogTrigger>
+    <DialogContent class="max-w-md max-h-[80vh] overflow-y-auto">
+      <DialogHeader>
+        <DialogTitle>Inställningar</DialogTitle>
+        <DialogDescription>Anpassa din upplevelse</DialogDescription>
+      </DialogHeader>
       <SettingsDialogContent />
-    </DropdownMenuContent>
-  </DropdownMenu>
+    </DialogContent>
+  </Dialog>
 </template>
