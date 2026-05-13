@@ -107,7 +107,9 @@ watch(isExamSidebarOpen, (open) => {
   sidebarRevealTimer = setTimeout(() => {
     sidebarContentReady.value = true;
     nextTick(() => {
-      const activeEl = examListRef.value?.querySelector('[data-current="true"]');
+      const activeEl = examListRef.value?.querySelector(
+        '[data-current="true"]',
+      );
       activeEl?.scrollIntoView({ block: "center" });
     });
   }, 110);
@@ -160,7 +162,7 @@ function confirmLockIn() {
 
 <template>
   <div
-    class="hidden lg:flex h-14 shrink-0 items-center justify-between border-b border-border bg-background px-4"
+    class="hidden lg:flex h-12 shrink-0 items-center justify-between border-b border-border bg-background px-4"
   >
     <div class="flex items-center gap-1">
       <Button
@@ -168,7 +170,7 @@ function confirmLockIn() {
         variant="ghost"
         @click="router.push(`/search/${courseCode}`)"
       >
-        <LucideArrowLeft class="size-5.5" />
+        <LucideArrowLeft />
       </Button>
 
       <TooltipProvider v-if="selectedExam" :delay-duration="0">
@@ -181,7 +183,7 @@ function confirmLockIn() {
               aria-label="Visa tentor"
               @click="isExamSidebarOpen = !isExamSidebarOpen"
             >
-              <LucidePanelLeft class="size-5.5" />
+              <LucidePanelLeft />
             </Button>
           </TooltipTrigger>
           <TooltipContent>
@@ -192,7 +194,9 @@ function confirmLockIn() {
 
       <div v-if="selectedExam" class="min-w-0 max-w-96 px-2">
         <p class="truncate text-xs font-semibold leading-none">
-          {{ selectedExam.exam_name.replace(selectedExam.exam_date, "").trim() }}
+          {{
+            selectedExam.exam_name.replace(selectedExam.exam_date, "").trim()
+          }}
         </p>
         <p class="mt-1 text-xs leading-none text-muted-foreground">
           {{ selectedExam.exam_date }}
@@ -261,11 +265,7 @@ function confirmLockIn() {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <Button
-        variant="ghost"
-        size="sm"
-        @click="chatStore.toggle()"
-      >
+      <Button variant="ghost" size="sm" @click="chatStore.toggle()">
         <LucideLoader2
           v-if="chatStore.isLoading"
           class="size-3.5 animate-spin"
@@ -276,10 +276,7 @@ function confirmLockIn() {
 
       <Dialog v-model:open="isSettingsOpen">
         <DialogTrigger as-child>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-          >
+          <Button variant="ghost" size="icon-sm">
             <LucideSettings class="w-4.5 h-4.5" />
           </Button>
         </DialogTrigger>
@@ -333,7 +330,9 @@ function confirmLockIn() {
           ref="examListRef"
           class="flex-1 min-h-0 overflow-y-auto px-2 py-2 custom-scrollbar transition-opacity duration-150 ease-out"
           :class="
-            isExamSidebarOpen && sidebarContentReady ? 'opacity-100' : 'opacity-0'
+            isExamSidebarOpen && sidebarContentReady
+              ? 'opacity-100'
+              : 'opacity-0'
           "
         >
           <div
@@ -375,7 +374,9 @@ function confirmLockIn() {
                       Facit
                     </span>
                   </div>
-                  <p class="mt-0.5 truncate text-xs capitalize text-muted-foreground">
+                  <p
+                    class="mt-0.5 truncate text-xs capitalize text-muted-foreground"
+                  >
                     {{ e.exam_name.replace(e.exam_date, "").trim() }}
                   </p>
                 </div>

@@ -112,21 +112,27 @@ function passColor(rate: number) {
 
     <div
       v-else-if="status === 'success' && !courseData"
-      class="flex flex-col items-center justify-center min-h-[60vh] text-center gap-4"
+      class="mx-auto flex min-h-[60vh] w-full max-w-2xl flex-col items-center justify-center gap-8 py-8"
     >
-      <LucideInbox class="w-10 h-10 text-muted-foreground" />
-      <div>
-        <p class="text-sm font-medium text-foreground">Inga tentor hittades</p>
-        <p class="text-xs text-muted-foreground mt-1">
-          Var den första att ladda upp tentor för {{ courseCode }}!
+      <div class="max-w-xl text-center">
+        <div
+          class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted"
+        >
+          <LucideInbox class="h-6 w-6 text-muted-foreground" />
+        </div>
+        <h1 class="text-2xl font-semibold text-foreground">
+          Vi saknar tentor för {{ courseCode }}
+        </h1>
+        <p class="mt-2 text-sm text-muted-foreground">
+          Har du en gammal tenta eller ett facit? Ladda upp den här så blir
+          nästa student som söker på {{ courseCode }} hjälpt direkt.
         </p>
       </div>
-      <NuxtLink to="/upload-exams">
-        <Button variant="default" size="sm">
-          <LucideUpload class="w-4 h-4" />
-          Ladda upp tenta
-        </Button>
-      </NuxtLink>
+      <ExamUploadForm
+        :initial-course-code="courseCode"
+        fixed-course-code
+        :show-heading="false"
+      />
     </div>
 
     <template v-else-if="courseData">

@@ -11,6 +11,38 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: "Basier Square";
+  src: url("/fonts/basiersquare-regular-webfont.woff2") format("woff2");
+  font-style: normal;
+  font-display: swap;
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: "Basier Square";
+  src: url("/fonts/basiersquare-medium-webfont.woff2") format("woff2");
+  font-style: normal;
+  font-display: swap;
+  font-weight: 500;
+}
+
+@font-face {
+  font-family: "Basier Square";
+  src: url("/fonts/basiersquare-semibold-webfont.woff2") format("woff2");
+  font-style: normal;
+  font-display: swap;
+  font-weight: 600;
+}
+
+@font-face {
+  font-family: "Basier Square";
+  src: url("/fonts/basiersquare-bold-webfont.woff2") format("woff2");
+  font-style: normal;
+  font-display: swap;
+  font-weight: 700;
+}
+
 @theme {
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
@@ -73,6 +105,7 @@
 
 body {
   font-family:
+    "Basier Square",
     system-ui,
     -apple-system,
     BlinkMacSystemFont,
