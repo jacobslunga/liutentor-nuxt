@@ -230,7 +230,9 @@ watch(currentUserId, (nextId, prevId) => {
 });
 
 watch(isOpen, (open) => {
-  if (!open) {
+  if (open) {
+    nextTick(() => chatInputRef.value?.focus());
+  } else {
     isHistoryOpen.value = false;
   }
 });
