@@ -151,7 +151,7 @@ watch(
       <div
         v-show="hasFacit && isFacitVisible && !chatStore.isOpen"
         ref="panelRef"
-        class="fixed right-0 top-14 h-[calc(100vh-3.5rem)] bg-background border-l shadow-2xl z-20 flex"
+        class="fixed right-0 top-12 h-[calc(100vh-3.5rem)] bg-background border-l shadow-2xl z-20 flex"
         :style="{ width: `${panelWidth}px` }"
       >
         <div class="relative w-0 shrink-0 z-30">
@@ -176,7 +176,7 @@ watch(
       <div
         v-if="chatHasBeenOpened"
         v-show="chatStore.isOpen"
-        class="fixed right-0 top-14 h-[calc(100vh-3.5rem)] bg-background border-l shadow-2xl z-20 flex"
+        class="fixed right-0 top-12 h-[calc(100vh-3.5rem)] bg-background border-l shadow-2xl z-20 flex"
         :style="{ width: `${panelWidth}px` }"
       >
         <div class="relative w-0 shrink-0 z-30">
