@@ -125,15 +125,17 @@ async function handleUpload() {
       const fileType = isSolution(file.name) ? "SOLUTION" : "EXAM";
       const normalizedFilename = `${normalizedCourseCode}_${examDate}_${fileType}.pdf`;
 
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("courseCode", normalizedCourseCode);
+      formData.append("originalFilename", file.name);
+      formData.append("normalizedFilename", normalizedFilename);
+      formData.append("examDate", examDate);
+      formData.append("fileType", fileType);
+
       await $fetch("/api/upload", {
         method: "POST",
-        body: {
-          courseCode: normalizedCourseCode,
-          originalFilename: file.name,
-          normalizedFilename,
-          examDate,
-          fileType,
-        },
+        body: formData,
       });
       successCount++;
     } catch (error) {
