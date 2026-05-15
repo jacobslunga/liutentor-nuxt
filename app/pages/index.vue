@@ -44,17 +44,19 @@ const uploadBannerDismissed = useCookie<boolean>("uploadBannerDismissed", {
     <div
       class="flex flex-row items-center justify-center gap-2 absolute top-5 right-5"
     >
-      <template v-if="user">
-        <UserDropdown />
-      </template>
-      <template v-else>
-        <Button size="sm" variant="outline" as-child>
-          <NuxtLink to="/logga-in">Logga in</NuxtLink>
-        </Button>
-        <Button size="sm" variant="default" as-child>
-          <NuxtLink to="/skapa-konto">Skapa konto</NuxtLink>
-        </Button>
-      </template>
+      <ClientOnly>
+        <template v-if="user">
+          <UserDropdown />
+        </template>
+        <template v-else>
+          <Button size="sm" variant="outline" as-child>
+            <NuxtLink to="/logga-in">Logga in</NuxtLink>
+          </Button>
+          <Button size="sm" variant="default" as-child>
+            <NuxtLink to="/skapa-konto">Skapa konto</NuxtLink>
+          </Button>
+        </template>
+      </ClientOnly>
     </div>
 
     <div class="flex flex-col items-center space-y-2 mb-10">

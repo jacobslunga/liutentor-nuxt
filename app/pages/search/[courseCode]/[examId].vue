@@ -42,7 +42,7 @@ watchEffect(() => {
   });
 });
 
-const isMobile = ref(false);
+const isMobile = ref(import.meta.client ? window.innerWidth < 1024 : false);
 const solutionBlurred = ref(true);
 const splitPercent = ref(55);
 const isResizing = ref(false);
@@ -169,12 +169,10 @@ function handleKeyUp(e: KeyboardEvent) {
               class="h-full overflow-hidden"
               :style="{ width: `${splitPercent}%` }"
             >
-              <ClientOnly>
-                <PdfRenderer
-                  :pdf-url="exam.pdf_url"
-                  layout-mode="exam-with-facit"
-                />
-              </ClientOnly>
+              <PdfRenderer
+                :pdf-url="exam.pdf_url"
+                layout-mode="exam-with-facit"
+              />
             </div>
 
             <div class="relative w-0 shrink-0">
@@ -201,12 +199,10 @@ function handleKeyUp(e: KeyboardEvent) {
                     @mouseenter="solutionBlurred = false"
                     @mouseleave="solutionBlurred = true"
                   >
-                    <ClientOnly>
-                      <PdfRenderer
-                        :pdf-url="solution.pdf_url"
-                        layout-mode="exam-with-facit"
-                      />
-                    </ClientOnly>
+                    <PdfRenderer
+                      :pdf-url="solution.pdf_url"
+                      layout-mode="exam-with-facit"
+                    />
                     <Transition name="fade">
                       <div
                         v-if="solutionBlurred"

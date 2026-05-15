@@ -40,14 +40,12 @@ const selectionColor = computed(() =>
     : "oklch(0.6193 0.1154 172.06 / 0.28)",
 );
 
-const isMobile = ref(false);
-const windowWidth = ref(1200);
+const isMobile = ref(window.innerWidth < 1024);
+const windowWidth = ref(window.innerWidth);
 const viewportEl = ref<HTMLElement | null>(null);
 const showScrollTop = ref(false);
 
 onMounted(() => {
-  isMobile.value = window.innerWidth < 1024;
-  windowWidth.value = window.innerWidth;
   window.addEventListener("resize", () => {
     isMobile.value = window.innerWidth < 1024;
     windowWidth.value = window.innerWidth;
