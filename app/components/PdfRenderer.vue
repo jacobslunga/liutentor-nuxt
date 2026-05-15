@@ -33,9 +33,6 @@ const colorMode = useColorMode();
 const { engine, isLoading } = usePdfiumEngine();
 
 const isDark = computed(() => colorMode.value === "dark");
-const pdfRenderStyle = computed(() =>
-  isDark.value ? { filter: "invert(100%) hue-rotate(180deg)" } : {},
-);
 
 const selectionColor = computed(() =>
   isDark.value
@@ -138,7 +135,7 @@ const plugins = computed(() => {
                           width: `${page.width}px`,
                           height: `${page.height}px`,
                         }"
-                        class="relative mx-auto my-4 bg-background pdf-page-shell"
+                        class="relative mx-auto my-4 pdf-page-shell"
                       >
                         <Rotate
                           :document-id="activeDocumentId"
@@ -147,7 +144,11 @@ const plugins = computed(() => {
                         >
                           <div
                             class="absolute inset-0 z-0 pdf-render-surface"
-                            :style="pdfRenderStyle"
+                            :style="
+                              isDark
+                                ? { filter: 'invert(10%) hue-rotate(10deg)' }
+                                : {}
+                            "
                           >
                             <RenderLayer
                               :document-id="activeDocumentId"
@@ -174,7 +175,7 @@ const plugins = computed(() => {
                               width: `${page.width}px`,
                               height: `${page.height}px`,
                             }"
-                            class="relative mx-auto my-4 bg-background pdf-page-shell"
+                            class="relative mx-auto my-4 pdf-page-shell"
                           >
                             <PagePointerProvider
                               :document-id="activeDocumentId"
@@ -187,7 +188,14 @@ const plugins = computed(() => {
                               >
                                 <div
                                   class="absolute inset-0 z-0 pdf-render-surface"
-                                  :style="pdfRenderStyle"
+                                  :style="
+                                    isDark
+                                      ? {
+                                          filter:
+                                            'invert(88%) hue-rotate(180deg)',
+                                        }
+                                      : {}
+                                  "
                                 >
                                   <RenderLayer
                                     :document-id="activeDocumentId"

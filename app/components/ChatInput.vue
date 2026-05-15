@@ -75,7 +75,10 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
 <template>
   <div class="px-4 bg-transparent relative w-full pointer-events-auto z-10">
     <div
-      class="pointer-events-none absolute inset-x-0 -top-12 -bottom-6 -z-10 bg-linear-to-t from-background via-background/95 to-transparent"
+      class="pointer-events-none absolute inset-x-0 -top-16 bottom-0 -z-10 bg-linear-to-t from-background from-50% to-transparent"
+    />
+    <div
+      class="pointer-events-none absolute inset-x-0 top-0 -bottom-20 -z-10 bg-background"
     />
 
     <div class="max-w-2xl mx-auto relative">
@@ -91,14 +94,16 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
       </Transition>
 
       <div
-        class="relative rounded-2xl bg-card/80 shadow-[0_8px_28px_color-mix(in_srgb,var(--foreground),transparent_94%)] ring-1 ring-border/50 backdrop-blur-sm transition-all duration-200 hover:ring-border focus-within:ring-foreground/20"
+        class="relative bg-card/80 shadow-[0_8px_28px_color-mix(in_srgb,var(--foreground),transparent_94%)] ring-1 ring-border/50 backdrop-blur-sm transition-all duration-200 focus-within:ring-primary/50"
+        :class="currentRows > 1 ? 'rounded-3xl' : 'rounded-full'"
       >
         <textarea
           ref="textareaRef"
           :value="modelValue"
           rows="1"
           placeholder="Fråga om tentan..."
-          class="w-full bg-transparent outline-none border-0 focus:ring-0 resize-none block pl-4 pr-12 py-3 text-sm leading-relaxed max-h-50 placeholder:text-muted"
+          class="w-full bg-transparent outline-none border-0 focus:ring-0 resize-none block py-3 text-sm leading-relaxed max-h-50"
+          :class="currentRows > 1 ? 'pl-5 pr-12' : 'pl-5 pr-12'"
           @input="handleInput"
           @keydown="handleKeyDown"
         />
@@ -150,10 +155,6 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
 <style scoped>
 textarea {
   transition: height 0.15s ease-out;
-}
-
-textarea::placeholder {
-  color: hsl(var(--muted-foreground) / 0.5);
 }
 
 .fade-up-enter-active,

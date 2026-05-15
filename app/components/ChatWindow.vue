@@ -370,7 +370,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
             </NuxtLink>
           </div>
 
-          <div v-else class="space-y-6 max-w-xl mx-auto w-full">
+          <div v-else class="space-y-6 max-w-2xl mx-auto w-full">
             <div
               v-for="(msg, i) in messages"
               :key="i"
@@ -402,8 +402,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
                   <span class="shimmer-text text-sm">Tänker...</span>
                 </div>
                 <div
-                  v-else
-                  class="prose dark:prose-invert prose-hr:border-foreground/10 marker:text-foreground marker:font-semibold"
+                  class="prose dark:prose-invert prose-hr:border-foreground/10 prose-tr:border-foreground/10 prose-thead:border-foreground/10 marker:text-foreground marker:font-semibold"
                   v-html="renderedAssistantHtml[i]"
                 />
               </div>
