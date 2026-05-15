@@ -135,7 +135,9 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
       </div>
 
       <div class="flex justify-between items-center mt-1.5 px-1">
-        <p class="text-[10px] text-muted-foreground/50">AI kan göra misstag.</p>
+        <p class="text-[10px] text-muted-foreground/50 pl-2">
+          AI kan göra misstag.
+        </p>
         <p
           v-if="modelValue.length > MAX_LENGTH * 0.8"
           class="text-[10px]"
