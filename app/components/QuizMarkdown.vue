@@ -6,6 +6,10 @@ import DOMPurify from "dompurify";
 
 const props = defineProps<{ content: string }>();
 
+defineOptions({
+  inheritAttrs: false,
+});
+
 function normalizeMathDelimiters(content: string): string {
   return content
     .replace(/\\\[([\s\S]*?)\\\]/g, (_m, inner) => `$$${inner.trim()}$$`)
@@ -50,7 +54,8 @@ const html = computed(() =>
 
 <template>
   <div
-    class="prose prose-sm dark:prose-invert max-w-none [&>p]:mb-0 [&>p:last-child]:mb-0"
+    v-bind="$attrs"
+    class="prose dark:prose-invert max-w-none [&>p]:mb-0 [&>p:last-child]:mb-0"
     v-html="html"
   />
 </template>

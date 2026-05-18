@@ -173,24 +173,15 @@ function confirmLockIn() {
         <LucideArrowLeft />
       </Button>
 
-      <TooltipProvider v-if="selectedExam" :delay-duration="0">
-        <Tooltip>
-          <TooltipTrigger as-child>
-            <Button
-              variant="ghost"
-              size="icon"
-              class="focus-visible:border-transparent focus-visible:ring-0"
-              aria-label="Visa tentor"
-              @click="isExamSidebarOpen = !isExamSidebarOpen"
-            >
-              <LucidePanelLeft />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>{{ isExamSidebarOpen ? "Stäng tentor" : "Visa tentor" }}</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <Button
+        variant="ghost"
+        size="icon"
+        class="focus-visible:border-transparent focus-visible:ring-0"
+        aria-label="Visa tentor"
+        @click="isExamSidebarOpen = !isExamSidebarOpen"
+      >
+        <LucidePanelLeft />
+      </Button>
 
       <div v-if="selectedExam" class="min-w-0 max-w-96 px-2">
         <p class="truncate text-xs font-semibold leading-none">
@@ -293,7 +284,7 @@ function confirmLockIn() {
 
   <Teleport to="body">
     <div
-      class="fixed inset-x-0 top-14 bottom-0 z-90 transition-opacity duration-200 ease-out"
+      class="fixed inset-x-0 top-12 bottom-0 z-90 transition-opacity duration-200 ease-out"
       :class="
         isExamSidebarOpen
           ? 'opacity-100 pointer-events-auto'
@@ -304,7 +295,7 @@ function confirmLockIn() {
     />
 
     <aside
-      class="fixed top-14 left-0 z-100 h-[calc(100vh-3.5rem)] w-86 border-r border-border bg-background transition-transform duration-250 ease-[cubic-bezier(0.32,0.72,0,1)]"
+      class="fixed top-12 left-0 z-100 h-[calc(100vh-3rem)] w-86 border-r border-border bg-background transition-transform duration-250 ease-[cubic-bezier(0.32,0.72,0,1)]"
       :class="isExamSidebarOpen ? 'translate-x-0' : '-translate-x-full'"
       aria-label="Välj tenta"
     >

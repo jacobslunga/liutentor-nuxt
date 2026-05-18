@@ -2,6 +2,7 @@
 import type { Exam, MultipleChoiceQuizResponse } from "@/types/quiz";
 import { useQuiz } from "@/composables/useQuiz";
 import { useQuizHistory } from "@/composables/useQuizHistory";
+import QuizHistorySidebar from "@/components/QuizHistorySidebar.vue";
 
 definePageMeta({ layout: "default" });
 
@@ -22,7 +23,6 @@ const activeQuizData = ref<MultipleChoiceQuizResponse | null>(null);
 const activeQuizId = ref<string | null>(null);
 const completedAnswers = ref<Record<number, number>>({});
 const user = useSupabaseUser();
-const hasAutoLoadedLatest = ref(false);
 const historyEnabled = computed(() =>
   Boolean((user.value as any)?.id ?? (user.value as any)?.sub),
 );
@@ -45,25 +45,8 @@ watch(courseCode, () => {
   activeQuizData.value = null;
   activeQuizId.value = null;
   completedAnswers.value = {};
-  hasAutoLoadedLatest.value = false;
   reset();
 });
-
-watch(
-  [courseHistory, historyEnabled],
-  ([history, enabled]) => {
-    if (!enabled) return;
-    if (hasAutoLoadedLatest.value) return;
-    const latest = history[0];
-    if (!latest) return;
-
-    activeQuizData.value = latest.data;
-    activeQuizId.value = latest.id;
-    stage.value = "answering";
-    hasAutoLoadedLatest.value = true;
-  },
-  { immediate: true },
-);
 
 watch(quizData, async (data) => {
   if (!data?.quiz?.questions?.length) return;
@@ -115,6 +98,10 @@ function handleRetake() {
 }
 
 function handleNewQuiz() {
+  reset();
+  activeQuizData.value = null;
+  activeQuizId.value = null;
+  completedAnswers.value = {};
   stage.value = "setup";
 }
 
@@ -128,50 +115,57 @@ function handleAdjustSetup() {
     <QuizNavBar
       :course-code="courseCode"
       :stage="stage"
-      :history="courseHistory"
-      :history-enabled="historyEnabled"
-      :active-quiz-id="activeQuizId"
-      @load-history="handleLoadHistory"
       @new-quiz="handleNewQuiz"
     />
 
-    <Transition
-      enter-active-class="transition-opacity duration-200"
-      enter-from-class="opacity-0"
-      leave-active-class="transition-opacity duration-150"
-      leave-to-class="opacity-0"
-      mode="out-in"
+    <div
+      class="mx-auto grid w-full max-w-7xl grid-cols-1 gap-8 px-4 pt-10 pb-12 lg:grid-cols-[minmax(0,1fr)_20rem] lg:px-8 lg:pt-12"
     >
-      <QuizSetup
-        v-if="stage === 'setup'"
-        :exams="exams"
-        :exams-loading="examsLoading"
-        :is-loading="isLoading"
-        @generate="handleGenerate"
-      />
+      <Transition
+        enter-active-class="transition-opacity duration-200"
+        enter-from-class="opacity-0"
+        leave-active-class="transition-opacity duration-150"
+        leave-to-class="opacity-0"
+        mode="out-in"
+      >
+        <QuizSetup
+          v-if="stage === 'setup'"
+          :exams="exams"
+          :exams-loading="examsLoading"
+          :is-loading="isLoading"
+          @generate="handleGenerate"
+        />
 
-      <QuizGenerating
-        v-else-if="stage === 'generating'"
-        :status-message="status?.message ?? 'Förbereder quiz...'"
-        :status-step="status?.step ?? null"
-        :error="error"
-        @retry="handleAdjustSetup"
-      />
+        <QuizGenerating
+          v-else-if="stage === 'generating'"
+          :status-message="status?.message ?? 'Förbereder quiz...'"
+          :status-step="status?.step ?? null"
+          :error="error"
+          @retry="handleAdjustSetup"
+        />
 
-      <QuizAnswering
-        v-else-if="stage === 'answering' && activeQuizData"
-        :quiz-data="activeQuizData"
-        @complete="handleComplete"
-      />
+        <QuizAnswering
+          v-else-if="stage === 'answering' && activeQuizData"
+          :quiz-data="activeQuizData"
+          @complete="handleComplete"
+        />
 
-      <QuizResults
-        v-else-if="stage === 'results' && activeQuizData"
-        :quiz-data="activeQuizData"
-        :answers="completedAnswers"
-        @retake="handleRetake"
-        @new-quiz="handleNewQuiz"
-        @adjust-setup="handleAdjustSetup"
+        <QuizResults
+          v-else-if="stage === 'results' && activeQuizData"
+          :quiz-data="activeQuizData"
+          :answers="completedAnswers"
+          @retake="handleRetake"
+          @new-quiz="handleNewQuiz"
+          @adjust-setup="handleAdjustSetup"
+        />
+      </Transition>
+
+      <QuizHistorySidebar
+        :history="courseHistory"
+        :history-enabled="historyEnabled"
+        :active-quiz-id="activeQuizId"
+        @load-history="handleLoadHistory"
       />
-    </Transition>
+    </div>
   </div>
 </template>

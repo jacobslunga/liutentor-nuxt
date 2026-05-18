@@ -59,8 +59,8 @@ function submit() {
 </script>
 
 <template>
-  <div class="mx-auto max-w-2xl px-4 py-6">
-    <div class="mb-5">
+  <div class="mx-auto w-full max-w-4xl py-8 lg:py-12">
+    <div class="mb-8">
       <div class="mb-2 flex items-center justify-between">
         <span class="text-xs text-muted-foreground">
           Fråga
@@ -90,7 +90,7 @@ function submit() {
     />
 
     <div
-      class="sticky bottom-0 mt-6 border-t border-border/40 bg-background/80 py-3 backdrop-blur-sm"
+      class="sticky bottom-0 mt-8 border-t border-border/40 bg-background/80 py-4 backdrop-blur-sm"
     >
       <div class="flex items-center justify-end gap-3">
         <span

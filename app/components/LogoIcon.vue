@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
+defineOptions({
+  inheritAttrs: false,
+});
+
 interface Props {
   className?: string;
   width?: number;
@@ -9,30 +13,34 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const attrs = useAttrs();
 
-const colorMode = useColorMode();
-const isDark = computed(() => colorMode.value === "dark");
+const lightSrc = computed(() =>
+  props.isBlackAndWhite ? "/images/logo-black.svg" : "/images/logo-light.svg",
+);
 
-const src = computed(() => {
-  if (props.isBlackAndWhite) {
-    return isDark.value ? "/images/logo-white.svg" : "/images/logo-black.svg";
-  }
+const darkSrc = computed(() =>
+  props.isBlackAndWhite ? "/images/logo-white.svg" : "/images/logo-dark.svg",
+);
 
-  return isDark.value ? "/images/logo-dark.svg" : "/images/logo-light.svg";
-});
+const logoClass = computed(() => [attrs.class, props.className]);
+const logoStyle = computed(() => ({
+  width: props.width ? `${props.width}px` : undefined,
+  height: props.height ? `${props.height}px` : undefined,
+}));
 </script>
 
 <template>
-  <ClientOnly>
-    <img
-      :key="src"
-      :src="src"
-      alt="Logo"
-      :class="className"
-      :style="{
-        width: width ? width + 'px' : undefined,
-        height: height ? height + 'px' : undefined,
-      }"
-    />
-  </ClientOnly>
+  <img
+    :src="lightSrc"
+    alt="Logo"
+    :class="['dark:hidden', logoClass]"
+    :style="logoStyle"
+  />
+  <img
+    :src="darkSrc"
+    alt="Logo"
+    :class="['hidden dark:block', logoClass]"
+    :style="logoStyle"
+  />
 </template>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { MousePointerClick } from "lucide-vue-next";
 import { useLayoutStore } from "~/stores/layout";
 
 definePageMeta({ layout: false });
@@ -211,7 +212,7 @@ function handleKeyUp(e: KeyboardEvent) {
                         <p class="text-sm font-normal text-muted-foreground">
                           Håll muspekaren för att visa facit
                         </p>
-                        <LucidePointer
+                        <MousePointerClick
                           class="text-muted-foreground animate-in"
                         />
                       </div>

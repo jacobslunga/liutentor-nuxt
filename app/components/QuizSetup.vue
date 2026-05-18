@@ -151,7 +151,7 @@ function handleGenerate() {
               </DialogTrigger>
 
               <DialogContent
-                class="sm:max-w-2xl p-0 overflow-hidden"
+                class="flex max-h-[85vh] flex-col overflow-hidden p-0 sm:max-w-2xl"
                 :show-close-button="false"
               >
                 <div
@@ -175,7 +175,7 @@ function handleGenerate() {
                   </Button>
                 </div>
 
-                <div class="max-h-[60vh] overflow-y-auto">
+                <div class="min-h-0 flex-1 overflow-y-auto">
                   <button
                     v-for="exam in availableExams"
                     :key="exam.id"
@@ -225,7 +225,7 @@ function handleGenerate() {
                 </div>
 
                 <div
-                  class="p-4 border-t border-border/50 flex items-center justify-between"
+                  class="flex items-center justify-between border-t border-border/50 p-4"
                 >
                   <p class="text-xs text-muted-foreground/60">
                     {{ selectedCount }} av {{ MAX_SELECTION }} valda
