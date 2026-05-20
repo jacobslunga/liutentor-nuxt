@@ -203,18 +203,6 @@ function handleScroll() {
 }
 
 watch(
-  messages,
-  () => {
-    nextTick(() => {
-      if (!isLoading.value && isAtBottom.value) {
-        scrollToBottom("auto");
-      }
-    });
-  },
-  { deep: true },
-);
-
-watch(
   () => chatStore.currentConversationId,
   () => {
     nextTick(() => {
