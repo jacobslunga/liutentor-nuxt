@@ -3,7 +3,7 @@ export default defineEventHandler(async (e) => {
 
   try {
     const data = await $fetch(
-      `https://liutentor-go-api-production.up.railway.app/v1/exams/LIU/${courseCode}`,
+      `https://liutentor-go-687405545415.europe-west1.run.app/v1/exams/LIU/${courseCode}`,
     );
     return data;
   } catch (err: any) {

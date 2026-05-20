@@ -36,8 +36,8 @@ let contentRevealTimer: ReturnType<typeof setTimeout> | null = null;
 const userId = computed(
   () =>
     ((user.value as any)?.id ?? (user.value as any)?.sub ?? null) as
-      | string
-      | null,
+    | string
+    | null,
 );
 
 const requiresLoginMessage = computed(
@@ -348,49 +348,29 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div
-    class="absolute inset-0 z-90 transition-opacity duration-200 ease-out"
-    :class="
-      open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-    "
-    aria-hidden="true"
-    @click="emit('update:open', false)"
-  />
+  <div class="absolute inset-0 z-90 transition-opacity duration-200 ease-out" :class="open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+    " aria-hidden="true" @click="emit('update:open', false)" />
 
   <aside
     class="absolute inset-y-0 right-0 z-100 h-full w-80 border-l border-border bg-background transition-transform duration-250 ease-[cubic-bezier(0.32,0.72,0,1)]"
-    :class="open ? 'translate-x-0' : 'translate-x-full'"
-    aria-label="Konversationshistorik"
-  >
+    :class="open ? 'translate-x-0' : 'translate-x-full'" aria-label="Konversationshistorik">
     <div class="flex h-full min-h-0 flex-col">
       <div class="border-b px-4 py-3 flex items-center justify-between gap-2">
-        <h2 class="text-sm font-semibold">Chatthistorik</h2>
+        <h2 class="text-sm font-medium">Chatthistorik</h2>
         <div class="flex items-center gap-1">
-          <Button
-            v-if="conversations.length > 0"
-            variant="ghost"
-            size="icon"
+          <Button v-if="conversations.length > 0" variant="ghost" size="icon"
             class="size-7 shrink-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-            :disabled="isDeletingAll || isDeletingConversation"
-            @click="showDeleteAllConfirm = true"
-          >
+            :disabled="isDeletingAll || isDeletingConversation" @click="showDeleteAllConfirm = true">
             <LucideTrash2 class="w-3.5 h-3.5" />
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            class="size-7 shrink-0"
-            @click="emit('update:open', false)"
-          >
+          <Button variant="ghost" size="icon" class="size-7 shrink-0" @click="emit('update:open', false)">
             <LucideX class="w-4 h-4" />
           </Button>
         </div>
       </div>
 
-      <div
-        class="flex-1 min-h-0 overflow-y-auto px-2 py-2 custom-scrollbar transition-opacity duration-150 ease-out"
-        :class="open && contentReady ? 'opacity-100' : 'opacity-0'"
-      >
+      <div class="flex-1 min-h-0 overflow-y-auto px-2 py-2 custom-scrollbar transition-opacity duration-150 ease-out"
+        :class="open && contentReady ? 'opacity-100' : 'opacity-0'">
         <div v-if="isLoading" class="px-2 py-4 text-sm text-muted-foreground">
           Hämtar historik...
         </div>
@@ -399,47 +379,32 @@ onUnmounted(() => {
           {{ loadError }}
         </div>
 
-        <div
-          v-else-if="requiresLoginMessage"
-          class="px-2 py-4 text-sm text-muted-foreground"
-        >
+        <div v-else-if="requiresLoginMessage" class="px-2 py-4 text-sm text-muted-foreground">
           Logga in för att se din chatthistorik.
         </div>
 
-        <div
-          v-else-if="groupedConversations.length === 0"
-          class="px-2 py-4 text-sm text-muted-foreground"
-        >
+        <div v-else-if="groupedConversations.length === 0" class="px-2 py-4 text-sm text-muted-foreground">
           Inga chattar hittades.
         </div>
 
         <div v-else class="space-y-6">
           <section v-for="group in groupedConversations" :key="group.label">
-            <h3
-              class="px-2 pb-2 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground/80"
-            >
+            <h3 class="px-2 pb-2 text-[11px] font-medium uppercase tracking-wide text-muted-foreground/80">
               {{ group.label }}
             </h3>
 
             <div class="space-y-1">
-              <div
-                v-for="item in group.items"
-                :key="item.id"
+              <div v-for="item in group.items" :key="item.id"
                 class="group rounded-md border px-1 py-1 transition-[opacity,background-color,border-color] ease-out"
                 :class="[
                   item.id === chatStore.currentConversationId
                     ? 'border-border bg-secondary'
                     : 'bg-transparent border-transparent hover:bg-muted/40',
                   open && contentReady ? 'opacity-100' : 'opacity-0',
-                ]"
-                :style="itemMotionStyle(item.id)"
-              >
+                ]" :style="itemMotionStyle(item.id)">
                 <div class="flex items-center gap-1">
-                  <button
-                    class="min-w-0 flex-1 cursor-pointer text-left rounded-md px-1 py-1"
-                    :disabled="isOpeningConversation || isDeletingConversation"
-                    @click="openConversation(item)"
-                  >
+                  <button class="min-w-0 flex-1 cursor-pointer text-left rounded-md px-1 py-1"
+                    :disabled="isOpeningConversation || isDeletingConversation" @click="openConversation(item)">
                     <p class="text-sm font-medium truncate">
                       {{ item.title || "Ny chatt" }}
                     </p>
@@ -448,13 +413,9 @@ onUnmounted(() => {
                     </p>
                   </button>
 
-                  <Button
-                    variant="ghost"
-                    size="icon"
+                  <Button variant="ghost" size="icon"
                     class="size-7 shrink-0 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity"
-                    :disabled="isDeletingConversation"
-                    @click="askDeleteConversation(item)"
-                  >
+                    :disabled="isDeletingConversation" @click="askDeleteConversation(item)">
                     <LucideTrash2 class="w-3.5 h-3.5 text-muted-foreground" />
                   </Button>
                 </div>
@@ -478,11 +439,8 @@ onUnmounted(() => {
         <AlertDialogCancel :disabled="isDeletingConversation">
           Avbryt
         </AlertDialogCancel>
-        <AlertDialogAction
-          class="bg-destructive text-white hover:bg-destructive/90"
-          :disabled="isDeletingConversation"
-          @click="confirmDeleteConversation"
-        >
+        <AlertDialogAction class="bg-destructive text-white hover:bg-destructive/90" :disabled="isDeletingConversation"
+          @click="confirmDeleteConversation">
           {{ isDeletingConversation ? "Raderar..." : "Radera" }}
         </AlertDialogAction>
       </AlertDialogFooter>
@@ -500,11 +458,8 @@ onUnmounted(() => {
       </AlertDialogHeader>
       <AlertDialogFooter>
         <AlertDialogCancel :disabled="isDeletingAll">Avbryt</AlertDialogCancel>
-        <AlertDialogAction
-          class="bg-destructive text-white hover:bg-destructive/90"
-          :disabled="isDeletingAll"
-          @click="confirmDeleteAllConversations"
-        >
+        <AlertDialogAction class="bg-destructive text-white hover:bg-destructive/90" :disabled="isDeletingAll"
+          @click="confirmDeleteAllConversations">
           {{ isDeletingAll ? "Raderar..." : `Radera alla` }}
         </AlertDialogAction>
       </AlertDialogFooter>

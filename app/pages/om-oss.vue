@@ -11,13 +11,11 @@ useSeoMeta({
 
 <template>
   <div class="w-full max-w-3xl">
-    <h1 class="text-3xl font-semibold text-foreground mb-2">Om oss</h1>
+    <h1 class="text-3xl font-medium text-foreground mb-2">Om oss</h1>
     <p class="text-sm font-medium text-muted-foreground mb-6">
       Studentdrivet projekt för enklare tentplugg
     </p>
-    <div
-      class="text-sm text-foreground/80 font-medium leading-relaxed space-y-4"
-    >
+    <div class="text-sm text-foreground/80 font-medium leading-relaxed space-y-4">
       <p>
         LiU Tentor är ett ideellt initiativ som startades av några studenter vid
         Linköpings universitet som tröttnade på att klicka runt i evigheter för

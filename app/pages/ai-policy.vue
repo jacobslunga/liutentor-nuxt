@@ -63,7 +63,7 @@ const sections: Section[] = [
 
 <template>
   <div class="w-full max-w-3xl">
-    <h1 class="text-3xl font-semibold text-foreground mb-1">AI-policy</h1>
+    <h1 class="text-3xl font-medium text-foreground mb-1">AI-policy</h1>
     <p class="text-xs text-muted-foreground mb-6">
       Senast uppdaterad: 2026-04-20
     </p>
@@ -84,18 +84,13 @@ const sections: Section[] = [
         <p class="text-sm text-foreground/80 leading-relaxed">
           {{ section.content }}
         </p>
-        <ul
-          v-if="section.items"
-          class="mt-3 list-disc pl-5 space-y-1 text-sm text-foreground/70"
-        >
+        <ul v-if="section.items" class="mt-3 list-disc pl-5 space-y-1 text-sm text-foreground/70">
           <li v-for="item in section.items" :key="item">{{ item }}</li>
         </ul>
       </div>
     </div>
 
-    <div
-      class="mt-8 pt-6 border-t bg-primary/5 rounded-md p-6 border border-primary/10"
-    >
+    <div class="mt-8 pt-6 border-t bg-primary/5 rounded-md p-6 border border-primary/10">
       <div class="flex items-center gap-2 mb-2">
         <LucideShieldCheck class="h-5 w-5 text-primary" />
         <h3 class="text-sm font-medium">Använd AI med omdöme</h3>

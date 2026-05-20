@@ -40,8 +40,8 @@ const chatMessageCount = ref(0);
 const currentUserId = computed(
   () =>
     ((user.value as any)?.id ?? (user.value as any)?.sub ?? null) as
-      | string
-      | null,
+    | string
+    | null,
 );
 
 const avatarColor = computed(() => colorCookie.value as string);
@@ -239,20 +239,12 @@ async function handleSignOut() {
 <template>
   <div class="flex flex-col gap-8">
     <template v-if="profileLoading">
-      <section
-        class="relative overflow-hidden rounded-md border border-border/70 p-8"
-      >
+      <section class="relative overflow-hidden rounded-md border border-border/70 p-8">
         <div class="h-8 w-40 rounded bg-muted animate-pulse mx-auto" />
-        <div
-          class="h-28 w-28 rounded-full bg-muted animate-pulse mx-auto mt-5"
-        />
+        <div class="h-28 w-28 rounded-full bg-muted animate-pulse mx-auto mt-5" />
         <div class="h-4 w-56 rounded bg-muted animate-pulse mx-auto mt-4" />
         <div class="grid grid-cols-3 gap-3 mt-6">
-          <div
-            v-for="i in 3"
-            :key="i"
-            class="h-18 rounded-md bg-muted animate-pulse"
-          />
+          <div v-for="i in 3" :key="i" class="h-18 rounded-md bg-muted animate-pulse" />
         </div>
       </section>
     </template>
@@ -260,73 +252,44 @@ async function handleSignOut() {
     <template v-else>
       <section class="relative p-6 sm:p-8">
         <div class="relative z-10 flex flex-col items-center text-center">
-          <button
-            class="relative mt-4 cursor-pointer shrink-0 group"
-            :disabled="avatarUploading"
-            @click="handleAvatarClick"
-          >
-            <div
-              v-if="avatarUrl"
-              :class="[
-                'relative h-30 w-30 sm:h-36 sm:w-36 rounded-full overflow-hidden border-4 shadow-lg',
-                COLOR_BORDER_MAP[avatarColor],
-              ]"
-            >
-              <img
-                :src="avatarUrl"
-                alt="Avatar"
-                class="h-full w-full object-cover"
-                :class="[
-                  avatarUploading
-                    ? 'opacity-40'
-                    : 'group-hover:opacity-85 transition-opacity',
-                ]"
-              />
-            </div>
-
-            <div
-              v-else
-              :class="[
-                'relative h-30 w-30 sm:h-36 sm:w-36 rounded-full flex items-center justify-center text-white text-5xl font-semibold border-4 shadow-lg',
+          <button class="relative mt-4 cursor-pointer shrink-0 group" :disabled="avatarUploading"
+            @click="handleAvatarClick">
+            <div v-if="avatarUrl" :class="[
+              'relative h-30 w-30 sm:h-36 sm:w-36 rounded-full overflow-hidden border-4 shadow-lg',
+              COLOR_BORDER_MAP[avatarColor],
+            ]">
+              <img :src="avatarUrl" alt="Avatar" class="h-full w-full object-cover" :class="[
                 avatarUploading
                   ? 'opacity-40'
                   : 'group-hover:opacity-85 transition-opacity',
-                COLOR_BG_MAP[avatarColor],
-                COLOR_BORDER_MAP[avatarColor],
-              ]"
-            >
+              ]" />
+            </div>
+
+            <div v-else :class="[
+              'relative h-30 w-30 sm:h-36 sm:w-36 rounded-full flex items-center justify-center text-white text-5xl font-medium border-4 shadow-lg',
+              avatarUploading
+                ? 'opacity-40'
+                : 'group-hover:opacity-85 transition-opacity',
+              COLOR_BG_MAP[avatarColor],
+              COLOR_BORDER_MAP[avatarColor],
+            ]">
               {{ initial }}
             </div>
 
-            <div
-              v-if="avatarUploading"
-              class="absolute inset-0 flex items-center justify-center z-10"
-            >
-              <LucideLoader2
-                class="h-7 w-7 text-white animate-spin drop-shadow"
-              />
+            <div v-if="avatarUploading" class="absolute inset-0 flex items-center justify-center z-10">
+              <LucideLoader2 class="h-7 w-7 text-white animate-spin drop-shadow" />
             </div>
 
             <div
-              class="absolute bottom-1 right-1 h-8 w-8 rounded-full bg-background border border-border flex items-center justify-center shadow-sm z-10"
-            >
-              <LucideLoader2
-                v-if="avatarUploading"
-                class="h-4 w-4 animate-spin text-muted-foreground"
-              />
+              class="absolute bottom-1 right-1 h-8 w-8 rounded-full bg-background border border-border flex items-center justify-center shadow-sm z-10">
+              <LucideLoader2 v-if="avatarUploading" class="h-4 w-4 animate-spin text-muted-foreground" />
               <LucidePlus v-else class="h-4 w-4 text-foreground" />
             </div>
           </button>
 
-          <input
-            ref="fileInput"
-            type="file"
-            accept="image/*"
-            class="hidden"
-            @change="handleFileChange"
-          />
+          <input ref="fileInput" type="file" accept="image/*" class="hidden" @change="handleFileChange" />
 
-          <h1 class="mt-4 text-2xl font-semibold">
+          <h1 class="mt-4 text-2xl font-medium">
             {{
               [firstName, lastName].filter(Boolean).join(" ") || "Din profil"
             }}
@@ -340,33 +303,21 @@ async function handleSignOut() {
           <div class="mt-6 w-full max-w-2xl">
             <div class="rounded-md border border-border/70 bg-card p-5 sm:p-6">
               <div class="grid grid-cols-3 gap-2 sm:gap-3">
-                <div
-                  class="rounded-md border border-border/70 bg-background/70 p-3 sm:p-4"
-                >
+                <div class="rounded-md border border-border/70 bg-background/70 p-3 sm:p-4">
                   <p class="text-[11px] text-muted-foreground">Quiz</p>
-                  <p
-                    class="mt-1 text-xl sm:text-2xl font-semibold tabular-nums"
-                  >
+                  <p class="mt-1 text-xl sm:text-2xl font-medium tabular-nums">
                     {{ activityLoading ? "..." : quizCount }}
                   </p>
                 </div>
-                <div
-                  class="rounded-md border border-border/70 bg-background/70 p-3 sm:p-4"
-                >
+                <div class="rounded-md border border-border/70 bg-background/70 p-3 sm:p-4">
                   <p class="text-[11px] text-muted-foreground">AI Chattar</p>
-                  <p
-                    class="mt-1 text-xl sm:text-2xl font-semibold tabular-nums"
-                  >
+                  <p class="mt-1 text-xl sm:text-2xl font-medium tabular-nums">
                     {{ activityLoading ? "..." : conversationCount }}
                   </p>
                 </div>
-                <div
-                  class="rounded-md border border-border/70 bg-background/70 p-3 sm:p-4"
-                >
+                <div class="rounded-md border border-border/70 bg-background/70 p-3 sm:p-4">
                   <p class="text-[11px] text-muted-foreground">Meddelanden</p>
-                  <p
-                    class="mt-1 text-xl sm:text-2xl font-semibold tabular-nums"
-                  >
+                  <p class="mt-1 text-xl sm:text-2xl font-medium tabular-nums">
                     {{ activityLoading ? "..." : chatMessageCount }}
                   </p>
                 </div>
@@ -377,9 +328,7 @@ async function handleSignOut() {
       </section>
 
       <section class="flex flex-col gap-3">
-        <h2
-          class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
-        >
+        <h2 class="text-xs font-medium text-muted-foreground uppercase tracking-wide">
           Inställningar
         </h2>
 
@@ -389,43 +338,26 @@ async function handleSignOut() {
             <div class="space-y-3">
               <div class="flex flex-col gap-1.5">
                 <label class="text-xs text-muted-foreground">Förnamn</label>
-                <input
-                  v-model="firstNameInput"
-                  type="text"
-                  placeholder="Ditt förnamn"
-                  class="h-10 rounded-md border border-border bg-background px-3 text-sm outline-none focus:border-foreground/30"
-                />
+                <input v-model="firstNameInput" type="text" placeholder="Ditt förnamn"
+                  class="h-10 rounded-md border border-border bg-background px-3 text-sm outline-none focus:border-foreground/30" />
               </div>
               <div class="flex flex-col gap-1.5">
                 <label class="text-xs text-muted-foreground">Efternamn</label>
-                <input
-                  v-model="lastNameInput"
-                  type="text"
-                  placeholder="Ditt efternamn"
-                  class="h-10 rounded-md border border-border bg-background px-3 text-sm outline-none focus:border-foreground/30"
-                />
+                <input v-model="lastNameInput" type="text" placeholder="Ditt efternamn"
+                  class="h-10 rounded-md border border-border bg-background px-3 text-sm outline-none focus:border-foreground/30" />
               </div>
             </div>
 
             <div class="mt-4 flex justify-end">
-              <Button
-                size="sm"
-                :disabled="profileSaving || !hasChanges"
-                @click="saveProfile"
-              >
-                <LucideLoader2
-                  v-if="profileSaving"
-                  class="w-4 h-4 animate-spin"
-                />
+              <Button size="sm" :disabled="profileSaving || !hasChanges" @click="saveProfile">
+                <LucideLoader2 v-if="profileSaving" class="w-4 h-4 animate-spin" />
                 <LucideCheck v-else-if="profileSaved" class="w-4 h-4" />
                 <span>{{ profileSaved ? "Sparat!" : "Spara" }}</span>
               </Button>
             </div>
           </div>
 
-          <div
-            class="rounded-md border border-border/70 bg-card divide-y divide-border/70"
-          >
+          <div class="rounded-md border border-border/70 bg-card divide-y divide-border/70">
             <div class="p-5">
               <p class="text-sm font-medium mb-3">Kontodetaljer</p>
               <div class="space-y-2 text-sm">
@@ -433,7 +365,7 @@ async function handleSignOut() {
                   <span class="text-muted-foreground">E-post</span>
                   <span class="font-medium truncate">{{
                     user?.email ?? "—"
-                  }}</span>
+                    }}</span>
                 </p>
                 <p class="flex items-center justify-between gap-3">
                   <span class="text-muted-foreground">Registrerad</span>
@@ -442,9 +374,7 @@ async function handleSignOut() {
                 <p class="flex items-center justify-between gap-3">
                   <span class="text-muted-foreground">Kontostatus</span>
                   <span
-                    class="text-xs font-medium text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-full"
-                    >Aktiv</span
-                  >
+                    class="text-xs font-medium text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-full">Aktiv</span>
                 </p>
               </div>
             </div>
@@ -452,18 +382,13 @@ async function handleSignOut() {
             <div class="p-5">
               <p class="text-sm font-medium mb-3">Avatarfärg</p>
               <div class="flex items-center gap-2">
-                <button
-                  v-for="color in COLORS"
-                  :key="color"
-                  :class="[
-                    'w-6 h-6 rounded-full cursor-pointer transition-all',
-                    COLOR_BG_MAP[color],
-                    colorCookie === color
-                      ? 'ring-2 ring-offset-2 ring-offset-background ring-foreground scale-110'
-                      : 'opacity-60 hover:opacity-100',
-                  ]"
-                  @click="setColor(color)"
-                />
+                <button v-for="color in COLORS" :key="color" :class="[
+                  'w-6 h-6 rounded-full cursor-pointer transition-all',
+                  COLOR_BG_MAP[color],
+                  colorCookie === color
+                    ? 'ring-2 ring-offset-2 ring-offset-background ring-foreground scale-110'
+                    : 'opacity-60 hover:opacity-100',
+                ]" @click="setColor(color)" />
               </div>
             </div>
 
@@ -474,16 +399,8 @@ async function handleSignOut() {
                   Avsluta din nuvarande session
                 </p>
               </div>
-              <Button
-                variant="outline"
-                size="sm"
-                :disabled="signOutLoading"
-                @click="handleSignOut"
-              >
-                <LucideLoader2
-                  v-if="signOutLoading"
-                  class="w-4 h-4 animate-spin"
-                />
+              <Button variant="outline" size="sm" :disabled="signOutLoading" @click="handleSignOut">
+                <LucideLoader2 v-if="signOutLoading" class="w-4 h-4 animate-spin" />
                 <LucideLogOut v-else class="w-4 h-4" />
                 <span v-if="!signOutLoading">Logga ut</span>
               </Button>

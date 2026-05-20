@@ -27,14 +27,12 @@ const retry = () => clearError();
 </script>
 
 <template>
-  <div
-    class="min-h-screen bg-background text-foreground flex items-center justify-center px-6"
-  >
+  <div class="min-h-screen bg-background text-foreground flex items-center justify-center px-6">
     <div class="w-full max-w-xl text-center space-y-5">
       <p class="text-xs font-mono text-muted-foreground">
         FEL {{ statusCode }}
       </p>
-      <h1 class="text-3xl md:text-4xl font-semibold">
+      <h1 class="text-3xl md:text-4xl font-medium">
         {{ statusMessage }}
       </h1>
       <p class="text-sm text-muted-foreground max-w-md mx-auto">

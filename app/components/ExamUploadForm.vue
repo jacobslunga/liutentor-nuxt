@@ -214,7 +214,7 @@ onUnmounted(() => {
 <template>
   <div class="w-full">
     <div v-if="showHeading" class="mb-8">
-      <h1 class="text-3xl font-semibold text-foreground mb-2">
+      <h1 class="text-3xl font-medium text-foreground mb-2">
         Ladda upp tenta
       </h1>
       <p class="text-sm font-medium text-muted-foreground">
@@ -225,11 +225,9 @@ onUnmounted(() => {
     <div class="space-y-6">
       <div v-if="fixedCourseCode" class="space-y-2">
         <p class="text-sm font-medium text-muted-foreground">Kurskod</p>
-        <div
-          class="flex items-center justify-center gap-2 rounded-md border border-border/60 bg-muted/30 px-4 py-3"
-        >
+        <div class="flex items-center justify-center gap-2 rounded-md border border-border/60 bg-muted/30 px-4 py-3">
           <LucideBookOpen class="h-4 w-4 text-muted-foreground" />
-          <span class="font-mono text-lg font-semibold tracking-wide">
+          <span class="font-mono text-lg font-medium tracking-wide">
             {{ kurskod }}
           </span>
         </div>
@@ -237,39 +235,21 @@ onUnmounted(() => {
 
       <div v-else class="space-y-2">
         <label class="text-sm font-medium text-muted-foreground">Kurskod</label>
-        <input
-          :value="kurskod"
-          :placeholder="kurskod ? '' : typed"
-          :disabled="loading"
+        <input :value="kurskod" :placeholder="kurskod ? '' : typed" :disabled="loading"
           class="w-full bg-transparent font-medium outline-none border-0 border-b-2 border-foreground/20 text-center text-4xl focus:ring-0 focus:border-primary transition-colors p-2 placeholder:text-muted-foreground/40"
           @input="
             kurskod = ($event.target as HTMLInputElement).value.toUpperCase()
-          "
-        />
+            " />
       </div>
 
-      <div
-        ref="dropZoneRef"
-        class="relative border-2 border-dashed rounded-md p-8 text-center cursor-pointer transition-all"
-        :class="
-          isOverDropZone
+      <div ref="dropZoneRef"
+        class="relative border-2 border-dashed rounded-md p-8 text-center cursor-pointer transition-all" :class="isOverDropZone
             ? 'border-primary bg-primary/5 scale-[1.02]'
             : 'border-muted hover:border-primary/50'
-        "
-        :style="loading ? 'opacity: 0.5; pointer-events: none' : ''"
-        @click="fileInputRef?.click()"
-      >
-        <input
-          ref="fileInputRef"
-          type="file"
-          accept="application/pdf"
-          multiple
-          class="hidden"
-          @change="handleFileInput"
-        />
-        <div
-          class="flex flex-col items-center justify-center gap-2 text-muted-foreground"
-        >
+          " :style="loading ? 'opacity: 0.5; pointer-events: none' : ''" @click="fileInputRef?.click()">
+        <input ref="fileInputRef" type="file" accept="application/pdf" multiple class="hidden"
+          @change="handleFileInput" />
+        <div class="flex flex-col items-center justify-center gap-2 text-muted-foreground">
           <LucideUpload class="h-8 w-8" />
           <p class="font-medium">
             Dra och släpp PDF-filer här, eller klicka för att välja
@@ -279,39 +259,24 @@ onUnmounted(() => {
 
       <div v-if="files.length > 0" class="space-y-3">
         <div class="space-y-2 rounded-md border p-2">
-          <div
-            v-for="(file, index) in files"
-            :key="`${file.name}-${index}`"
-            class="flex items-center justify-between text-sm p-2 bg-muted/50 rounded"
-          >
+          <div v-for="(file, index) in files" :key="`${file.name}-${index}`"
+            class="flex items-center justify-between text-sm p-2 bg-muted/50 rounded">
             <div class="flex items-center gap-2 overflow-hidden">
               <LucideFileText class="h-4 w-4 shrink-0 text-muted-foreground" />
               <span class="truncate">{{ file.name }}</span>
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              class="h-6 w-6"
-              @click.stop="removeFile(index)"
-            >
+            <Button variant="ghost" size="icon" class="h-6 w-6" @click.stop="removeFile(index)">
               <LucideX class="h-4 w-4" />
             </Button>
           </div>
         </div>
-        <Button
-          class="w-full"
-          size="lg"
-          :disabled="!kurskod || loading"
-          @click="handleUpload"
-        >
+        <Button class="w-full" size="lg" :disabled="!kurskod || loading" @click="handleUpload">
           <LucideLoader2 v-if="loading" class="h-5 w-5 animate-spin" />
           <span v-else>Ladda upp</span>
         </Button>
       </div>
 
-      <div
-        class="p-4 bg-muted/50 border rounded-md flex items-start gap-2 text-left"
-      >
+      <div class="p-4 bg-muted/50 border rounded-md flex items-start gap-2 text-left">
         <LucideInfo class="h-4 w-4 text-muted-foreground shrink-0" />
         <p class="text-xs text-muted-foreground">
           Uppladdade tentor granskas innan de blir tillgängliga för andra
@@ -324,10 +289,7 @@ onUnmounted(() => {
       <AlertDialogContent>
         <AlertDialogHeader class="text-center">
           <div class="flex justify-center mb-2">
-            <LucideCheckCircle
-              v-if="uploadStatus === 'success'"
-              class="h-12 w-12 text-green-500"
-            />
+            <LucideCheckCircle v-if="uploadStatus === 'success'" class="h-12 w-12 text-green-500" />
             <LucideAlertCircle v-else class="h-12 w-12 text-red-500" />
           </div>
           <AlertDialogTitle class="text-xl">

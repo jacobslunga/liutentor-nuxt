@@ -1,7 +1,7 @@
 import type { MultipleChoiceQuizResponse } from "@/types/quiz";
 
 const QUIZ_API_BASE =
-  "https://liutentor-api-production.up.railway.app/api/v1/quiz";
+  "https://liutentor-hono-687405545415.europe-north2.run.app/api/v1/quiz";
 
 // USE FOR LOCAL DEVELOPMENT
 // const QUIZ_API_BASE_LOCAL = "http://localhost:3001/api/v1/quiz";

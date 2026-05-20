@@ -1,8 +1,14 @@
-const VALID_MODEL_IDS = ["gemini-3.1-flash-lite-preview"] as const;
+export const CHAT_MODELS = [
+  { id: "gemini-3.5-flash", label: "Flash" },
+  { id: "gemini-3.1-flash-lite-preview", label: "Flash Lite" },
+] as const;
+
+const VALID_MODEL_IDS = CHAT_MODELS.map((m) => m.id);
 const DEFAULT_MODEL_ID = "gemini-3.1-flash-lite-preview";
 const VALID_MODEL_ID_SET = new Set<string>(VALID_MODEL_IDS);
-const MODEL_COOKIE_KEY = "liutentor_selected_model_v4";
+const MODEL_COOKIE_KEY = "liutentor_selected_model_v5";
 const LEGACY_MODEL_COOKIE_KEYS = [
+  "liutentor_selected_model_v4",
   "liutentor_selected_model_v3",
   "liutentor_selected_model_v2",
   "liutentor_selected_model_v1",

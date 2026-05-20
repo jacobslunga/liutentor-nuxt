@@ -66,6 +66,7 @@ onBeforeRouteUpdate((to, from) => {
 
 onBeforeRouteLeave(() => {
   chatStore.close();
+  chatStore.clearChat();
 });
 
 watch(

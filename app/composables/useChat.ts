@@ -2,8 +2,8 @@ import { ref } from "vue";
 import { useChatStore } from "@/stores/chat";
 
 const CHAT_API_URL =
-  "https://liutentor-api-production.up.railway.app/api/v1/chat/completion";
-const GEMINI_MODEL_ID = "gemini-3.1-flash-lite-preview";
+  "https://liutentor-hono-687405545415.europe-north2.run.app/api/v1/chat/completion";
+const DEFAULT_MODEL_ID = "gemini-3.1-flash-lite-preview";
 
 // USE FOR LOCAL DEVELOPMENT
 // const CHAT_API_URL_LOCAL = "http://localhost:3001/api/v1/chat/completion";
@@ -108,9 +108,8 @@ export function useChat(options: {
       }
     }
 
-    const { modelId = GEMINI_MODEL_ID, context } = opts;
-    const resolvedModelId =
-      modelId === GEMINI_MODEL_ID ? modelId : GEMINI_MODEL_ID;
+    const { modelId = DEFAULT_MODEL_ID, context } = opts;
+    const resolvedModelId = modelId || DEFAULT_MODEL_ID;
 
     const userMessage = {
       role: "user" as const,

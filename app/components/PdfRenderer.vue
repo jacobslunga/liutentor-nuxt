@@ -98,10 +98,7 @@ const plugins = computed(() => {
 
 <template>
   <div class="relative h-full w-full overflow-hidden bg-background">
-    <div
-      v-if="isLoading || !engine"
-      class="flex h-full w-full items-center justify-center"
-    >
+    <div v-if="isLoading || !engine" class="flex h-full w-full items-center justify-center">
       <LucideLoader2 class="h-5 w-5 animate-spin text-muted-foreground" />
     </div>
 
@@ -110,48 +107,26 @@ const plugins = computed(() => {
         <template v-if="activeDocumentId">
           <DocumentContent :document-id="activeDocumentId">
             <template #default="{ isLoaded }">
-              <div
-                v-if="!isLoaded"
-                class="flex h-full w-full items-center justify-center"
-              >
-                <LucideLoader2
-                  class="h-5 w-5 animate-spin text-muted-foreground"
-                />
+              <div v-if="!isLoaded" class="flex h-full w-full items-center justify-center">
+                <LucideLoader2 class="h-5 w-5 animate-spin text-muted-foreground" />
               </div>
 
-              <Viewport
-                v-else
-                :document-id="activeDocumentId"
-                class="h-full w-full bg-background pdf-viewport"
-                @scroll="handleViewportScroll"
-              >
+              <Viewport v-else :document-id="activeDocumentId" class="h-full w-full bg-background pdf-viewport"
+                @scroll="handleViewportScroll">
                 <template v-if="isMobile">
                   <Scroller :document-id="activeDocumentId">
                     <template #default="{ page }">
-                      <div
-                        :style="{
-                          width: `${page.width}px`,
-                          height: `${page.height}px`,
-                        }"
-                        class="relative mx-auto my-4 pdf-page-shell"
-                      >
-                        <Rotate
-                          :document-id="activeDocumentId"
-                          :page-index="page.pageIndex"
-                          class="relative h-full w-full"
-                        >
-                          <div
-                            class="absolute inset-0 z-0 pdf-render-surface"
-                            :style="
-                              isDark
-                                ? { filter: 'invert(10%) hue-rotate(10deg)' }
-                                : {}
-                            "
-                          >
-                            <RenderLayer
-                              :document-id="activeDocumentId"
-                              :page-index="page.pageIndex"
-                            />
+                      <div :style="{
+                        width: `${page.width}px`,
+                        height: `${page.height}px`,
+                      }" class="relative mx-auto my-4 pdf-page-shell">
+                        <Rotate :document-id="activeDocumentId" :page-index="page.pageIndex"
+                          class="relative h-full w-full">
+                          <div class="absolute inset-0 z-0 pdf-render-surface" :style="isDark
+                            ? { filter: 'invert(93%)' }
+                            : {}
+                            ">
+                            <RenderLayer :document-id="activeDocumentId" :page-index="page.pageIndex" />
                           </div>
                         </Rotate>
                       </div>
@@ -161,53 +136,25 @@ const plugins = computed(() => {
 
                 <template v-else>
                   <PdfInner>
-                    <ZoomGestureWrapper
-                      :document-id="activeDocumentId"
-                      :enable-pinch="false"
-                      :enable-wheel="true"
-                    >
+                    <ZoomGestureWrapper :document-id="activeDocumentId" :enable-pinch="false" :enable-wheel="true">
                       <Scroller :document-id="activeDocumentId">
                         <template #default="{ page }">
-                          <div
-                            :style="{
-                              width: `${page.width}px`,
-                              height: `${page.height}px`,
-                            }"
-                            class="relative mx-auto my-4 pdf-page-shell"
-                          >
-                            <PagePointerProvider
-                              :document-id="activeDocumentId"
-                              :page-index="page.pageIndex"
-                            >
-                              <Rotate
-                                :document-id="activeDocumentId"
-                                :page-index="page.pageIndex"
-                                class="relative h-full w-full"
-                              >
-                                <div
-                                  class="absolute inset-0 z-0 pdf-render-surface"
-                                  :style="
-                                    isDark
-                                      ? {
-                                          filter:
-                                            'invert(88%) hue-rotate(180deg)',
-                                        }
-                                      : {}
-                                  "
-                                >
-                                  <RenderLayer
-                                    :document-id="activeDocumentId"
-                                    :page-index="page.pageIndex"
-                                  />
+                          <div :style="{
+                            width: `${page.width}px`,
+                            height: `${page.height}px`,
+                          }" class="relative mx-auto my-4 pdf-page-shell">
+                            <PagePointerProvider :document-id="activeDocumentId" :page-index="page.pageIndex">
+                              <Rotate :document-id="activeDocumentId" :page-index="page.pageIndex"
+                                class="relative h-full w-full">
+                                <div class="absolute inset-0 z-0 pdf-render-surface" :style="isDark
+                                  ? { filter: 'invert(93%)' }
+                                  : {}
+                                  ">
+                                  <RenderLayer :document-id="activeDocumentId" :page-index="page.pageIndex" />
                                 </div>
-                                <div
-                                  class="absolute inset-0 z-10 pdf-selection-surface"
-                                >
-                                  <SelectionLayer
-                                    :document-id="activeDocumentId"
-                                    :page-index="page.pageIndex"
-                                    :text-style="{ background: selectionColor }"
-                                  />
+                                <div class="absolute inset-0 z-10 pdf-selection-surface">
+                                  <SelectionLayer :document-id="activeDocumentId" :page-index="page.pageIndex"
+                                    :text-style="{ background: selectionColor }" />
                                 </div>
                               </Rotate>
                             </PagePointerProvider>
@@ -219,22 +166,14 @@ const plugins = computed(() => {
                 </template>
               </Viewport>
 
-              <Transition
-                enter-active-class="transition-all duration-200 ease-out"
-                enter-from-class="opacity-0 translate-y-2 scale-95"
-                enter-to-class="opacity-100 translate-y-0 scale-100"
+              <Transition enter-active-class="transition-all duration-200 ease-out"
+                enter-from-class="opacity-0 translate-y-2 scale-95" enter-to-class="opacity-100 translate-y-0 scale-100"
                 leave-active-class="transition-all duration-150 ease-in"
                 leave-from-class="opacity-100 translate-y-0 scale-100"
-                leave-to-class="opacity-0 translate-y-2 scale-95"
-              >
-                <Button
-                  v-if="showScrollTop"
-                  variant="ghost"
-                  size="icon-sm"
+                leave-to-class="opacity-0 translate-y-2 scale-95">
+                <Button v-if="showScrollTop" variant="ghost" size="icon-sm"
                   class="absolute bottom-4 right-4 z-30 border border-border bg-background/90 shadow-sm backdrop-blur"
-                  aria-label="Scrolla till toppen"
-                  @click="scrollToTop"
-                >
+                  aria-label="Scrolla till toppen" @click="scrollToTop">
                   <LucideArrowUp class="h-4 w-4" />
                 </Button>
               </Transition>

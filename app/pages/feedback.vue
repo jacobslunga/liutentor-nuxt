@@ -68,18 +68,13 @@ async function handleSubmit() {
 
 <template>
   <div class="w-full max-w-2xl">
-    <h1 class="text-3xl font-semibold text-foreground mb-2">Feedback</h1>
+    <h1 class="text-3xl font-medium text-foreground mb-2">Feedback</h1>
     <p class="text-sm font-medium text-muted-foreground mb-6">
       Hjälp oss bli bättre – dela dina tankar och förslag.
     </p>
 
-    <div
-      v-if="isSuccess === true"
-      class="flex flex-col items-center gap-4 text-center py-8"
-    >
-      <div
-        class="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center"
-      >
+    <div v-if="isSuccess === true" class="flex flex-col items-center gap-4 text-center py-8">
+      <div class="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
         <LucideCheck class="h-6 w-6 text-green-600 dark:text-green-400" />
       </div>
       <div>
@@ -88,18 +83,11 @@ async function handleSubmit() {
           Vi har tagit emot din feedback och återkommer om det behövs.
         </p>
       </div>
-      <NuxtLink to="/"
-        ><Button size="sm">Tillbaka till startsidan</Button></NuxtLink
-      >
+      <NuxtLink to="/"><Button size="sm">Tillbaka till startsidan</Button></NuxtLink>
     </div>
 
-    <div
-      v-else-if="isSuccess === false"
-      class="flex flex-col items-center gap-4 text-center py-8"
-    >
-      <div
-        class="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center"
-      >
+    <div v-else-if="isSuccess === false" class="flex flex-col items-center gap-4 text-center py-8">
+      <div class="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
         <LucideAlertCircle class="h-6 w-6 text-red-600 dark:text-red-400" />
       </div>
       <div>
@@ -117,11 +105,8 @@ async function handleSubmit() {
           <span class="text-sm font-medium">Namn</span>
           <span class="text-sm text-muted-foreground">Valfritt</span>
         </div>
-        <input
-          v-model="form.name"
-          placeholder="Ditt namn"
-          class="w-full h-9 px-3 rounded-md border border-input bg-transparent text-sm outline-none focus:ring-1 focus:ring-ring"
-        />
+        <input v-model="form.name" placeholder="Ditt namn"
+          class="w-full h-9 px-3 rounded-md border border-input bg-transparent text-sm outline-none focus:ring-1 focus:ring-ring" />
       </div>
 
       <div>
@@ -129,12 +114,9 @@ async function handleSubmit() {
           <span class="text-sm font-medium">LiU Mail</span>
           <span class="text-destructive text-sm">*</span>
         </div>
-        <input
-          v-model="form.liu_mail"
-          placeholder="liuid123@student.liu.se"
+        <input v-model="form.liu_mail" placeholder="liuid123@student.liu.se"
           class="w-full h-9 px-3 rounded-md border border-input bg-transparent text-sm outline-none focus:ring-1 focus:ring-ring"
-          :class="errors.liu_mail ? 'border-destructive' : ''"
-        />
+          :class="errors.liu_mail ? 'border-destructive' : ''" />
         <p v-if="errors.liu_mail" class="text-xs text-destructive mt-1">
           {{ errors.liu_mail }}
         </p>
@@ -148,11 +130,8 @@ async function handleSubmit() {
           <span class="text-sm font-medium">Del av hemsidan</span>
           <span class="text-sm text-muted-foreground">Valfritt</span>
         </div>
-        <input
-          v-model="form.partOfWebsite"
-          placeholder="t.ex. Söksidan, PDF-visaren..."
-          class="w-full h-9 px-3 rounded-md border border-input bg-transparent text-sm outline-none focus:ring-1 focus:ring-ring"
-        />
+        <input v-model="form.partOfWebsite" placeholder="t.ex. Söksidan, PDF-visaren..."
+          class="w-full h-9 px-3 rounded-md border border-input bg-transparent text-sm outline-none focus:ring-1 focus:ring-ring" />
       </div>
 
       <div>
@@ -160,13 +139,9 @@ async function handleSubmit() {
           <span class="text-sm font-medium">Meddelande</span>
           <span class="text-destructive text-sm">*</span>
         </div>
-        <textarea
-          v-model="form.message"
-          placeholder="Berätta vad du tänker..."
-          rows="5"
+        <textarea v-model="form.message" placeholder="Berätta vad du tänker..." rows="5"
           class="w-full px-3 py-2 rounded-md border border-input bg-transparent text-sm outline-none focus:ring-1 focus:ring-ring resize-none"
-          :class="errors.message ? 'border-destructive' : ''"
-        />
+          :class="errors.message ? 'border-destructive' : ''" />
         <p v-if="errors.message" class="text-xs text-destructive mt-1">
           {{ errors.message }}
         </p>
