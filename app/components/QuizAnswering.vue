@@ -3,16 +3,20 @@ import type { MultipleChoiceQuizResponse } from "@/types/quiz";
 
 const props = defineProps<{
   quizData: MultipleChoiceQuizResponse;
+  currentIndex: number;
 }>();
 
 const emit = defineEmits<{
   complete: [answers: Record<number, number>];
+  next: [hasAnsweredCurrent: boolean];
+  previous: [];
 }>();
 
-const currentIndex = ref(0);
 const answers = ref<Record<number, number>>({});
 
 const questions = computed(() => props.quizData.quiz.questions);
+const currentIndex = computed(() => props.currentIndex);
+
 const questionCount = computed(() => questions.value.length);
 const currentQuestion = computed(
   () => questions.value[currentIndex.value] ?? null,
@@ -38,18 +42,6 @@ const progress = computed(() =>
 function onAnswer(optionIndex: number) {
   if (!currentQuestion.value) return;
   answers.value[currentQuestion.value.id] = optionIndex;
-}
-
-function next() {
-  if (!hasAnsweredCurrent.value) return;
-  currentIndex.value = Math.min(
-    currentIndex.value + 1,
-    questionCount.value - 1,
-  );
-}
-
-function previous() {
-  currentIndex.value = Math.max(currentIndex.value - 1, 0);
 }
 
 function submit() {
@@ -105,7 +97,7 @@ function submit() {
             size="sm"
             :disabled="currentIndex === 0"
             class="gap-1.5 border-border/50 shadow-none"
-            @click="previous"
+            @click="emit('previous')"
           >
             <LucideArrowLeft class="h-3.5 w-3.5" />
             Förra
@@ -116,7 +108,7 @@ function submit() {
             size="sm"
             :disabled="!hasAnsweredCurrent"
             class="gap-1.5 border-border/50 shadow-none"
-            @click="next"
+            @click="emit('next', hasAnsweredCurrent)"
           >
             Nästa
             <LucideArrowRight class="h-3.5 w-3.5" />

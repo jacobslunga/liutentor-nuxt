@@ -53,9 +53,5 @@ const html = computed(() =>
 </script>
 
 <template>
-  <div
-    v-bind="$attrs"
-    class="prose dark:prose-invert max-w-none [&>p]:mb-0 [&>p:last-child]:mb-0"
-    v-html="html"
-  />
+  <div v-bind="$attrs" class="prose dark:prose-invert max-w-none [&>p]:mb-0 [&>p:last-child]:mb-0" v-html="html" />
 </template>
