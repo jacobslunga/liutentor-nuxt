@@ -134,7 +134,7 @@ function passColor(rate: number) {
               <span class="text-muted-foreground/30">/</span>
               <span class="text-xs text-muted-foreground/60">Tentor</span>
             </div>
-            <h1 class="text-3xl sm:text-4xl font-medium text-foreground leading-tight w-full wrap-break-word mb-5">
+            <h1 class="text-3xl sm:text-4xl font-semibold text-foreground leading-tight w-full wrap-break-word mb-5">
               {{ courseData.courseName }}
             </h1>
 
@@ -145,7 +145,7 @@ function passColor(rate: number) {
                 <span class="text-xs text-muted-foreground">
                   <span class="font-medium text-foreground">{{
                     exams.length
-                    }}</span>
+                  }}</span>
                   tentor
                 </span>
               </div>
@@ -154,7 +154,7 @@ function passColor(rate: number) {
                 <span class="text-xs text-muted-foreground">
                   <span class="font-medium text-foreground">{{
                     examsWithSolutions
-                    }}</span>
+                  }}</span>
                   med facit
                 </span>
               </div>
@@ -173,8 +173,8 @@ function passColor(rate: number) {
           <div v-if="prefixes.length > 1" class="flex flex-wrap gap-2 w-full -mt-4">
             <button v-for="p in prefixes" :key="p"
               class="text-xs cursor-pointer font-mono px-3 py-1.5 rounded-md border transition-all" :class="activeFilters.has(p)
-                  ? 'bg-foreground text-background border-foreground shadow-sm'
-                  : 'border-border/50 text-muted-foreground hover:text-foreground hover:border-border'
+                ? 'bg-foreground text-background border-foreground shadow-sm'
+                : 'border-border/50 text-muted-foreground hover:text-foreground hover:border-border'
                 " @click="toggleFilter(p)">
               {{ p }}
             </button>

@@ -13,24 +13,8 @@
 
 @font-face {
   font-family: "LiU Tentor Sans";
-  src: url("/fonts/KarasumaGothic-Regular.otf") format("opentype");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "LiU Tentor Sans";
-  src: url("/fonts/KarasumaGothic-Medium.otf") format("opentype");
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "LiU Tentor Sans";
-  src: url("/fonts/KarasumaGothic-Bold.otf") format("opentype");
-  font-weight: 700;
+  src: url("/fonts/TentorSans.woff2") format("woff2");
+  font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }
