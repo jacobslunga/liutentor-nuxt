@@ -29,8 +29,7 @@ const sections: Section[] = [
     content:
       "Vi använder toppmoderna modeller från världsledande leverantörer för att säkerställa högsta möjliga kvalitet på svaren:",
     items: [
-      "OpenAI (GPT-4o) för generering av logiska quiz och analyser.",
-      "Google (Gemini 2.5 Pro/Flash) för bearbetning av stora tentamens-PDF:er.",
+      "Google (Gemini 3.1 Flash/Flash Lite) för bearbetning av stora tentamens-PDF:er.",
     ],
   },
   {

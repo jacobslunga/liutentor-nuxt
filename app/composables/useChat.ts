@@ -3,10 +3,9 @@ import { useChatStore } from "@/stores/chat";
 
 const CHAT_API_URL =
   "https://liutentor-hono-687405545415.europe-north2.run.app/api/v1/chat/completion";
-const DEFAULT_MODEL_ID = "gemini-3.1-flash-lite-preview";
 
 // USE FOR LOCAL DEVELOPMENT
-// const CHAT_API_URL_LOCAL = "http://localhost:3001/api/v1/chat/completion";
+const CHAT_API_URL_LOCAL = "http://localhost:8080/api/v1/chat/completion";
 
 function getAnonymousId(): string {
   if (typeof window === "undefined") return "unknown";
@@ -135,7 +134,7 @@ export function useChat(options: {
 
       const authHeaders = await getAuthHeaders();
 
-      const response = await fetch(`${CHAT_API_URL}/${options.examId}`, {
+      const response = await fetch(`${CHAT_API_URL_LOCAL}/${options.examId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -1,13 +1,14 @@
 export const CHAT_MODELS = [
-  { id: "gemini-3.5-flash", label: "Flash" },
-  { id: "gemini-3.1-flash-lite-preview", label: "Flash Lite" },
+  { id: "gemini-3-flash-preview", label: "Flash" },
+  { id: "gemini-3.1-flash-lite", label: "Flash Lite" },
 ] as const;
 
 const VALID_MODEL_IDS = CHAT_MODELS.map((m) => m.id);
-const DEFAULT_MODEL_ID = "gemini-3.1-flash-lite-preview";
+const DEFAULT_MODEL_ID = "gemini-3.1-flash-lite";
 const VALID_MODEL_ID_SET = new Set<string>(VALID_MODEL_IDS);
-const MODEL_COOKIE_KEY = "liutentor_selected_model_v5";
+const MODEL_COOKIE_KEY = "liutentor_selected_model_v6";
 const LEGACY_MODEL_COOKIE_KEYS = [
+  "liutentor_selected_model_v4",
   "liutentor_selected_model_v4",
   "liutentor_selected_model_v3",
   "liutentor_selected_model_v2",
