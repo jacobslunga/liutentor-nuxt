@@ -107,7 +107,7 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
         </Transition>
         <!-- Textarea -->
         <textarea ref="textareaRef" :value="modelValue" rows="1" placeholder="Fråga om tentan..."
-          class="w-full bg-transparent outline-none border-0 focus:ring-0 resize-none block pt-4 pb-2 px-5 text-[15px] leading-relaxed max-h-45"
+          class="w-full font-normal bg-transparent outline-none border-0 focus:ring-0 resize-none block pt-4 pb-2 px-5 text-[15px] leading-relaxed max-h-45"
           @input="handleInput" @keydown="handleKeyDown" />
 
         <!-- Bottom toolbar -->

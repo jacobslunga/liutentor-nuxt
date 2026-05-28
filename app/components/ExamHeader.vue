@@ -173,7 +173,7 @@ function confirmLockIn() {
       </Button>
 
       <div v-if="selectedExam" class="min-w-0 max-w-96 px-2 flex flex-row gap-2">
-        <p class="text-sm leading-none font-semibold">
+        <p class="text-sm leading-none font-medium">
           {{ selectedExam.exam_date }}
         </p>
         <p class="truncate text-muted-foreground text-sm font-normal leading-none">

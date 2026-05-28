@@ -393,7 +393,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
           @scroll="handleScroll" @mouseup="handleMessageMouseUp">
           <div v-if="messages.length === 0"
             class="h-full flex flex-col items-center justify-center px-4 text-center pb-24">
-            <h2 class="text-2xl font-medium mb-3 text-foreground">
+            <h2 class="text-2xl font-normal mb-3 text-foreground">
               Vad kan jag hjälpa till med?
             </h2>
             <p class="text-muted-foreground text-sm max-w-70 sm:max-w-md mb-8 leading-relaxed">

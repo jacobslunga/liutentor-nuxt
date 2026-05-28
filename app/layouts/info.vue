@@ -16,34 +16,19 @@ const mobileOpen = ref(false);
 
 <template>
   <div class="flex flex-col min-h-screen bg-background">
-    <header
-      class="sticky top-0 z-40 w-full bg-linear-to-b from-background to-transparent"
-    >
-      <div
-        class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between"
-      >
-        <NuxtLink
-          to="/"
-          class="flex items-center gap-2 hover:opacity-80 transition-opacity shrink-0"
-        >
+    <header class="sticky top-0 z-40 w-full bg-linear-to-b from-background to-transparent">
+      <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+        <NuxtLink to="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity shrink-0">
           <LogoIcon class="w-7 h-7" />
-          <span class="font-medium text-lg font-logo tracking-tighter"
-            >LiU Tentor</span
-          >
+          <span class="font-normal text-lg font-logo tracking-tighter">LiU Tentor</span>
         </NuxtLink>
 
         <nav class="hidden md:flex items-center gap-1">
-          <NuxtLink
-            v-for="link in navLinks"
-            :key="link.to"
-            :to="link.to"
-            class="px-3 py-1.5 font-medium text-sm rounded-md transition-colors"
-            :class="
-              isCurrentPath(link.to)
-                ? 'bg-secondary text-foreground'
-                : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
-            "
-          >
+          <NuxtLink v-for="link in navLinks" :key="link.to" :to="link.to"
+            class="px-3 py-1.5 font-normal text-sm rounded-md transition-colors" :class="isCurrentPath(link.to)
+              ? 'bg-secondary text-foreground'
+              : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
+              ">
             {{ link.label }}
           </NuxtLink>
         </nav>
@@ -58,24 +43,15 @@ const mobileOpen = ref(false);
             <SheetHeader>
               <SheetTitle class="flex items-center gap-2">
                 <LogoIcon class="w-7 h-7" />
-                <span class="font-medium text-lg font-logo tracking-tighter"
-                  >LiU Tentor</span
-                >
+                <span class="font-normal text-lg font-logo tracking-tighter">LiU Tentor</span>
               </SheetTitle>
             </SheetHeader>
             <div class="mt-6 space-y-1">
-              <NuxtLink
-                v-for="link in navLinks"
-                :key="link.to"
-                :to="link.to"
-                class="block px-3 py-2 text-sm rounded-md transition-colors"
-                :class="
-                  isCurrentPath(link.to)
-                    ? 'bg-secondary text-foreground'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
-                "
-                @click="mobileOpen = false"
-              >
+              <NuxtLink v-for="link in navLinks" :key="link.to" :to="link.to"
+                class="block px-3 py-2 text-sm rounded-md transition-colors" :class="isCurrentPath(link.to)
+                  ? 'bg-secondary text-foreground'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
+                  " @click="mobileOpen = false">
                 {{ link.label }}
               </NuxtLink>
             </div>

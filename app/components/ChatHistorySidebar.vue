@@ -405,7 +405,7 @@ onUnmounted(() => {
                 <div class="flex items-center gap-1">
                   <button class="min-w-0 flex-1 cursor-pointer text-left rounded-md px-1 py-1"
                     :disabled="isOpeningConversation || isDeletingConversation" @click="openConversation(item)">
-                    <p class="text-sm font-medium truncate">
+                    <p class="text-sm font-normal truncate">
                       {{ item.title || "Ny chatt" }}
                     </p>
                     <p class="text-xs text-muted-foreground mt-0.5">

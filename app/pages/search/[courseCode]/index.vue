@@ -134,7 +134,7 @@ function passColor(rate: number) {
               <span class="text-muted-foreground/30">/</span>
               <span class="text-xs text-muted-foreground/60">Tentor</span>
             </div>
-            <h1 class="text-3xl sm:text-4xl font-semibold text-foreground leading-tight w-full wrap-break-word mb-5">
+            <h1 class="text-3xl sm:text-4xl font-medium text-foreground leading-tight w-full wrap-break-word mb-5">
               {{ courseData.courseName }}
             </h1>
 
@@ -145,7 +145,7 @@ function passColor(rate: number) {
                 <span class="text-xs text-muted-foreground">
                   <span class="font-medium text-foreground">{{
                     exams.length
-                  }}</span>
+                    }}</span>
                   tentor
                 </span>
               </div>
@@ -154,7 +154,7 @@ function passColor(rate: number) {
                 <span class="text-xs text-muted-foreground">
                   <span class="font-medium text-foreground">{{
                     examsWithSolutions
-                  }}</span>
+                    }}</span>
                   med facit
                 </span>
               </div>
