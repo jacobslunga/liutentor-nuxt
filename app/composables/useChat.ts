@@ -78,6 +78,7 @@ export function useChat(options: {
     opts: {
       modelId?: string;
       context?: string;
+      selectionContext?: string;
     } = {},
   ) {
     if (!content.trim() || chatStore.isLoading) return;
@@ -109,13 +110,14 @@ export function useChat(options: {
       }
     }
 
-    const { modelId = DEFAULT_MODEL_ID, context } = opts;
+    const { modelId = DEFAULT_MODEL_ID, context, selectionContext } = opts;
     const resolvedModelId = modelId || DEFAULT_MODEL_ID;
 
     const userMessage = {
       role: "user" as const,
       content,
       ...(context ? { context } : {}),
+      ...(selectionContext ? { selectionContext } : {}),
     };
 
     chatStore.messages.push(userMessage);
@@ -150,6 +152,7 @@ export function useChat(options: {
           solutionUrl: options.solutionUrl || undefined,
           modelId: resolvedModelId,
           conversationId: chatStore.currentConversationId,
+          selectionContext: selectionContext || undefined,
         }),
         signal: abortController.value.signal,
       });

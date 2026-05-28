@@ -5,6 +5,7 @@ export interface Message {
   role: "user" | "assistant";
   content: string;
   context?: string;
+  selectionContext?: string;
 }
 
 export const useChatStore = defineStore("chat", () => {

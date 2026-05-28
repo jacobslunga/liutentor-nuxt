@@ -16,6 +16,7 @@ const props = defineProps<{
   showScrollButton: boolean;
   courseCode?: string;
   hasSolution?: boolean;
+  selectionContext?: string;
 }>();
 
 const emit = defineEmits<{
@@ -25,6 +26,7 @@ const emit = defineEmits<{
   scrollToBottom: [];
   "update:giveDirectAnswer": [value: boolean];
   "update:selectedModelId": [value: string];
+  clearSelectionContext: [];
 }>();
 
 const textareaRef = ref<HTMLTextAreaElement | null>(null);
@@ -91,6 +93,18 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
 
       <div
         class="bg-card/70 shadow-[0_8px_28px_color-mix(in_srgb,var(--foreground),transparent_94%)] dark:shadow-[0_8px_28px_color-mix(in_srgb,var(--background),transparent_94%)] ring-1 ring-border/50 backdrop-blur-sm transition-all duration-200 focus-within:ring-primary/50 rounded-3xl overflow-hidden">
+        <!-- Selection context chip -->
+        <Transition name="context-chip">
+          <div v-if="selectionContext"
+            class="flex items-center gap-2 w-full bg-secondary border-b border-border px-4 py-2.5">
+            <LucideCornerUpLeft class="w-3.5 h-3.5 shrink-0 text-muted-foreground" />
+            <span class="flex-1 min-w-0 text-sm italic text-muted-foreground truncate">"{{ selectionContext }}"</span>
+            <button class="shrink-0 cursor-pointer text-muted-foreground hover:opacity-60 transition-opacity"
+              @click.prevent="emit('clearSelectionContext')">
+              <LucideX class="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </Transition>
         <!-- Textarea -->
         <textarea ref="textareaRef" :value="modelValue" rows="1" placeholder="Fråga om tentan..."
           class="w-full bg-transparent outline-none border-0 focus:ring-0 resize-none block pt-4 pb-2 px-5 text-[15px] leading-relaxed max-h-45"
@@ -173,5 +187,25 @@ textarea {
 .scale-leave-to {
   opacity: 0;
   transform: scale(0.8);
+}
+
+.context-chip-enter-active,
+.context-chip-leave-active {
+  transition: all 0.15s ease;
+  overflow: hidden;
+}
+
+.context-chip-enter-from,
+.context-chip-leave-to {
+  opacity: 0;
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.context-chip-enter-to,
+.context-chip-leave-from {
+  opacity: 1;
+  max-height: 48px;
 }
 </style>
