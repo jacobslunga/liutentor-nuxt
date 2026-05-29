@@ -437,7 +437,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
                   <span class="shimmer-text text-sm">Tänker...</span>
                 </div>
                 <div
-                  class="prose dark:prose-invert prose-headings:font-medium prose-strong:font-medium prose-hr:border-foreground/10 prose-tr:border-foreground/10 prose-thead:border-foreground/10 marker:text-foreground marker:font-medium"
+                  class="prose font-normal dark:prose-invert prose-p:font-normal prose-headings:font-medium prose-strong:font-medium prose-hr:border-foreground/10 prose-tr:border-foreground/10 prose-thead:border-foreground/10 marker:text-foreground marker:font-medium"
                   v-html="renderedAssistantHtml[i]" />
               </div>
             </div>
