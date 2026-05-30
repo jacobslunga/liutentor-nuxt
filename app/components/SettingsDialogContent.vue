@@ -14,6 +14,8 @@ const themeOptions = [
   { id: "system", label: "System" },
 ];
 
+const { font } = useFontPreference();
+
 const shortcuts = [
   { action: "Visa/dölj facit", key: "E", category: "visibility" },
   { action: "Visa/dölj AI-chat", key: "C", category: "visibility" },
@@ -45,6 +47,34 @@ const categories = [
           <LucideSun v-if="opt.id === 'light'" class="w-4.5 h-4.5" />
           <LucideMoonStar v-else-if="opt.id === 'dark'" class="w-4.5 h-4.5" />
           <LucideMonitor v-else class="w-4.5 h-4.5" />
+          <span class="text-sm font-medium">{{ opt.label }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="space-y-3">
+      <h3 class="font-medium">Typsnitt</h3>
+      <div class="flex gap-2">
+        <div
+          v-for="opt in FONT_OPTIONS"
+          :key="opt.id"
+          class="flex-1 cursor-pointer rounded-xl border transition-all select-none flex flex-col items-center justify-center gap-2 py-4 hover:bg-primary/5 hover:border-primary"
+          :class="
+            font === opt.id
+              ? 'bg-primary/5 border-primary'
+              : 'bg-card border-border'
+          "
+          @click="font = opt.id"
+        >
+          <span
+            class="text-base"
+            :style="
+              opt.id === 'system'
+                ? { fontFamily: 'system-ui, sans-serif' }
+                : { fontFamily: '\'Yet Grotesk\', sans-serif' }
+            "
+            >Ag</span
+          >
           <span class="text-sm font-medium">{{ opt.label }}</span>
         </div>
       </div>
