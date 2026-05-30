@@ -217,7 +217,7 @@ const donutOptions = computed(() => ({
             <div class="flex items-center gap-2 text-sm text-muted-foreground/70">
               <span class="font-medium text-foreground/80">{{
                 courseCode
-                }}</span>
+              }}</span>
               <span>/</span>
               <span>Statistik</span>
             </div>
