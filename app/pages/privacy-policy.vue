@@ -52,7 +52,7 @@ const sections: Section[] = [
       "Vi använder moderna molntjänster för att driva tjänsten och möjliggöra AI-funktionalitet:",
     items: [
       "Supabase: Vår databas och autentiseringstjänst. Din data lagras på servrar i Frankfurt, Tyskland (EU).",
-      "AI-leverantörer (Google, OpenAI): Vid användning av chatten skickas meddelanden och relevant tentainnehåll till dessa för att generera svar. Ingen personlig profilinformation (som din e-post) delas med dessa leverantörer.",
+      "AI-leverantörer (Google): Vid användning av chatten skickas meddelanden och relevant tentainnehåll till dessa för att generera svar. Ingen personlig profilinformation (som din e-post) delas med dessa leverantörer.",
       "Infrastruktur: Vi säljer aldrig dina personuppgifter till tredje part.",
     ],
   },
