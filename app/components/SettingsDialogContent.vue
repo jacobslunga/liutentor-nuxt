@@ -37,9 +37,9 @@ const categories = [
             ? 'bg-primary/5 border-primary'
             : 'bg-card border-border'
             " @click="theme = opt.id">
-          <LucideSun v-if="opt.id === 'light'" class="w-4.5 h-4.5" />
-          <LucideMoonStar v-else-if="opt.id === 'dark'" class="w-4.5 h-4.5" />
-          <LucideMonitor v-else class="w-4.5 h-4.5" />
+          <LucideSun v-if="opt.id === 'light'" class="w-4.5 h-4.5"  />
+          <LucideMoonStar v-else-if="opt.id === 'dark'" class="w-4.5 h-4.5"  />
+          <LucideMonitor v-else class="w-4.5 h-4.5"  />
           <span class="text-sm font-medium">{{ opt.label }}</span>
         </div>
       </div>

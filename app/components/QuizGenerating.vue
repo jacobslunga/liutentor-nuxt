@@ -60,7 +60,7 @@ const t = {
             class="mt-3 gap-1.5"
             @click="emit('retry')"
           >
-            <LucideRefreshCw class="h-3.5 w-3.5" />
+            <LucideRefreshCw class="h-3.5 w-3.5"  />
             {{ t.retry }}
           </Button>
         </div>

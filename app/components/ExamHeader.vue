@@ -164,12 +164,12 @@ function confirmLockIn() {
   <div class="hidden lg:flex h-12 shrink-0 items-center justify-between border-b border-border bg-background px-4">
     <div class="flex items-center gap-1">
       <Button size="icon-sm" variant="ghost" @click="router.push(`/search/${courseCode}`)">
-        <LucideArrowLeft />
+        <LucideArrowLeft  />
       </Button>
 
       <Button variant="ghost" size="icon" class="focus-visible:border-transparent focus-visible:ring-0"
         aria-label="Visa tentor" @click="isExamSidebarOpen = !isExamSidebarOpen">
-        <LucidePanelLeft />
+        <LucidePanelRight  />
       </Button>
 
       <div v-if="selectedExam" class="min-w-0 max-w-96 px-2 flex flex-row gap-2">
@@ -188,7 +188,7 @@ function confirmLockIn() {
       <DropdownMenu v-model:open="isLockInOpen">
         <DropdownMenuTrigger as-child>
           <Button variant="ghost" size="sm" :disabled="!selectedExam">
-            <LucideLock class="w-3.5 h-3.5" />
+            <LucideLock class="w-3.5 h-3.5"  />
             <span class="text-xs">Lock in</span>
           </Button>
         </DropdownMenuTrigger>
@@ -198,7 +198,7 @@ function confirmLockIn() {
           </div>
           <DropdownMenuItem v-for="opt in TIME_OPTIONS" :key="opt.value" class="gap-2 text-sm cursor-pointer"
             @click="selectLockInDuration(opt.value)">
-            <LucideTimer class="w-3.5 h-3.5 opacity-70" />
+            <LucideTimer class="w-3.5 h-3.5 opacity-70"  />
             {{ opt.label }}
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -208,7 +208,7 @@ function confirmLockIn() {
         <DropdownMenuTrigger as-child>
           <Button variant="ghost" size="sm" :disabled="!hasDownload">
             <span class="text-xs">Ladda ned</span>
-            <LucideChevronDown class="w-4 h-4 text-muted-foreground" />
+            <LucideChevronDown class="w-4 h-4 text-muted-foreground"  />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" :side-offset="8">
@@ -218,7 +218,7 @@ function confirmLockIn() {
               `${selectedExam!.course_code}_${selectedExam!.exam_date}_EXAM.pdf`,
             )
             ">
-            <LucideDownload class="w-4 h-4" /> Ladda ned tenta
+            <LucideDownload class="w-4 h-4"  /> Ladda ned tenta
           </DropdownMenuItem>
           <DropdownMenuItem class="gap-2 text-sm cursor-pointer" :disabled="!solutionPdfUrl" @click="
             downloadFile(
@@ -226,21 +226,21 @@ function confirmLockIn() {
               `${selectedExam?.course_code}_${selectedExam?.exam_date}_SOLUTION.pdf`,
             )
             ">
-            <LucideDownload class="w-4 h-4" /> Ladda ned facit
+            <LucideDownload class="w-4 h-4"  /> Ladda ned facit
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
       <Button variant="ghost" size="sm" @click="chatStore.toggle()">
-        <LucideLoader2 v-if="chatStore.isLoading" class="size-3.5 animate-spin" />
-        <LucideMessageSquare v-else class="w-4 h-4" />
+        <LucideLoader2 v-if="chatStore.isLoading" class="size-3.5 animate-spin"  />
+        <LucideMessageSquare v-else class="w-4 h-4"  />
         <span class="text-xs">{{ chatStore.isOpen ? "Stäng" : "Chatt" }}</span>
       </Button>
 
       <Dialog v-model:open="isSettingsOpen">
         <DialogTrigger as-child>
           <Button variant="ghost" size="icon-sm">
-            <LucideSettings class="w-4.5 h-4.5" />
+            <LucideSettings class="w-4.5 h-4.5"  />
           </Button>
         </DialogTrigger>
         <DialogContent class="max-w-md">
@@ -272,7 +272,7 @@ function confirmLockIn() {
             </p>
           </div>
           <Button variant="ghost" size="icon" class="size-7 shrink-0" @click="isExamSidebarOpen = false">
-            <LucideX class="w-4 h-4" />
+            <LucideX class="w-4 h-4"  />
           </Button>
         </div>
 
@@ -312,7 +312,7 @@ function confirmLockIn() {
                   </p>
                 </div>
                 <LucideChevronRight v-if="e.id.toString() !== examId"
-                  class="mt-1 h-4 w-4 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+                  class="mt-1 h-4 w-4 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100"  />
               </div>
             </button>
           </div>

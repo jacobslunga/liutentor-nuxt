@@ -208,7 +208,7 @@ const donutOptions = computed(() => ({
   <div class="bg-background min-h-screen w-full">
     <div class="container mx-auto px-4 md:px-8 py-8 max-w-5xl">
       <div v-if="status === 'pending'" class="flex items-center justify-center min-h-[60vh]">
-        <LucideLoader2 class="h-8 w-8 animate-spin text-muted-foreground" />
+        <LucideLoader2 class="h-8 w-8 animate-spin text-muted-foreground"  />
       </div>
 
       <template v-else-if="courseData">
@@ -229,7 +229,7 @@ const donutOptions = computed(() => ({
           <div class="rounded-md border border-border bg-card overflow-hidden shadow-sm">
             <div class="p-5 border-b border-border/60 bg-muted/20">
               <div class="flex items-center gap-2 mb-1">
-                <LucideTrendingUp class="w-4 h-4 text-primary" />
+                <LucideTrendingUp class="w-4 h-4 text-primary"  />
                 <h2 class="text-sm font-medium">Godkända över tid</h2>
               </div>
               <p class="text-xs text-muted-foreground">
@@ -248,7 +248,7 @@ const donutOptions = computed(() => ({
           <div class="rounded-md border border-border bg-card overflow-hidden shadow-sm">
             <div class="p-5 border-b border-border/60 bg-muted/20">
               <div class="flex items-center gap-2 mb-1">
-                <LucidePieChart class="w-4 h-4 text-primary" />
+                <LucideChartPie class="w-4 h-4 text-primary"  />
                 <h2 class="text-sm font-medium">Betygsfördelning</h2>
               </div>
               <p class="text-xs text-muted-foreground">
@@ -287,19 +287,19 @@ const donutOptions = computed(() => ({
                 <ButtonGroup class="pointer-events-auto">
                   <Button variant="default" size="sm" as-child>
                     <NuxtLink to="/upload-exams">
-                      <LucideUpload class="w-4.5 h-4.5" />
+                      <LucideUpload class="w-4.5 h-4.5"  />
                       Ladda upp
                     </NuxtLink>
                   </Button>
                   <Button variant="outline" size="sm" as-child>
                     <NuxtLink :to="`/search/${courseCode}`">
-                      <LucideBookA class="w-4.5 h-4.5" />
+                      <LucideBookA class="w-4.5 h-4.5"  />
                       Visa tentor
                     </NuxtLink>
                   </Button>
                   <Button variant="outline" size="sm" as-child>
                     <NuxtLink :to="`/quiz/${courseCode}`">
-                      <LucideLayers class="w-4.5 h-4.5" />
+                      <LucideLayers class="w-4.5 h-4.5"  />
                       Quiz
                     </NuxtLink>
                   </Button>

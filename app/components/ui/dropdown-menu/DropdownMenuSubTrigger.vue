@@ -17,18 +17,13 @@ const forwardedProps = useForwardProps(delegatedProps);
 </script>
 
 <template>
-  <DropdownMenuSubTrigger
-    data-slot="dropdown-menu-sub-trigger"
-    v-bind="forwardedProps"
-    :data-inset="inset ? '' : undefined"
-    :class="
-      cn(
-        'focus:bg-accent focus:text-accent-foreground data-[state=open]:bg-accent data-[state=open]:text-accent-foreground relative flex cursor-default items-center gap-2 rounded-md px-2 py-1.5 text-sm outline-hidden select-none data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*=\'size-\'])]:size-4 data-[variant=destructive]:*:[svg]:!text-destructive [&_svg:not([class*=\'text-\'])]:text-muted-foreground',
-        props.class,
-      )
-    "
-  >
+  <DropdownMenuSubTrigger data-slot="dropdown-menu-sub-trigger" v-bind="forwardedProps"
+    :data-inset="inset ? '' : undefined" :class="cn(
+      'focus:bg-secondary focus:text-accent-foreground data-[state=open]:bg-secondary data-[state=open]:text-accent-foreground relative flex cursor-default items-center gap-2 rounded-md px-2 py-1.5 text-sm outline-hidden select-none data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*=\'size-\'])]:size-4 data-[variant=destructive]:*:[svg]:!text-destructive [&_svg:not([class*=\'text-\'])]:text-muted-foreground',
+      props.class,
+    )
+      ">
     <slot />
-    <LucideChevronRight class="ml-auto size-4" />
+    <LucideChevronRight class="ml-auto size-4"  />
   </DropdownMenuSubTrigger>
 </template>

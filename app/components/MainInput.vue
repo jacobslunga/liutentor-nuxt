@@ -200,7 +200,7 @@ function handleClickOutside(event: MouseEvent) {
 <template>
   <div class="relative w-full">
     <div class="w-full relative flex flex-row items-center justify-center px-4">
-      <LucideSearch class="text-gray-500" />
+      <LucideSearch class="text-gray-500"  />
 
       <input
         ref="inputRef"
@@ -221,7 +221,7 @@ function handleClickOutside(event: MouseEvent) {
             class="shrink-0 gap-1.5 px-2 text-foreground/60 hover:text-foreground"
           >
             {{ searchMethodLabel }}
-            <LucideChevronDown class="h-3.5 w-3.5" />
+            <LucideChevronDown class="h-3.5 w-3.5"  />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" :side-offset="8" class="w-36">
@@ -232,7 +232,7 @@ function handleClickOutside(event: MouseEvent) {
             <LucideCheck
               class="h-4 w-4"
               :class="searchMethod === 'tentor' ? 'opacity-100' : 'opacity-0'"
-            />
+             />
             Tentor
           </DropdownMenuItem>
           <DropdownMenuItem
@@ -242,7 +242,7 @@ function handleClickOutside(event: MouseEvent) {
             <LucideCheck
               class="h-4 w-4"
               :class="searchMethod === 'stats' ? 'opacity-100' : 'opacity-0'"
-            />
+             />
             Statistik
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -256,7 +256,7 @@ function handleClickOutside(event: MouseEvent) {
         aria-label="Search"
         @click="handleSelectCourse(courseCode)"
       >
-        <LucideArrowUp class="w-5 h-5" />
+        <LucideArrowUp class="w-5 h-5"  />
       </Button>
     </div>
 

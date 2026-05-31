@@ -131,7 +131,7 @@ function handleKeyUp(e: KeyboardEvent) {
         v-if="isLoading"
         class="flex flex-1 items-center justify-center flex-col gap-2"
       >
-        <LucideLoader2 class="w-8 h-8 animate-spin text-muted-foreground" />
+        <LucideLoader2 class="w-8 h-8 animate-spin text-muted-foreground"  />
         <p class="text-sm text-muted-foreground">Laddar tenta...</p>
       </div>
 
@@ -215,7 +215,7 @@ function handleKeyUp(e: KeyboardEvent) {
                         </p>
                         <MousePointerClick
                           class="text-muted-foreground animate-in"
-                        />
+                         />
                       </div>
                     </Transition>
                   </div>
@@ -232,7 +232,7 @@ function handleKeyUp(e: KeyboardEvent) {
                         >
                           <LucideUpload
                             class="size-6 text-muted-foreground group-hover:text-primary transition-colors"
-                          />
+                           />
                         </div>
                         <div>
                           <p class="font-medium text-foreground/80">
@@ -247,7 +247,7 @@ function handleKeyUp(e: KeyboardEvent) {
                         </div>
                         <NuxtLink to="/upload-exams">
                           <Button size="sm" variant="outline">
-                            <LucideUpload class="size-3.5" />
+                            <LucideUpload class="size-3.5"  />
                             Ladda upp
                           </Button>
                         </NuxtLink>

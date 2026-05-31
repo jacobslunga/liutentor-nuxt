@@ -24,7 +24,7 @@ watch(
       <NuxtLink :to="`/search/${courseCode}`"
         class="shrink-0 inline-flex items-center justify-center h-8 w-8 rounded-md border border-border bg-background text-foreground active:scale-95 transition-transform"
         aria-label="Gå tillbaka">
-        <LucideArrowLeft class="w-4 h-4" />
+        <LucideArrowLeft class="w-4 h-4"  />
       </NuxtLink>
       <div class="min-w-0 flex-1">
         <p class="text-sm font-bold text-foreground truncate leading-tight">
@@ -37,7 +37,7 @@ watch(
       <button v-if="hasSolution"
         class="shrink-0 cursor-pointer inline-flex items-center gap-1.5 h-8 px-3 rounded-md border border-border bg-background text-foreground text-xs active:scale-95 transition-transform"
         @click="showSolution = true">
-        <LucideBookOpen class="w-3.5 h-3.5 text-primary" />
+        <LucideBookOpen class="w-3.5 h-3.5 text-primary"  />
         Facit
       </button>
     </div>
@@ -68,7 +68,7 @@ watch(
           <button
             class="shrink-0 cursor-pointer inline-flex items-center justify-center h-8 w-8 rounded-md border border-border bg-background text-foreground active:scale-95 transition-transform"
             aria-label="Stäng" @click="showSolution = false">
-            <LucideX class="w-4 h-4" />
+            <LucideX class="w-4 h-4"  />
           </button>
         </div>
         <div class="h-full w-full overflow-hidden pt-12">

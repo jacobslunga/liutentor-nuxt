@@ -36,7 +36,7 @@ const mobileOpen = ref(false);
         <Sheet v-model:open="mobileOpen">
           <SheetTrigger as-child>
             <Button variant="ghost" size="icon" class="md:hidden">
-              <LucideMenu class="h-5 w-5" />
+              <LucideMenu class="h-5 w-5"  />
             </Button>
           </SheetTrigger>
           <SheetContent side="right" class="w-70">

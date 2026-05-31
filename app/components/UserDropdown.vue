@@ -88,7 +88,7 @@ const gotoProfile = () => {
         <LucideLoader2
           v-if="isPending || (avatarUrl && isImageLoading)"
           class="w-4 h-4 animate-spin absolute z-10"
-        />
+         />
 
         <img
           v-if="avatarUrl"
@@ -119,7 +119,7 @@ const gotoProfile = () => {
       </div>
       <DropdownMenuSeparator />
       <DropdownMenuItem class="cursor-pointer" @click="gotoProfile">
-        <LucideUser class="w-4 h-4" />
+        <LucideUser class="w-4 h-4"  />
         Profil
       </DropdownMenuItem>
       <DropdownMenuSeparator />
@@ -128,7 +128,7 @@ const gotoProfile = () => {
         @click="signOut"
         variant="destructive"
       >
-        <LucideLogOut class="w-4 h-4" />
+        <LucideLogOut class="w-4 h-4"  />
         Logga ut
       </DropdownMenuItem>
     </DropdownMenuContent>

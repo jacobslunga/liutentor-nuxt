@@ -317,6 +317,33 @@ async function confirmDeleteAllConversations() {
   }
 }
 
+const sidebarWidth = ref(320);
+const isResizing = ref(false);
+
+function startResizing(e: MouseEvent) {
+  isResizing.value = true;
+  document.addEventListener("mousemove", handleMouseMove);
+  document.addEventListener("mouseup", stopResizing);
+  document.body.style.cursor = "col-resize";
+  document.body.style.userSelect = "none";
+}
+
+function handleMouseMove(e: MouseEvent) {
+  if (!isResizing.value) return;
+  const newWidth = window.innerWidth - e.clientX;
+  if (newWidth > 240 && newWidth < 600) {
+    sidebarWidth.value = newWidth;
+  }
+}
+
+function stopResizing() {
+  isResizing.value = false;
+  document.removeEventListener("mousemove", handleMouseMove);
+  document.removeEventListener("mouseup", stopResizing);
+  document.body.style.cursor = "";
+  document.body.style.userSelect = "";
+}
+
 watch(
   [() => props.open, userId],
   ([open]) => {
@@ -352,8 +379,21 @@ onUnmounted(() => {
     " aria-hidden="true" @click="emit('update:open', false)" />
 
   <aside
-    class="absolute inset-y-0 right-0 z-100 h-full w-80 border-l border-border bg-background transition-transform duration-250 ease-[cubic-bezier(0.32,0.72,0,1)]"
-    :class="open ? 'translate-x-0' : 'translate-x-full'" aria-label="Konversationshistorik">
+    class="absolute inset-y-0 right-0 z-100 h-full border-l border-border bg-background"
+    :class="[
+      open ? 'translate-x-0' : 'translate-x-full',
+      !isResizing ? 'transition-transform duration-250 ease-[cubic-bezier(0.32,0.72,0,1)]' : ''
+    ]"
+    :style="{ width: `${sidebarWidth}px` }"
+    aria-label="Konversationshistorik">
+    <!-- Resize Handler -->
+    <div
+      class="absolute left-0 top-0 bottom-0 w-4 cursor-col-resize z-[60] group/resizer -translate-x-1/2 flex items-center justify-center"
+      @mousedown="startResizing"
+    >
+      <div class="absolute inset-y-0 left-1/2 w-[1px] opacity-0 group-hover/resizer:opacity-100 bg-primary/30 transition-opacity" />
+      <div class="w-1 h-8 rounded-full bg-primary/40 group-hover/resizer:bg-primary transition-colors" />
+    </div>
     <div class="flex h-full min-h-0 flex-col">
       <div class="border-b px-4 py-3 flex items-center justify-between gap-2">
         <h2 class="text-sm font-medium">Chatthistorik</h2>
@@ -361,10 +401,10 @@ onUnmounted(() => {
           <Button v-if="conversations.length > 0" variant="ghost" size="icon"
             class="size-7 shrink-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
             :disabled="isDeletingAll || isDeletingConversation" @click="showDeleteAllConfirm = true">
-            <LucideTrash2 class="w-3.5 h-3.5" />
+            <LucideTrash2 class="w-3.5 h-3.5"  />
           </Button>
           <Button variant="ghost" size="icon" class="size-7 shrink-0" @click="emit('update:open', false)">
-            <LucideX class="w-4 h-4" />
+            <LucideX class="w-4 h-4"  />
           </Button>
         </div>
       </div>
@@ -389,34 +429,32 @@ onUnmounted(() => {
 
         <div v-else class="space-y-6">
           <section v-for="group in groupedConversations" :key="group.label">
-            <h3 class="px-2 pb-2 text-[11px] font-medium uppercase tracking-wide text-muted-foreground/80">
+            <h3 class="px-4 pb-2 text-[13px] font-normal text-muted-foreground/60">
               {{ group.label }}
             </h3>
 
-            <div class="space-y-1">
+            <div class="space-y-0.5 px-2">
               <div v-for="item in group.items" :key="item.id"
-                class="group rounded-md border px-1 py-1 transition-[opacity,background-color,border-color] ease-out"
+                class="group rounded-full transition-[opacity,background-color] ease-out"
                 :class="[
                   item.id === chatStore.currentConversationId
-                    ? 'border-border bg-secondary'
-                    : 'bg-transparent border-transparent hover:bg-muted/40',
+                    ? 'bg-secondary'
+                    : 'bg-transparent hover:bg-secondary/40',
                   open && contentReady ? 'opacity-100' : 'opacity-0',
                 ]" :style="itemMotionStyle(item.id)">
-                <div class="flex items-center gap-1">
-                  <button class="min-w-0 flex-1 cursor-pointer text-left rounded-md px-1 py-1"
+                <div class="flex items-center gap-1 px-2">
+                  <button class="min-w-0 flex-1 cursor-pointer text-left rounded-full py-1.5 px-2"
                     :disabled="isOpeningConversation || isDeletingConversation" @click="openConversation(item)">
-                    <p class="text-sm font-normal truncate">
+                    <p class="text-[13px] truncate text-foreground/90"
+                      :class="item.id === chatStore.currentConversationId ? 'font-semibold' : 'font-normal'">
                       {{ item.title || "Ny chatt" }}
-                    </p>
-                    <p class="text-xs text-muted-foreground mt-0.5">
-                      {{ formatCreatedAt(item.createdAt) }}
                     </p>
                   </button>
 
                   <Button variant="ghost" size="icon"
-                    class="size-7 shrink-0 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity"
+                    class="size-7 shrink-0 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity hover:bg-transparent"
                     :disabled="isDeletingConversation" @click="askDeleteConversation(item)">
-                    <LucideTrash2 class="w-3.5 h-3.5 text-muted-foreground" />
+                    <LucideTrash2 class="w-3.5 h-3.5 text-muted-foreground/60 hover:text-destructive"  />
                   </Button>
                 </div>
               </div>

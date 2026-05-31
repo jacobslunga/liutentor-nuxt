@@ -91,7 +91,7 @@ const sections: Section[] = [
 
     <div class="mt-8 pt-6 border-t bg-primary/5 rounded-md p-6 border border-primary/10">
       <div class="flex items-center gap-2 mb-2">
-        <LucideShieldCheck class="h-5 w-5 text-primary" />
+        <LucideShieldCheck class="h-5 w-5 text-primary"  />
         <h3 class="text-sm font-medium">Använd AI med omdöme</h3>
       </div>
       <p class="text-sm text-muted-foreground leading-relaxed">

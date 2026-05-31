@@ -149,7 +149,7 @@ const iconSize = computed(
             <LucideSearch
                 class="absolute left-3 pointer-events-none text-muted-foreground z-10"
                 :class="iconSize"
-            />
+             />
             <input
                 ref="inputRef"
                 :value="courseCode.toUpperCase()"
@@ -180,7 +180,7 @@ const iconSize = computed(
                 <LucideX
                     class="text-muted-foreground hover:text-foreground transition-colors"
                     :class="iconSize"
-                />
+                 />
             </button>
         </div>
 
@@ -204,7 +204,7 @@ const iconSize = computed(
                 @mousedown="handleSelectCourse(suggestion)"
             >
                 <span class="flex-1 font-normal">{{ suggestion }}</span>
-                <LucideCornerDownLeft class="w-3.5 h-3.5 opacity-40" />
+                <LucideCornerDownLeft class="w-3.5 h-3.5 opacity-40"  />
             </div>
         </div>
     </div>

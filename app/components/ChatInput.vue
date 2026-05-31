@@ -86,7 +86,7 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
       <Transition name="fade-up">
         <div v-if="showScrollButton" class="absolute -top-12 left-1/2 -translate-x-1/2 z-20">
           <Button variant="outline" size="icon" @click="emit('scrollToBottom')">
-            <LucideArrowDown class="w-4 h-4" />
+            <LucideArrowDown class="w-4 h-4"  />
           </Button>
         </div>
       </Transition>
@@ -97,11 +97,11 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
         <Transition name="context-chip">
           <div v-if="selectionContext"
             class="flex items-center gap-2 w-full bg-secondary border-b border-border px-4 py-2.5">
-            <LucideCornerUpLeft class="w-3.5 h-3.5 shrink-0 text-muted-foreground" />
+            <LucideCornerUpLeft class="w-3.5 h-3.5 shrink-0 text-muted-foreground"  />
             <span class="flex-1 min-w-0 text-sm italic text-muted-foreground truncate">"{{ selectionContext }}"</span>
             <button class="shrink-0 cursor-pointer text-muted-foreground hover:opacity-60 transition-opacity"
               @click.prevent="emit('clearSelectionContext')">
-              <LucideX class="w-3.5 h-3.5" />
+              <LucideX class="w-3.5 h-3.5"  />
             </button>
           </div>
         </Transition>
@@ -131,7 +131,7 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
                 <Button variant="ghost" size="sm"
                   class="h-8 gap-1.5 text-xs text-muted-foreground hover:text-foreground px-2.5">
                   {{ currentModelLabel }}
-                  <LucideChevronDown class="size-3.5" />
+                  <LucideChevronDown class="size-3.5"  />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" class="min-w-40">
@@ -148,11 +148,11 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
             <Transition name="scale" mode="out-in">
               <Button v-if="isLoading" key="stop" size="icon" variant="secondary" class="size-8 rounded-full"
                 @click="emit('cancel')">
-                <LucideSquare class="size-3.5 fill-current" />
+                <LucideSquare class="size-3.5 fill-current"  />
               </Button>
               <Button v-else key="send" size="icon" class="size-8 rounded-full"
                 :disabled="!modelValue.trim() || modelValue.length > MAX_LENGTH" @click="emit('send')">
-                <LucideArrowUp class="size-4" />
+                <LucideArrowUp class="size-4"  />
               </Button>
             </Transition>
           </div>

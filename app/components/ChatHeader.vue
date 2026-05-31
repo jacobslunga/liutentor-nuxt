@@ -9,7 +9,7 @@
                 class="size-8"
                 @click="emit('close')"
             >
-                <LucideChevronRight />
+                <LucideChevronRight  />
             </Button>
         </div>
         <div class="flex items-center gap-1">
@@ -19,7 +19,7 @@
                 class="size-8"
                 @click="emit('newChat')"
             >
-                <LucidePlus class="w-4 h-4" />
+                <LucidePlus class="w-4 h-4"  />
             </Button>
             <Button
                 variant="ghost"
@@ -27,8 +27,8 @@
                 class="size-8"
                 @click="emit('openHistory')"
             >
-                <LucidePanelRightDashed v-if="historyOpen" class="w-4 h-4" />
-                <LucidePanelRight v-else class="w-4 h-4" />
+                <LucidePanelRight v-if="historyOpen" class="w-4 h-4"  />
+                <LucidePanelRight v-else class="w-4 h-4"  />
             </Button>
         </div>
     </div>

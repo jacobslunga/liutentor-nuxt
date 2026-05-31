@@ -202,7 +202,7 @@ async function handleSignup() {
           <div
             class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center"
           >
-            <LucideCheck class="w-6 h-6 text-primary" />
+            <LucideCheck class="w-6 h-6 text-primary"  />
           </div>
           <p class="font-medium">Inloggad!</p>
           <p class="text-sm text-muted-foreground">
@@ -210,7 +210,7 @@ async function handleSignup() {
           </p>
           <LucideLoader2
             class="w-4 h-4 animate-spin text-muted-foreground mt-1"
-          />
+           />
         </div>
 
         <form
@@ -252,8 +252,8 @@ async function handleSignup() {
                 class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 @click="showLoginPassword = !showLoginPassword"
               >
-                <LucideEye v-if="!showLoginPassword" class="w-4 h-4" />
-                <LucideEyeOff v-else class="w-4 h-4" />
+                <LucideEye v-if="!showLoginPassword" class="w-4 h-4"  />
+                <LucideEyeOff v-else class="w-4 h-4"  />
               </button>
             </div>
             <p v-if="loginErrors.password" class="text-xs text-destructive">
@@ -269,7 +269,7 @@ async function handleSignup() {
           </p>
 
           <Button type="submit" class="w-full" :disabled="loginLoading">
-            <LucideLoader2 v-if="loginLoading" class="w-4 h-4 animate-spin" />
+            <LucideLoader2 v-if="loginLoading" class="w-4 h-4 animate-spin"  />
             <span v-else>Logga in</span>
           </Button>
 
@@ -295,7 +295,7 @@ async function handleSignup() {
           <div
             class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center"
           >
-            <LucideMailCheck class="w-6 h-6 text-primary" />
+            <LucideMailCheck class="w-6 h-6 text-primary"  />
           </div>
           <p class="font-medium">Konto skapat!</p>
           <p class="text-sm text-muted-foreground">
@@ -394,8 +394,8 @@ async function handleSignup() {
                 class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 @click="showSignupPassword = !showSignupPassword"
               >
-                <LucideEye v-if="!showSignupPassword" class="w-4 h-4" />
-                <LucideEyeOff v-else class="w-4 h-4" />
+                <LucideEye v-if="!showSignupPassword" class="w-4 h-4"  />
+                <LucideEyeOff v-else class="w-4 h-4"  />
               </button>
             </div>
             <p v-if="signupErrors.password" class="text-xs text-destructive">
@@ -425,8 +425,8 @@ async function handleSignup() {
                 class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 @click="showSignupConfirm = !showSignupConfirm"
               >
-                <LucideEye v-if="!showSignupConfirm" class="w-4 h-4" />
-                <LucideEyeOff v-else class="w-4 h-4" />
+                <LucideEye v-if="!showSignupConfirm" class="w-4 h-4"  />
+                <LucideEyeOff v-else class="w-4 h-4"  />
               </button>
             </div>
             <p
@@ -445,7 +445,7 @@ async function handleSignup() {
           </p>
 
           <Button type="submit" class="w-full" :disabled="signupLoading">
-            <LucideLoader2 v-if="signupLoading" class="w-4 h-4 animate-spin" />
+            <LucideLoader2 v-if="signupLoading" class="w-4 h-4 animate-spin"  />
             <span v-else>Skapa konto</span>
           </Button>
 

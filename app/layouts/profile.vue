@@ -26,7 +26,7 @@ watch(
           size="sm"
           class="text-muted-foreground"
         >
-          <LucideArrowLeft class="w-4 h-4" />
+          <LucideArrowLeft class="w-4 h-4"  />
           Tillbaka
         </Button>
         <NuxtLink

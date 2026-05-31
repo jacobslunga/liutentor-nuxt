@@ -75,7 +75,7 @@ async function handleSubmit() {
 
     <div v-if="isSuccess === true" class="flex flex-col items-center gap-4 text-center py-8">
       <div class="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-        <LucideCheck class="h-6 w-6 text-green-600 dark:text-green-400" />
+        <LucideCheck class="h-6 w-6 text-green-600 dark:text-green-400"  />
       </div>
       <div>
         <h2 class="text-xl font-medium mb-1">Tack!</h2>
@@ -88,7 +88,7 @@ async function handleSubmit() {
 
     <div v-else-if="isSuccess === false" class="flex flex-col items-center gap-4 text-center py-8">
       <div class="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-        <LucideAlertCircle class="h-6 w-6 text-red-600 dark:text-red-400" />
+        <LucideAlertCircle class="h-6 w-6 text-red-600 dark:text-red-400"  />
       </div>
       <div>
         <h2 class="text-xl font-medium mb-1">Något gick fel</h2>
@@ -153,7 +153,7 @@ async function handleSubmit() {
           <span class="text-destructive">*</span> Obligatoriskt fält
         </p>
         <Button type="submit" size="sm" :disabled="isSubmitting">
-          <LucideLoader2 v-if="isSubmitting" class="w-3.5 h-3.5 animate-spin" />
+          <LucideLoader2 v-if="isSubmitting" class="w-3.5 h-3.5 animate-spin"  />
           Skicka
         </Button>
       </div>

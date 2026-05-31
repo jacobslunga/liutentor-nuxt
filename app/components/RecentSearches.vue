@@ -13,7 +13,7 @@ const { latest } = useRecentSearches();
     >
       <NuxtLink :to="`/search/${s.courseCode}`">
         {{ s.courseCode }}
-        <LucideArrowUpRight class="w-3 h-3" />
+        <LucideArrowUpRight class="w-3 h-3"  />
       </NuxtLink>
     </Button>
   </div>

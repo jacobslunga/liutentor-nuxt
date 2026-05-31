@@ -38,10 +38,10 @@ function switchLayout(val: "exam-with-facit" | "exam-only") {
                   : 'rounded-r-xl',
                 layoutMode === mode.value
                   ? 'bg-primary text-primary-foreground border-transparent'
-                  : 'bg-background/80 text-muted-foreground border-border hover:bg-accent hover:text-foreground',
+                  : 'bg-background/80 text-muted-foreground border-border hover:bg-secondary hover:text-foreground',
               ]" @click="switchLayout(mode.value)">
-              <LucideColumns2 v-if="mode.icon === 'split'" class="w-5 h-5" />
-              <LucidePanelRight v-else class="w-5 h-5" />
+              <LucideColumns2 v-if="mode.icon === 'split'" class="w-5 h-5"  />
+              <LucidePanelRight v-else class="w-5 h-5"  />
             </button>
           </TooltipTrigger>
           <TooltipContent>

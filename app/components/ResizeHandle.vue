@@ -28,7 +28,7 @@ const emit = defineEmits<{
       <LucideGripVertical
         class="h-4 w-4 transition-colors"
         :class="isResizing ? 'text-primary' : 'text-muted-foreground'"
-      />
+       />
     </div>
   </div>
 </template>

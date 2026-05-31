@@ -483,7 +483,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
                   isLoading &&
                   i === messages.length - 1
                 " class="flex items-center gap-2 h-6">
-                  <LucideLoader class="variable-spin w-4 h-4 text-muted-foreground" />
+                  <LucideLoader2 class="variable-spin w-4 h-4 text-muted-foreground" />
                   <span class="shimmer-text text-sm">Tänker...</span>
                 </div>
                 <div class="prose font-normal dark:prose-invert prose-p:font-normal prose-headings:font-medium prose-strong:font-medium prose-hr:border-foreground/10
@@ -582,7 +582,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
 }
 
 .prose :deep(.code-lang) {
-  font-family: "JetBrains Mono", "SF Mono", Menlo, monospace;
+  font-family: "Google Sans Code", "SF Mono", Menlo, monospace;
   font-size: 0.7rem;
   letter-spacing: 0.04em;
   color: var(--muted-foreground);

@@ -104,14 +104,14 @@ function passColor(rate: number) {
 <template>
   <div class="container mx-auto px-4 py-8 max-w-4xl">
     <div v-if="status === 'pending'" class="flex items-center justify-center min-h-[60vh]">
-      <LucideLoader2 class="w-6 h-6 animate-spin text-muted-foreground" />
+      <LucideLoader2 class="w-6 h-6 animate-spin text-muted-foreground"  />
     </div>
 
     <div v-else-if="status === 'success' && !courseData"
       class="mx-auto flex min-h-[60vh] w-full max-w-2xl flex-col items-center justify-center gap-8 py-8">
       <div class="max-w-xl text-center">
         <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
-          <LucideInbox class="h-6 w-6 text-muted-foreground" />
+          <LucideInbox class="h-6 w-6 text-muted-foreground"  />
         </div>
         <h1 class="text-2xl font-medium text-foreground">
           Vi saknar tentor för {{ courseCode }}
@@ -142,7 +142,7 @@ function passColor(rate: number) {
             <!-- Meta stats -->
             <div class="flex flex-wrap gap-3">
               <div class="flex items-center gap-2 px-3 py-2 rounded-2xl bg-muted/40 border border-border/50">
-                <LucideFileText class="w-3.5 h-3.5 text-muted-foreground" />
+                <LucideFileText class="w-3.5 h-3.5 text-muted-foreground"  />
                 <span class="text-xs text-muted-foreground">
                   <span class="font-medium text-foreground">{{
                     exams.length
@@ -151,7 +151,7 @@ function passColor(rate: number) {
                 </span>
               </div>
               <div class="flex items-center gap-2 px-3 py-2 rounded-2xl bg-muted/40 border border-border/50">
-                <LucideCheckCircle class="w-3.5 h-3.5 text-muted-foreground" />
+                <LucideCheckCircle class="w-3.5 h-3.5 text-muted-foreground"  />
                 <span class="text-xs text-muted-foreground">
                   <span class="font-medium text-foreground">{{
                     examsWithSolutions
@@ -161,7 +161,7 @@ function passColor(rate: number) {
               </div>
               <div v-if="avgPassRate !== null"
                 class="flex items-center gap-2 px-3 py-2 rounded-2xl bg-muted/40 border border-border/50">
-                <LucideTrendingUp class="w-3.5 h-3.5 text-muted-foreground" />
+                <LucideTrendingUp class="w-3.5 h-3.5 text-muted-foreground"  />
                 <span class="text-xs text-muted-foreground">
                   Snitt godkänd
                   <span class="font-medium" :class="passColor(avgPassRate)">{{ avgPassRate }}%</span>
@@ -195,8 +195,8 @@ function passColor(rate: number) {
                       : 'desc'
                     ">
                   Tentamen
-                  <LucideArrowDownWideNarrow v-if="sortOrder === 'asc'" class="w-3.5 h-3.5" />
-                  <LucideArrowUpWideNarrow v-else class="w-3.5 h-3.5" />
+                  <LucideArrowDownWideNarrow v-if="sortOrder === 'asc'" class="w-3.5 h-3.5"  />
+                  <LucideArrowDownWideNarrow v-else class="w-3.5 h-3.5"  />
                 </button>
                 <div class="text-xs text-muted-foreground">
                   Typ
@@ -231,8 +231,8 @@ function passColor(rate: number) {
                 </div>
 
                 <div class="flex justify-center">
-                  <LucideCheck v-if="exam.has_solution" class="w-4 h-4 text-green-500" />
-                  <LucideMinus v-else class="w-4 h-4 text-muted-foreground/30" />
+                  <LucideCheck v-if="exam.has_solution" class="w-4 h-4 text-green-500"  />
+                  <LucideMinus v-else class="w-4 h-4 text-muted-foreground/30"  />
                 </div>
 
                 <div class="text-right flex flex-col items-end gap-1">
@@ -250,19 +250,19 @@ function passColor(rate: number) {
             <ButtonGroup class="pointer-events-auto">
               <Button variant="default" size="sm" as-child>
                 <NuxtLink to="/upload-exams">
-                  <LucideUpload class="w-4.5 h-4.5" />
+                  <LucideUpload class="w-4.5 h-4.5"  />
                   Ladda upp
                 </NuxtLink>
               </Button>
               <Button variant="outline" size="sm" as-child>
                 <NuxtLink :to="`/search/${courseCode}/stats`">
-                  <LucideChartPie class="w-4.5 h-4.5" />
+                  <LucideChartPie class="w-4.5 h-4.5"  />
                   Statistik
                 </NuxtLink>
               </Button>
               <Button variant="outline" size="sm" as-child>
                 <NuxtLink :to="`/quiz/${courseCode}`">
-                  <LucideLayers class="w-4.5 h-4.5" />
+                  <LucideLayers class="w-4.5 h-4.5"  />
                   Quiz
                 </NuxtLink>
               </Button>

@@ -170,7 +170,7 @@ function handleGenerate() {
                     variant="outline"
                     @click="randomize"
                   >
-                    <LucideShuffle class="h-3.5 w-3.5 mr-1.5" />
+                    <LucideShuffle class="h-3.5 w-3.5 mr-1.5"  />
                     Slumpa
                   </Button>
                 </div>
@@ -310,7 +310,7 @@ function handleGenerate() {
             class="w-full gap-1.5 border-border/50 shadow-none"
             @click="randomize"
           >
-            <LucideShuffle class="h-3.5 w-3.5" />
+            <LucideShuffle class="h-3.5 w-3.5"  />
             Slumpa urval
           </Button>
         </div>

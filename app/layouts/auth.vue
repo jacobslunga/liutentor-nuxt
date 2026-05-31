@@ -23,7 +23,7 @@ watch(
         variant="ghost"
         size="sm"
       >
-        <LucideArrowLeft class="w-4 h-4" />
+        <LucideArrowLeft class="w-4 h-4"  />
         Tillbaka
       </Button>
       <slot />

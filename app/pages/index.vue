@@ -20,7 +20,7 @@ const uploadBannerDismissed = useCookie<boolean>("uploadBannerDismissed", {
     <div v-if="!uploadBannerDismissed"
       class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between gap-3 bg-amber-50/60 dark:bg-amber-950/60 border-b border-amber-200 dark:border-amber-800 px-4 py-2.5 text-sm text-amber-900 dark:text-amber-200">
       <div class="flex items-center gap-2">
-        <LucideTriangleAlert class="w-4 h-4 shrink-0 text-amber-500" />
+        <LucideTriangleAlert class="w-4 h-4 shrink-0 text-amber-500"  />
         <span>
           Vi har haft problem med uppladdning av tentor och lösningar nyligen —
           vissa dokument kan saknas eller inte ha bearbetats korrekt. Det borde
@@ -29,7 +29,7 @@ const uploadBannerDismissed = useCookie<boolean>("uploadBannerDismissed", {
       </div>
       <button class="shrink-0 cursor-pointer rounded p-0.5 hover:bg-amber-100 dark:hover:bg-amber-900 transition-colors"
         aria-label="Stäng meddelande" @click="uploadBannerDismissed = true">
-        <LucideX class="w-4 h-4" />
+        <LucideX class="w-4 h-4"  />
       </button>
     </div>
     <div class="flex flex-row items-center justify-center gap-2 absolute top-5 right-5">
@@ -61,7 +61,7 @@ const uploadBannerDismissed = useCookie<boolean>("uploadBannerDismissed", {
 
       <NuxtLink to="/upload-exams">
         <Button variant="outline">
-          <LucideUpload />
+          <LucideUpload  />
           Ladda upp fler tentor
         </Button>
       </NuxtLink>

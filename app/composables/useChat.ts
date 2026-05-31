@@ -4,7 +4,7 @@ import { useChatStore } from "@/stores/chat";
 const CHAT_API_URL =
   "https://liutentor-hono-687405545415.europe-north2.run.app/api/v1/chat/completion";
 
-const DEFAULT_MODEL_ID = "gemini-3.1-flash-lite"
+const DEFAULT_MODEL_ID = "gemini-3.1-flash-lite";
 
 // USE FOR LOCAL DEVELOPMENT
 // const CHAT_API_URL_LOCAL = "http://localhost:8080/api/v1/chat/completion";
