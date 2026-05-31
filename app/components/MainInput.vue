@@ -200,70 +200,40 @@ function handleClickOutside(event: MouseEvent) {
 <template>
   <div class="relative w-full">
     <div class="w-full relative flex flex-row items-center justify-center px-4">
-      <LucideSearch class="text-gray-500"  />
+      <LucideSearch class="text-gray-500" />
 
-      <input
-        ref="inputRef"
-        :value="courseCode.toUpperCase()"
+      <input ref="inputRef" :value="courseCode.toUpperCase()"
         class="min-w-0 w-full p-4 border-none bg-transparent text-md text-foreground/80 outline-none"
-        :placeholder="`Sök efter ${typed}`"
-        @input="courseCode = ($event.target as HTMLInputElement).value"
-        @keydown="handleKeyDown"
-        @focus="emit('update:focusInput', true)"
-        @blur="emit('update:focusInput', false)"
-      />
+        :placeholder="`Sök efter ${typed}`" @input="courseCode = ($event.target as HTMLInputElement).value"
+        @keydown="handleKeyDown" @focus="emit('update:focusInput', true)" @blur="emit('update:focusInput', false)" />
 
       <DropdownMenu>
         <DropdownMenuTrigger as-child>
-          <Button
-            variant="ghost"
-            size="sm"
-            class="shrink-0 gap-1.5 px-2 text-foreground/60 hover:text-foreground"
-          >
+          <Button variant="ghost" size="sm" class="shrink-0 gap-1.5 px-2 text-foreground/60 hover:text-foreground">
             {{ searchMethodLabel }}
-            <LucideChevronDown class="h-3.5 w-3.5"  />
+            <LucideChevronDown class="h-3.5 w-3.5" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" :side-offset="8" class="w-36">
-          <DropdownMenuItem
-            class="cursor-pointer"
-            @click="selectSearchMethod('tentor')"
-          >
-            <LucideCheck
-              class="h-4 w-4"
-              :class="searchMethod === 'tentor' ? 'opacity-100' : 'opacity-0'"
-             />
+          <DropdownMenuItem class="cursor-pointer" @click="selectSearchMethod('tentor')">
+            <LucideCheck class="h-4 w-4" :class="searchMethod === 'tentor' ? 'opacity-100' : 'opacity-0'" />
             Tentor
           </DropdownMenuItem>
-          <DropdownMenuItem
-            class="cursor-pointer"
-            @click="selectSearchMethod('stats')"
-          >
-            <LucideCheck
-              class="h-4 w-4"
-              :class="searchMethod === 'stats' ? 'opacity-100' : 'opacity-0'"
-             />
+          <DropdownMenuItem class="cursor-pointer" @click="selectSearchMethod('stats')">
+            <LucideCheck class="h-4 w-4" :class="searchMethod === 'stats' ? 'opacity-100' : 'opacity-0'" />
             Statistik
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <Button
-        class="shrink-0 ml-2"
-        variant="outline"
-        size="icon-sm"
-        :disabled="!courseCode"
-        aria-label="Search"
-        @click="handleSelectCourse(courseCode)"
-      >
-        <LucideArrowUp class="w-5 h-5"  />
+      <Button class="shrink-0 ml-2" variant="outline" size="icon-sm" :disabled="!courseCode" aria-label="Search"
+        @click="handleSelectCourse(courseCode)">
+        <LucideArrowUp class="w-5 h-5" />
       </Button>
     </div>
 
-    <div
-      v-if="showSuggestions && suggestions.length > 0"
-      class="absolute w-full left-0 mt-2 bg-background rounded-md border shadow-md z-40 max-h-72 overflow-hidden text-sm"
-    >
+    <div v-if="showSuggestions && suggestions.length > 0"
+      class="absolute w-full left-0 mt-2 bg-background rounded-md border shadow-md z-40 max-h-72 overflow-hidden text-sm">
       <div v-if="isLoading" class="p-3 text-sm text-muted-foreground">
         Laddar...
       </div>
@@ -272,37 +242,25 @@ function handleClickOutside(event: MouseEvent) {
         Alla kurser
       </div>
 
-      <div
-        ref="listParentRef"
-        class="overflow-y-auto max-h-64 scrollbar-hide"
-        @scroll="handleScroll"
-      >
-        <div
-          :style="{
-            height: `${totalHeight}px`,
-            position: 'relative',
-            width: '100%',
-          }"
-        >
-          <div
-            v-for="{ index, item, top } in virtualItems"
-            :key="item"
-            :class="[
-              'flex items-center px-4 py-2 cursor-pointer transition-colors',
-              index === selectedIndex
-                ? 'bg-muted text-foreground'
-                : 'hover:bg-muted/50',
-            ]"
-            :style="{
+      <div ref="listParentRef" class="overflow-y-auto max-h-64 scrollbar-hide" @scroll="handleScroll">
+        <div :style="{
+          height: `${totalHeight}px`,
+          position: 'relative',
+          width: '100%',
+        }">
+          <div v-for="{ index, item, top } in virtualItems" :key="item" :class="[
+            'flex items-center px-4 py-2 cursor-pointer transition-colors',
+            index === selectedIndex
+              ? 'bg-muted text-foreground'
+              : 'hover:bg-muted/50',
+          ]" :style="{
               position: 'absolute',
               top: 0,
               left: 0,
               width: '100%',
               height: `${ITEM_HEIGHT}px`,
               transform: `translateY(${top}px)`,
-            }"
-            @mousedown.prevent="handleSelectCourse(item)"
-          >
+            }" @mousedown.prevent="handleSelectCourse(item)">
             <span class="flex-1 font-normal">{{ item }}</span>
           </div>
         </div>
