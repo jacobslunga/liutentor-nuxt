@@ -1,5 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Google+Sans+Code:ital,wght,MONO@0,300..800,1;1,300..800,1&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Special+Gothic:wght@400..700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
 
 @import "tailwindcss";
 
@@ -79,8 +80,14 @@
     transparent;
 }
 
+@theme {
+  --font-logo: "Logo", serif;
+  --font-mono: "Google Sans Code", monospace;
+}
+
 body {
   font-family:
+    "DM Sans",
     system-ui,
     -apple-system,
     BlinkMacSystemFont,
@@ -112,11 +119,6 @@ body {
 .dark *::-moz-selection {
   background: oklch(0.8332 0.088 144.73 / 0.35);
   color: oklch(0.985 0 0);
-}
-
-@theme {
-  --font-logo: "Logo", serif;
-  --font-mono: "Google Sans Code", monospace;
 }
 
 @custom-variant dark (&:is(.dark *));
@@ -226,6 +228,15 @@ body {
 }
 
 @layer base {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Outfit", sans-serif;
+  }
+
   * {
     @apply border-border outline-ring/50;
   }
