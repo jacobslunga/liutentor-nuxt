@@ -130,7 +130,9 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
 
           <div
             class="flex gap-2 px-5 py-3"
-            :class="isMultiline || selectionContext ? 'items-end' : 'items-center'"
+            :class="
+              isMultiline || selectionContext ? 'items-end' : 'items-center'
+            "
           >
             <!-- Textarea -->
             <textarea
@@ -156,7 +158,7 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
                     <LucideChevronDown class="size-3.5" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" class="min-w-40">
+                <DropdownMenuContent align="end" class="min-w-40 rounded-2xl">
                   <DropdownMenuRadioGroup
                     :model-value="selectedModelId"
                     @update:model-value="
@@ -167,7 +169,7 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
                       v-for="model in CHAT_MODELS"
                       :key="model.id"
                       :value="model.id"
-                      class="text-sm"
+                      class="text-sm cursor-pointer rounded-xl"
                     >
                       {{ model.label }}
                     </DropdownMenuRadioItem>
@@ -175,28 +177,30 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
                 </DropdownMenuContent>
               </DropdownMenu>
 
-            <!-- Send / Cancel -->
-            <Transition name="scale" mode="out-in">
-              <Button
-                v-if="isLoading"
-                key="stop"
-                size="icon"
-                variant="secondary"
-                class="size-8 rounded-full"
-                @click="emit('cancel')"
-              >
-                <LucideSquare class="size-3.5 fill-current" />
-              </Button>
-              <Button
-                v-else
-                key="send"
-                size="icon"
-                class="size-8 rounded-full"
-                :disabled="!modelValue.trim() || modelValue.length > MAX_LENGTH"
-                @click="emit('send')"
-              >
-                <LucideArrowUp class="size-4" />
-              </Button>
+              <!-- Send / Cancel -->
+              <Transition name="scale" mode="out-in">
+                <Button
+                  v-if="isLoading"
+                  key="stop"
+                  size="icon"
+                  variant="secondary"
+                  class="size-8 rounded-full"
+                  @click="emit('cancel')"
+                >
+                  <LucideSquare class="size-3.5 fill-current" />
+                </Button>
+                <Button
+                  v-else
+                  key="send"
+                  size="icon"
+                  class="size-8 rounded-full"
+                  :disabled="
+                    !modelValue.trim() || modelValue.length > MAX_LENGTH
+                  "
+                  @click="emit('send')"
+                >
+                  <LucideArrowUp class="size-4" />
+                </Button>
               </Transition>
             </div>
           </div>
