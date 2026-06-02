@@ -184,6 +184,22 @@ const selectionContext = ref("");
 const selectionPopover = ref({ visible: false, x: 0, y: 0 });
 const selectionPopoverScrollAnchor = ref(0);
 
+const loadingPhrases = [
+  "Baljar...",
+  "Går till Terra...",
+  "Kollar Lisam...",
+  "Letar grupprum i B-huset...",
+  "Köar i Kårallen...",
+  "Räknar om HP...",
+  "Cyklar över Campus Valla...",
+  "Hämtar kaffe i Key...",
+  "Frågar någon i märkesbacken...",
+  "Letar facit i tenta-P...",
+  "Tar en omväg via Zenit...",
+];
+
+const loadingPhrase = ref(loadingPhrases[0]);
+
 const copyTimers = new WeakMap<HTMLElement, number>();
 
 function handleCodeCopy(e: MouseEvent) {
@@ -326,6 +342,17 @@ watch(isOpen, (open) => {
     isHistoryOpen.value = false;
   }
 });
+
+watch(
+  isLoading,
+  (loading) => {
+    if (!loading) return;
+    loadingPhrase.value =
+      loadingPhrases[Math.floor(Math.random() * loadingPhrases.length)] ??
+      loadingPhrases[0];
+  },
+  { immediate: true },
+);
 
 onMounted(() => {
   if (chatStore.currentExamId !== props.examId) {
@@ -512,7 +539,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
                   <LucideLoader
                     class="variable-spin w-4 h-4 text-muted-foreground"
                   />
-                  <span class="shimmer-text text-sm">Tänker...</span>
+                  <span class="shimmer-text text-sm">{{ loadingPhrase }}</span>
                 </div>
                 <div
                   class="prose font-normal dark:prose-invert prose-p:font-normal prose-headings:font-medium prose-strong:font-medium prose-hr:border-foreground/10 prose-table:w-full prose-table:border-separate prose-table:border-spacing-0 prose-table:border prose-table:border-foreground/10 prose-table:rounded-2xl prose-table:overflow-hidden prose-thead:bg-muted/50 prose-th:text-left prose-th:font-medium prose-th:px-4 prose-th:py-2.5 prose-th:border-b prose-th:border-foreground/10 prose-td:px-4 prose-td:py-2.5 prose-td:border-b prose-td:border-foreground/10 prose-td:align-top marker:text-foreground marker:font-medium"

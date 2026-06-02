@@ -1,6 +1,6 @@
 export const CHAT_MODELS = [
-  { id: "gemini-3-flash-preview", label: "Flash" },
-  { id: "gemini-3.1-flash-lite", label: "Flash Lite" },
+  { id: "gemini-3-flash-preview", label: "Tänkande" },
+  { id: "gemini-3.1-flash-lite", label: "Direkt" },
 ] as const;
 
 const VALID_MODEL_IDS = CHAT_MODELS.map((m) => m.id);
