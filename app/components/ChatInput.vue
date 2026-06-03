@@ -47,7 +47,7 @@ const updateHeight = () => {
 };
 
 const inputRadiusClass = computed(() =>
-  isMultiline.value || props.selectionContext ? "rounded-2xl" : "rounded-full",
+  isMultiline.value || props.selectionContext ? "rounded-3xl" : "rounded-full",
 );
 
 const handleInput = (e: Event) => {
@@ -103,7 +103,7 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
 
       <div class="space-y-2">
         <div
-          class="border border-border bg-card/80 shadow-[0_10px_34px_color-mix(in_srgb,var(--foreground),transparent_92%)] dark:shadow-[0_10px_34px_color-mix(in_srgb,var(--background),transparent_92%)] backdrop-blur-sm transition-colors duration-150 focus-within:border-border focus-within:bg-card"
+          class="border border-border bg-background dark:bg-card shadow-[0_10px_20px_color-mix(in_srgb,var(--foreground),transparent_92%)] dark:shadow-[0_10px_34px_color-mix(in_srgb,var(--background),transparent_92%)] transition-colors duration-150 focus-within:border-border focus-within:bg-card"
           :class="inputRadiusClass"
         >
           <!-- Selection context chip -->
