@@ -106,8 +106,8 @@ async function initMarkdown() {
       inner = highlighter.highlight(token.content, {
         lang: language,
         themes: {
-          light: "one-light",
-          dark: "one-dark-pro",
+          light: "github-light",
+          dark: "github-dark",
         },
         defaultColor: false,
       });
@@ -648,13 +648,13 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
   align-items: center;
   justify-content: space-between;
   padding: 0.4rem 0.75rem 0.4rem 1rem;
-  background-color: color-mix(in oklch, var(--muted) 60%, transparent);
+  background-color: color-mix(in oklch, var(--background) 60%, transparent);
   border-bottom: 1px solid
     color-mix(in oklch, var(--foreground) 8%, transparent);
 }
 
 .prose :deep(.code-lang) {
-  font-family: "Google Sans Code", "SF Mono", Menlo, monospace;
+  font-family: "IBM Plex Mono", "SF Mono", Menlo, monospace;
   font-size: 0.7rem;
   letter-spacing: 0.04em;
   color: var(--muted-foreground);
@@ -675,7 +675,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
   border-radius: 0;
   padding: 1rem 1.25rem;
   overflow-x: auto;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   line-height: 1.6;
   background-color: var(--shiki-light-bg);
 }

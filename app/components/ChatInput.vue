@@ -129,7 +129,7 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
           </Transition>
 
           <div
-            class="flex gap-2 px-5 py-3"
+            class="flex gap-2 px-5 py-2"
             :class="
               isMultiline || selectionContext ? 'items-end' : 'items-center'
             "
@@ -207,7 +207,7 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
         </div>
 
         <div class="flex items-center justify-center gap-2 px-4 text-center">
-          <p class="text-xs text-muted-foreground/60">
+          <p class="text-[10px] text-muted-foreground/60">
             AI kan göra misstag. Kontrollera viktig information.
           </p>
           <p
