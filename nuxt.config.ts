@@ -90,7 +90,7 @@ export default defineNuxtConfig({
   },
 
   shiki: {
-    bundledThemes: ["github-dark", "github-light"],
+    bundledThemes: ["min-dark", "min-light"],
     bundledLangs: [
       "typescript",
       "javascript",

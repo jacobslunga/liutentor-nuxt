@@ -103,7 +103,7 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
 
       <div class="space-y-2">
         <div
-          class="border border-border bg-background dark:bg-card shadow-[0_10px_20px_color-mix(in_srgb,var(--foreground),transparent_92%)] dark:shadow-[0_10px_34px_color-mix(in_srgb,var(--background),transparent_92%)] transition-colors duration-150 focus-within:border-border focus-within:bg-card"
+          class="border border-border bg-background dark:bg-card shadow-[0_10px_20px_color-mix(in_srgb,var(--foreground),transparent_92%)] dark:shadow-[0_10px_34px_color-mix(in_srgb,var(--background),transparent_92%)] transition-colors duration-150 focus-within:border-border"
           :class="inputRadiusClass"
         >
           <!-- Selection context chip -->
