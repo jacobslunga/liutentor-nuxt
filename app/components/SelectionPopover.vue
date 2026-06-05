@@ -21,7 +21,7 @@ const emit = defineEmits<{ reply: [] }>();
         }"
       >
         <button
-          class="flex cursor-pointer items-center gap-1.5 bg-foreground text-background text-[13px] font-medium px-3 py-1.5 rounded-full shadow-lg hover:opacity-90 active:scale-95 transition-all select-none"
+          class="flex cursor-pointer items-center gap-1.5 bg-foreground text-background text-[13px] font-normal px-3 py-1.5 rounded-full shadow-lg hover:opacity-90 active:scale-95 transition-all select-none"
           @mousedown.prevent.stop="emit('reply')"
         >
           Svara
