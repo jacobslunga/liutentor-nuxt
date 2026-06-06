@@ -87,14 +87,10 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
 <template>
   <div class="px-4 bg-transparent relative w-full pointer-events-auto z-10">
     <div
-      class="pointer-events-none absolute inset-x-0 -top-20 -bottom-20 -z-10 bg-linear-to-t from-background via-background to-transparent"
-    />
+      class="pointer-events-none absolute inset-x-0 -top-20 -bottom-20 -z-10 bg-linear-to-t from-background via-background to-transparent" />
     <div class="max-w-2xl mx-auto relative">
       <Transition name="fade-up">
-        <div
-          v-if="showScrollButton"
-          class="absolute -top-12 left-1/2 -translate-x-1/2 z-20"
-        >
+        <div v-if="showScrollButton" class="absolute -top-12 left-1/2 -translate-x-1/2 z-20">
           <Button variant="outline" size="icon" @click="emit('scrollToBottom')">
             <LucideArrowDown class="w-4 h-4" />
           </Button>
@@ -104,73 +100,42 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
       <div class="space-y-2">
         <div
           class="border border-border bg-background dark:bg-card shadow-[0_10px_20px_color-mix(in_srgb,var(--foreground),transparent_92%)] dark:shadow-[0_10px_34px_color-mix(in_srgb,var(--background),transparent_92%)] transition-colors duration-150 focus-within:border-border"
-          :class="inputRadiusClass"
-        >
+          :class="inputRadiusClass">
           <!-- Selection context chip -->
           <Transition name="context-chip">
-            <div
-              v-if="selectionContext"
-              class="flex items-center gap-2 w-full border-b border-border/70 px-5 py-2.5"
-            >
-              <LucideCornerUpLeft
-                class="w-3.5 h-3.5 shrink-0 text-muted-foreground"
-              />
-              <span
-                class="flex-1 min-w-0 text-sm italic text-muted-foreground truncate"
-                >"{{ selectionContext }}"</span
-              >
-              <button
-                class="shrink-0 cursor-pointer text-muted-foreground hover:opacity-60 transition-opacity"
-                @click.prevent="emit('clearSelectionContext')"
-              >
+            <div v-if="selectionContext" class="flex items-center gap-2 w-full border-b border-border/70 px-5 py-2.5">
+              <LucideCornerUpLeft class="w-3.5 h-3.5 shrink-0 text-muted-foreground" />
+              <span class="flex-1 min-w-0 text-sm italic text-muted-foreground truncate">"{{ selectionContext }}"</span>
+              <button class="shrink-0 cursor-pointer text-muted-foreground hover:opacity-60 transition-opacity"
+                @click.prevent="emit('clearSelectionContext')">
                 <LucideX class="w-3.5 h-3.5" />
               </button>
             </div>
           </Transition>
 
-          <div
-            class="flex gap-2 px-5 py-2"
-            :class="
-              isMultiline || selectionContext ? 'items-end' : 'items-center'
-            "
-          >
+          <div class="flex gap-2 px-5 py-2" :class="isMultiline || selectionContext ? 'items-end' : 'items-center'
+            ">
             <!-- Textarea -->
-            <textarea
-              ref="textareaRef"
-              :value="modelValue"
-              rows="1"
-              placeholder="Fråga vad som helst"
-              class="min-h-8 flex-1 resize-none border-0 bg-transparent py-1 text-[15px] leading-relaxed outline-none placeholder:text-muted-foreground/70 focus:ring-0 max-h-45"
-              @input="handleInput"
-              @keydown="handleKeyDown"
-            />
+            <textarea ref="textareaRef" :value="modelValue" rows="1" placeholder="Fråga vad som helst"
+              class="min-h-8 flex-1 resize-none border-0 bg-transparent py-2 text-[15px] leading-relaxed outline-none placeholder:text-muted-foreground/70 focus:ring-0 max-h-45"
+              @input="handleInput" @keydown="handleKeyDown" />
 
             <div class="flex shrink-0 items-center gap-1.5 pb-0.5">
               <!-- Model selector -->
               <DropdownMenu>
                 <DropdownMenuTrigger as-child>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    class="h-8 gap-1.5 px-2.5 text-xs text-muted-foreground hover:text-foreground"
-                  >
+                  <Button variant="ghost" size="sm"
+                    class="h-8 gap-1.5 px-2.5 text-xs text-muted-foreground hover:text-foreground">
                     {{ currentModelLabel }}
                     <LucideChevronDown class="size-3.5" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" class="min-w-40 rounded-2xl">
-                  <DropdownMenuRadioGroup
-                    :model-value="selectedModelId"
-                    @update:model-value="
-                      (v) => v && emit('update:selectedModelId', v as string)
-                    "
-                  >
-                    <DropdownMenuRadioItem
-                      v-for="model in CHAT_MODELS"
-                      :key="model.id"
-                      :value="model.id"
-                      class="text-sm cursor-pointer rounded-xl"
-                    >
+                  <DropdownMenuRadioGroup :model-value="selectedModelId" @update:model-value="
+                    (v) => v && emit('update:selectedModelId', v as string)
+                  ">
+                    <DropdownMenuRadioItem v-for="model in CHAT_MODELS" :key="model.id" :value="model.id"
+                      class="text-sm cursor-pointer rounded-xl">
                       {{ model.label }}
                     </DropdownMenuRadioItem>
                   </DropdownMenuRadioGroup>
@@ -179,26 +144,12 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
 
               <!-- Send / Cancel -->
               <Transition name="scale" mode="out-in">
-                <Button
-                  v-if="isLoading"
-                  key="stop"
-                  size="icon"
-                  variant="secondary"
-                  class="size-8 rounded-full"
-                  @click="emit('cancel')"
-                >
+                <Button v-if="isLoading" key="stop" size="icon" variant="secondary" class="size-8 rounded-full"
+                  @click="emit('cancel')">
                   <LucideSquare class="size-3.5 fill-current" />
                 </Button>
-                <Button
-                  v-else
-                  key="send"
-                  size="icon"
-                  class="size-8 rounded-full"
-                  :disabled="
-                    !modelValue.trim() || modelValue.length > MAX_LENGTH
-                  "
-                  @click="emit('send')"
-                >
+                <Button v-else key="send" size="icon" class="size-8 rounded-full" :disabled="!modelValue.trim() || modelValue.length > MAX_LENGTH
+                  " @click="emit('send')">
                   <LucideArrowUp class="size-4" />
                 </Button>
               </Transition>
@@ -210,15 +161,10 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
           <p class="text-[10px] text-muted-foreground/60">
             AI kan göra misstag. Kontrollera viktig information.
           </p>
-          <p
-            v-if="modelValue.length > MAX_LENGTH * 0.8"
-            class="text-xs"
-            :class="
-              modelValue.length > MAX_LENGTH
-                ? 'text-destructive font-bold'
-                : 'text-muted-foreground'
-            "
-          >
+          <p v-if="modelValue.length > MAX_LENGTH * 0.8" class="text-xs" :class="modelValue.length > MAX_LENGTH
+            ? 'text-destructive font-bold'
+            : 'text-muted-foreground'
+            ">
             {{ modelValue.length }} / {{ MAX_LENGTH }}
           </p>
         </div>

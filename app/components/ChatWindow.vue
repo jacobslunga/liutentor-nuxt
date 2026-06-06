@@ -41,8 +41,8 @@ const {
 const currentUserId = computed(
   () =>
     ((user.value as any)?.id ?? (user.value as any)?.sub ?? null) as
-      | string
-      | null,
+    | string
+    | null,
 );
 
 const { send, cancelGeneration } = useChat({
@@ -201,6 +201,25 @@ const loadingPhrases = [
 const loadingPhrase = ref(loadingPhrases[0]);
 
 const copyTimers = new WeakMap<HTMLElement, number>();
+const copiedMessageIndex = ref<number | null>(null);
+let copiedMessageTimer: number | null = null;
+
+async function copyMessage(content: string, index: number) {
+  if (!content.trim()) return;
+
+  try {
+    await navigator.clipboard.writeText(content);
+    copiedMessageIndex.value = index;
+
+    if (copiedMessageTimer) window.clearTimeout(copiedMessageTimer);
+    copiedMessageTimer = window.setTimeout(() => {
+      copiedMessageIndex.value = null;
+      copiedMessageTimer = null;
+    }, 1500);
+  } catch (error) {
+    console.error("Failed to copy message:", error);
+  }
+}
 
 function handleCodeCopy(e: MouseEvent) {
   const btn = (e.target as HTMLElement).closest(
@@ -212,7 +231,7 @@ function handleCodeCopy(e: MouseEvent) {
   const code = pre?.textContent ?? "";
   if (!code) return;
 
-  navigator.clipboard.writeText(code).catch(() => {});
+  navigator.clipboard.writeText(code).catch(() => { });
 
   const label = btn.querySelector(".code-copy-label");
   if (label) label.textContent = "Kopierad";
@@ -447,6 +466,7 @@ onMounted(() => {
 onUnmounted(() => {
   document.removeEventListener("keydown", handleKeyDown, true);
   document.removeEventListener("selectionchange", handleSelectionChange);
+  if (copiedMessageTimer) window.clearTimeout(copiedMessageTimer);
 });
 
 defineExpose({ focusInput: () => chatInputRef.value?.focus() });
@@ -454,97 +474,72 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
 
 <template>
   <div class="h-full w-full flex bg-background overflow-hidden relative">
-    <div
-      class="flex-1 min-w-0 flex flex-col transition-all duration-300 ease-out"
-    >
+    <div class="flex-1 min-w-0 flex flex-col transition-all duration-300 ease-out">
       <div class="flex-1 min-h-0 relative">
         <div class="absolute inset-x-0 top-0 z-20 pointer-events-none">
-          <ChatHeader
-            class="pointer-events-auto"
-            :has-solution="hasSolution"
-            :title="chatHeaderTitle"
-            :history-open="isHistoryOpen"
-            @close="emit('close')"
-            @open-history="toggleHistory"
-            @new-chat="startNewChat"
-          />
+          <ChatHeader class="pointer-events-auto" :has-solution="hasSolution" :title="chatHeaderTitle"
+            :history-open="isHistoryOpen" @close="emit('close')" @open-history="toggleHistory"
+            @new-chat="startNewChat" />
         </div>
 
-        <div
-          ref="messagesContainer"
-          class="h-full w-full overflow-y-auto overflow-x-hidden px-4 pt-20 custom-scrollbar"
-          @scroll="handleScroll"
-          @mouseup="handleMessageMouseUp"
-          @click="handleCodeCopy"
-        >
-          <div
-            v-if="messages.length === 0"
-            class="h-full flex flex-col items-center justify-center px-4 text-center pb-24"
-          >
+        <div ref="messagesContainer" class="h-full w-full overflow-y-auto overflow-x-hidden px-4 pt-20 custom-scrollbar"
+          @scroll="handleScroll" @mouseup="handleMessageMouseUp" @click="handleCodeCopy">
+          <div v-if="messages.length === 0"
+            class="h-full flex flex-col items-center justify-center px-4 text-center pb-24">
             <h2 class="text-2xl font-medium mb-3 text-foreground">
               Vad kan jag hjälpa till med?
             </h2>
-            <p
-              class="text-muted-foreground text-sm max-w-70 sm:max-w-md mb-8 leading-relaxed"
-            >
+            <p class="text-muted-foreground text-sm max-w-70 sm:max-w-md mb-8 leading-relaxed">
               Ställ frågor om tentan, be om ledtrådar eller få hjälp att förstå
               lösningarna.
             </p>
-            <NuxtLink
-              to="/ai-policy"
-              target="_blank"
-              class="text-[11px] text-muted-foreground/60 hover:text-foreground transition-all duration-200 border-b border-transparent hover:border-foreground/30 pb-0.5"
-            >
+            <NuxtLink to="/ai-policy" target="_blank"
+              class="text-[11px] text-muted-foreground/60 hover:text-foreground transition-all duration-200 border-b border-transparent hover:border-foreground/30 pb-0.5">
               Läs vår AI-policy
             </NuxtLink>
           </div>
 
-          <div v-else class="space-y-6 max-w-2xl mx-auto w-full">
-            <div
-              v-for="(msg, i) in messages"
-              :key="i"
-              :class="msg.role === 'user' ? 'flex justify-end' : ''"
-              v-memo="[
-                msg.role,
-                msg.content,
-                msg.selectionContext,
-                isLoading && i === messages.length - 1,
-                mdReady,
-              ]"
-            >
-              <div
-                v-if="msg.role === 'user'"
-                class="flex flex-col items-end gap-1.5 max-w-[85%]"
-              >
-                <div
-                  v-if="msg.selectionContext"
-                  class="border-l-2 border-muted-foreground/30 pl-3 text-sm text-muted-foreground italic line-clamp-3 text-right"
-                >
+          <div v-else class="space-y-8 max-w-2xl mx-auto w-full">
+            <div v-for="(msg, i) in messages" :key="i" :class="msg.role === 'user' ? 'flex justify-end' : ''" v-memo="[
+              msg.role,
+              msg.content,
+              msg.selectionContext,
+              copiedMessageIndex === i,
+              isLoading && i === messages.length - 1,
+              mdReady,
+            ]">
+              <div v-if="msg.role === 'user'" class="flex flex-col items-end gap-1.5 max-w-[70%]">
+                <div v-if="msg.selectionContext"
+                  class="border-l-2 border-muted-foreground/30 pl-3 text-sm text-muted-foreground italic line-clamp-3 text-right">
                   "{{ msg.selectionContext }}"
                 </div>
-                <div
-                  class="bg-primary/10 text-foreground px-4 py-2 rounded-3xl w-fit"
-                >
+                <div class="bg-muted text-foreground px-4 py-2 rounded-2xl w-fit">
                   <p class="text-[15px] leading-relaxed whitespace-pre-wrap">
                     {{ msg.content }}
                   </p>
                 </div>
+                <button v-if="msg.content" type="button" class="message-copy-button cursor-pointer"
+                  @click="copyMessage(msg.content, i)">
+                  <LucideCheck v-if="copiedMessageIndex === i" class="w-3.5 h-3.5" />
+                  <LucideCopy v-else class="w-3.5 h-3.5" />
+                  {{ copiedMessageIndex === i ? "Kopierad" : "Kopiera" }}
+                </button>
               </div>
 
               <div v-else class="w-full px-1 py-2" data-role="assistant">
-                <div
-                  v-if="!msg.content && isLoading && i === messages.length - 1"
-                  class="flex items-center gap-2 h-6"
-                >
-                  <LucideLoader
-                    class="variable-spin w-4 h-4 text-muted-foreground"
-                  />
+                <div v-if="!msg.content && isLoading && i === messages.length - 1" class="flex items-center gap-2 h-6">
+                  <LucideLoader class="variable-spin w-4 h-4 text-muted-foreground" />
                   <span class="shimmer-text text-sm">{{ loadingPhrase }}</span>
                 </div>
                 <div
-                  class="prose font-normal dark:prose-invert prose-p:font-normal prose-headings:font-medium prose-strong:font-medium prose-hr:border-foreground/10 prose-table:w-full prose-table:border-separate prose-table:border-spacing-0 prose-table:border prose-table:border-foreground/10 prose-table:rounded-2xl prose-table:overflow-hidden prose-thead:bg-muted/50 prose-th:text-left prose-th:font-medium prose-th:px-4 prose-th:py-2.5 prose-th:border-b prose-th:border-foreground/10 prose-td:px-4 prose-td:py-2.5 prose-td:border-b prose-td:border-foreground/10 prose-td:align-top marker:text-foreground marker:font-medium"
-                  v-html="renderedAssistantHtml[i]"
-                />
+                  class="prose font-normal dark:prose-invert prose-strong:font-medium prose-p:font-normal prose-headings:font-medium prose-h1:text-2xl prose-h2:text-2xl prose-h3:text-xl prose-h1:mt-8 prose-h1:mb-3 prose-h2:mt-7 prose-h2:mb-3 prose-h3:mt-6 prose-h3:mb-4 prose-hr:border-foreground/10 prose-table:w-full prose-table:border-separate prose-table:border-spacing-0 prose-table:border prose-table:border-foreground/10 prose-table:rounded-2xl prose-table:overflow-hidden prose-thead:bg-muted/50 prose-th:text-left prose-th:font-medium prose-th:px-4 prose-th:py-2.5 prose-th:border-b prose-th:border-foreground/10 prose-td:px-4 prose-td:py-2.5 prose-td:border-b prose-td:border-foreground/10 prose-td:align-top marker:text-foreground marker:font-medium"
+                  v-html="renderedAssistantHtml[i]" />
+                <button v-if="msg.content" type="button" class="message-copy-button mt-3 cursor-pointer"
+                  @click="copyMessage(msg.content, i)">
+                  <LucideCheck v-if="copiedMessageIndex === i" class="w-3.5 h-3.5" />
+                  <LucideCopy v-else class="w-3.5 h-3.5" />
+                  {{ copiedMessageIndex === i ? "Kopierad" : "Kopiera" }}
+                </button>
               </div>
             </div>
 
@@ -553,51 +548,54 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
           </div>
         </div>
 
-        <div
-          class="absolute bottom-0 left-0 right-0 pt-10 pb-4 pointer-events-none z-10"
-        >
-          <ChatInput
-            ref="chatInputRef"
-            v-model="draftInput"
-            :is-loading="isLoading"
-            :give-direct-answer="giveDirectAnswer"
-            :selected-model-id="selectedModelId"
-            :show-scroll-button="showScrollButton"
-            :course-code="courseCode"
-            :has-solution="hasSolution"
-            :selection-context="selectionContext"
-            class="pointer-events-auto"
-            @send="handleSend"
-            @cancel="handleCancel"
-            @scroll-to-bottom="scrollToBottom('smooth')"
-            @update:give-direct-answer="giveDirectAnswer = $event"
-            @update:selected-model-id="selectedModelId = $event"
-            @clear-selection-context="selectionContext = ''"
-          />
+        <div class="absolute bottom-0 left-0 right-0 pt-10 pb-4 pointer-events-none z-10">
+          <ChatInput ref="chatInputRef" v-model="draftInput" :is-loading="isLoading"
+            :give-direct-answer="giveDirectAnswer" :selected-model-id="selectedModelId"
+            :show-scroll-button="showScrollButton" :course-code="courseCode" :has-solution="hasSolution"
+            :selection-context="selectionContext" class="pointer-events-auto" @send="handleSend" @cancel="handleCancel"
+            @scroll-to-bottom="scrollToBottom('smooth')" @update:give-direct-answer="giveDirectAnswer = $event"
+            @update:selected-model-id="selectedModelId = $event" @clear-selection-context="selectionContext = ''" />
         </div>
       </div>
     </div>
 
     <ChatHistorySidebar v-model:open="isHistoryOpen" />
 
-    <SelectionPopover
-      :visible="selectionPopover.visible"
-      :x="selectionPopover.x"
-      :y="selectionPopover.y"
-      @reply="handleReplyToSelection"
-    />
+    <SelectionPopover :visible="selectionPopover.visible" :x="selectionPopover.x" :y="selectionPopover.y"
+      @reply="handleReplyToSelection" />
   </div>
 </template>
 
 <style scoped>
+.message-copy-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  width: fit-content;
+  border-radius: 999px;
+  padding: 0.2rem 0.55rem;
+  color: var(--muted-foreground);
+  font-size: 0.72rem;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.message-copy-button:hover {
+  background-color: color-mix(in oklch, var(--foreground) 6%, transparent);
+  color: var(--foreground);
+}
+
 .prose :deep(.katex-display) {
   overflow-x: auto;
   overflow-y: hidden;
   max-width: 100%;
   padding: 0.5rem 0;
+  margin-left: -2rem;
+  margin-right: -2rem;
 }
 
-.prose :deep(.katex-display) > .katex {
+.prose :deep(.katex-display)>.katex {
   max-width: none;
   white-space: normal;
 }
@@ -606,9 +604,14 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
   max-width: 100%;
 }
 
+.prose :deep(p .katex) {
+  line-height: 0;
+}
+
 .prose :deep(p) {
   overflow-wrap: break-word;
   word-wrap: break-word;
+  line-height: 1.9;
 }
 
 .prose :deep(.katex-display)::-webkit-scrollbar {
@@ -649,8 +652,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
   justify-content: space-between;
   padding: 0.4rem 0.75rem 0.4rem 1rem;
   background-color: color-mix(in oklch, var(--secondary) 60%, transparent);
-  border-bottom: 1px solid
-    color-mix(in oklch, var(--foreground) 8%, transparent);
+  border-bottom: 1px solid color-mix(in oklch, var(--foreground) 8%, transparent);
 }
 
 .prose :deep(.code-lang) {
