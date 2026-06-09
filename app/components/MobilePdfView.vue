@@ -26,6 +26,11 @@ function isTypingTarget(target: EventTarget | null) {
 }
 
 function handleKeyDown(event: KeyboardEvent) {
+  if (event.key === "Escape" && showSolution.value) {
+    showSolution.value = false;
+    return;
+  }
+
   if (
     event.key.toLowerCase() !== "f" ||
     event.metaKey ||
