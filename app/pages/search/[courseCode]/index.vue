@@ -145,7 +145,7 @@ function passColor(rate: number) {
                 <span class="text-xs text-muted-foreground">
                   <span class="font-medium text-foreground">{{
                     exams.length
-                  }}</span>
+                    }}</span>
                   tentor
                 </span>
               </div>
@@ -154,7 +154,7 @@ function passColor(rate: number) {
                 <span class="text-xs text-muted-foreground">
                   <span class="font-medium text-foreground">{{
                     examsWithSolutions
-                  }}</span>
+                    }}</span>
                   med facit
                 </span>
               </div>
@@ -237,7 +237,7 @@ function passColor(rate: number) {
       </div>
 
       <div class="sticky bottom-0 z-50 pointer-events-none">
-        <div class="bg-linear-to-t from-background via-background/80 to-transparent pt-8 pb-10">
+        <div class="bg-linear-to-t from-background via-background/80 to-background/0 pt-8 pb-10">
           <div class="flex items-center justify-center pointer-events-auto">
             <ButtonGroup class="pointer-events-auto">
               <Button variant="default" size="sm" as-child>

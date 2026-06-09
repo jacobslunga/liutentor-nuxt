@@ -87,7 +87,7 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
 <template>
   <div class="px-4 bg-transparent relative w-full pointer-events-auto z-10">
     <div
-      class="pointer-events-none absolute inset-x-0 -top-20 -bottom-20 -z-10 bg-linear-to-t from-background via-background to-transparent" />
+      class="pointer-events-none absolute inset-x-0 -top-20 -bottom-20 -z-10 bg-linear-to-t from-background via-background to-background/0" />
     <div class="max-w-2xl mx-auto relative">
       <Transition name="fade-up">
         <div v-if="showScrollButton" class="absolute -top-12 left-1/2 -translate-x-1/2 z-20">

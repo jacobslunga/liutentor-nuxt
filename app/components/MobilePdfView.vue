@@ -58,7 +58,7 @@ onUnmounted(() => {
 <template>
   <div class="flex flex-col h-screen w-full bg-background relative">
     <div
-      class="absolute inset-x-0 top-0 z-40 flex h-12 items-center gap-3 bg-linear-to-b from-background via-background/90 to-transparent px-3">
+      class="absolute inset-x-0 top-0 z-40 flex h-12 items-center gap-3 bg-linear-to-b from-background via-background/90 to-background/0 px-3">
       <NuxtLink :to="`/search/${courseCode}`">
         <Button aria-label="Gå tillbaka" variant="outline" size="icon-sm">
           <LucideArrowLeft class="w-4 h-4" />
@@ -92,7 +92,7 @@ onUnmounted(() => {
         class="fixed inset-0 z-50 h-screen w-screen bg-background flex flex-col overflow-hidden" role="dialog"
         aria-modal="true">
         <div
-          class="absolute inset-x-0 top-0 z-10 flex h-12 items-center gap-3 bg-linear-to-b from-background via-background/90 to-transparent px-3">
+          class="absolute inset-x-0 top-0 z-10 flex h-12 items-center gap-3 bg-linear-to-b from-background via-background/90 to-background/0 px-3">
           <div class="min-w-0 flex-1">
             <p class="text-sm font-bold text-foreground truncate leading-tight">
               Facit

@@ -16,7 +16,7 @@ const mobileOpen = ref(false);
 
 <template>
   <div class="flex flex-col min-h-screen bg-background">
-    <header class="sticky top-0 z-40 w-full bg-linear-to-b from-background to-transparent">
+    <header class="sticky top-0 z-40 w-full bg-linear-to-b from-background to-background/0">
       <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
         <NuxtLink to="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity shrink-0">
           <LogoIcon class="w-7 h-7" />
@@ -36,7 +36,7 @@ const mobileOpen = ref(false);
         <Sheet v-model:open="mobileOpen">
           <SheetTrigger as-child>
             <Button variant="ghost" size="icon" class="md:hidden">
-              <LucideMenu class="h-5 w-5"  />
+              <LucideMenu class="h-5 w-5" />
             </Button>
           </SheetTrigger>
           <SheetContent side="right" class="w-70">

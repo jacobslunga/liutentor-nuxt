@@ -123,7 +123,7 @@ function confirmLockIn() {
 
 <template>
   <div
-    class="hidden lg:flex h-12 absolute top-0 z-60 w-full shrink-0 items-center justify-between bg-linear-to-b from-background via-background/90 to-transparent px-4">
+    class="hidden lg:flex h-12 absolute top-0 z-60 w-full shrink-0 items-center justify-between bg-linear-to-b from-background via-background/90 to-background/0 px-4">
     <div class="flex items-center gap-1">
       <Button size="icon-sm" variant="ghost" @click="router.push(`/search/${courseCode}`)">
         <LucideArrowLeft />
@@ -135,7 +135,7 @@ function confirmLockIn() {
             <div class="flex flex-row items-center gap-2 leading-none">
               <span class="text-sm font-semibold">{{
                 selectedExam.exam_date
-              }}</span>
+                }}</span>
             </div>
             <LucideChevronDown class="w-4 h-4 text-muted-foreground transition-transform duration-200"
               :class="{ 'rotate-180': isDropdownOpen }" />
@@ -180,7 +180,7 @@ function confirmLockIn() {
 
       <span v-if="selectedExam" class="text-sm font-normal text-muted-foreground">{{
         selectedExam.exam_name.replace(selectedExam.exam_date, "").trim()
-        }}</span>
+      }}</span>
     </div>
 
     <div class="flex items-center gap-2">

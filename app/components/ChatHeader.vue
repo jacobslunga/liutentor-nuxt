@@ -1,6 +1,6 @@
 <template>
   <div
-    class="shrink-0 bg-linear-to-b from-background via-background/90 to-transparent relative flex items-center justify-between px-3 py-2 z-90 overflow-visible">
+    class="shrink-0 bg-linear-to-b from-background via-background/90 to-background/0 relative flex items-center justify-between px-3 py-2 z-90 overflow-visible">
     <div class="flex items-center gap-2 min-w-0">
       <Button variant="ghost" size="icon" class="size-8" @click="emit('close')">
         <LucideChevronRight />
