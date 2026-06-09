@@ -147,7 +147,7 @@ const plugins = computed(() => {
                               <Rotate :document-id="activeDocumentId" :page-index="page.pageIndex"
                                 class="relative h-full w-full">
                                 <div class="absolute inset-0 z-0 pdf-render-surface" :style="isDark
-                                  ? { filter: 'invert(93%)' }
+                                  ? { filter: 'invert(93.6%)' }
                                   : {}
                                   ">
                                   <RenderLayer :document-id="activeDocumentId" :page-index="page.pageIndex" />

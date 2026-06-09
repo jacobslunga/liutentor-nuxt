@@ -178,7 +178,7 @@ function confirmLockIn() {
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <span v-if="selectedExam" class="text-sm font-normal text-muted-foreground">{{
+      <span v-if="selectedExam" class="text-sm font-normal text-muted-foreground ml-2">{{
         selectedExam.exam_name.replace(selectedExam.exam_date, "").trim()
       }}</span>
     </div>

@@ -29,7 +29,7 @@ const isDark = computed(() => colorMode.value === "dark");
 
 const gradientOpacity = computed(() => {
   const v = spring.value;
-  return isDark.value ? 0.08 + v * 0.3 : 0.16 + v * 0.45;
+  return isDark.value ? 0.08 + v * 0.3 : 0.36 + v * 0.45;
 });
 
 const backgroundImage = computed(() => {
@@ -44,7 +44,7 @@ function handleMouseMove(e: MouseEvent) {
   const w = window.innerWidth;
   const h = window.innerHeight;
   const xTrigger = w * 0.7;
-  const safeZoneY = h * 0.2;
+  const safeZoneY = h * 0.25;
   const inSafeZone = e.clientY < safeZoneY || e.clientY > h - safeZoneY;
 
   if (e.clientX > xTrigger && !inSafeZone) {
@@ -63,16 +63,11 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div
-    class="absolute right-0 top-0 h-full w-28 pointer-events-none"
-    :style="{ backgroundImage }"
-  >
-    <div
-      class="absolute right-0 flex items-center h-full pr-2"
-      :style="{ opacity: iconOpacity, transform: `translateX(${arrowX})` }"
-    >
+  <div class="absolute right-0 top-0 h-full w-28 pointer-events-none" :style="{ backgroundImage }">
+    <div class="absolute right-0 flex items-center h-full pr-2"
+      :style="{ opacity: iconOpacity, transform: `translateX(${arrowX})` }">
       <div v-if="facitPdfUrl" class="flex items-center gap-2">
-        <LucideArrowLeftToLine class="w-5 h-5 text-primary"  />
+        <LucideArrowLeftToLine class="w-5 h-5 text-primary" />
         <span class="text-xs font-medium text-primary hidden md:block">
           {{ label ?? "Facit" }}
         </span>

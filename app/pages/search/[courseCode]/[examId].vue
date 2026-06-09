@@ -148,7 +148,7 @@ function handleKeyUp(e: KeyboardEvent) {
               <PdfRenderer :pdf-url="exam.pdf_url" layout-mode="exam-with-facit" />
             </div>
 
-            <div class="relative z-[100] w-0 shrink-0">
+            <div class="relative z-100 w-0 shrink-0">
               <ResizeHandle :is-resizing="isResizing" @start-resize="startResize" />
             </div>
 
@@ -206,7 +206,7 @@ function handleKeyUp(e: KeyboardEvent) {
               </div>
 
               <Transition name="panel-swap">
-                <div v-if="chatHasBeenOpened" v-show="chatStore.isOpen" class="absolute inset-0 z-[80] h-full w-full">
+                <div v-if="chatHasBeenOpened" v-show="chatStore.isOpen" class="absolute inset-0 z-80 h-full w-full">
                   <ChatWindow :exam-id="examId" :exam-url="exam.pdf_url" :course-code="courseCode"
                     :solution-url="solutionPdfUrl" :has-solution="!!solution" class="h-full w-full bg-background"
                     @close="chatStore.close()" />

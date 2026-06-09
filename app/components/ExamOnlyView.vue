@@ -50,6 +50,14 @@ function handleMouseMove(e: MouseEvent) {
   if (!hasFacit.value || isManual.value || isDragging.value || chatStore.isOpen)
     return;
 
+  const h = window.innerHeight;
+  const safeZone = h * 0.25;
+  const inSafeZone = e.clientY < safeZone || e.clientY > h - safeZone;
+
+  if (inSafeZone) {
+    if (!isFacitVisible.value) return;
+  }
+
   if (!isFacitVisible.value && e.clientY < 80) return;
 
   const w = window.innerWidth;
@@ -63,7 +71,7 @@ function handleMouseMove(e: MouseEvent) {
     if (isInside) return;
   }
 
-  if (e.clientX > threshold) {
+  if (e.clientX > threshold && !inSafeZone) {
     isFacitVisible.value = true;
   } else {
     isFacitVisible.value = false;
@@ -139,8 +147,8 @@ watch(
       leave-active-class="transition-all duration-200 ease-[cubic-bezier(0.32,0.72,0,1)]"
       leave-from-class="translate-x-0 opacity-100 blur-0" leave-to-class="translate-x-full opacity-0 blur-sm">
       <div v-show="hasFacit && isFacitVisible && !chatStore.isOpen" ref="panelRef"
-        class="fixed right-0 bottom-0 z-[70] flex h-screen bg-background" :style="{ width: `${panelWidth}px` }">
-        <div class="relative z-[100] w-0 shrink-0">
+        class="fixed right-0 bottom-0 z-70 flex h-screen bg-background" :style="{ width: `${panelWidth}px` }">
+        <div class="relative z-100 w-0 shrink-0">
           <ResizeHandle :is-resizing="isDragging" @start-resize="startResize" />
         </div>
         <div class="flex-1 overflow-hidden">
@@ -156,8 +164,8 @@ watch(
       leave-active-class="transition-all duration-200 ease-[cubic-bezier(0.32,0.72,0,1)]"
       leave-from-class="translate-x-0 opacity-100 blur-0" leave-to-class="translate-x-full opacity-0 blur-sm">
       <div v-if="chatHasBeenOpened" v-show="chatStore.isOpen"
-        class="fixed right-0 bottom-0 z-[80] flex h-screen bg-background" :style="{ width: `${panelWidth}px` }">
-        <div class="relative z-[100] w-0 shrink-0">
+        class="fixed right-0 bottom-0 z-80 flex h-screen bg-background" :style="{ width: `${panelWidth}px` }">
+        <div class="relative z-100 w-0 shrink-0">
           <ResizeHandle :is-resizing="isDragging" @start-resize="startResize" />
         </div>
         <div class="flex-1 overflow-hidden">
