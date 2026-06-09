@@ -20,15 +20,22 @@ const props = defineProps<{
 const router = useRouter();
 const chatStore = useChatStore();
 const { startSession } = useLockInMode();
-const isExamSidebarOpen = ref(false);
-const sidebarContentReady = ref(false);
-const examListRef = ref<HTMLDivElement | null>(null);
+const isDropdownOpen = ref(false);
 const isDownloadOpen = ref(false);
 const isSettingsOpen = ref(false);
 const isLockInOpen = ref(false);
 const lockInDuration = ref<string | null>(null);
 const showLockInConfirm = ref(false);
-let sidebarRevealTimer: ReturnType<typeof setTimeout> | null = null;
+const scrollRef = ref<HTMLDivElement | null>(null);
+
+watch(isDropdownOpen, (open) => {
+  if (open) {
+    nextTick(() => {
+      const activeEl = scrollRef.value?.querySelector('[data-current="true"]');
+      activeEl?.scrollIntoView({ block: "center" });
+    });
+  }
+});
 
 const TIME_OPTIONS = [
   { value: "30", label: "30 min" },
@@ -57,69 +64,23 @@ const selectedDurationLabel = computed(
   () => TIME_OPTIONS.find((o) => o.value === lockInDuration.value)?.label ?? "",
 );
 
-function isTypingTarget(target: EventTarget | null) {
-  if (!(target instanceof HTMLElement)) return false;
-  return (
-    target.tagName === "INPUT" ||
-    target.tagName === "TEXTAREA" ||
-    target.isContentEditable
-  );
-}
-
 function handleKeyDown(event: KeyboardEvent) {
-  if (event.key === "Escape" && isExamSidebarOpen.value) {
-    isExamSidebarOpen.value = false;
+  if (event.key === "Escape" && isDropdownOpen.value) {
+    isDropdownOpen.value = false;
     return;
-  }
-
-  if (
-    event.key.toLowerCase() === "t" &&
-    !event.metaKey &&
-    !event.ctrlKey &&
-    !event.altKey &&
-    !event.repeat &&
-    !isTypingTarget(event.target)
-  ) {
-    isExamSidebarOpen.value = !isExamSidebarOpen.value;
   }
 }
 
 const changeExam = (e: Exam) => {
   if (e.id.toString() === props.examId) {
-    isExamSidebarOpen.value = false;
+    isDropdownOpen.value = false;
     return;
   }
-  isExamSidebarOpen.value = false;
+  isDropdownOpen.value = false;
   router.push(`/search/${props.courseCode}/${e.id}`);
 };
 
-watch(isExamSidebarOpen, (open) => {
-  if (sidebarRevealTimer) {
-    clearTimeout(sidebarRevealTimer);
-    sidebarRevealTimer = null;
-  }
-
-  if (!open) {
-    sidebarContentReady.value = false;
-    return;
-  }
-
-  sidebarRevealTimer = setTimeout(() => {
-    sidebarContentReady.value = true;
-    nextTick(() => {
-      const activeEl = examListRef.value?.querySelector(
-        '[data-current="true"]',
-      );
-      activeEl?.scrollIntoView({ block: "center" });
-    });
-  }, 110);
-});
-
 onUnmounted(() => {
-  if (sidebarRevealTimer) {
-    clearTimeout(sidebarRevealTimer);
-    sidebarRevealTimer = null;
-  }
   window.removeEventListener("keydown", handleKeyDown);
 });
 
@@ -162,254 +123,162 @@ function confirmLockIn() {
 
 <template>
   <div
-    class="hidden lg:flex h-12 shrink-0 items-center justify-between border-b border-border bg-background px-4"
-  >
+    class="hidden lg:flex h-12 absolute top-0 z-60 w-full shrink-0 items-center justify-between bg-linear-to-b from-background via-background/90 to-transparent px-4">
     <div class="flex items-center gap-1">
-      <Button
-        size="icon-sm"
-        variant="ghost"
-        @click="router.push(`/search/${courseCode}`)"
-      >
+      <Button size="icon-sm" variant="ghost" @click="router.push(`/search/${courseCode}`)">
         <LucideArrowLeft />
       </Button>
 
-      <Button
-        variant="ghost"
-        size="icon"
-        class="focus-visible:border-transparent focus-visible:ring-0"
-        aria-label="Visa tentor"
-        @click="isExamSidebarOpen = !isExamSidebarOpen"
-      >
-        <LucidePanelRight />
-      </Button>
-
-      <div
-        v-if="selectedExam"
-        class="min-w-0 max-w-96 px-2 flex flex-row gap-2"
-      >
-        <p class="text-sm leading-none font-semibold">
-          {{ selectedExam.exam_date }}
-        </p>
-        <p
-          class="truncate text-muted-foreground text-sm font-normal leading-none"
-        >
-          {{
-            selectedExam.exam_name.replace(selectedExam.exam_date, "").trim()
-          }}
-        </p>
-      </div>
-    </div>
-
-    <div class="flex items-center gap-1">
-      <DropdownMenu v-model:open="isLockInOpen">
+      <DropdownMenu v-if="selectedExam" v-model:open="isDropdownOpen">
         <DropdownMenuTrigger as-child>
-          <Button variant="ghost" size="sm" :disabled="!selectedExam">
-            <LucideLock class="w-3.5 h-3.5" />
-            <span class="text-xs">Lock in</span>
+          <Button variant="ghost" size="sm" class="gap-2">
+            <div class="flex flex-row items-center gap-2 leading-none">
+              <span class="text-sm font-semibold">{{
+                selectedExam.exam_date
+              }}</span>
+            </div>
+            <LucideChevronDown class="w-4 h-4 text-muted-foreground transition-transform duration-200"
+              :class="{ 'rotate-180': isDropdownOpen }" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" :side-offset="8" class="w-44">
-          <div
-            class="px-2 py-1.5 text-[11px] font-medium text-muted-foreground border-b mb-1"
-          >
-            Välj varaktighet
+        <DropdownMenuContent align="start" :side-offset="8" class="w-76 p-0 overflow-hidden">
+          <div class="px-3 py-2.5 flex items-center justify-between border-b">
+            <span class="text-[11px] font-semibold text-foreground">Tentor</span>
+            <span class="text-[11px] text-muted-foreground">{{ sortedExams.length }} st</span>
           </div>
-          <DropdownMenuItem
-            v-for="opt in TIME_OPTIONS"
-            :key="opt.value"
-            class="gap-2 text-sm cursor-pointer"
-            @click="selectLockInDuration(opt.value)"
-          >
-            <LucideTimer class="w-3.5 h-3.5 opacity-70" />
-            {{ opt.label }}
-          </DropdownMenuItem>
+          <div ref="scrollRef" class="max-h-80 overflow-y-auto p-1.5 space-y-1">
+            <button v-for="e in sortedExams" :key="e.id" :data-current="e.id.toString() === examId"
+              class="w-full text-left rounded-lg px-3 py-2.5 transition-colors cursor-pointer group" :class="e.id.toString() === examId
+                ? 'bg-primary/8 ring-1 ring-primary/20'
+                : 'hover:bg-foreground/5'
+                " @click="changeExam(e)">
+              <div class="flex items-start justify-between gap-2">
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2">
+                    <span class="font-semibold text-sm" :class="e.id.toString() === examId
+                      ? 'text-primary'
+                      : 'text-foreground'
+                      ">
+                      {{ e.exam_date }}
+                    </span>
+                  </div>
+                  <div class="text-[11px] text-muted-foreground mt-0.5 capitalize truncate">
+                    {{ e.exam_name.replace(e.exam_date, "").trim() }}
+                  </div>
+                </div>
+                <div class="shrink-0 pt-0.5">
+                  <span v-if="e.has_solution"
+                    class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                    Facit
+                  </span>
+                </div>
+              </div>
+            </button>
+          </div>
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <DropdownMenu v-model:open="isDownloadOpen">
-        <DropdownMenuTrigger as-child>
-          <Button variant="ghost" size="sm" :disabled="!hasDownload">
-            <span class="text-xs">Ladda ned</span>
-            <LucideChevronDown class="w-4 h-4 text-muted-foreground" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" :side-offset="8">
-          <DropdownMenuItem
-            class="gap-2 text-sm cursor-pointer"
-            :disabled="!selectedExam?.pdf_url"
-            @click="
+      <span v-if="selectedExam" class="text-sm font-normal text-muted-foreground">{{
+        selectedExam.exam_name.replace(selectedExam.exam_date, "").trim()
+        }}</span>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <div class="flex items-center gap-0.5">
+        <LayoutSwitcher />
+
+        <Dialog v-model:open="isSettingsOpen">
+          <DialogTrigger as-child>
+            <Button variant="ghost" size="icon-sm"
+              class="text-muted-foreground/60 hover:bg-transparent hover:text-foreground">
+              <LucideSettings class="size-4" />
+            </Button>
+          </DialogTrigger>
+          <DialogContent class="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Inställningar</DialogTitle>
+              <DialogDescription>Anpassa din studieupplevelse</DialogDescription>
+            </DialogHeader>
+            <SettingsDialogContent />
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <div class="h-5 w-px bg-border/60" />
+
+      <Button variant="ghost" size="sm" class="text-muted-foreground hover:text-foreground" @click="chatStore.toggle()">
+        <LucideLoader2 v-if="chatStore.isLoading" class="size-3.5 animate-spin" />
+        <LucideMessageSquare v-else class="size-4" />
+        <span class="text-xs">{{ chatStore.isOpen ? "Stäng" : "Chatt" }}</span>
+      </Button>
+
+      <div class="h-5 w-px bg-border/60" />
+
+      <div class="flex items-center gap-1.5">
+        <DropdownMenu v-model:open="isDownloadOpen">
+          <DropdownMenuTrigger as-child>
+            <Button variant="ghost" size="sm" class="text-muted-foreground hover:text-foreground"
+              :disabled="!hasDownload">
+              <LucideDownload class="size-4" />
+              <span class="text-xs">Ladda ned</span>
+              <LucideChevronDown class="size-3.5 opacity-60 transition-transform duration-200"
+                :class="{ 'rotate-180': isDownloadOpen }" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" :side-offset="8">
+            <DropdownMenuItem class="gap-2 text-sm cursor-pointer" :disabled="!selectedExam?.pdf_url" @click="
               downloadFile(
                 selectedExam!.pdf_url,
                 `${selectedExam!.course_code}_${selectedExam!.exam_date}_EXAM.pdf`,
               )
-            "
-          >
-            <LucideDownload class="w-4 h-4" /> Ladda ned tenta
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            class="gap-2 text-sm cursor-pointer"
-            :disabled="!solutionPdfUrl"
-            @click="
+              ">
+              <LucideDownload class="size-4" /> Ladda ned tenta
+            </DropdownMenuItem>
+            <DropdownMenuItem class="gap-2 text-sm cursor-pointer" :disabled="!solutionPdfUrl" @click="
               downloadFile(
                 solutionPdfUrl!,
                 `${selectedExam?.course_code}_${selectedExam?.exam_date}_SOLUTION.pdf`,
               )
-            "
-          >
-            <LucideDownload class="w-4 h-4" /> Ladda ned facit
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+              ">
+              <LucideDownload class="size-4" /> Ladda ned facit
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
-      <Button variant="ghost" size="sm" @click="chatStore.toggle()">
-        <LucideLoader2
-          v-if="chatStore.isLoading"
-          class="size-3.5 animate-spin"
-        />
-        <LucideMessageSquare v-else class="w-4 h-4" />
-        <span class="text-xs">{{ chatStore.isOpen ? "Stäng" : "Chatt" }}</span>
-      </Button>
-
-      <Dialog v-model:open="isSettingsOpen">
-        <DialogTrigger as-child>
-          <Button variant="ghost" size="icon-sm">
-            <LucideSettings class="w-4.5 h-4.5" />
-          </Button>
-        </DialogTrigger>
-        <DialogContent class="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Inställningar</DialogTitle>
-            <DialogDescription>Anpassa din studieupplevelse</DialogDescription>
-          </DialogHeader>
-          <SettingsDialogContent />
-        </DialogContent>
-      </Dialog>
+        <DropdownMenu v-model:open="isLockInOpen">
+          <DropdownMenuTrigger as-child>
+            <Button variant="outline" size="sm" class="border-border/60 shadow-none" :disabled="!selectedExam">
+              <LucideLock class="size-3.5" />
+              <span class="text-xs font-medium">Lock in</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" :side-offset="8" class="w-44">
+            <div class="px-2 py-1.5 text-[11px] font-medium text-muted-foreground border-b mb-1">
+              Välj varaktighet
+            </div>
+            <DropdownMenuItem v-for="opt in TIME_OPTIONS" :key="opt.value" class="gap-2 text-sm cursor-pointer"
+              @click="selectLockInDuration(opt.value)">
+              <LucideTimer class="size-3.5 opacity-70" />
+              {{ opt.label }}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </div>
   </div>
 
-  <Teleport to="body">
-    <div
-      class="fixed inset-x-0 top-12 bottom-0 z-90 transition-opacity duration-200 ease-out"
-      :class="
-        isExamSidebarOpen
-          ? 'opacity-100 pointer-events-auto'
-          : 'opacity-0 pointer-events-none'
-      "
-      aria-hidden="true"
-      @click="isExamSidebarOpen = false"
-    />
-
-    <aside
-      class="fixed top-12 left-0 z-100 h-[calc(100vh-3rem)] w-86 border-r border-border bg-background transition-transform duration-250 ease-[cubic-bezier(0.32,0.72,0,1)]"
-      :class="isExamSidebarOpen ? 'translate-x-0' : '-translate-x-full'"
-      aria-label="Välj tenta"
-    >
-      <div class="flex h-full min-h-0 flex-col">
-        <div class="border-b px-4 py-3 flex items-center justify-between gap-2">
-          <div class="min-w-0">
-            <h2 class="text-sm font-medium">Tentor</h2>
-            <p class="text-xs text-muted-foreground">
-              {{ sortedExams.length }} tentor
-            </p>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            class="size-7 shrink-0"
-            @click="isExamSidebarOpen = false"
-          >
-            <LucideX class="w-4 h-4" />
-          </Button>
-        </div>
-
-        <div
-          ref="examListRef"
-          class="flex-1 min-h-0 overflow-y-auto px-2 py-2 custom-scrollbar transition-opacity duration-150 ease-out"
-          :class="
-            isExamSidebarOpen && sidebarContentReady
-              ? 'opacity-100'
-              : 'opacity-0'
-          "
-        >
-          <div
-            v-if="sortedExams.length === 0"
-            class="px-2 py-4 text-sm text-muted-foreground"
-          >
-            Inga tentor hittades.
-          </div>
-
-          <div v-else class="space-y-1">
-            <button
-              v-for="e in sortedExams"
-              :key="e.id"
-              :data-current="e.id.toString() === examId"
-              class="group w-full cursor-pointer rounded-md border px-3 py-3 text-left transition-colors"
-              :class="
-                e.id.toString() === examId
-                  ? 'border-primary/25 bg-primary/8'
-                  : 'border-transparent hover:bg-muted/40'
-              "
-              @click="changeExam(e)"
-            >
-              <div class="flex items-start justify-between gap-3">
-                <div class="min-w-0 flex-1">
-                  <div class="flex items-center gap-2">
-                    <span class="text-sm font-medium text-foreground">
-                      {{ e.exam_date }}
-                    </span>
-                    <span
-                      v-if="e.id.toString() === examId"
-                      class="shrink-0 rounded-full border border-primary/20 bg-primary/10 px-1.5 py-0.5 text-[9px] font-bold text-primary"
-                    >
-                      Aktiv
-                    </span>
-                    <span
-                      v-if="e.has_solution"
-                      class="shrink-0 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-1.5 py-0.5 text-[9px] font-bold text-emerald-600 dark:text-emerald-400"
-                    >
-                      Facit
-                    </span>
-                  </div>
-                  <p
-                    class="mt-0.5 truncate text-xs capitalize text-muted-foreground"
-                  >
-                    {{ e.exam_name.replace(e.exam_date, "").trim() }}
-                  </p>
-                </div>
-                <LucideChevronRight
-                  v-if="e.id.toString() !== examId"
-                  class="mt-1 h-4 w-4 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100"
-                />
-              </div>
-            </button>
-          </div>
-        </div>
-      </div>
-    </aside>
-  </Teleport>
-
-  <AlertDialog
-    :open="showLockInConfirm"
-    @update:open="showLockInConfirm = $event"
-  >
+  <AlertDialog :open="showLockInConfirm" @update:open="showLockInConfirm = $event">
     <AlertDialogContent>
       <AlertDialogHeader>
-        <AlertDialogTitle
-          >Är du säker på att du vill locka in?</AlertDialogTitle
-        >
+        <AlertDialogTitle>Är du säker på att du vill locka in?</AlertDialogTitle>
         <AlertDialogDescription>
           Du startar en session på {{ selectedDurationLabel }}. Du kommer inte
           kunna se lösningar under denna tid.
         </AlertDialogDescription>
       </AlertDialogHeader>
       <AlertDialogFooter>
-        <AlertDialogCancel @click="showLockInConfirm = false"
-          >Avbryt</AlertDialogCancel
-        >
-        <AlertDialogAction
-          class="bg-destructive text-white hover:bg-destructive/90"
-          @click="confirmLockIn"
-        >
+        <AlertDialogCancel @click="showLockInConfirm = false">Avbryt</AlertDialogCancel>
+        <AlertDialogAction class="bg-destructive text-white hover:bg-destructive/90" @click="confirmLockIn">
           Starta timer
         </AlertDialogAction>
       </AlertDialogFooter>

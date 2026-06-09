@@ -15,16 +15,49 @@ watch(
     showSolution.value = false;
   },
 );
+
+function isTypingTarget(target: EventTarget | null) {
+  if (!(target instanceof HTMLElement)) return false;
+  return (
+    target.tagName === "INPUT" ||
+    target.tagName === "TEXTAREA" ||
+    target.isContentEditable
+  );
+}
+
+function handleKeyDown(event: KeyboardEvent) {
+  if (
+    event.key.toLowerCase() !== "f" ||
+    event.metaKey ||
+    event.ctrlKey ||
+    event.altKey ||
+    event.repeat ||
+    isTypingTarget(event.target) ||
+    !hasSolution.value
+  ) {
+    return;
+  }
+
+  showSolution.value = !showSolution.value;
+}
+
+onMounted(() => {
+  window.addEventListener("keydown", handleKeyDown);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("keydown", handleKeyDown);
+});
 </script>
 
 <template>
   <div class="flex flex-col h-screen w-full bg-background relative">
     <div
-      class="absolute inset-x-0 top-0 z-40 flex items-center gap-3 px-3 h-12 bg-linear-to-b from-background to-transparent">
-      <NuxtLink :to="`/search/${courseCode}`"
-        class="shrink-0 inline-flex items-center justify-center h-8 w-8 rounded-md border border-border bg-background text-foreground active:scale-95 transition-transform"
-        aria-label="Gå tillbaka">
-        <LucideArrowLeft class="w-4 h-4"  />
+      class="absolute inset-x-0 top-0 z-40 flex h-12 items-center gap-3 bg-linear-to-b from-background via-background/90 to-transparent px-3">
+      <NuxtLink :to="`/search/${courseCode}`">
+        <Button aria-label="Gå tillbaka" variant="outline" size="icon-sm">
+          <LucideArrowLeft class="w-4 h-4" />
+        </Button>
       </NuxtLink>
       <div class="min-w-0 flex-1">
         <p class="text-sm font-bold text-foreground truncate leading-tight">
@@ -34,15 +67,13 @@ watch(
           {{ examDate }}
         </p>
       </div>
-      <button v-if="hasSolution"
-        class="shrink-0 cursor-pointer inline-flex items-center gap-1.5 h-8 px-3 rounded-md border border-border bg-background text-foreground text-xs active:scale-95 transition-transform"
-        @click="showSolution = true">
-        <LucideBookOpen class="w-3.5 h-3.5 text-primary"  />
+      <Button v-if="hasSolution" variant="outline" size="sm" @click="showSolution = true">
+        <LucideBookOpen class="w-3.5 h-3.5 text-primary" />
         Facit
-      </button>
+      </Button>
     </div>
 
-    <div class="w-full h-full overflow-hidden pt-12">
+    <div class="w-full h-full overflow-hidden">
       <ClientOnly>
         <PdfRenderer :pdf-url="examPdfUrl" />
       </ClientOnly>
@@ -56,22 +87,20 @@ watch(
         class="fixed inset-0 z-50 h-screen w-screen bg-background flex flex-col overflow-hidden" role="dialog"
         aria-modal="true">
         <div
-          class="absolute inset-x-0 top-0 z-10 flex items-center gap-3 px-3 h-12 bg-linear-to-b from-background to-transparent">
+          class="absolute inset-x-0 top-0 z-10 flex h-12 items-center gap-3 bg-linear-to-b from-background via-background/90 to-transparent px-3">
           <div class="min-w-0 flex-1">
-            <p class="text-sm font-medium text-foreground truncate leading-tight">
+            <p class="text-sm font-bold text-foreground truncate leading-tight">
               Facit
             </p>
             <p class="text-xs text-muted-foreground truncate leading-tight">
               {{ courseCode }} - {{ examDate }}
             </p>
           </div>
-          <button
-            class="shrink-0 cursor-pointer inline-flex items-center justify-center h-8 w-8 rounded-md border border-border bg-background text-foreground active:scale-95 transition-transform"
-            aria-label="Stäng" @click="showSolution = false">
-            <LucideX class="w-4 h-4"  />
-          </button>
+          <Button variant="outline" size="icon-sm" aria-label="Stäng" @click="showSolution = false">
+            <LucideX class="w-4 h-4" />
+          </Button>
         </div>
-        <div class="h-full w-full overflow-hidden pt-12">
+        <div class="h-full w-full overflow-hidden">
           <ClientOnly>
             <PdfRenderer v-if="solutionPdfUrl" :pdf-url="solutionPdfUrl" />
           </ClientOnly>

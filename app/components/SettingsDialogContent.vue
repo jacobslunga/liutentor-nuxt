@@ -16,14 +16,11 @@ const themeOptions = [
 
 const shortcuts = [
   { action: "Visa/dölj facit", key: "E", category: "visibility" },
+  { action: "Visa/dölj facit på mobil", key: "F", category: "visibility" },
   { action: "Visa/dölj AI-chat", key: "C", category: "visibility" },
-  { action: "Visa/dölj tentor", key: "T", category: "navigation" },
 ];
 
-const categories = [
-  { id: "visibility", label: "Synlighet" },
-  { id: "navigation", label: "Navigation" },
-];
+const categories = [{ id: "visibility", label: "Synlighet" }];
 </script>
 
 <template>

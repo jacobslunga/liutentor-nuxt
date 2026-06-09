@@ -103,21 +103,14 @@ function passColor(rate: number) {
 
 <template>
   <div class="container mx-auto px-4 py-8 max-w-4xl">
-    <div
-      v-if="status === 'pending'"
-      class="flex items-center justify-center min-h-[60vh]"
-    >
+    <div v-if="status === 'pending'" class="flex items-center justify-center min-h-[60vh]">
       <LucideLoader2 class="w-6 h-6 animate-spin text-muted-foreground" />
     </div>
 
-    <div
-      v-else-if="status === 'success' && !courseData"
-      class="mx-auto flex min-h-[60vh] w-full max-w-2xl flex-col items-center justify-center gap-8 py-8"
-    >
+    <div v-else-if="status === 'success' && !courseData"
+      class="mx-auto flex min-h-[60vh] w-full max-w-2xl flex-col items-center justify-center gap-8 py-8">
       <div class="max-w-xl text-center">
-        <div
-          class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted"
-        >
+        <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
           <LucideInbox class="h-6 w-6 text-muted-foreground" />
         </div>
         <h1 class="text-2xl font-medium text-foreground">
@@ -128,11 +121,7 @@ function passColor(rate: number) {
           nästa student som söker på {{ courseCode }} hjälpt direkt.
         </p>
       </div>
-      <ExamUploadForm
-        :initial-course-code="courseCode"
-        fixed-course-code
-        :show-heading="false"
-      />
+      <ExamUploadForm :initial-course-code="courseCode" fixed-course-code :show-heading="false" />
     </div>
 
     <template v-else-if="courseData">
@@ -141,24 +130,17 @@ function passColor(rate: number) {
           <!-- Header -->
           <div class="w-full">
             <div class="flex items-center gap-2 mb-3">
-              <span
-                class="text-xs text-muted-foreground/60 tracking-wide uppercase"
-                >{{ courseCode }}</span
-              >
+              <span class="text-xs text-muted-foreground/60 tracking-wide uppercase">{{ courseCode }}</span>
               <span class="text-muted-foreground/30">/</span>
               <span class="text-xs text-muted-foreground/60">Tentor</span>
             </div>
-            <h1
-              class="text-3xl sm:text-4xl font-semibold text-foreground leading-tight w-full wrap-break-word mb-5"
-            >
+            <h1 class="text-3xl sm:text-4xl font-semibold text-foreground leading-tight w-full wrap-break-word mb-5">
               {{ courseData.courseName }}
             </h1>
 
             <!-- Meta stats -->
             <div class="flex flex-wrap gap-3">
-              <div
-                class="flex items-center gap-2 px-3 py-2 rounded-2xl bg-muted/40 border border-border/50"
-              >
+              <div class="flex items-center gap-2 px-3 py-2 rounded-2xl bg-muted/40 border border-border/50">
                 <LucideFileText class="w-3.5 h-3.5 text-muted-foreground" />
                 <span class="text-xs text-muted-foreground">
                   <span class="font-medium text-foreground">{{
@@ -167,9 +149,7 @@ function passColor(rate: number) {
                   tentor
                 </span>
               </div>
-              <div
-                class="flex items-center gap-2 px-3 py-2 rounded-2xl bg-muted/40 border border-border/50"
-              >
+              <div class="flex items-center gap-2 px-3 py-2 rounded-2xl bg-muted/40 border border-border/50">
                 <LucideCheckCircle class="w-3.5 h-3.5 text-muted-foreground" />
                 <span class="text-xs text-muted-foreground">
                   <span class="font-medium text-foreground">{{
@@ -178,58 +158,38 @@ function passColor(rate: number) {
                   med facit
                 </span>
               </div>
-              <div
-                v-if="avgPassRate !== null"
-                class="flex items-center gap-2 px-3 py-2 rounded-2xl bg-muted/40 border border-border/50"
-              >
+              <div v-if="avgPassRate !== null"
+                class="flex items-center gap-2 px-3 py-2 rounded-2xl bg-muted/40 border border-border/50">
                 <LucideTrendingUp class="w-3.5 h-3.5 text-muted-foreground" />
                 <span class="text-xs text-muted-foreground">
                   Snitt godkänd
-                  <span class="font-medium" :class="passColor(avgPassRate)"
-                    >{{ avgPassRate }}%</span
-                  >
+                  <span class="font-medium" :class="passColor(avgPassRate)">{{ avgPassRate }}%</span>
                 </span>
               </div>
             </div>
           </div>
 
           <!-- Filters -->
-          <div
-            v-if="prefixes.length > 1"
-            class="flex flex-wrap gap-2 w-full -mt-4"
-          >
-            <button
-              v-for="p in prefixes"
-              :key="p"
-              class="text-xs cursor-pointer font-mono px-3 py-1.5 rounded-md border transition-all"
-              :class="
-                activeFilters.has(p)
-                  ? 'bg-foreground text-background border-foreground shadow-sm'
-                  : 'border-border/50 text-muted-foreground hover:text-foreground hover:border-border'
-              "
-              @click="toggleFilter(p)"
-            >
+          <div v-if="prefixes.length > 1" class="flex flex-wrap gap-2 w-full -mt-4">
+            <button v-for="p in prefixes" :key="p"
+              class="text-xs cursor-pointer font-mono px-3 py-1.5 rounded-md border transition-all" :class="activeFilters.has(p)
+                ? 'bg-foreground text-background border-foreground shadow-sm'
+                : 'border-border/50 text-muted-foreground hover:text-foreground hover:border-border'
+                " @click="toggleFilter(p)">
               {{ p }}
             </button>
           </div>
 
           <!-- Table -->
-          <div
-            class="w-full overflow-x-auto rounded-2xl border border-border/60 -mt-4"
-          >
+          <div class="w-full overflow-x-auto rounded-2xl border border-border/60 -mt-4">
             <div class="min-w-fit w-full rounded-2xl overflow-hidden">
               <div
-                class="grid grid-cols-[1fr_80px_64px_80px] gap-x-4 px-6 py-3.5 border-b border-border/50 bg-muted/30"
-              >
+                class="grid grid-cols-[1fr_80px_64px_80px] gap-x-4 px-6 py-3.5 border-b border-border/50 bg-muted/30">
                 <button
                   class="text-xs text-muted-foreground flex items-center gap-1.5 hover:text-foreground transition-colors w-fit"
-                  @click="sortOrder = sortOrder === 'desc' ? 'asc' : 'desc'"
-                >
+                  @click="sortOrder = sortOrder === 'desc' ? 'asc' : 'desc'">
                   Tentamen
-                  <LucideArrowDownWideNarrow
-                    v-if="sortOrder === 'asc'"
-                    class="w-3.5 h-3.5"
-                  />
+                  <LucideArrowDownWideNarrow v-if="sortOrder === 'asc'" class="w-3.5 h-3.5" />
                   <LucideArrowDownWideNarrow v-else class="w-3.5 h-3.5" />
                 </button>
                 <div class="text-xs text-muted-foreground">Typ</div>
@@ -241,18 +201,13 @@ function passColor(rate: number) {
                 </div>
               </div>
 
-              <div
-                v-for="exam in filteredExams"
-                :key="exam.id"
+              <div v-for="exam in filteredExams" :key="exam.id"
                 class="grid grid-cols-[1fr_80px_64px_80px] gap-x-4 cursor-pointer px-3 py-2 border-b border-border/20 last:border-0 hover:bg-muted/20 transition-colors items-center group"
-                @mouseenter="prefetchExamRoute(exam.id)"
-                @focusin="prefetchExamRoute(exam.id)"
-                @click="navigateTo(examRoutePath(exam.id))"
-              >
+                @mouseenter="prefetchExamRoute(exam.id)" @focusin="prefetchExamRoute(exam.id)"
+                @click="navigateTo(examRoutePath(exam.id))">
                 <div class="min-w-0">
                   <div
-                    class="text-sm font-medium text-foreground group-hover:text-foreground/80 transition-colors truncate"
-                  >
+                    class="text-sm font-medium text-foreground group-hover:text-foreground/80 transition-colors truncate">
                     {{ exam.exam_name }}
                   </div>
                   <div class="text-xs text-muted-foreground/70 mt-0.5">
@@ -262,29 +217,18 @@ function passColor(rate: number) {
 
                 <div>
                   <span
-                    class="text-[10px] px-2 py-0.5 rounded-md border border-border/50 bg-muted/40 text-muted-foreground font-mono"
-                  >
+                    class="text-[10px] px-2 py-0.5 rounded-md border border-border/50 bg-muted/40 text-muted-foreground font-mono">
                     {{ exam.exam_name.split(" ")[0] }}
                   </span>
                 </div>
 
                 <div class="flex justify-center">
-                  <LucideCheck
-                    v-if="exam.has_solution"
-                    class="w-4 h-4 text-green-500"
-                  />
-                  <LucideMinus
-                    v-else
-                    class="w-4 h-4 text-muted-foreground/30"
-                  />
+                  <LucideCheck v-if="exam.has_solution" class="w-4 h-4 text-green-500" />
+                  <LucideMinus v-else class="w-4 h-4 text-muted-foreground/30" />
                 </div>
 
                 <div class="text-right flex flex-col items-end gap-1">
-                  <ExamStatsDialog
-                    :statistics="exam.statistics"
-                    :date="exam.exam_date"
-                    :pass-rate="exam.pass_rate"
-                  />
+                  <ExamStatsDialog :statistics="exam.statistics" :date="exam.exam_date" :pass-rate="exam.pass_rate" />
                 </div>
               </div>
             </div>
@@ -293,9 +237,7 @@ function passColor(rate: number) {
       </div>
 
       <div class="sticky bottom-0 z-50 pointer-events-none">
-        <div
-          class="bg-linear-to-t from-background via-background/80 to-transparent pt-8 pb-10"
-        >
+        <div class="bg-linear-to-t from-background via-background/80 to-transparent pt-8 pb-10">
           <div class="flex items-center justify-center pointer-events-auto">
             <ButtonGroup class="pointer-events-auto">
               <Button variant="default" size="sm" as-child>

@@ -146,63 +146,38 @@ const iconSize = computed(
 <template>
   <div class="relative" :class="props.class">
     <div class="relative flex items-center">
-      <LucideSearch
-        class="absolute left-3 pointer-events-none text-muted-foreground z-10"
-        :class="iconSize"
-      />
-      <input
-        ref="inputRef"
-        :value="courseCode.toUpperCase()"
-        placeholder="Sök kurskod..."
-        class="w-full rounded-full bg-secondary border-none outline-none pl-9 pr-9 text-foreground placeholder:text-muted-foreground"
-        :class="sizeClass"
-        @input="courseCode = ($event.target as HTMLInputElement).value"
-        @keydown="handleKeyDown"
-        @focus="handleFocus"
-        @blur="handleBlur"
-      />
-      <div
-        v-if="!courseCode"
-        class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none hidden sm:flex"
-      >
+      <LucideSearch class="absolute left-3 pointer-events-none z-10 transition-colors"
+        :class="[iconSize, isFocused ? 'text-primary' : 'text-muted-foreground']" />
+      <input ref="inputRef" :value="courseCode.toUpperCase()" placeholder="Sök kurskod..."
+        class="w-full rounded-full border bg-background pl-9 pr-9 text-foreground outline-none transition-all duration-200 placeholder:text-muted-foreground hover:border-primary/40 hover:bg-background"
+        :class="[
+          sizeClass,
+          isFocused
+            ? 'border-primary ring-4 ring-primary/10'
+            : 'border-border/70',
+        ]" @input="courseCode = ($event.target as HTMLInputElement).value" @keydown="handleKeyDown"
+        @focus="handleFocus" @blur="handleBlur" />
+      <div v-if="!courseCode" class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none hidden sm:flex">
         <kbd
-          class="inline-flex h-5 items-center rounded border bg-muted px-1.5 font-mono text-[10px] text-muted-foreground"
-        >
+          class="inline-flex h-5 items-center rounded border border-border/70 bg-background px-1.5 font-mono text-[10px] text-muted-foreground shadow-sm">
           /
         </kbd>
       </div>
-      <button
-        v-else
-        class="absolute right-3 top-1/2 -translate-y-1/2 z-10"
-        aria-label="Rensa"
-        @click="courseCode = ''"
-      >
-        <LucideX
-          class="text-muted-foreground hover:text-foreground transition-colors"
-          :class="iconSize"
-        />
+      <button v-else class="absolute right-3 top-1/2 -translate-y-1/2 z-10" aria-label="Rensa" @click="courseCode = ''">
+        <LucideX class="text-muted-foreground hover:text-foreground transition-colors" :class="iconSize" />
       </button>
     </div>
 
-    <div
-      v-if="showSuggestions && suggestions.length > 0"
-      ref="suggestionsRef"
-      class="absolute w-full left-0 mt-2 bg-background border border-border rounded-md z-60 max-h-72 overflow-y-auto text-sm shadow-md"
-    >
+    <div v-if="showSuggestions && suggestions.length > 0" ref="suggestionsRef"
+      class="absolute w-full left-0 mt-2 bg-background border border-primary/20 rounded-xl z-60 max-h-72 overflow-y-auto text-sm shadow-lg shadow-primary/5">
       <div class="px-3 pt-3 pb-1 text-xs text-muted-foreground">
         Alla kurser
       </div>
-      <div
-        v-for="(suggestion, index) in suggestions"
-        :key="suggestion"
-        class="flex items-center px-3 py-2 cursor-pointer transition-colors"
-        :class="
-          index === selectedIndex
-            ? 'bg-muted text-foreground'
-            : 'hover:bg-muted/50'
-        "
-        @mousedown="handleSelectCourse(suggestion)"
-      >
+      <div v-for="(suggestion, index) in suggestions" :key="suggestion"
+        class="flex items-center px-3 py-2 cursor-pointer transition-colors" :class="index === selectedIndex
+          ? 'bg-muted text-foreground'
+          : 'hover:bg-muted/50'
+          " @mousedown="handleSelectCourse(suggestion)">
         <span class="flex-1 font-normal">{{ suggestion }}</span>
         <LucideCornerDownLeft class="w-3.5 h-3.5 opacity-40" />
       </div>

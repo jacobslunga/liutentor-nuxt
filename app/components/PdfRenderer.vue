@@ -59,7 +59,7 @@ function handleViewportScroll(event: Event) {
 }
 
 function scrollToTop() {
-  viewportEl.value?.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+  viewportEl.value?.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 const plugins = computed(() => {
@@ -99,7 +99,7 @@ const plugins = computed(() => {
 <template>
   <div class="relative h-full w-full overflow-hidden bg-background">
     <div v-if="isLoading || !engine" class="flex h-full w-full items-center justify-center">
-      <LucideLoader2 class="h-5 w-5 animate-spin text-muted-foreground"  />
+      <LucideLoader2 class="h-5 w-5 animate-spin text-muted-foreground" />
     </div>
 
     <EmbedPDF v-else :engine="engine" :plugins="plugins">
@@ -108,7 +108,7 @@ const plugins = computed(() => {
           <DocumentContent :document-id="activeDocumentId">
             <template #default="{ isLoaded }">
               <div v-if="!isLoaded" class="flex h-full w-full items-center justify-center">
-                <LucideLoader2 class="h-5 w-5 animate-spin text-muted-foreground"  />
+                <LucideLoader2 class="h-5 w-5 animate-spin text-muted-foreground" />
               </div>
 
               <Viewport v-else :document-id="activeDocumentId" class="h-full w-full bg-background pdf-viewport"
@@ -172,9 +172,9 @@ const plugins = computed(() => {
                 leave-from-class="opacity-100 translate-y-0 scale-100"
                 leave-to-class="opacity-0 translate-y-2 scale-95">
                 <Button v-if="showScrollTop" variant="ghost" size="icon-sm"
-                  class="absolute bottom-4 right-4 z-30 border border-border bg-background/90 shadow-sm backdrop-blur"
+                  class="absolute bottom-4 left-4 z-30 border border-border bg-background"
                   aria-label="Scrolla till toppen" @click="scrollToTop">
-                  <LucideArrowUp class="h-4 w-4"  />
+                  <LucideArrowUp class="h-4 w-4" />
                 </Button>
               </Transition>
             </template>

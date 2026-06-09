@@ -19,7 +19,17 @@ const session = getCurrentSession();
 const { data: examData } = useFetch(() => `/api/exams/detail/${examId.value}`);
 const exam = computed(() => (examData.value as any)?.data?.exam);
 
-useSeoMeta({ robots: "noindex, nofollow" });
+useSeoMeta({
+  title: () =>
+    exam.value
+      ? `Lock in - ${exam.value.course_code} ${exam.value.exam_date}`
+      : "Lock in - LiU Tentor",
+  description: () =>
+    exam.value
+      ? `Fokuserat tentläge för ${exam.value.course_code} från ${exam.value.exam_date}.`
+      : "Fokuserat tentläge på LiU Tentor.",
+  robots: "noindex, nofollow",
+});
 
 onMounted(() => {
   if (!session || session.examId !== examId.value) {
@@ -108,9 +118,9 @@ function formatTime(ms: number): string {
         class="bg-background/80 backdrop-blur-md border border-border/60 shadow-sm rounded-full px-4 py-2 flex items-center gap-6 pointer-events-auto">
         <div class="flex items-center gap-3 min-w-30 justify-center">
           <LucideTimer class="w-5 h-5" :class="timeRemaining < 300000
-              ? 'text-red-500 animate-pulse'
-              : 'text-primary'
-            "  />
+            ? 'text-red-500 animate-pulse'
+            : 'text-primary'
+            " />
           <span class="font-mono text-xl font-medium tracking-widest tabular-nums">
             {{ formatTime(timeRemaining) }}
           </span>
@@ -118,14 +128,14 @@ function formatTime(ms: number): string {
 
         <div class="flex items-center gap-2 border-l pl-4">
           <Button variant="ghost" size="icon" class="h-8 w-8" @click="toggleFullscreen">
-            <LucideMinimize v-if="isFullscreen" class="w-4 h-4"  />
-            <LucideMaximize v-else class="w-4 h-4"  />
+            <LucideMinimize v-if="isFullscreen" class="w-4 h-4" />
+            <LucideMaximize v-else class="w-4 h-4" />
           </Button>
 
           <Button variant="ghost" size="icon" class="h-8 w-8" :class="paused ? 'text-yellow-500 bg-yellow-500/10' : ''"
             @click="handlePauseResume">
-            <LucidePlay v-if="paused" class="w-4 h-4 fill-current"  />
-            <LucidePause v-else class="w-4 h-4 fill-current"  />
+            <LucidePlay v-if="paused" class="w-4 h-4 fill-current" />
+            <LucidePause v-else class="w-4 h-4 fill-current" />
           </Button>
 
           <Button variant="destructive" size="sm" class="h-8 px-3 ml-2" @click="showFinishDialog = true">
@@ -149,7 +159,7 @@ function formatTime(ms: number): string {
       <div v-if="paused"
         class="absolute inset-0 z-50 bg-background/60 backdrop-blur-xl flex flex-col items-center justify-center gap-6">
         <div class="p-4 rounded-md bg-yellow-500/10 mb-2">
-          <LucidePause class="w-16 h-16 text-yellow-500 fill-current"  />
+          <LucidePause class="w-16 h-16 text-yellow-500 fill-current" />
         </div>
         <h2 class="text-4xl font-medium">PAUSAD</h2>
         <div class="flex flex-col items-center gap-2">
@@ -159,7 +169,7 @@ function formatTime(ms: number): string {
           </p>
         </div>
         <Button size="lg" class="rounded-full px-8 h-12 text-lg gap-2 mt-4" @click="handlePauseResume">
-          <LucidePlay class="w-5 h-5 fill-current"  />
+          <LucidePlay class="w-5 h-5 fill-current" />
           Återuppta
         </Button>
       </div>

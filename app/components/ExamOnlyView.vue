@@ -123,38 +123,24 @@ watch(
 </script>
 
 <template>
-  <div
-    class="w-full h-full relative bg-background overflow-hidden"
-    :class="{ 'select-none': isDragging }"
-  >
+  <div class="w-full h-full relative bg-background overflow-hidden" :class="{ 'select-none': isDragging }">
     <div class="absolute inset-0 z-0">
       <ClientOnly>
         <PdfRenderer :pdf-url="examPdfUrl" layout-mode="exam-only" />
       </ClientOnly>
     </div>
 
-    <GradientIndicator
-      v-if="hasFacit && !isFacitVisible && !chatStore.isOpen"
-      :facit-pdf-url="solutionPdfUrl"
-    />
+    <GradientIndicator v-if="hasFacit && !isFacitVisible && !chatStore.isOpen" :facit-pdf-url="solutionPdfUrl" />
   </div>
 
   <Teleport to="body">
-    <Transition
-      enter-active-class="transition-all duration-200 ease-[cubic-bezier(0.32,0.72,0,1)]"
-      enter-from-class="translate-x-full opacity-0 blur-sm"
-      enter-to-class="translate-x-0 opacity-100 blur-0"
+    <Transition enter-active-class="transition-all duration-200 ease-[cubic-bezier(0.32,0.72,0,1)]"
+      enter-from-class="translate-x-full opacity-0" enter-to-class="translate-x-0 opacity-100 blur-0"
       leave-active-class="transition-all duration-200 ease-[cubic-bezier(0.32,0.72,0,1)]"
-      leave-from-class="translate-x-0 opacity-100 blur-0"
-      leave-to-class="translate-x-full opacity-0 blur-sm"
-    >
-      <div
-        v-show="hasFacit && isFacitVisible && !chatStore.isOpen"
-        ref="panelRef"
-        class="fixed right-0 top-12 h-[calc(100vh-3rem)] bg-background border-l shadow-2xl z-20 flex"
-        :style="{ width: `${panelWidth}px` }"
-      >
-        <div class="relative w-0 shrink-0 z-30">
+      leave-from-class="translate-x-0 opacity-100 blur-0" leave-to-class="translate-x-full opacity-0 blur-sm">
+      <div v-show="hasFacit && isFacitVisible && !chatStore.isOpen" ref="panelRef"
+        class="fixed right-0 bottom-0 z-[70] flex h-screen bg-background" :style="{ width: `${panelWidth}px` }">
+        <div class="relative z-[100] w-0 shrink-0">
           <ResizeHandle :is-resizing="isDragging" @start-resize="startResize" />
         </div>
         <div class="flex-1 overflow-hidden">
@@ -165,34 +151,19 @@ watch(
       </div>
     </Transition>
 
-    <Transition
-      enter-active-class="transition-all duration-200 ease-[cubic-bezier(0.32,0.72,0,1)]"
-      enter-from-class="translate-x-full opacity-0 blur-sm"
-      enter-to-class="translate-x-0 opacity-100 blur-0"
+    <Transition enter-active-class="transition-all duration-200 ease-[cubic-bezier(0.32,0.72,0,1)]"
+      enter-from-class="translate-x-full opacity-0" enter-to-class="translate-x-0 opacity-100 blur-0"
       leave-active-class="transition-all duration-200 ease-[cubic-bezier(0.32,0.72,0,1)]"
-      leave-from-class="translate-x-0 opacity-100 blur-0"
-      leave-to-class="translate-x-full opacity-0 blur-sm"
-    >
-      <div
-        v-if="chatHasBeenOpened"
-        v-show="chatStore.isOpen"
-        class="fixed right-0 top-12 h-[calc(100vh-3rem)] bg-background border-l shadow-2xl z-20 flex"
-        :style="{ width: `${panelWidth}px` }"
-      >
-        <div class="relative w-0 shrink-0 z-30">
+      leave-from-class="translate-x-0 opacity-100 blur-0" leave-to-class="translate-x-full opacity-0 blur-sm">
+      <div v-if="chatHasBeenOpened" v-show="chatStore.isOpen"
+        class="fixed right-0 bottom-0 z-[80] flex h-screen bg-background" :style="{ width: `${panelWidth}px` }">
+        <div class="relative z-[100] w-0 shrink-0">
           <ResizeHandle :is-resizing="isDragging" @start-resize="startResize" />
         </div>
         <div class="flex-1 overflow-hidden">
-          <ChatWindow
-            ref="chatWindowRef"
-            :exam-id="String(route.params.examId)"
-            :exam-url="examPdfUrl"
-            :course-code="String(route.params.courseCode)"
-            :solution-url="solutionPdfUrl"
-            :has-solution="hasFacit"
-            class="h-full w-full"
-            @close="chatStore.close()"
-          />
+          <ChatWindow ref="chatWindowRef" :exam-id="String(route.params.examId)" :exam-url="examPdfUrl"
+            :course-code="String(route.params.courseCode)" :solution-url="solutionPdfUrl" :has-solution="hasFacit"
+            class="h-full w-full" @close="chatStore.close()" />
         </div>
       </div>
     </Transition>

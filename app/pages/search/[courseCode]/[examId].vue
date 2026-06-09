@@ -119,26 +119,15 @@ function handleKeyUp(e: KeyboardEvent) {
 <template>
   <ClientOnly>
     <div class="flex h-screen flex-col w-full overflow-hidden">
-      <ExamHeader
-        v-if="exam"
-        :exams="exams"
-        :exam-id="examId"
-        :course-code="courseCode"
-        :solution-pdf-url="solutionPdfUrl"
-      />
+      <ExamHeader v-if="exam" :exams="exams" :exam-id="examId" :course-code="courseCode"
+        :solution-pdf-url="solutionPdfUrl" />
 
-      <div
-        v-if="isLoading"
-        class="flex flex-1 items-center justify-center flex-col gap-2"
-      >
-        <LucideLoader2 class="w-8 h-8 animate-spin text-muted-foreground"  />
+      <div v-if="isLoading" class="flex flex-1 items-center justify-center flex-col gap-2">
+        <LucideLoader2 class="w-8 h-8 animate-spin text-muted-foreground" />
         <p class="text-sm text-muted-foreground">Laddar tenta...</p>
       </div>
 
-      <div
-        v-else-if="isError"
-        class="flex flex-1 items-center justify-center flex-col gap-2"
-      >
+      <div v-else-if="isError" class="flex flex-1 items-center justify-center flex-col gap-2">
         <p class="text-2xl text-foreground/80">Något gick fel!</p>
         <p class="text-sm text-muted-foreground">
           Ibland fungerar det att bara ladda om sidan :)
@@ -147,75 +136,39 @@ function handleKeyUp(e: KeyboardEvent) {
       </div>
 
       <template v-else-if="exam">
-        <MobilePdfView
-          v-if="isMobile"
-          :exam-pdf-url="exam.pdf_url"
-          :solution-pdf-url="solutionPdfUrl"
-          :course-code="courseCode"
-          :exam-date="exam.exam_date"
-        />
+        <MobilePdfView v-if="isMobile" :exam-pdf-url="exam.pdf_url" :solution-pdf-url="solutionPdfUrl"
+          :course-code="courseCode" :exam-date="exam.exam_date" />
 
-        <div
-          v-else
-          class="flex-1 flex flex-row overflow-hidden"
-          :class="{ 'select-none': isResizing }"
-        >
-          <ExamOnlyView
-            v-if="layoutMode === 'exam-only'"
-            :exam-pdf-url="exam.pdf_url"
-            :solution-pdf-url="solutionPdfUrl"
-          />
+        <div v-else class="flex-1 flex flex-row overflow-hidden" :class="{ 'select-none': isResizing }">
+          <ExamOnlyView v-if="layoutMode === 'exam-only'" :exam-pdf-url="exam.pdf_url"
+            :solution-pdf-url="solutionPdfUrl" />
 
           <template v-else>
-            <div
-              class="h-full overflow-hidden"
-              :style="{ width: `${splitPercent}%` }"
-            >
-              <PdfRenderer
-                :pdf-url="exam.pdf_url"
-                layout-mode="exam-with-facit"
-              />
+            <div class="h-full overflow-hidden" :style="{ width: `${splitPercent}%` }">
+              <PdfRenderer :pdf-url="exam.pdf_url" layout-mode="exam-with-facit" />
             </div>
 
-            <div class="relative w-0 shrink-0">
-              <ResizeHandle
-                :is-resizing="isResizing"
-                @start-resize="startResize"
-              />
+            <div class="relative z-[100] w-0 shrink-0">
+              <ResizeHandle :is-resizing="isResizing" @start-resize="startResize" />
             </div>
 
-            <div
-              class="relative h-full flex-1 min-w-0 overflow-hidden bg-background"
-            >
-              <div
-                class="absolute inset-0 z-0 h-full w-full flex flex-col transition-opacity duration-150 ease-in-out"
-                :class="
-                  chatStore.isOpen
-                    ? 'opacity-0 pointer-events-none'
-                    : 'opacity-100'
-                "
-              >
+            <div class="relative h-full flex-1 min-w-0 overflow-hidden bg-background">
+              <div class="absolute inset-0 h-full w-full flex flex-col transition-opacity duration-150 ease-in-out"
+                :class="chatStore.isOpen
+                  ? 'opacity-0 pointer-events-none'
+                  : 'opacity-100'
+                  ">
                 <template v-if="solution">
-                  <div
-                    class="h-full relative"
-                    @mouseenter="solutionBlurred = false"
-                    @mouseleave="solutionBlurred = true"
-                  >
-                    <PdfRenderer
-                      :pdf-url="solution.pdf_url"
-                      layout-mode="exam-with-facit"
-                    />
+                  <div class="h-full relative" @mouseenter="solutionBlurred = false"
+                    @mouseleave="solutionBlurred = true">
+                    <PdfRenderer :pdf-url="solution.pdf_url" layout-mode="exam-with-facit" />
                     <Transition name="fade">
-                      <div
-                        v-if="solutionBlurred"
-                        class="absolute inset-0 backdrop-blur-md bg-background/30 flex flex-col gap-2 items-center justify-center pointer-events-none"
-                      >
+                      <div v-if="solutionBlurred"
+                        class="absolute inset-0 z-50 backdrop-blur-md bg-background/30 flex flex-col gap-2 items-center justify-center pointer-events-none">
                         <p class="text-sm font-normal text-muted-foreground">
                           Håll muspekaren för att visa facit
                         </p>
-                        <MousePointerClick
-                          class="text-muted-foreground animate-in"
-                         />
+                        <MousePointerClick class="text-muted-foreground animate-in" />
                       </div>
                     </Transition>
                   </div>
@@ -224,30 +177,25 @@ function handleKeyUp(e: KeyboardEvent) {
                 <div v-else class="flex h-full items-center justify-center p-6">
                   <div class="group relative w-full max-w-sm">
                     <div
-                      class="rounded-md border-2 border-dashed border-border/60 px-8 py-10 transition-colors group-hover:border-primary/30"
-                    >
+                      class="rounded-md border-2 border-dashed border-border/60 px-8 py-10 transition-colors group-hover:border-primary/30">
                       <div class="flex flex-col items-center text-center gap-4">
                         <div
-                          class="flex size-12 items-center justify-center rounded-md bg-muted/60 group-hover:bg-primary/10 transition-colors"
-                        >
+                          class="flex size-12 items-center justify-center rounded-md bg-muted/60 group-hover:bg-primary/10 transition-colors">
                           <LucideUpload
-                            class="size-6 text-muted-foreground group-hover:text-primary transition-colors"
-                           />
+                            class="size-6 text-muted-foreground group-hover:text-primary transition-colors" />
                         </div>
                         <div>
                           <p class="font-medium text-foreground/80">
                             Inget facit tillgängligt
                           </p>
-                          <p
-                            class="mt-1 text-xs text-muted-foreground/70 max-w-55 leading-relaxed"
-                          >
+                          <p class="mt-1 text-xs text-muted-foreground/70 max-w-55 leading-relaxed">
                             Hjälp andra studenter genom att ladda upp facit till
                             denna tenta.
                           </p>
                         </div>
                         <NuxtLink to="/upload-exams">
                           <Button size="sm" variant="outline">
-                            <LucideUpload class="size-3.5"  />
+                            <LucideUpload class="size-3.5" />
                             Ladda upp
                           </Button>
                         </NuxtLink>
@@ -258,20 +206,10 @@ function handleKeyUp(e: KeyboardEvent) {
               </div>
 
               <Transition name="panel-swap">
-                <div
-                  v-if="chatHasBeenOpened"
-                  v-show="chatStore.isOpen"
-                  class="absolute inset-0 z-20 h-full w-full"
-                >
-                  <ChatWindow
-                    :exam-id="examId"
-                    :exam-url="exam.pdf_url"
-                    :course-code="courseCode"
-                    :solution-url="solutionPdfUrl"
-                    :has-solution="!!solution"
-                    class="h-full w-full bg-background"
-                    @close="chatStore.close()"
-                  />
+                <div v-if="chatHasBeenOpened" v-show="chatStore.isOpen" class="absolute inset-0 z-[80] h-full w-full">
+                  <ChatWindow :exam-id="examId" :exam-url="exam.pdf_url" :course-code="courseCode"
+                    :solution-url="solutionPdfUrl" :has-solution="!!solution" class="h-full w-full bg-background"
+                    @close="chatStore.close()" />
                 </div>
               </Transition>
             </div>
@@ -279,7 +217,6 @@ function handleKeyUp(e: KeyboardEvent) {
         </div>
       </template>
 
-      <LayoutSwitcher />
     </div>
   </ClientOnly>
 </template>
@@ -289,20 +226,24 @@ function handleKeyUp(e: KeyboardEvent) {
 .fade-leave-active {
   transition: opacity 0.2s ease;
 }
+
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
 }
+
 .panel-swap-enter-active,
 .panel-swap-leave-active {
   transition:
     opacity 0.15s ease,
     transform 0.15s ease;
 }
+
 .panel-swap-enter-from {
   opacity: 0;
   transform: translateX(16px);
 }
+
 .panel-swap-leave-to {
   opacity: 0;
   transform: translateX(16px);
