@@ -16,6 +16,8 @@ import DOMPurify from "dompurify";
 import { getShikiHighlighter } from "#imports";
 import { useChatStore } from "@/stores/chat";
 import { useChat } from "@/composables/useChat";
+import { useMermaid } from "@/composables/useMermaid";
+import { usePlot } from "@/composables/usePlot";
 
 const props = defineProps<{
   examId: string;
@@ -98,6 +100,19 @@ async function initMarkdown() {
     if (!token) return "";
     const info = token.info ? token.info.trim() : "";
     const rawLang = info.split(/\s+/)[0] || "";
+
+    if (rawLang === "mermaid") {
+      return `<div class="mermaid-block" data-state="pending"><pre class="mermaid-source">${escapeHtml(
+        token.content,
+      )}</pre></div>`;
+    }
+
+    if (rawLang === "plot") {
+      return `<div class="plot-block" data-state="pending"><span class="plot-loading shimmer-text">Ritar graf...</span><pre class="plot-source">${escapeHtml(
+        token.content,
+      )}</pre></div>`;
+    }
+
     const language =
       rawLang && loadedLangs.has(rawLang as never) ? rawLang : "text";
 
@@ -132,9 +147,39 @@ async function initMarkdown() {
 
 initMarkdown();
 
+const LATEX_ENVS = "array|aligned|align\\*?|cases|[pbvB]?matrix|gathered|gather\\*?|smallmatrix";
+
+function normalizeMath(content: string): string {
+  const segments = content.split(/(```[\s\S]*?(?:```|$))/g);
+  return segments
+    .map((seg, i) => {
+      if (i % 2 === 1) return seg;
+      let out = seg;
+      out = out.replace(
+        /\\\[([\s\S]+?)\\\]/g,
+        (_, expr) => `\n\n$$\n${expr.trim()}\n$$\n\n`,
+      );
+      out = out.replace(/\\\((.+?)\\\)/g, (_, expr) => `$${expr.trim()}$`);
+      out = out.replace(
+        new RegExp(
+          `(?<!\\$)(\\\\begin\\{(${LATEX_ENVS})\\}[\\s\\S]*?\\\\end\\{\\2\\})(?!\\$)`,
+          "g",
+        ),
+        (_, env) => `\n\n$$\n${env}\n$$\n\n`,
+      );
+      out = out.replace(/\$\$([^$]+?)\$\$/g, (_, expr) =>
+        expr.includes("\n")
+          ? `\n\n$$\n${expr.replace(/\n{2,}/g, "\n").trim()}\n$$\n\n`
+          : `$$${expr.trim()}$$`,
+      );
+      return out;
+    })
+    .join("");
+}
+
 function renderMarkdown(content: string): string {
   if (!md.value) return "";
-  const normalized = content;
+  const normalized = normalizeMath(content);
   return DOMPurify.sanitize(md.value.render(normalized), {
     ADD_TAGS: [
       "math",
@@ -175,6 +220,13 @@ function getCachedMarkdown(content: string): string {
 const giveDirectAnswer = ref(true);
 const { selectedModelId } = useSelectedModel();
 const messagesContainer = ref<HTMLDivElement | null>(null);
+const { hydrate: hydrateMermaid } = useMermaid(messagesContainer);
+const { hydrate: hydratePlots } = usePlot(messagesContainer);
+
+function hydrateBlocks() {
+  hydrateMermaid();
+  hydratePlots();
+}
 const chatInputRef = ref<{ focus: () => void } | null>(null);
 const isUserScrolling = ref(false);
 const isAtBottom = ref(true);
@@ -228,7 +280,8 @@ function handleCodeCopy(e: MouseEvent) {
   copyTimers.set(btn, t);
 }
 
-function handleMessageMouseUp() {
+function handleMessageMouseUp(e: MouseEvent) {
+  if ((e.target as HTMLElement | null)?.closest?.(".plot-block")) return;
   setTimeout(() => {
     const selection = window.getSelection();
     const text = selection?.toString().trim();
@@ -320,11 +373,16 @@ function handleScroll() {
   }
 }
 
+watch(renderedAssistantHtml, () => {
+  nextTick(() => hydrateBlocks());
+});
+
 watch(
   () => chatStore.currentConversationId,
   () => {
     nextTick(() => {
       scrollToBottom("auto");
+      hydrateBlocks();
     });
   },
 );
@@ -369,6 +427,7 @@ onMounted(() => {
     } else {
       scrollToBottom("auto");
     }
+    hydrateBlocks();
   });
 });
 
@@ -499,7 +558,8 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
                 </div>
               </div>
 
-              <div v-else class="w-full px-1 py-2" data-role="assistant">
+              <div v-else class="w-full px-1 py-2" data-role="assistant"
+                :data-streaming="isLoading && i === messages.length - 1 ? 'true' : undefined">
                 <div v-if="!msg.content && isLoading && i === messages.length - 1" class="flex items-center gap-2 h-6">
                   <LucideLoader class="variable-spin w-4 h-4 text-muted-foreground" />
                   <span class="shimmer-text text-sm">{{ loadingPhrase }}</span>
@@ -659,5 +719,176 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
 
 .prose :deep(.code-copy-label) {
   margin-left: 0.1rem;
+}
+
+.prose :deep(.mermaid-block) {
+  margin: 1.25rem 0;
+  border: 1px solid color-mix(in oklch, var(--foreground) 10%, transparent);
+  border-radius: 1.25rem;
+  overflow: hidden;
+  max-width: 100%;
+}
+
+.prose :deep(.mermaid-block[data-state="pending"] .mermaid-source),
+.prose :deep(.mermaid-block[data-state="rendering"] .mermaid-source),
+.prose :deep(.mermaid-block[data-state="done"] .mermaid-source) {
+  display: none;
+}
+
+.prose :deep(.mermaid-block[data-state="pending"]::before),
+.prose :deep(.mermaid-block[data-state="rendering"]::before) {
+  content: "Ritar diagram...";
+  display: block;
+  padding: 1rem 1.25rem;
+  font-size: 0.875rem;
+  background: linear-gradient(90deg,
+      color-mix(in srgb, var(--muted-foreground), transparent 40%) 0%,
+      color-mix(in srgb, var(--muted-foreground), transparent 40%) 35%,
+      var(--foreground) 50%,
+      color-mix(in srgb, var(--muted-foreground), transparent 40%) 65%,
+      color-mix(in srgb, var(--muted-foreground), transparent 40%) 100%);
+  background-size: 200% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer-sweep 3.2s linear infinite;
+}
+
+.prose :deep(.mermaid-block[data-state="error"] .mermaid-source) {
+  margin: 0;
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  font-family: "SF Mono", monospace;
+  color: var(--muted-foreground);
+  background-color: color-mix(in oklch, var(--secondary) 60%, transparent);
+}
+
+.prose :deep(.mermaid-svg) {
+  display: flex;
+  justify-content: center;
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.prose :deep(.mermaid-svg svg) {
+  max-width: 100%;
+  height: auto;
+}
+
+.prose :deep(.mermaid-svg)::-webkit-scrollbar {
+  height: 4px;
+}
+
+.prose :deep(.mermaid-svg)::-webkit-scrollbar-thumb {
+  background: color-mix(in oklch, var(--muted-foreground) 30%, transparent);
+  border-radius: 2px;
+}
+
+.prose :deep(.mermaid-svg)::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.prose :deep(.plot-block) {
+  margin: 1.25rem 0;
+  border: 1px solid color-mix(in oklch, var(--foreground) 10%, transparent);
+  border-radius: 1.25rem;
+  overflow: hidden;
+  max-width: 100%;
+}
+
+.prose :deep(.plot-block[data-state="pending"] .plot-source),
+.prose :deep(.plot-block[data-state="rendering"] .plot-source),
+.prose :deep(.plot-block[data-state="done"] .plot-source) {
+  display: none;
+}
+
+.prose :deep(.plot-block .plot-loading) {
+  display: block;
+  padding: 1rem 1.25rem;
+  font-size: 0.875rem;
+}
+
+.prose :deep(.plot-block[data-state="done"] .plot-loading),
+.prose :deep(.plot-block[data-state="error"] .plot-loading) {
+  display: none;
+}
+
+.prose :deep(.plot-block[data-state="error"] .plot-source) {
+  margin: 0;
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  font-family: "SF Mono", monospace;
+  color: var(--muted-foreground);
+  background-color: color-mix(in oklch, var(--secondary) 60%, transparent);
+}
+
+.prose :deep(.plot-title) {
+  font-family: "SF Mono", monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  color: var(--muted-foreground);
+  padding: 0.4rem 1rem;
+  background-color: color-mix(in oklch, var(--secondary) 60%, transparent);
+  border-bottom: 1px solid color-mix(in oklch, var(--foreground) 8%, transparent);
+}
+
+.prose :deep(.plot-host) {
+  display: flex;
+  justify-content: center;
+  padding: 0.75rem;
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.prose :deep(.plot-host svg.function-plot) {
+  max-width: 100%;
+  height: auto;
+}
+
+.prose :deep(.function-plot text) {
+  fill: var(--muted-foreground);
+}
+
+.prose :deep(.function-plot .axis path.domain) {
+  stroke: color-mix(in oklch, var(--foreground) 25%, transparent);
+}
+
+.prose :deep(.function-plot .tick line) {
+  stroke: color-mix(in oklch, var(--foreground) 10%, transparent);
+}
+
+.prose :deep(.function-plot .origin) {
+  stroke: var(--foreground);
+}
+
+.prose :deep(.function-plot .annotations path) {
+  stroke: color-mix(in oklch, var(--foreground) 30%, transparent);
+}
+
+.prose :deep(.function-plot .annotations text) {
+  fill: var(--muted-foreground);
+}
+
+.prose :deep(.function-plot .tip text) {
+  fill: var(--foreground);
+}
+
+.prose :deep(.plot-host)::-webkit-scrollbar {
+  height: 4px;
+}
+
+.prose :deep(.plot-host)::-webkit-scrollbar-thumb {
+  background: color-mix(in oklch, var(--muted-foreground) 30%, transparent);
+  border-radius: 2px;
+}
+
+.prose :deep(.plot-host)::-webkit-scrollbar-track {
+  background: transparent;
 }
 </style>
