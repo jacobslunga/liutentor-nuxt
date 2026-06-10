@@ -7,7 +7,6 @@ export default defineNuxtConfig({
     "@nuxtjs/supabase",
     "@nuxtjs/color-mode",
     "@pinia/nuxt",
-    "@nuxt/icon",
     "shadcn-nuxt",
     "nuxt-lucide-icons",
     "nuxt-gtag",

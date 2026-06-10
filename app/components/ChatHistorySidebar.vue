@@ -503,8 +503,7 @@ onUnmounted(() => {
                     @click="askDeleteConversation(item)"
                   >
                     <LucideTrash2
-                      class="w-3.5 h-3.5 text-muted-foreground/60 hover:text-destructive"
-                    />
+                      class="w-3.5 h-3.5 text-muted-foreground/60 hover:text-destructive" />
                   </Button>
                 </div>
               </div>

@@ -307,8 +307,7 @@ async function handleSignOut() {
                             class="absolute inset-0 flex items-center justify-center z-10"
                         >
                             <LucideLoader2
-                                class="h-7 w-7 text-white animate-spin drop-shadow"
-                             />
+                                class="h-7 w-7 text-white animate-spin drop-shadow" />
                         </div>
 
                         <div
@@ -316,12 +315,10 @@ async function handleSignOut() {
                         >
                             <LucideLoader2
                                 v-if="avatarUploading"
-                                class="h-4 w-4 animate-spin text-muted-foreground"
-                             />
+                                class="h-4 w-4 animate-spin text-muted-foreground" />
                             <LucidePlus
                                 v-else
-                                class="h-4 w-4 text-foreground"
-                             />
+                                class="h-4 w-4 text-foreground" />
                         </div>
                     </button>
 
@@ -453,12 +450,10 @@ async function handleSignOut() {
                             >
                                 <LucideLoader2
                                     v-if="profileSaving"
-                                    class="w-4 h-4 animate-spin"
-                                 />
+                                    class="w-4 h-4 animate-spin" />
                                 <LucideCheck
                                     v-else-if="profileSaved"
-                                    class="w-4 h-4"
-                                 />
+                                    class="w-4 h-4" />
                                 <span>{{
                                     profileSaved ? "Sparat!" : "Spara"
                                 }}</span>
@@ -543,9 +538,8 @@ async function handleSignOut() {
                             >
                                 <LucideLoader2
                                     v-if="signOutLoading"
-                                    class="w-4 h-4 animate-spin"
-                                 />
-                                <LucideLogOut v-else class="w-4 h-4"  />
+                                    class="w-4 h-4 animate-spin" />
+                                <LucideLogOut v-else class="w-4 h-4" />
                                 <span v-if="!signOutLoading">Logga ut</span>
                             </Button>
                         </div>

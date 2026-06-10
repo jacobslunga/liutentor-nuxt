@@ -99,7 +99,7 @@ function submit() {
             class="gap-1.5 border-border/50 shadow-none"
             @click="emit('previous')"
           >
-            <LucideArrowLeft class="h-3.5 w-3.5"  />
+            <LucideArrowLeft class="h-3.5 w-3.5" />
             Förra
           </Button>
           <Button
@@ -111,7 +111,7 @@ function submit() {
             @click="emit('next', hasAnsweredCurrent)"
           >
             Nästa
-            <LucideArrowForward class="h-3.5 w-3.5"  />
+            <LucideArrowForward class="h-3.5 w-3.5" />
           </Button>
           <Button
             v-else
@@ -120,7 +120,7 @@ function submit() {
             class="gap-1.5"
             @click="submit"
           >
-            <LucideCheckCircle class="h-3.5 w-3.5"  />
+            <LucideCheckCircle class="h-3.5 w-3.5" />
             Rätta quiz
           </Button>
         </ButtonGroup>

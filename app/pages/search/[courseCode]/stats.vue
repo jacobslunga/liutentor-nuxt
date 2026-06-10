@@ -283,27 +283,25 @@ const donutOptions = computed(() => ({
 
           <div class="sticky bottom-0 z-50 pointer-events-none">
             <div class="bg-linear-to-t from-background via-background/80 to-background/0 pt-8 pb-10">
-              <div class="flex items-center justify-center pointer-events-auto">
-                <ButtonGroup class="pointer-events-auto">
-                  <Button variant="default" size="sm" as-child>
-                    <NuxtLink to="/upload-exams">
-                      <LucideUpload class="w-4.5 h-4.5" />
-                      Ladda upp
-                    </NuxtLink>
-                  </Button>
-                  <Button variant="outline" size="sm" as-child>
-                    <NuxtLink :to="`/search/${courseCode}`">
-                      <LucideBookA class="w-4.5 h-4.5" />
-                      Visa tentor
-                    </NuxtLink>
-                  </Button>
-                  <Button variant="outline" size="sm" as-child>
-                    <NuxtLink :to="`/quiz/${courseCode}`">
-                      <LucideLayers class="w-4.5 h-4.5" />
-                      Quiz
-                    </NuxtLink>
-                  </Button>
-                </ButtonGroup>
+              <div class="flex items-center justify-center pointer-events-auto gap-2">
+                <Button variant="default" size="sm" as-child>
+                  <NuxtLink to="/upload-exams">
+                    <LucideUpload class="w-4.5 h-4.5" />
+                    Ladda upp
+                  </NuxtLink>
+                </Button>
+                <Button variant="outline" size="sm" as-child>
+                  <NuxtLink :to="`/search/${courseCode}`">
+                    <LucideBookA class="w-4.5 h-4.5" />
+                    Visa tentor
+                  </NuxtLink>
+                </Button>
+                <Button variant="outline" size="sm" as-child>
+                  <NuxtLink :to="`/quiz/${courseCode}`">
+                    <LucideLayers class="w-4.5 h-4.5" />
+                    Quiz
+                  </NuxtLink>
+                </Button>
               </div>
             </div>
           </div>

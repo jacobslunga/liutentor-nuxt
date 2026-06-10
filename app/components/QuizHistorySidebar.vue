@@ -61,9 +61,9 @@ const historyItems = computed(() =>
                     · {{ item.sourceCount }} tentor</span>
                 </p>
               </div>
-              <LucideCheck v-if="item.id === activeQuizId" class="mt-0.5 h-4 w-4 shrink-0 text-primary"  />
+              <LucideCheck v-if="item.id === activeQuizId" class="mt-0.5 h-4 w-4 shrink-0 text-primary" />
               <LucideArrowForward v-else
-                class="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground/40 opacity-0 transition-opacity group-hover:opacity-100"  />
+                class="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground/40 opacity-0 transition-opacity group-hover:opacity-100" />
             </div>
           </button>
         </div>

@@ -2,7 +2,7 @@
   <Dialog>
     <DialogTrigger as-child>
       <Button variant="ghost" size="icon">
-        <LucideSettings class="w-4.5 h-4.5"  />
+        <LucideSettings size=18 />
       </Button>
     </DialogTrigger>
     <DialogContent class="max-w-md max-h-[80vh] overflow-y-auto">

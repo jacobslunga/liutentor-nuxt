@@ -7,7 +7,9 @@ const props = defineProps<{
 }>();
 
 const showSolution = ref(false);
+const isDownloadOpen = ref(false);
 const hasSolution = computed(() => !!props.solutionPdfUrl);
+const hasDownload = computed(() => !!props.examPdfUrl || !!props.solutionPdfUrl);
 
 watch(
   () => props.examPdfUrl,
@@ -53,6 +55,20 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener("keydown", handleKeyDown);
 });
+
+const downloadFile = async (url: string, filename: string) => {
+  try {
+    const res = await fetch(url);
+    const blob = await res.blob();
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  } catch {
+    window.open(url, "_blank");
+  }
+};
 </script>
 
 <template>
@@ -72,6 +88,31 @@ onUnmounted(() => {
           {{ examDate }}
         </p>
       </div>
+      <DropdownMenu v-model:open="isDownloadOpen">
+        <DropdownMenuTrigger as-child>
+          <Button variant="outline" size="icon-sm" :disabled="!hasDownload" aria-label="Ladda ned">
+            <LucideDownload class="w-4 h-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" :side-offset="8">
+          <DropdownMenuItem class="gap-2 text-sm cursor-pointer" :disabled="!examPdfUrl" @click="
+            downloadFile(
+              examPdfUrl,
+              `${courseCode}_${examDate}_EXAM.pdf`,
+            )
+            ">
+            <LucideDownload class="size-4" /> Ladda ned tenta
+          </DropdownMenuItem>
+          <DropdownMenuItem class="gap-2 text-sm cursor-pointer" :disabled="!solutionPdfUrl" @click="
+            downloadFile(
+              solutionPdfUrl!,
+              `${courseCode}_${examDate}_SOLUTION.pdf`,
+            )
+            ">
+            <LucideDownload class="size-4" /> Ladda ned facit
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
       <Button v-if="hasSolution" variant="outline" size="sm" @click="showSolution = true">
         <LucideBookOpen class="w-3.5 h-3.5 text-primary" />
         Facit

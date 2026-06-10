@@ -15,7 +15,7 @@ const emit = defineEmits<{
     <div class="flex justify-start">
       <Button variant="ghost" size="sm" class="gap-1.5 text-sm" as-child>
         <NuxtLink :to="`/search/${courseCode}`">
-          <LucideArrowLeft class="h-4 w-4"  />
+          <LucideArrowLeft class="h-4 w-4" />
           Tentor
         </NuxtLink>
       </Button>
@@ -28,7 +28,7 @@ const emit = defineEmits<{
     <div class="flex justify-end">
       <Button variant="ghost" size="sm" class="gap-1.5 text-sm" :disabled="stage === 'generating'"
         @click="emit('newQuiz')">
-        <LucideRefreshCw class="h-4 w-4" :class="stage === 'generating' ? 'animate-spin' : ''"  />
+        <LucideRefreshCw class="h-4 w-4" :class="stage === 'generating' ? 'animate-spin' : ''" />
         Nytt quiz
       </Button>
     </div>

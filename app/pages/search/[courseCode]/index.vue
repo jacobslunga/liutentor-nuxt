@@ -145,7 +145,7 @@ function passColor(rate: number) {
                 <span class="text-xs text-muted-foreground">
                   <span class="font-medium text-foreground">{{
                     exams.length
-                    }}</span>
+                  }}</span>
                   tentor
                 </span>
               </div>
@@ -154,7 +154,7 @@ function passColor(rate: number) {
                 <span class="text-xs text-muted-foreground">
                   <span class="font-medium text-foreground">{{
                     examsWithSolutions
-                    }}</span>
+                  }}</span>
                   med facit
                 </span>
               </div>

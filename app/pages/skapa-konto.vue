@@ -17,6 +17,6 @@ onMounted(() => {
 
 <template>
   <div class="flex items-center justify-center">
-    <LucideLoader2 class="w-5 h-5 animate-spin text-muted-foreground"  />
+    <LucideLoader2 class="w-5 h-5 animate-spin text-muted-foreground" />
   </div>
 </template>

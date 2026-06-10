@@ -208,7 +208,8 @@ function confirmLockIn() {
 
       <Button variant="ghost" size="sm" class="text-muted-foreground hover:text-foreground" @click="chatStore.toggle()">
         <LucideLoader2 v-if="chatStore.isLoading" class="size-3.5 animate-spin" />
-        <LucideMessageSquare v-else class="size-4" />
+        <LucideMessageCircleX v-else-if="chatStore.isOpen" class="size-4" />
+        <LucideMessageCircleReply v-else class="size-4" />
         <span class="text-xs">{{ chatStore.isOpen ? "Stäng" : "Chatt" }}</span>
       </Button>
 

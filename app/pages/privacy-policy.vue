@@ -130,7 +130,7 @@ const sections: Section[] = [
 
     <div class="mt-8 pt-6 border-t space-y-2">
       <div class="flex items-center gap-2">
-        <LucideMailbox class="h-5 w-5 text-primary"  />
+        <LucideMailbox class="h-5 w-5 text-primary" />
         <h3 class="text-sm font-medium">Kontakta oss</h3>
       </div>
       <p class="text-sm text-muted-foreground">

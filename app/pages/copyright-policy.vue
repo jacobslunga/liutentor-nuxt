@@ -101,7 +101,7 @@ const sections: Section[] = [
 
     <div class="mt-8 pt-6 border-t space-y-4">
       <div class="flex items-center gap-2">
-        <LucideShieldAlert class="h-5 w-5 text-primary"  />
+        <LucideShieldAlert class="h-5 w-5 text-primary" />
         <h3 class="text-sm font-medium">Begär borttagning av material</h3>
       </div>
       <p class="text-sm text-muted-foreground">

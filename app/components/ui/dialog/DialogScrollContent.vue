@@ -57,7 +57,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
 
         <DialogClose v-if="showCloseButton"
           class="absolute top-4 right-4 p-0.5 transition-colors rounded-md hover:bg-secondary">
-          <LucideX class="w-4 h-4"  />
+          <LucideX class="w-4 h-4" />
           <span class="sr-only">Close</span>
         </DialogClose>
       </DialogContent>

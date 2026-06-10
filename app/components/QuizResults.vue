@@ -66,11 +66,11 @@ const courseCodeLabel = computed(() => {
       </p>
       <div class="flex items-center gap-2">
         <Button size="sm" variant="outline" class="gap-1.5 border-border/50 shadow-none" @click="emit('retake')">
-          <LucideRefreshCw class="h-3.5 w-3.5"  />
+          <LucideRefreshCw class="h-3.5 w-3.5" />
           Gör om
         </Button>
         <Button size="sm" class="gap-1.5 ml-auto" @click="emit('newQuiz')">
-          <LucideZap class="h-3.5 w-3.5"  />
+          <LucideZap class="h-3.5 w-3.5" />
           Nytt quiz
         </Button>
       </div>
