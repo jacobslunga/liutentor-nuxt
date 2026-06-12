@@ -409,7 +409,7 @@ onUnmounted(() => {
     </div>
     <div class="flex h-full min-h-0 flex-col">
       <div class="border-b px-4 py-3 flex items-center justify-between gap-2">
-        <h2 class="text-sm font-medium">Chatthistorik</h2>
+        <h2 class="text-sm font-bold">Chatthistorik</h2>
         <div class="flex items-center gap-1">
           <Button
             v-if="conversations.length > 0"
@@ -487,7 +487,7 @@ onUnmounted(() => {
                       class="text-sm truncate text-foreground/90"
                       :class="
                         item.id === chatStore.currentConversationId
-                          ? 'font-semibold'
+                          ? 'font-bold'
                           : 'font-normal'
                       "
                     >
@@ -503,7 +503,8 @@ onUnmounted(() => {
                     @click="askDeleteConversation(item)"
                   >
                     <LucideTrash2
-                      class="w-3.5 h-3.5 text-muted-foreground/60 hover:text-destructive" />
+                      class="w-3.5 h-3.5 text-muted-foreground/60 hover:text-destructive"
+                    />
                   </Button>
                 </div>
               </div>

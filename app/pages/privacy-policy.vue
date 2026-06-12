@@ -99,9 +99,7 @@ const sections: Section[] = [
 
 <template>
   <div class="w-full max-w-3xl">
-    <h1 class="text-3xl font-medium text-foreground mb-1">
-      Integritetspolicy
-    </h1>
+    <h1 class="text-3xl font-medium text-foreground mb-1">Integritetspolicy</h1>
     <p class="text-xs text-muted-foreground mb-6">
       Senast uppdaterad: 2026-04-19
     </p>
@@ -122,7 +120,10 @@ const sections: Section[] = [
         <p class="text-sm text-foreground/80 leading-relaxed">
           {{ section.content }}
         </p>
-        <ul v-if="section.items" class="mt-3 list-disc pl-5 space-y-1 text-sm text-foreground/70">
+        <ul
+          v-if="section.items"
+          class="mt-3 list-disc pl-5 space-y-1 text-sm text-foreground/70"
+        >
           <li v-for="item in section.items" :key="item">{{ item }}</li>
         </ul>
       </div>

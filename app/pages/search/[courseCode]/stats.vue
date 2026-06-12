@@ -207,26 +207,35 @@ const donutOptions = computed(() => ({
 <template>
   <div class="bg-background min-h-screen w-full">
     <div class="container mx-auto px-4 md:px-8 py-8 max-w-5xl">
-      <div v-if="status === 'pending'" class="flex items-center justify-center min-h-[60vh]">
+      <div
+        v-if="status === 'pending'"
+        class="flex items-center justify-center min-h-[60vh]"
+      >
         <LucideLoader2 class="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
 
       <template v-else-if="courseData">
         <div class="flex flex-col gap-5 w-full">
           <div class="flex flex-col gap-1">
-            <div class="flex items-center gap-2 text-sm text-muted-foreground/70">
+            <div
+              class="flex items-center gap-2 text-sm text-muted-foreground/70"
+            >
               <span class="font-medium text-foreground/80">{{
                 courseCode
-                }}</span>
+              }}</span>
               <span>/</span>
               <span>Statistik</span>
             </div>
-            <h1 class="font-semibold text-foreground max-w-3xl leading-tight text-2xl sm:text-3xl">
+            <h1
+              class="font-bold text-foreground max-w-3xl leading-tight text-2xl sm:text-3xl"
+            >
               {{ courseData.courseName }}
             </h1>
           </div>
 
-          <div class="rounded-md border border-border bg-card overflow-hidden shadow-sm">
+          <div
+            class="rounded-md border border-border bg-card overflow-hidden shadow-sm"
+          >
             <div class="p-5 border-b border-border/60 bg-muted/20">
               <div class="flex items-center gap-2 mb-1">
                 <LucideTrendingUp class="w-4 h-4 text-primary" />
@@ -245,7 +254,9 @@ const donutOptions = computed(() => ({
             </div>
           </div>
 
-          <div class="rounded-md border border-border bg-card overflow-hidden shadow-sm">
+          <div
+            class="rounded-md border border-border bg-card overflow-hidden shadow-sm"
+          >
             <div class="p-5 border-b border-border/60 bg-muted/20">
               <div class="flex items-center gap-2 mb-1">
                 <LucideChartPie class="w-4 h-4 text-primary" />
@@ -262,17 +273,25 @@ const donutOptions = computed(() => ({
                 </ClientOnly>
               </div>
               <div class="w-full md:w-1/2 space-y-2">
-                <div v-for="d in aggregate.entries" :key="d.key"
-                  class="flex items-center justify-between py-2 px-3 rounded-md bg-muted/30 hover:bg-muted/50 transition-colors">
+                <div
+                  v-for="d in aggregate.entries"
+                  :key="d.key"
+                  class="flex items-center justify-between py-2 px-3 rounded-md bg-muted/30 hover:bg-muted/50 transition-colors"
+                >
                   <div class="flex items-center gap-3">
-                    <span class="block w-2.5 h-2.5 rounded-full" :style="{ background: d.color }" />
+                    <span
+                      class="block w-2.5 h-2.5 rounded-full"
+                      :style="{ background: d.color }"
+                    />
                     <span class="text-sm">Betyg {{ d.label }}</span>
                   </div>
                   <div class="flex items-center gap-3 text-right">
                     <span class="text-xs text-muted-foreground tabular-nums">
                       {{ d.value.toLocaleString("sv-SE") }}
                     </span>
-                    <span class="text-xs font-medium tabular-nums bg-muted px-2 py-0.5 rounded-md">
+                    <span
+                      class="text-xs font-medium tabular-nums bg-muted px-2 py-0.5 rounded-md"
+                    >
                       {{ d.pct.toFixed(1) }}%
                     </span>
                   </div>
@@ -282,8 +301,12 @@ const donutOptions = computed(() => ({
           </div>
 
           <div class="sticky bottom-0 z-50 pointer-events-none">
-            <div class="bg-linear-to-t from-background via-background/80 to-background/0 pt-8 pb-10">
-              <div class="flex items-center justify-center pointer-events-auto gap-2">
+            <div
+              class="bg-linear-to-t from-background via-background/80 to-background/0 pt-8 pb-10"
+            >
+              <div
+                class="flex items-center justify-center pointer-events-auto gap-2"
+              >
                 <Button variant="default" size="sm" as-child>
                   <NuxtLink to="/upload-exams">
                     <LucideUpload class="w-4.5 h-4.5" />

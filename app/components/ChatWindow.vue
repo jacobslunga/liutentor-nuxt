@@ -43,8 +43,8 @@ const {
 const currentUserId = computed(
   () =>
     ((user.value as any)?.id ?? (user.value as any)?.sub ?? null) as
-    | string
-    | null,
+      | string
+      | null,
 );
 
 const { send, cancelGeneration } = useChat({
@@ -147,7 +147,8 @@ async function initMarkdown() {
 
 initMarkdown();
 
-const LATEX_ENVS = "array|aligned|align\\*?|cases|[pbvB]?matrix|gathered|gather\\*?|smallmatrix";
+const LATEX_ENVS =
+  "array|aligned|align\\*?|cases|[pbvB]?matrix|gathered|gather\\*?|smallmatrix";
 
 function normalizeMath(content: string): string {
   const segments = content.split(/(```[\s\S]*?(?:```|$))/g);
@@ -264,7 +265,7 @@ function handleCodeCopy(e: MouseEvent) {
   const code = pre?.textContent ?? "";
   if (!code) return;
 
-  navigator.clipboard.writeText(code).catch(() => { });
+  navigator.clipboard.writeText(code).catch(() => {});
 
   const label = btn.querySelector(".code-copy-label");
   if (label) label.textContent = "Kopierad";
@@ -513,60 +514,104 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
 
 <template>
   <div class="h-full w-full flex bg-background overflow-hidden relative">
-    <div class="flex-1 min-w-0 flex flex-col transition-all duration-300 ease-out">
+    <div
+      class="flex-1 min-w-0 flex flex-col transition-all duration-300 ease-out"
+    >
       <div class="flex-1 min-h-0 relative">
         <div class="absolute inset-x-0 top-0 z-20 pointer-events-none">
-          <ChatHeader class="pointer-events-auto" :has-solution="hasSolution" :title="chatHeaderTitle"
-            :history-open="isHistoryOpen" @close="emit('close')" @open-history="toggleHistory"
-            @new-chat="startNewChat" />
+          <ChatHeader
+            class="pointer-events-auto"
+            :has-solution="hasSolution"
+            :title="chatHeaderTitle"
+            :history-open="isHistoryOpen"
+            @close="emit('close')"
+            @open-history="toggleHistory"
+            @new-chat="startNewChat"
+          />
         </div>
 
-        <div ref="messagesContainer" class="h-full w-full overflow-y-auto overflow-x-hidden px-4 pt-20 custom-scrollbar"
-          @scroll="handleScroll" @mouseup="handleMessageMouseUp" @click="handleCodeCopy">
-          <div v-if="messages.length === 0"
-            class="h-full flex flex-col items-center justify-center px-4 text-center pb-24">
-            <h2 class="text-2xl font-medium mb-3 text-foreground">
+        <div
+          ref="messagesContainer"
+          class="h-full w-full overflow-y-auto overflow-x-hidden px-4 pt-20 custom-scrollbar"
+          @scroll="handleScroll"
+          @mouseup="handleMessageMouseUp"
+          @click="handleCodeCopy"
+        >
+          <div
+            v-if="messages.length === 0"
+            class="h-full flex flex-col items-center justify-center px-4 text-center pb-24"
+          >
+            <h2 class="text-2xl font-semibold mb-3 text-foreground">
               Vad kan jag hjälpa till med?
             </h2>
-            <p class="text-muted-foreground text-sm max-w-70 sm:max-w-md mb-8 leading-relaxed">
+            <p
+              class="text-muted-foreground text-sm max-w-70 sm:max-w-md mb-8 leading-relaxed"
+            >
               Ställ frågor om tentan, be om ledtrådar eller få hjälp att förstå
               lösningarna.
             </p>
-            <NuxtLink to="/ai-policy" target="_blank"
-              class="text-[11px] text-muted-foreground/60 hover:text-foreground transition-all duration-200 border-b border-transparent hover:border-foreground/30 pb-0.5">
+            <NuxtLink
+              to="/ai-policy"
+              target="_blank"
+              class="text-[11px] text-muted-foreground/60 hover:text-foreground transition-all duration-200 border-b border-transparent hover:border-foreground/30 pb-0.5"
+            >
               Läs vår AI-policy
             </NuxtLink>
           </div>
 
           <div v-else class="space-y-6 max-w-2xl mx-auto w-full">
-            <div v-for="(msg, i) in messages" :key="i" :class="msg.role === 'user' ? 'flex justify-end' : ''" v-memo="[
-              msg.role,
-              msg.content,
-              msg.selectionContext,
-              isLoading && i === messages.length - 1,
-              mdReady,
-            ]">
-              <div v-if="msg.role === 'user'" class="flex flex-col items-end gap-1.5 max-w-[85%]">
-                <div v-if="msg.selectionContext"
-                  class="border-l-2 border-muted-foreground/30 pl-3 text-sm text-muted-foreground italic line-clamp-3 text-right">
+            <div
+              v-for="(msg, i) in messages"
+              :key="i"
+              :class="msg.role === 'user' ? 'flex justify-end' : ''"
+              v-memo="[
+                msg.role,
+                msg.content,
+                msg.selectionContext,
+                isLoading && i === messages.length - 1,
+                mdReady,
+              ]"
+            >
+              <div
+                v-if="msg.role === 'user'"
+                class="flex flex-col items-end gap-1.5 max-w-[85%]"
+              >
+                <div
+                  v-if="msg.selectionContext"
+                  class="border-l-2 border-muted-foreground/30 pl-3 text-sm text-muted-foreground italic line-clamp-3 text-right"
+                >
                   "{{ msg.selectionContext }}"
                 </div>
-                <div class="bg-primary/10 text-foreground px-4 py-2 rounded-3xl w-fit">
+                <div
+                  class="bg-primary/10 text-foreground px-4 py-2 rounded-3xl w-fit"
+                >
                   <p class="text-[15px] leading-relaxed whitespace-pre-wrap">
                     {{ msg.content }}
                   </p>
                 </div>
               </div>
 
-              <div v-else class="w-full px-1 py-2" data-role="assistant"
-                :data-streaming="isLoading && i === messages.length - 1 ? 'true' : undefined">
-                <div v-if="!msg.content && isLoading && i === messages.length - 1" class="flex items-center gap-2 h-6">
-                  <LucideLoader class="variable-spin w-4 h-4 text-muted-foreground" />
+              <div
+                v-else
+                class="w-full px-1 py-2"
+                data-role="assistant"
+                :data-streaming="
+                  isLoading && i === messages.length - 1 ? 'true' : undefined
+                "
+              >
+                <div
+                  v-if="!msg.content && isLoading && i === messages.length - 1"
+                  class="flex items-center gap-2 h-6"
+                >
+                  <LucideLoader
+                    class="variable-spin w-4 h-4 text-muted-foreground"
+                  />
                   <span class="shimmer-text text-sm">{{ loadingPhrase }}</span>
                 </div>
                 <div
-                  class="prose font-normal dark:prose-invert prose-p:font-normal prose-headings:font-medium prose-strong:font-medium prose-hr:border-foreground/10 marker:text-foreground marker:font-medium"
-                  v-html="renderedAssistantHtml[i]" />
+                  class="prose font-normal dark:prose-invert prose-p:font-normal prose-hr:border-foreground/10 marker:text-foreground marker:font-medium"
+                  v-html="renderedAssistantHtml[i]"
+                />
               </div>
             </div>
 
@@ -575,21 +620,39 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
           </div>
         </div>
 
-        <div class="absolute bottom-0 left-0 right-0 pt-10 pb-4 pointer-events-none z-10">
-          <ChatInput ref="chatInputRef" v-model="draftInput" :is-loading="isLoading"
-            :give-direct-answer="giveDirectAnswer" :selected-model-id="selectedModelId"
-            :show-scroll-button="showScrollButton" :course-code="courseCode" :has-solution="hasSolution"
-            :selection-context="selectionContext" class="pointer-events-auto" @send="handleSend" @cancel="handleCancel"
-            @scroll-to-bottom="scrollToBottom('smooth')" @update:give-direct-answer="giveDirectAnswer = $event"
-            @update:selected-model-id="selectedModelId = $event" @clear-selection-context="selectionContext = ''" />
+        <div
+          class="absolute bottom-0 left-0 right-0 pt-10 pb-4 pointer-events-none z-10"
+        >
+          <ChatInput
+            ref="chatInputRef"
+            v-model="draftInput"
+            :is-loading="isLoading"
+            :give-direct-answer="giveDirectAnswer"
+            :selected-model-id="selectedModelId"
+            :show-scroll-button="showScrollButton"
+            :course-code="courseCode"
+            :has-solution="hasSolution"
+            :selection-context="selectionContext"
+            class="pointer-events-auto"
+            @send="handleSend"
+            @cancel="handleCancel"
+            @scroll-to-bottom="scrollToBottom('smooth')"
+            @update:give-direct-answer="giveDirectAnswer = $event"
+            @update:selected-model-id="selectedModelId = $event"
+            @clear-selection-context="selectionContext = ''"
+          />
         </div>
       </div>
     </div>
 
     <ChatHistorySidebar v-model:open="isHistoryOpen" />
 
-    <SelectionPopover :visible="selectionPopover.visible" :x="selectionPopover.x" :y="selectionPopover.y"
-      @reply="handleReplyToSelection" />
+    <SelectionPopover
+      :visible="selectionPopover.visible"
+      :x="selectionPopover.x"
+      :y="selectionPopover.y"
+      @reply="handleReplyToSelection"
+    />
   </div>
 </template>
 
@@ -601,7 +664,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
   padding: 0.5rem 0;
 }
 
-.prose :deep(.katex-display)>.katex {
+.prose :deep(.katex-display) > .katex {
   max-width: none;
   white-space: normal;
 }
@@ -641,7 +704,8 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
   justify-content: space-between;
   padding: 0.4rem 0.75rem 0.4rem 1rem;
   background-color: color-mix(in oklch, var(--secondary) 60%, transparent);
-  border-bottom: 1px solid color-mix(in oklch, var(--foreground) 8%, transparent);
+  border-bottom: 1px solid
+    color-mix(in oklch, var(--foreground) 8%, transparent);
 }
 
 .prose :deep(.code-lang) {
@@ -741,12 +805,14 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
   display: block;
   padding: 1rem 1.25rem;
   font-size: 0.875rem;
-  background: linear-gradient(90deg,
-      color-mix(in srgb, var(--muted-foreground), transparent 40%) 0%,
-      color-mix(in srgb, var(--muted-foreground), transparent 40%) 35%,
-      var(--foreground) 50%,
-      color-mix(in srgb, var(--muted-foreground), transparent 40%) 65%,
-      color-mix(in srgb, var(--muted-foreground), transparent 40%) 100%);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--muted-foreground), transparent 40%) 0%,
+    color-mix(in srgb, var(--muted-foreground), transparent 40%) 35%,
+    var(--foreground) 50%,
+    color-mix(in srgb, var(--muted-foreground), transparent 40%) 65%,
+    color-mix(in srgb, var(--muted-foreground), transparent 40%) 100%
+  );
   background-size: 200% 100%;
   background-clip: text;
   -webkit-background-clip: text;
@@ -835,7 +901,8 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
   color: var(--muted-foreground);
   padding: 0.4rem 1rem;
   background-color: color-mix(in oklch, var(--secondary) 60%, transparent);
-  border-bottom: 1px solid color-mix(in oklch, var(--foreground) 8%, transparent);
+  border-bottom: 1px solid
+    color-mix(in oklch, var(--foreground) 8%, transparent);
 }
 
 .prose :deep(.plot-host) {
