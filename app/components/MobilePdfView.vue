@@ -9,7 +9,9 @@ const props = defineProps<{
 const showSolution = ref(false);
 const isDownloadOpen = ref(false);
 const hasSolution = computed(() => !!props.solutionPdfUrl);
-const hasDownload = computed(() => !!props.examPdfUrl || !!props.solutionPdfUrl);
+const hasDownload = computed(
+  () => !!props.examPdfUrl || !!props.solutionPdfUrl,
+);
 
 watch(
   () => props.examPdfUrl,
@@ -74,14 +76,15 @@ const downloadFile = async (url: string, filename: string) => {
 <template>
   <div class="flex flex-col h-screen w-full bg-background relative">
     <div
-      class="absolute inset-x-0 top-0 z-40 flex h-12 items-center gap-3 bg-linear-to-b from-background via-background/90 to-background/0 px-3">
+      class="absolute inset-x-0 top-0 z-40 flex h-12 items-center gap-3 bg-linear-to-b from-background via-background/90 to-background/0 px-3"
+    >
       <NuxtLink :to="`/search/${courseCode}`">
         <Button aria-label="Gå tillbaka" variant="outline" size="icon-sm">
           <LucideArrowLeft class="w-4 h-4" />
         </Button>
       </NuxtLink>
       <div class="min-w-0 flex-1">
-        <p class="text-sm font-bold text-foreground truncate leading-tight">
+        <p class="text-sm font-medium text-foreground truncate leading-tight">
           {{ courseCode }}
         </p>
         <p class="text-xs text-muted-foreground truncate leading-tight">
@@ -90,30 +93,45 @@ const downloadFile = async (url: string, filename: string) => {
       </div>
       <DropdownMenu v-model:open="isDownloadOpen">
         <DropdownMenuTrigger as-child>
-          <Button variant="outline" size="icon-sm" :disabled="!hasDownload" aria-label="Ladda ned">
+          <Button
+            variant="outline"
+            size="icon-sm"
+            :disabled="!hasDownload"
+            aria-label="Ladda ned"
+          >
             <LucideDownload class="w-4 h-4" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" :side-offset="8">
-          <DropdownMenuItem class="gap-2 text-sm cursor-pointer" :disabled="!examPdfUrl" @click="
-            downloadFile(
-              examPdfUrl,
-              `${courseCode}_${examDate}_EXAM.pdf`,
-            )
-            ">
+          <DropdownMenuItem
+            class="gap-2 text-sm cursor-pointer"
+            :disabled="!examPdfUrl"
+            @click="
+              downloadFile(examPdfUrl, `${courseCode}_${examDate}_EXAM.pdf`)
+            "
+          >
             <LucideDownload class="size-4" /> Ladda ned tenta
           </DropdownMenuItem>
-          <DropdownMenuItem class="gap-2 text-sm cursor-pointer" :disabled="!solutionPdfUrl" @click="
-            downloadFile(
-              solutionPdfUrl!,
-              `${courseCode}_${examDate}_SOLUTION.pdf`,
-            )
-            ">
+          <DropdownMenuItem
+            class="gap-2 text-sm cursor-pointer"
+            :disabled="!solutionPdfUrl"
+            @click="
+              downloadFile(
+                solutionPdfUrl!,
+                `${courseCode}_${examDate}_SOLUTION.pdf`,
+              )
+            "
+          >
             <LucideDownload class="size-4" /> Ladda ned facit
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <Button v-if="hasSolution" variant="outline" size="sm" @click="showSolution = true">
+      <Button
+        v-if="hasSolution"
+        variant="outline"
+        size="sm"
+        @click="showSolution = true"
+      >
         <LucideBookOpen class="w-3.5 h-3.5 text-primary" />
         Facit
       </Button>
@@ -125,24 +143,39 @@ const downloadFile = async (url: string, filename: string) => {
       </ClientOnly>
     </div>
 
-    <Transition enter-active-class="transition duration-200 ease-out"
-      enter-from-class="opacity-0 translate-y-4 scale-[0.99]" enter-to-class="opacity-100 translate-y-0 scale-100"
-      leave-active-class="transition duration-200 ease-in" leave-from-class="opacity-100 translate-y-0 scale-100"
-      leave-to-class="opacity-0 translate-y-4 scale-[0.99]">
-      <section v-show="showSolution"
-        class="fixed inset-0 z-50 h-screen w-screen bg-background flex flex-col overflow-hidden" role="dialog"
-        aria-modal="true">
+    <Transition
+      enter-active-class="transition duration-200 ease-out"
+      enter-from-class="opacity-0 translate-y-4 scale-[0.99]"
+      enter-to-class="opacity-100 translate-y-0 scale-100"
+      leave-active-class="transition duration-200 ease-in"
+      leave-from-class="opacity-100 translate-y-0 scale-100"
+      leave-to-class="opacity-0 translate-y-4 scale-[0.99]"
+    >
+      <section
+        v-show="showSolution"
+        class="fixed inset-0 z-50 h-screen w-screen bg-background flex flex-col overflow-hidden"
+        role="dialog"
+        aria-modal="true"
+      >
         <div
-          class="absolute inset-x-0 top-0 z-10 flex h-12 items-center gap-3 bg-linear-to-b from-background via-background/90 to-background/0 px-3">
+          class="absolute inset-x-0 top-0 z-10 flex h-12 items-center gap-3 bg-linear-to-b from-background via-background/90 to-background/0 px-3"
+        >
           <div class="min-w-0 flex-1">
-            <p class="text-sm font-bold text-foreground truncate leading-tight">
+            <p
+              class="text-sm font-medium text-foreground truncate leading-tight"
+            >
               Facit
             </p>
             <p class="text-xs text-muted-foreground truncate leading-tight">
               {{ courseCode }} - {{ examDate }}
             </p>
           </div>
-          <Button variant="outline" size="icon-sm" aria-label="Stäng" @click="showSolution = false">
+          <Button
+            variant="outline"
+            size="icon-sm"
+            aria-label="Stäng"
+            @click="showSolution = false"
+          >
             <LucideX class="w-4 h-4" />
           </Button>
         </div>

@@ -217,7 +217,7 @@ function handleGenerate() {
                     </span>
                     <span
                       v-if="exam.has_solution"
-                      class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 shrink-0"
+                      class="text-[9px] font-medium px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 shrink-0"
                     >
                       Facit
                     </span>

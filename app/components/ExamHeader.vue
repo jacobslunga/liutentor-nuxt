@@ -138,7 +138,7 @@ function confirmLockIn() {
         <DropdownMenuTrigger as-child>
           <Button variant="ghost" size="sm" class="gap-2">
             <div class="flex flex-row items-center gap-2 leading-none">
-              <span class="text-sm font-bold">{{
+              <span class="text-sm font-semibold">{{
                 selectedExam.exam_date
               }}</span>
             </div>
@@ -154,21 +154,21 @@ function confirmLockIn() {
           class="w-76 p-0 overflow-hidden"
         >
           <div class="px-3 py-2.5 flex items-center justify-between border-b">
-            <span class="text-[11px] font-bold text-foreground">Tentor</span>
-            <span class="text-[11px] text-muted-foreground"
+            <span class="text-[13px] font-medium text-foreground">Tentor</span>
+            <span class="text-[13px] text-muted-foreground"
               >{{ sortedExams.length }} st</span
             >
           </div>
-          <div ref="scrollRef" class="max-h-80 overflow-y-auto p-1.5 space-y-1">
+          <div ref="scrollRef" class="max-h-80 overflow-y-auto p-1.5 space-y-2">
             <button
               v-for="e in sortedExams"
               :key="e.id"
               :data-current="e.id.toString() === examId"
-              class="w-full text-left rounded-lg px-3 py-2.5 transition-colors cursor-pointer group"
+              class="w-full text-left rounded-lg px-3 py-1.5 transition-colors cursor-pointer group"
               :class="
                 e.id.toString() === examId
-                  ? 'bg-primary/8 ring-1 ring-primary/20'
-                  : 'hover:bg-foreground/5'
+                  ? 'bg-secondary dark:bg-muted border'
+                  : 'hover:bg-muted dark:hover:bg-secondary/60'
               "
               @click="changeExam(e)"
             >
@@ -176,11 +176,11 @@ function confirmLockIn() {
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-2">
                     <span
-                      class="font-bold text-sm"
+                      class="text-sm text-foreground"
                       :class="
                         e.id.toString() === examId
-                          ? 'text-primary'
-                          : 'text-foreground'
+                          ? 'font-semibold'
+                          : 'font-normal'
                       "
                     >
                       {{ e.exam_date }}
@@ -193,12 +193,7 @@ function confirmLockIn() {
                   </div>
                 </div>
                 <div class="shrink-0 pt-0.5">
-                  <span
-                    v-if="e.has_solution"
-                    class="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20"
-                  >
-                    Facit
-                  </span>
+                  <Badge v-if="e.has_solution" variant="outline"> Facit </Badge>
                 </div>
               </div>
             </button>

@@ -140,16 +140,9 @@ function passColor(rate: number) {
         <div class="flex flex-col items-start w-full max-w-2xl gap-8">
           <!-- Header -->
           <div class="w-full">
-            <div class="flex items-center gap-2 mb-3">
-              <span
-                class="text-xs text-muted-foreground/60 tracking-wide uppercase"
-                >{{ courseCode }}</span
-              >
-              <span class="text-muted-foreground/30">/</span>
-              <span class="text-xs text-muted-foreground/60">Tentor</span>
-            </div>
+            <Badge class="mb-3" variant="secondary">{{ courseCode }}</Badge>
             <h1
-              class="text-3xl sm:text-4xl font-bold text-foreground leading-tight w-full wrap-break-word mb-5"
+              class="text-3xl sm:text-4xl font-medium text-foreground leading-tight w-full wrap-break-word mb-5"
             >
               {{ courseData.courseName }}
             </h1>

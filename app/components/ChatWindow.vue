@@ -541,7 +541,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
             v-if="messages.length === 0"
             class="h-full flex flex-col items-center justify-center px-4 text-center pb-24"
           >
-            <h2 class="text-2xl font-semibold mb-3 text-foreground">
+            <h2 class="text-2xl font-normal mb-3 text-foreground">
               Vad kan jag hjälpa till med?
             </h2>
             <p
@@ -609,7 +609,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
                   <span class="shimmer-text text-sm">{{ loadingPhrase }}</span>
                 </div>
                 <div
-                  class="prose font-normal dark:prose-invert prose-p:font-normal prose-hr:border-foreground/10 marker:text-foreground marker:font-medium"
+                  class="prose font-normal prose-headings:font-medium prose-strong:font-medium dark:prose-invert prose-p:font-normal prose-hr:border-secondary marker:text-foreground marker:font-medium"
                   v-html="renderedAssistantHtml[i]"
                 />
               </div>

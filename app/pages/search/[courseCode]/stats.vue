@@ -217,25 +217,15 @@ const donutOptions = computed(() => ({
       <template v-else-if="courseData">
         <div class="flex flex-col gap-5 w-full">
           <div class="flex flex-col gap-1">
-            <div
-              class="flex items-center gap-2 text-sm text-muted-foreground/70"
-            >
-              <span class="font-medium text-foreground/80">{{
-                courseCode
-              }}</span>
-              <span>/</span>
-              <span>Statistik</span>
-            </div>
+            <Badge variant="secondary" class="mb-3">{{ courseCode }}</Badge>
             <h1
-              class="font-bold text-foreground max-w-3xl leading-tight text-2xl sm:text-3xl"
+              class="font-medium text-foreground max-w-3xl leading-tight text-2xl sm:text-3xl"
             >
               {{ courseData.courseName }}
             </h1>
           </div>
 
-          <div
-            class="rounded-md border border-border bg-card overflow-hidden shadow-sm"
-          >
+          <div class="rounded-xl border border-border bg-card overflow-hidden">
             <div class="p-5 border-b border-border/60 bg-muted/20">
               <div class="flex items-center gap-2 mb-1">
                 <LucideTrendingUp class="w-4 h-4 text-primary" />
@@ -254,9 +244,7 @@ const donutOptions = computed(() => ({
             </div>
           </div>
 
-          <div
-            class="rounded-md border border-border bg-card overflow-hidden shadow-sm"
-          >
+          <div class="rounded-xl border border-border bg-card overflow-hidden">
             <div class="p-5 border-b border-border/60 bg-muted/20">
               <div class="flex items-center gap-2 mb-1">
                 <LucideChartPie class="w-4 h-4 text-primary" />
