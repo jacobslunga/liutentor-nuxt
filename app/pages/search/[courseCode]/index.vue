@@ -142,7 +142,7 @@ function passColor(rate: number) {
           <div class="w-full">
             <Badge class="mb-3" variant="secondary">{{ courseCode }}</Badge>
             <h1
-              class="text-3xl sm:text-4xl font-medium text-foreground leading-tight w-full wrap-break-word mb-5"
+              class="text-3xl sm:text-4xl font-semibold text-foreground leading-tight w-full wrap-break-word mb-5"
             >
               {{ courseData.courseName }}
             </h1>

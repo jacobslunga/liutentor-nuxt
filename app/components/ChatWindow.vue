@@ -121,8 +121,8 @@ async function initMarkdown() {
       inner = highlighter.highlight(token.content, {
         lang: language,
         themes: {
-          light: "min-light",
-          dark: "min-dark",
+          light: "one-light",
+          dark: "one-dark-pro",
         },
         defaultColor: false,
       });
@@ -541,7 +541,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
             v-if="messages.length === 0"
             class="h-full flex flex-col items-center justify-center px-4 text-center pb-24"
           >
-            <h2 class="text-2xl font-normal mb-3 text-foreground">
+            <h2 class="text-2xl font-semibold mb-3 text-foreground">
               Vad kan jag hjälpa till med?
             </h2>
             <p
@@ -583,7 +583,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
                   "{{ msg.selectionContext }}"
                 </div>
                 <div
-                  class="bg-primary/10 text-foreground px-4 py-2 rounded-3xl w-fit"
+                  class="bg-primary/10 text-foreground px-4 py-2 rounded-lg w-fit"
                 >
                   <p class="text-[15px] leading-relaxed whitespace-pre-wrap">
                     {{ msg.content }}
@@ -609,7 +609,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
                   <span class="shimmer-text text-sm">{{ loadingPhrase }}</span>
                 </div>
                 <div
-                  class="prose font-normal prose-headings:font-medium prose-strong:font-medium dark:prose-invert prose-p:font-normal prose-hr:border-secondary marker:text-foreground marker:font-medium"
+                  class="prose prose-headings:font-semibold prose-strong:font-semibold dark:prose-invert prose-p:font-normal prose-hr:border-secondary marker:text-foreground marker:font-medium"
                   v-html="renderedAssistantHtml[i]"
                 />
               </div>
@@ -730,7 +730,6 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
   border-radius: 0;
   padding: 1rem 1.25rem;
   overflow-x: auto;
-  font-size: 0.8rem;
   line-height: 1.6;
   background-color: var(--shiki-light-bg);
 }

@@ -47,7 +47,7 @@ const updateHeight = () => {
 };
 
 const inputRadiusClass = computed(() =>
-  isMultiline.value || props.selectionContext ? "rounded-3xl" : "rounded-full",
+  isMultiline.value || props.selectionContext ? "rounded-2xl" : "rounded-4xl",
 );
 
 const handleInput = (e: Event) => {
@@ -198,7 +198,7 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
                   v-else
                   key="send"
                   size="icon"
-                  class="size-8 rounded-full"
+                  class="size-8"
                   :disabled="
                     !modelValue.trim() || modelValue.length > MAX_LENGTH
                   "

@@ -89,7 +89,7 @@ export default defineNuxtConfig({
   },
 
   shiki: {
-    bundledThemes: ["min-dark", "min-light"],
+    bundledThemes: ["one-light", "one-dark-pro"],
     bundledLangs: [
       "typescript",
       "javascript",
@@ -144,7 +144,7 @@ export default defineNuxtConfig({
       "wasm",
       "solidity",
     ],
-    defaultTheme: "github-light",
+    defaultTheme: "one-light",
   },
 
   gtag: {
