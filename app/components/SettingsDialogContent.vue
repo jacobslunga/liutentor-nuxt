@@ -28,12 +28,17 @@ const categories = [{ id: "visibility", label: "Synlighet" }];
     <div class="space-y-3">
       <h3 class="font-medium">Tema</h3>
       <div class="flex gap-2">
-        <div v-for="opt in themeOptions" :key="opt.id"
+        <div
+          v-for="opt in themeOptions"
+          :key="opt.id"
           class="flex-1 cursor-pointer rounded-xl border transition-all select-none flex flex-col items-center justify-center gap-2 py-4 hover:bg-primary/5 hover:border-primary"
-          :class="theme === opt.id
-            ? 'bg-primary/5 border-primary'
-            : 'bg-card border-border'
-            " @click="theme = opt.id">
+          :class="
+            theme === opt.id
+              ? 'bg-primary/5 border-primary'
+              : 'bg-card border-border'
+          "
+          @click="theme = opt.id"
+        >
           <LucideSun v-if="opt.id === 'light'" class="w-4.5 h-4.5" />
           <LucideMoonStar v-else-if="opt.id === 'dark'" class="w-4.5 h-4.5" />
           <LucideMonitor v-else class="w-4.5 h-4.5" />
@@ -50,11 +55,16 @@ const categories = [{ id: "visibility", label: "Synlighet" }];
           <div class="rounded-xl border bg-card">
             <table class="w-full">
               <tbody class="divide-y divide-border">
-                <tr v-for="s in shortcuts.filter((s) => s.category === cat.id)" :key="s.action" class="text-sm">
+                <tr
+                  v-for="s in shortcuts.filter((s) => s.category === cat.id)"
+                  :key="s.action"
+                  class="text-sm"
+                >
                   <td class="px-4 py-3 text-foreground">{{ s.action }}</td>
                   <td class="px-4 py-3 text-right">
                     <kbd
-                      class="inline-flex h-7 items-center rounded border bg-muted px-2 font-mono text-sm text-muted-foreground">
+                      class="inline-flex h-7 items-center rounded border bg-muted px-2 font-mono text-sm text-muted-foreground"
+                    >
                       {{ s.key }}
                     </kbd>
                   </td>

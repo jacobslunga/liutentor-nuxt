@@ -90,11 +90,9 @@ function handleFocus() {
 }
 
 function handleBlur() {
-  setTimeout(() => {
-    isFocused.value = false;
-    showSuggestions.value = false;
-    selectedIndex.value = -1;
-  }, 150);
+  isFocused.value = false;
+  showSuggestions.value = false;
+  selectedIndex.value = -1;
 }
 
 function handleClickOutside(e: MouseEvent) {
@@ -157,13 +155,8 @@ const iconSize = computed(
         ref="inputRef"
         :value="courseCode.toUpperCase()"
         placeholder="Sök kurskod..."
-        class="w-full rounded-xl border bg-background pl-9 pr-9 text-foreground outline-none transition-all duration-200 placeholder:text-muted-foreground hover:border-primary/40 hover:bg-background"
-        :class="[
-          sizeClass,
-          isFocused
-            ? 'border-primary ring-4 ring-primary/10'
-            : 'border-border/70',
-        ]"
+        class="w-full rounded-xl border bg-background pl-9 pr-9 text-foreground outline-none placeholder:text-muted-foreground hover:bg-background"
+        :class="[sizeClass, isFocused ? 'border-primary' : 'border-border/70']"
         @input="courseCode = ($event.target as HTMLInputElement).value"
         @keydown="handleKeyDown"
         @focus="handleFocus"

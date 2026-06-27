@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { Exam } from "~/types/exam";
+
 definePageMeta({ layout: "search" });
 
 const route = useRoute();
@@ -6,19 +8,9 @@ const courseCode = route.params.courseCode as string;
 
 const { data, status } = useFetch(`/api/exams/${courseCode}`);
 
-interface Exam {
-  id: number;
-  exam_name: string;
-  exam_date: string;
-  has_solution: boolean;
-  pass_rate: number;
-  statistics: Record<string, number>;
-  pdf_url: string;
-  course_code: string;
-}
-
 const courseData = computed(() => (data.value as any)?.data);
 const exams = computed<Exam[]>(() => courseData.value?.exams ?? []);
+const activeTab = ref("exams");
 
 watchEffect(() => {
   if (courseData.value) {
@@ -36,32 +28,6 @@ watchEffect(() => {
   }
 });
 
-const sortOrder = ref<"asc" | "desc">("desc");
-const activeFilters = ref<Set<string>>(new Set());
-
-const prefixes = computed(() => {
-  const all = exams.value.map((e) => e.exam_name.split(" ")[0]);
-  return [...new Set(all)] as string[];
-});
-
-const sortedExams = computed<Exam[]>(() => {
-  return [...exams.value].sort((a, b) => {
-    const diff =
-      new Date(b.exam_date).getTime() - new Date(a.exam_date).getTime();
-    return sortOrder.value === "desc" ? diff : -diff;
-  });
-});
-
-const filteredExams = computed<Exam[]>(() => {
-  let result = sortedExams.value;
-  if (activeFilters.value.size > 0) {
-    result = result.filter((e) =>
-      activeFilters.value.has(e.exam_name.split(" ")[0] ?? ""),
-    );
-  }
-  return result;
-});
-
 const avgPassRate = computed(() => {
   const valid = exams.value.filter((e) => e.pass_rate != null);
   if (!valid.length) return null;
@@ -73,26 +39,6 @@ const avgPassRate = computed(() => {
 const examsWithSolutions = computed(
   () => exams.value.filter((e) => e.has_solution).length,
 );
-
-const prefetchedRoutes = new Set<string>();
-
-function examRoutePath(examId: number) {
-  return `/search/${courseCode}/${examId}`;
-}
-
-function prefetchExamRoute(examId: number) {
-  if (import.meta.server) return;
-  const path = examRoutePath(examId);
-  if (prefetchedRoutes.has(path)) return;
-  prefetchedRoutes.add(path);
-  void preloadRouteComponents(path);
-}
-
-function toggleFilter(p: string) {
-  const next = new Set(activeFilters.value);
-  next.has(p) ? next.delete(p) : next.add(p);
-  activeFilters.value = next;
-}
 
 function passColor(rate: number) {
   if (rate >= 50) return "text-green-500";
@@ -137,182 +83,115 @@ function passColor(rate: number) {
 
     <template v-else-if="courseData">
       <div class="flex justify-center">
-        <div class="flex flex-col items-start w-full max-w-2xl gap-8">
-          <!-- Header -->
+        <div class="flex flex-col items-start w-full max-w-4xl gap-8">
           <div class="w-full">
-            <Badge class="mb-3" variant="secondary">{{ courseCode }}</Badge>
             <h1
-              class="text-3xl sm:text-4xl font-semibold text-foreground leading-tight w-full wrap-break-word mb-5"
+              class="text-3xl sm:text-4xl font-semibold text-foreground leading-tight w-full wrap-break-word"
             >
               {{ courseData.courseName }}
             </h1>
 
-            <!-- Meta stats -->
-            <div class="flex flex-wrap gap-3">
-              <div
-                class="flex items-center gap-2 px-3 py-2 rounded-2xl bg-muted/40 border border-border/50"
-              >
-                <LucideFileText class="w-3.5 h-3.5 text-muted-foreground" />
-                <span class="text-xs text-muted-foreground">
-                  <span class="font-medium text-foreground">{{
-                    exams.length
-                  }}</span>
-                  tentor
-                </span>
-              </div>
-              <div
-                class="flex items-center gap-2 px-3 py-2 rounded-2xl bg-muted/40 border border-border/50"
-              >
-                <LucideCheckCircle class="w-3.5 h-3.5 text-muted-foreground" />
-                <span class="text-xs text-muted-foreground">
-                  <span class="font-medium text-foreground">{{
-                    examsWithSolutions
-                  }}</span>
-                  med facit
-                </span>
-              </div>
-              <div
-                v-if="avgPassRate !== null"
-                class="flex items-center gap-2 px-3 py-2 rounded-2xl bg-muted/40 border border-border/50"
-              >
-                <LucideTrendingUp class="w-3.5 h-3.5 text-muted-foreground" />
-                <span class="text-xs text-muted-foreground">
-                  Snitt godkänd
-                  <span class="font-medium" :class="passColor(avgPassRate)"
-                    >{{ avgPassRate }}%</span
-                  >
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Filters -->
-          <div
-            v-if="prefixes.length > 1"
-            class="flex flex-wrap gap-2 w-full -mt-4"
-          >
-            <button
-              v-for="p in prefixes"
-              :key="p"
-              class="text-xs cursor-pointer font-mono px-3 py-1.5 rounded-md border transition-all"
-              :class="
-                activeFilters.has(p)
-                  ? 'bg-foreground text-background border-foreground shadow-sm'
-                  : 'border-border/50 text-muted-foreground hover:text-foreground hover:border-border'
-              "
-              @click="toggleFilter(p)"
+            <p
+              class="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground"
             >
-              {{ p }}
-            </button>
+              <span class="font-mono font-medium text-foreground">{{
+                courseCode
+              }}</span>
+              <span aria-hidden="true">·</span>
+              <span>
+                <span class="font-medium text-foreground">{{ exams.length }}</span>
+                tentor
+              </span>
+              <span aria-hidden="true">·</span>
+              <span>
+                <span class="font-medium text-foreground">{{
+                  examsWithSolutions
+                }}</span>
+                med facit
+              </span>
+              <template v-if="avgPassRate !== null">
+                <span aria-hidden="true">·</span>
+                <span>
+                  <span class="font-medium" :class="passColor(avgPassRate)">
+                    {{ avgPassRate }}%
+                  </span>
+                  godkända i snitt
+                </span>
+              </template>
+            </p>
           </div>
 
-          <!-- Table -->
-          <div
-            class="w-full overflow-x-auto rounded-2xl border border-border/60 -mt-4"
-          >
-            <div class="min-w-fit w-full rounded-2xl overflow-hidden">
-              <div
-                class="grid grid-cols-[1fr_80px_64px_80px] gap-x-4 px-6 py-3.5 border-b border-border/50 bg-muted/30"
+          <Tabs v-model="activeTab" class="w-full -mt-4">
+            <div
+              class="sticky top-0 z-40 flex flex-col gap-3 border-b border-border/70 bg-background pt-2 sm:flex-row sm:items-end sm:justify-between dark:border-border/60"
+            >
+              <TabsList
+                class="h-auto justify-start rounded-none border-0 bg-transparent p-0"
               >
-                <button
-                  class="text-xs text-muted-foreground flex items-center gap-1.5 hover:text-foreground transition-colors w-fit"
-                  @click="sortOrder = sortOrder === 'desc' ? 'asc' : 'desc'"
+                <TabsTrigger
+                  value="exams"
+                  class="relative h-10 cursor-pointer flex-none rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 py-2 text-sm text-muted-foreground shadow-none hover:text-foreground data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none dark:data-[state=active]:border-primary dark:data-[state=active]:bg-transparent"
                 >
-                  Tentamen
-                  <LucideArrowDownWideNarrow
-                    v-if="sortOrder === 'asc'"
-                    class="w-3.5 h-3.5"
-                  />
-                  <LucideArrowDownWideNarrow v-else class="w-3.5 h-3.5" />
-                </button>
-                <div class="text-xs text-muted-foreground">Typ</div>
-                <div class="text-xs text-muted-foreground text-center">
-                  Facit
-                </div>
-                <div class="text-xs text-muted-foreground text-right">
-                  Godkänd
-                </div>
-              </div>
+                  <LucideScrollText class="w-4 h-4" />
+                  Tentor
+                </TabsTrigger>
+                <TabsTrigger
+                  value="stats"
+                  class="relative h-10 cursor-pointer flex-none rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 py-2 text-sm text-muted-foreground shadow-none hover:text-foreground data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none dark:data-[state=active]:border-primary dark:data-[state=active]:bg-transparent"
+                >
+                  <LucideChartSpline class="w-4 h-4" />
+                  Statistik
+                </TabsTrigger>
+              </TabsList>
 
-              <div
-                v-for="exam in filteredExams"
-                :key="exam.id"
-                class="grid grid-cols-[1fr_80px_64px_80px] gap-x-4 cursor-pointer px-3 py-2 border-b border-border/20 last:border-0 hover:bg-muted/20 transition-colors items-center group"
-                @mouseenter="prefetchExamRoute(exam.id)"
-                @focusin="prefetchExamRoute(exam.id)"
-                @click="navigateTo(examRoutePath(exam.id))"
-              >
-                <div class="min-w-0">
-                  <div
-                    class="text-sm font-medium text-foreground group-hover:text-foreground/80 transition-colors truncate"
-                  >
-                    {{ exam.exam_name }}
-                  </div>
-                  <div class="text-xs text-muted-foreground/70 mt-0.5">
-                    {{ exam.exam_date }}
-                  </div>
-                </div>
-
-                <div>
-                  <span
-                    class="text-[10px] px-2 py-0.5 rounded-md border border-border/50 bg-muted/40 text-muted-foreground font-mono"
-                  >
-                    {{ exam.exam_name.split(" ")[0] }}
-                  </span>
-                </div>
-
-                <div class="flex justify-center">
-                  <LucideCheck
-                    v-if="exam.has_solution"
-                    class="w-4 h-4 text-green-500"
-                  />
-                  <LucideMinus
-                    v-else
-                    class="w-4 h-4 text-muted-foreground/30"
-                  />
-                </div>
-
-                <div class="text-right flex flex-col items-end gap-1">
-                  <ExamStatsDialog
-                    :statistics="exam.statistics"
-                    :date="exam.exam_date"
-                    :pass-rate="exam.pass_rate"
-                  />
-                </div>
+              <div class="flex items-center gap-2 pb-2">
+                <Button variant="default" size="sm" as-child>
+                  <NuxtLink to="/upload-exams">
+                    <LucideUpload class="w-4.5 h-4.5" />
+                    Ladda upp
+                  </NuxtLink>
+                </Button>
+                <Button variant="outline" size="sm" as-child>
+                  <NuxtLink :to="`/quiz/${courseCode}`">
+                    <LucideLayers class="w-4.5 h-4.5" />
+                    Quiz
+                  </NuxtLink>
+                </Button>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
 
-      <div class="sticky bottom-0 z-50 pointer-events-none">
-        <div
-          class="bg-linear-to-t from-background via-background/80 to-background/0 pt-8 pb-10"
-        >
-          <div
-            class="flex items-center justify-center pointer-events-auto gap-2"
-          >
-            <Button variant="default" size="sm" as-child>
-              <NuxtLink to="/upload-exams">
-                <LucideUpload class="w-4.5 h-4.5" />
-                Ladda upp
-              </NuxtLink>
-            </Button>
-            <Button variant="outline" size="sm" as-child>
-              <NuxtLink :to="`/search/${courseCode}/stats`">
-                <LucideChartPie class="w-4.5 h-4.5" />
-                Statistik
-              </NuxtLink>
-            </Button>
-            <Button variant="outline" size="sm" as-child>
-              <NuxtLink :to="`/quiz/${courseCode}`">
-                <LucideLayers class="w-4.5 h-4.5" />
-                Quiz
-              </NuxtLink>
-            </Button>
-          </div>
+            <Transition name="tab-panel" mode="out-in">
+              <TabsContent
+                v-if="activeTab === 'exams'"
+                key="exams"
+                value="exams"
+                class="mt-5"
+              >
+                <CourseExamsTable :course-code="courseCode" :exams="exams" />
+              </TabsContent>
+
+              <TabsContent v-else key="stats" value="stats" class="mt-5">
+                <CourseStats :exams="exams" />
+              </TabsContent>
+            </Transition>
+          </Tabs>
         </div>
       </div>
     </template>
   </div>
 </template>
+
+<style scoped>
+.tab-panel-enter-active,
+.tab-panel-leave-active {
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
+}
+
+.tab-panel-enter-from,
+.tab-panel-leave-to {
+  opacity: 0;
+  transform: translateX(12px);
+}
+</style>

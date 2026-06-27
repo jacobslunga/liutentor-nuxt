@@ -1,8 +1,8 @@
 <template>
   <Dialog>
     <DialogTrigger as-child>
-      <Button variant="ghost" size="icon">
-        <LucideSettings size=18 />
+      <Button variant="ghost" size="icon-sm">
+        <LucideSettings />
       </Button>
     </DialogTrigger>
     <DialogContent class="max-w-md max-h-[80vh] overflow-y-auto">
