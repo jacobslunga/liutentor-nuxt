@@ -11,8 +11,12 @@ const focusInput = ref(false);
 </script>
 
 <template>
-  <div class="relative flex flex-col items-center justify-start w-full min-h-screen p-4 pt-[20vh] bg-background">
-    <div class="flex flex-row items-center justify-center gap-2 absolute top-5 right-5">
+  <div
+    class="relative flex flex-col items-center justify-start w-full min-h-screen p-4 pt-[20vh] bg-background"
+  >
+    <div
+      class="flex flex-row items-center justify-center gap-2 absolute top-5 right-5"
+    >
       <AuthActions />
     </div>
 
@@ -29,10 +33,12 @@ const focusInput = ref(false);
       <div class="relative w-full">
         <div
           class="w-full border border-foreground/20 bg-background flex flex-row items-center justify-center rounded-full transition-all duration-200 text-sm text-foreground/80 outline-none"
-          :class="focusInput
-            ? 'border-primary ring-1 ring-primary'
-            : 'hover:border-foreground/40'
-            ">
+          :class="
+            focusInput
+              ? 'border-primary ring-1 ring-primary'
+              : 'hover:border-foreground/40'
+          "
+        >
           <MainInput v-model:focusInput="focusInput" />
         </div>
       </div>
@@ -41,7 +47,7 @@ const focusInput = ref(false);
 
       <NuxtLink to="/upload-exams">
         <Button variant="outline">
-          <LucideUpload size="1.4em" />
+          <LucideUpload />
           Ladda upp fler tentor
         </Button>
       </NuxtLink>

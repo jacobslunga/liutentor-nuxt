@@ -24,10 +24,6 @@ const courseCode = ref("");
 const suggestions = ref<string[]>([]);
 const showSuggestions = ref(false);
 const selectedIndex = ref(-1);
-const searchMethod = ref<"tentor" | "stats">("tentor");
-const searchMethodLabel = computed(() =>
-  searchMethod.value === "stats" ? "Statistik" : "Tentor",
-);
 const { add } = useRecentSearches();
 
 const inputRef = ref<HTMLInputElement | null>(null);
@@ -93,16 +89,7 @@ function handleSelectCourse(course: string) {
   add(courseCode.value);
   courseCode.value = "";
   showSuggestions.value = false;
-  router.push(
-    searchMethod.value === "stats"
-      ? `/search/${searchCode}/stats`
-      : `/search/${searchCode}`,
-  );
-}
-
-function selectSearchMethod(method: "tentor" | "stats") {
-  searchMethod.value = method;
-  inputRef.value?.focus();
+  router.push(`/search/${searchCode}`);
 }
 
 function handleKeyDown(e: KeyboardEvent) {
@@ -212,45 +199,6 @@ function handleClickOutside(event: MouseEvent) {
         @focus="emit('update:focusInput', true)"
         @blur="emit('update:focusInput', false)"
       />
-
-      <DropdownMenu>
-        <DropdownMenuTrigger as-child>
-          <Button
-            variant="ghost"
-            size="sm"
-            class="shrink-0 gap-1.5 px-2 text-foreground/60 hover:text-foreground"
-          >
-            {{ searchMethodLabel }}
-            <LucideChevronDown class="h-3.5 w-3.5" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent
-          align="end"
-          :side-offset="8"
-          class="w-36 rounded-2xl"
-        >
-          <DropdownMenuItem
-            class="cursor-pointer rounded-xl"
-            @click="selectSearchMethod('tentor')"
-          >
-            <LucideCheck
-              class="h-4 w-4"
-              :class="searchMethod === 'tentor' ? 'opacity-100' : 'opacity-0'"
-            />
-            Tentor
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            class="cursor-pointer rounded-xl"
-            @click="selectSearchMethod('stats')"
-          >
-            <LucideCheck
-              class="h-4 w-4"
-              :class="searchMethod === 'stats' ? 'opacity-100' : 'opacity-0'"
-            />
-            Statistik
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
 
       <Button
         class="shrink-0 ml-2"
