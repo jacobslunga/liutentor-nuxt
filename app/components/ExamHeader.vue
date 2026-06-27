@@ -21,9 +21,8 @@ const router = useRouter();
 const chatStore = useChatStore();
 const { startSession } = useLockInMode();
 const isDropdownOpen = ref(false);
-const isDownloadOpen = ref(false);
+const isActionsOpen = ref(false);
 const isSettingsOpen = ref(false);
-const isLockInOpen = ref(false);
 const lockInDuration = ref<string | null>(null);
 const showLockInConfirm = ref(false);
 const scrollRef = ref<HTMLDivElement | null>(null);
@@ -104,7 +103,7 @@ const downloadFile = async (url: string, filename: string) => {
 
 function selectLockInDuration(value: string) {
   lockInDuration.value = value;
-  isLockInOpen.value = false;
+  isActionsOpen.value = false;
   showLockInConfirm.value = true;
 }
 
@@ -123,7 +122,7 @@ function confirmLockIn() {
 
 <template>
   <div
-    class="hidden lg:flex h-12 absolute top-0 z-60 w-full shrink-0 items-center justify-between bg-linear-to-b from-background via-background/90 to-background/0 px-4"
+    class="hidden lg:flex h-12 z-60 w-full shrink-0 items-center justify-between border-b bg-background px-4"
   >
     <div class="flex items-center gap-1">
       <Button
@@ -211,127 +210,104 @@ function confirmLockIn() {
     </div>
 
     <div class="flex items-center gap-2">
-      <div class="flex items-center gap-0.5">
-        <LayoutSwitcher />
-
-        <Dialog v-model:open="isSettingsOpen">
-          <DialogTrigger as-child>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              class="text-muted-foreground/60 hover:bg-transparent hover:text-foreground"
-            >
-              <LucideSettings class="size-4" />
-            </Button>
-          </DialogTrigger>
-          <DialogContent class="max-w-md">
-            <DialogHeader>
-              <DialogTitle>Inställningar</DialogTitle>
-              <DialogDescription
-                >Anpassa din studieupplevelse</DialogDescription
-              >
-            </DialogHeader>
-            <SettingsDialogContent />
-          </DialogContent>
-        </Dialog>
-      </div>
-
-      <div class="h-5 w-px bg-border/60" />
-
-      <Button
-        variant="ghost"
-        size="sm"
-        class="text-muted-foreground hover:text-foreground"
-        @click="chatStore.toggle()"
-      >
+      <Button variant="secondary" size="sm" @click="chatStore.toggle()">
         <LucideLoader2
           v-if="chatStore.isLoading"
           class="size-3.5 animate-spin"
         />
-        <LucideMessageCircleX v-else-if="chatStore.isOpen" class="size-4" />
-        <LucideMessageCircleReply v-else class="size-4" />
+        <LucideMessageSquareX v-else-if="chatStore.isOpen" class="size-4" />
+        <LucideMessageSquareReply v-else class="size-4" />
         <span class="text-xs">{{ chatStore.isOpen ? "Stäng" : "Chatt" }}</span>
       </Button>
 
-      <div class="h-5 w-px bg-border/60" />
+      <DropdownMenu v-model:open="isActionsOpen">
+        <DropdownMenuTrigger as-child>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            class="text-muted-foreground hover:text-foreground"
+            aria-label="Fler åtgärder"
+          >
+            <LucideEllipsis class="size-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" :side-offset="8" class="w-52">
+          <DropdownMenuItem
+            class="cursor-pointer"
+            @click="isSettingsOpen = true"
+          >
+            <LucideSettings class="size-4" />
+            Inställningar
+          </DropdownMenuItem>
 
-      <div class="flex items-center gap-1.5">
-        <DropdownMenu v-model:open="isDownloadOpen">
-          <DropdownMenuTrigger as-child>
-            <Button
-              variant="ghost"
-              size="sm"
-              class="text-muted-foreground hover:text-foreground"
-              :disabled="!hasDownload"
-            >
+          <DropdownMenuSeparator />
+
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger :disabled="!hasDownload">
               <LucideDownload class="size-4" />
-              <span class="text-xs">Ladda ned</span>
-              <LucideChevronDown
-                class="size-3.5 opacity-60 transition-transform duration-200"
-                :class="{ 'rotate-180': isDownloadOpen }"
-              />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" :side-offset="8">
-            <DropdownMenuItem
-              class="gap-2 text-sm cursor-pointer"
-              :disabled="!selectedExam?.pdf_url"
-              @click="
-                downloadFile(
-                  selectedExam!.pdf_url,
-                  `${selectedExam!.course_code}_${selectedExam!.exam_date}_EXAM.pdf`,
-                )
-              "
-            >
-              <LucideDownload class="size-4" /> Ladda ned tenta
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              class="gap-2 text-sm cursor-pointer"
-              :disabled="!solutionPdfUrl"
-              @click="
-                downloadFile(
-                  solutionPdfUrl!,
-                  `${selectedExam?.course_code}_${selectedExam?.exam_date}_SOLUTION.pdf`,
-                )
-              "
-            >
-              <LucideDownload class="size-4" /> Ladda ned facit
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+              Ladda ned
+            </DropdownMenuSubTrigger>
+            <DropdownMenuSubContent class="w-48">
+              <DropdownMenuItem
+                class="cursor-pointer"
+                :disabled="!selectedExam?.pdf_url"
+                @click="
+                  downloadFile(
+                    selectedExam!.pdf_url,
+                    `${selectedExam!.course_code}_${selectedExam!.exam_date}_EXAM.pdf`,
+                  )
+                "
+              >
+                <LucideFileText class="size-4" />
+                Tenta
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                class="cursor-pointer"
+                :disabled="!solutionPdfUrl"
+                @click="
+                  downloadFile(
+                    solutionPdfUrl!,
+                    `${selectedExam?.course_code}_${selectedExam?.exam_date}_SOLUTION.pdf`,
+                  )
+                "
+              >
+                <LucideFileCheck class="size-4" />
+                Facit
+              </DropdownMenuItem>
+            </DropdownMenuSubContent>
+          </DropdownMenuSub>
 
-        <DropdownMenu v-model:open="isLockInOpen">
-          <DropdownMenuTrigger as-child>
-            <Button
-              variant="outline"
-              size="sm"
-              class="border-border/60 shadow-none"
-              :disabled="!selectedExam"
-            >
-              <LucideLock class="size-3.5" />
-              <span class="text-xs font-medium">Lock in</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" :side-offset="8" class="w-44">
-            <div
-              class="px-2 py-1.5 text-[11px] font-medium text-muted-foreground border-b mb-1"
-            >
-              Välj varaktighet
-            </div>
-            <DropdownMenuItem
-              v-for="opt in TIME_OPTIONS"
-              :key="opt.value"
-              class="gap-2 text-sm cursor-pointer"
-              @click="selectLockInDuration(opt.value)"
-            >
-              <LucideTimer class="size-3.5 opacity-70" />
-              {{ opt.label }}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger :disabled="!selectedExam">
+              <LucideLock class="size-4" />
+              Lock in
+            </DropdownMenuSubTrigger>
+            <DropdownMenuSubContent class="w-44">
+              <DropdownMenuItem
+                v-for="opt in TIME_OPTIONS"
+                :key="opt.value"
+                class="cursor-pointer"
+                @click="selectLockInDuration(opt.value)"
+              >
+                <LucideTimer class="size-3.5 opacity-70" />
+                {{ opt.label }}
+              </DropdownMenuItem>
+            </DropdownMenuSubContent>
+          </DropdownMenuSub>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   </div>
+
+  <Dialog v-model:open="isSettingsOpen">
+    <DialogContent class="max-w-md">
+      <DialogHeader>
+        <DialogTitle>Inställningar</DialogTitle>
+        <DialogDescription>Anpassa din studieupplevelse</DialogDescription>
+      </DialogHeader>
+      <SettingsDialogContent />
+    </DialogContent>
+  </Dialog>
 
   <AlertDialog
     :open="showLockInConfirm"

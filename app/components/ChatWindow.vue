@@ -583,7 +583,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
                   "{{ msg.selectionContext }}"
                 </div>
                 <div
-                  class="bg-primary/10 text-foreground px-4 py-2 rounded-lg w-fit"
+                  class="bg-primary/10 text-foreground px-4 py-2 rounded-3xl w-fit"
                 >
                   <p class="text-[15px] leading-relaxed whitespace-pre-wrap">
                     {{ msg.content }}

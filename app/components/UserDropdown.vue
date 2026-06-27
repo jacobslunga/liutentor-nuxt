@@ -87,7 +87,8 @@ const gotoProfile = () => {
       >
         <LucideLoader2
           v-if="isPending || (avatarUrl && isImageLoading)"
-          class="w-4 h-4 animate-spin absolute z-10" />
+          class="w-4 h-4 animate-spin absolute z-10"
+        />
 
         <img
           v-if="avatarUrl"
