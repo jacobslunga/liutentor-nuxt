@@ -48,7 +48,11 @@ function passColor(rate: number) {
 </script>
 
 <template>
-  <div class="container mx-auto px-4 py-8 max-w-4xl">
+  <div class="container mx-auto max-w-3xl px-4 pb-8 pt-2 md:py-8">
+    <div class="sticky top-0 z-50 bg-background h-12 pt-2 mb-4 md:hidden">
+      <CourseSearchDropdown size="md" class="mx-auto w-full max-w-xl" />
+    </div>
+
     <div
       v-if="status === 'pending'"
       class="flex items-center justify-center min-h-[60vh]"
@@ -99,7 +103,9 @@ function passColor(rate: number) {
               }}</span>
               <span aria-hidden="true">·</span>
               <span>
-                <span class="font-medium text-foreground">{{ exams.length }}</span>
+                <span class="font-medium text-foreground">{{
+                  exams.length
+                }}</span>
                 tentor
               </span>
               <span aria-hidden="true">·</span>
@@ -123,7 +129,7 @@ function passColor(rate: number) {
 
           <Tabs v-model="activeTab" class="w-full -mt-4">
             <div
-              class="sticky top-0 z-40 flex flex-col gap-3 border-b border-border/70 bg-background pt-2 sm:flex-row sm:items-end sm:justify-between dark:border-border/60"
+              class="sticky top-12 z-40 flex flex-col gap-3 border-b border-border/70 bg-background pt-2 sm:flex-row sm:items-end sm:justify-between md:top-0 dark:border-border/60"
             >
               <TabsList
                 class="h-auto justify-start rounded-none border-0 bg-transparent p-0"

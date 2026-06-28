@@ -115,7 +115,10 @@ function toggleFilter(p: string) {
           </div>
 
           <div class="flex justify-center">
-            <LucideCheck v-if="exam.has_solution" class="w-4 h-4 text-green-500" />
+            <LucideCheck
+              v-if="exam.has_solution"
+              class="w-4 h-4 text-green-500"
+            />
             <LucideMinus v-else class="w-4 h-4 text-muted-foreground/30" />
           </div>
 
