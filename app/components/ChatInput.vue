@@ -42,7 +42,9 @@ const updateHeight = () => {
   const el = textareaRef.value;
   if (!el) return;
   el.style.height = "auto";
-  el.style.height = `${Math.min(el.scrollHeight, 180)}px`;
+  const nextHeight = Math.min(el.scrollHeight, 180);
+  el.style.height = `${nextHeight}px`;
+  el.style.overflowY = el.scrollHeight > 180 ? "auto" : "hidden";
   isMultiline.value = el.scrollHeight > 42;
 };
 
@@ -145,7 +147,7 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
               :value="modelValue"
               rows="1"
               placeholder="Fråga vad som helst"
-              class="min-h-8 flex-1 resize-none border-0 bg-transparent py-2 text-[15px] leading-relaxed outline-none placeholder:text-muted-foreground/70 focus:ring-0 max-h-45"
+              class="chat-textarea min-h-8 flex-1 resize-none border-0 bg-transparent py-2 text-[15px] leading-relaxed outline-none placeholder:text-muted-foreground/70 focus:ring-0 max-h-45"
               @input="handleInput"
               @keydown="handleKeyDown"
             />
@@ -235,6 +237,15 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
 <style scoped>
 textarea {
   transition: height 0.15s ease-out;
+}
+
+.chat-textarea {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.chat-textarea::-webkit-scrollbar {
+  display: none;
 }
 
 .fade-up-enter-active,
