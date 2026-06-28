@@ -76,7 +76,7 @@ const downloadFile = async (url: string, filename: string) => {
 <template>
   <div class="flex flex-col h-screen w-full bg-background relative">
     <div
-      class="absolute inset-x-0 top-0 z-40 flex h-12 items-center gap-3 bg-linear-to-b from-background via-background/90 to-background/0 px-3"
+      class="z-40 flex h-12 shrink-0 items-center gap-3 border-b bg-background px-3"
     >
       <NuxtLink :to="`/search/${courseCode}`">
         <Button aria-label="Gå tillbaka" variant="outline" size="icon-sm">
@@ -84,7 +84,7 @@ const downloadFile = async (url: string, filename: string) => {
         </Button>
       </NuxtLink>
       <div class="min-w-0 flex-1">
-        <p class="text-sm font-medium text-foreground truncate leading-tight">
+        <p class="text-sm font-semibold text-foreground truncate leading-tight">
           {{ courseCode }}
         </p>
         <p class="text-xs text-muted-foreground truncate leading-tight">
@@ -137,7 +137,7 @@ const downloadFile = async (url: string, filename: string) => {
       </Button>
     </div>
 
-    <div class="w-full h-full overflow-hidden">
+    <div class="min-h-0 w-full flex-1 overflow-hidden">
       <ClientOnly>
         <PdfRenderer :pdf-url="examPdfUrl" />
       </ClientOnly>
@@ -158,11 +158,11 @@ const downloadFile = async (url: string, filename: string) => {
         aria-modal="true"
       >
         <div
-          class="absolute inset-x-0 top-0 z-10 flex h-12 items-center gap-3 bg-linear-to-b from-background via-background/90 to-background/0 px-3"
+          class="z-10 flex h-12 shrink-0 items-center gap-3 border-b bg-background px-3"
         >
           <div class="min-w-0 flex-1">
             <p
-              class="text-sm font-medium text-foreground truncate leading-tight"
+              class="text-sm font-semibold text-foreground truncate leading-tight"
             >
               Facit
             </p>
@@ -179,7 +179,7 @@ const downloadFile = async (url: string, filename: string) => {
             <LucideX class="w-4 h-4" />
           </Button>
         </div>
-        <div class="h-full w-full overflow-hidden">
+        <div class="min-h-0 w-full flex-1 overflow-hidden">
           <ClientOnly>
             <PdfRenderer v-if="solutionPdfUrl" :pdf-url="solutionPdfUrl" />
           </ClientOnly>
