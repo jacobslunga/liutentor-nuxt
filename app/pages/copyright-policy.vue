@@ -70,7 +70,6 @@ const sections: Section[] = [
 </script>
 
 <template>
-  <div class="w-full max-w-3xl">
     <h1 class="text-3xl font-medium text-foreground mb-1">Upphovsrätt</h1>
     <p class="text-xs text-muted-foreground mb-6">
       Senast uppdaterad: 2026/03/23
@@ -111,5 +110,4 @@ const sections: Section[] = [
       </p>
       <Button size="sm" @click="openMail"> Skicka borttagningsbegäran </Button>
     </div>
-  </div>
 </template>

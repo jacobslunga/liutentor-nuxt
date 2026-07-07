@@ -20,13 +20,14 @@ const emit = defineEmits<{ reply: [] }>();
           transform: 'translate(-50%, calc(-100% - 8px))',
         }"
       >
-        <button
-          class="flex cursor-pointer items-center gap-1.5 bg-foreground text-background text-[13px] font-medium px-3 py-1.5 rounded-lg shadow-lg hover:opacity-90 active:scale-95 transition-all select-none"
+        <Button
+          size="sm"
+          class="bg-foreground text-background hover:opacity-90"
           @mousedown.prevent.stop="emit('reply')"
         >
           Svara
           <LucideCornerUpLeft class="w-3.5 h-3.5" />
-        </button>
+        </Button>
       </div>
     </Transition>
   </Teleport>
@@ -36,8 +37,8 @@ const emit = defineEmits<{ reply: [] }>();
 .popover-fade-enter-active,
 .popover-fade-leave-active {
   transition:
-    opacity 0.15s ease,
-    transform 0.15s ease;
+    opacity 0.15s var(--ease-spring),
+    transform 0.15s var(--ease-spring);
 }
 
 .popover-fade-enter-from,

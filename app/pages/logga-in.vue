@@ -245,15 +245,15 @@ async function handleSignup() {
                   loginErrors.password ? 'border-destructive pr-10' : 'pr-10'
                 "
               />
-              <button
-                type="button"
-                tabindex="-1"
-                class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              <Button
+                variant="ghost"
+                size="icon-xs"
+                class="absolute right-3 top-1/2 -translate-y-1/2"
                 @click="showLoginPassword = !showLoginPassword"
               >
                 <LucideEye v-if="!showLoginPassword" class="w-4 h-4" />
                 <LucideEyeOff v-else class="w-4 h-4" />
-              </button>
+              </Button>
             </div>
             <p v-if="loginErrors.password" class="text-xs text-destructive">
               {{ loginErrors.password }}
@@ -274,13 +274,14 @@ async function handleSignup() {
 
           <p class="text-xs text-center text-muted-foreground">
             Inget konto?
-            <button
-              type="button"
-              class="text-foreground cursor-pointer underline underline-offset-2 hover:text-primary transition-colors"
+            <Button
+              variant="link"
+              size="sm"
+              class="text-foreground underline-offset-2 hover:text-primary h-auto p-0"
               @click="activeTab = 'skapa-konto'"
             >
               Skapa ett här
-            </button>
+            </Button>
           </p>
         </form>
       </TabsContent>
@@ -387,15 +388,15 @@ async function handleSignup() {
                   signupErrors.password ? 'border-destructive pr-10' : 'pr-10'
                 "
               />
-              <button
-                type="button"
-                tabindex="-1"
-                class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              <Button
+                variant="ghost"
+                size="icon-xs"
+                class="absolute right-3 top-1/2 -translate-y-1/2"
                 @click="showSignupPassword = !showSignupPassword"
               >
                 <LucideEye v-if="!showSignupPassword" class="w-4 h-4" />
                 <LucideEyeOff v-else class="w-4 h-4" />
-              </button>
+              </Button>
             </div>
             <p v-if="signupErrors.password" class="text-xs text-destructive">
               {{ signupErrors.password }}
@@ -418,15 +419,15 @@ async function handleSignup() {
                     : 'pr-10'
                 "
               />
-              <button
-                type="button"
-                tabindex="-1"
-                class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              <Button
+                variant="ghost"
+                size="icon-xs"
+                class="absolute right-3 top-1/2 -translate-y-1/2"
                 @click="showSignupConfirm = !showSignupConfirm"
               >
                 <LucideEye v-if="!showSignupConfirm" class="w-4 h-4" />
                 <LucideEyeOff v-else class="w-4 h-4" />
-              </button>
+              </Button>
             </div>
             <p
               v-if="signupErrors.confirmPassword"
@@ -450,13 +451,14 @@ async function handleSignup() {
 
           <p class="text-xs text-center text-muted-foreground">
             Har du redan ett konto?
-            <button
-              type="button"
-              class="text-foreground cursor-pointer underline underline-offset-2 hover:text-primary transition-colors"
+            <Button
+              variant="link"
+              size="sm"
+              class="text-foreground underline-offset-2 hover:text-primary h-auto p-0"
               @click="activeTab = 'logga-in'"
             >
               Logga in
-            </button>
+            </Button>
           </p>
         </form>
       </TabsContent>

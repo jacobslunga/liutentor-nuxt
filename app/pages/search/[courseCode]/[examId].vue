@@ -126,8 +126,6 @@ function handleKeyUp(e: KeyboardEvent) {
         :solution-pdf-url="solutionPdfUrl"
       />
 
-      <LayoutSwitcher />
-
       <div
         v-if="isLoading"
         class="flex flex-1 items-center justify-center flex-col gap-2"
@@ -286,7 +284,7 @@ function handleKeyUp(e: KeyboardEvent) {
 <style scoped>
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.2s ease;
+  transition: opacity 0.2s var(--ease-spring);
 }
 
 .fade-enter-from,
@@ -297,8 +295,8 @@ function handleKeyUp(e: KeyboardEvent) {
 .panel-swap-enter-active,
 .panel-swap-leave-active {
   transition:
-    opacity 0.15s ease,
-    transform 0.15s ease;
+    opacity 0.15s var(--ease-spring),
+    transform 0.15s var(--ease-spring);
 }
 
 .panel-swap-enter-from {

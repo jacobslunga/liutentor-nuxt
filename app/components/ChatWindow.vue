@@ -515,7 +515,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
 <template>
   <div class="h-full w-full flex bg-background overflow-hidden relative">
     <div
-      class="flex-1 min-w-0 flex flex-col transition-all duration-300 ease-out"
+      class="flex-1 min-w-0 flex flex-col transition-all duration-300 ease-spring"
     >
       <div class="flex-1 min-h-0 relative">
         <div class="absolute inset-x-0 top-0 z-20 pointer-events-none">
@@ -776,8 +776,8 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
   border: 1px solid transparent;
   cursor: pointer;
   transition:
-    background-color 0.15s ease,
-    color 0.15s ease;
+    background-color 0.15s var(--ease-spring),
+    color 0.15s var(--ease-spring);
 }
 
 .prose :deep(.code-copy-label) {

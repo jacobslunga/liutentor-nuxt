@@ -47,9 +47,9 @@ const t = {
       </p>
 
       <Transition
-        enter-active-class="transition-all duration-200"
+        enter-active-class="transition-all duration-200 ease-spring"
         enter-from-class="opacity-0 translate-y-1"
-        leave-active-class="transition-all duration-150"
+        leave-active-class="transition-all duration-150 ease-spring"
         leave-to-class="opacity-0"
       >
         <div v-if="error" class="text-center">

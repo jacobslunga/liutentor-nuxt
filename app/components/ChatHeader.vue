@@ -2,15 +2,15 @@
   <div
     class="shrink-0 bg-linear-to-b from-background via-background/90 to-background/0 relative flex items-center justify-between px-3 py-2 z-90 overflow-visible">
     <div class="flex items-center gap-2 min-w-0">
-      <Button variant="ghost" size="icon" class="size-8" @click="emit('close')">
+      <Button variant="ghost" size="icon-sm" @click="emit('close')">
         <LucideChevronRight />
       </Button>
     </div>
     <div class="flex items-center gap-1">
-      <Button variant="ghost" size="icon" class="size-8" @click="emit('newChat')">
+      <Button variant="ghost" size="icon-sm" @click="emit('newChat')">
         <LucidePlus class="w-4 h-4" />
       </Button>
-      <Button variant="ghost" size="icon" class="size-8" @click="emit('openHistory')">
+      <Button variant="ghost" size="icon-sm" @click="emit('openHistory')">
         <LucidePanelRight v-if="historyOpen" class="w-4 h-4" />
         <LucidePanelRight v-else class="w-4 h-4" />
       </Button>

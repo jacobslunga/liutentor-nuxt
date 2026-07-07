@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useChatStore } from "@/stores/chat";
+import { useLayoutStore } from "~/stores/layout";
 
 interface Exam {
   id: number;
@@ -19,6 +20,8 @@ const props = defineProps<{
 
 const router = useRouter();
 const chatStore = useChatStore();
+const layoutStore = useLayoutStore();
+const { layoutMode } = storeToRefs(layoutStore);
 const { startSession } = useLockInMode();
 const isDropdownOpen = ref(false);
 const isActionsOpen = ref(false);
@@ -62,6 +65,12 @@ const hasDownload = computed(
 const selectedDurationLabel = computed(
   () => TIME_OPTIONS.find((o) => o.value === lockInDuration.value)?.label ?? "",
 );
+
+function switchLayout(val: string | number) {
+  if (val !== "exam-with-facit" && val !== "exam-only") return;
+  layoutStore.setLayoutMode(val);
+  chatStore.close();
+}
 
 function handleKeyDown(event: KeyboardEvent) {
   if (event.key === "Escape" && isDropdownOpen.value) {
@@ -122,11 +131,11 @@ function confirmLockIn() {
 
 <template>
   <div
-    class="hidden lg:flex h-12 z-60 w-full shrink-0 items-center justify-between border-b bg-background px-4"
+    class="hidden lg:flex absolute top-0 left-0 right-0 h-14 z-60 w-full items-center justify-between px-4 bg-gradient-to-b from-background/95 via-background/80 to-transparent"
   >
     <div class="flex items-center gap-1">
       <Button
-        size="icon-sm"
+        size="icon-xs"
         variant="ghost"
         @click="router.push(`/search/${courseCode}`)"
       >
@@ -150,81 +159,78 @@ function confirmLockIn() {
         <DropdownMenuContent
           align="start"
           :side-offset="8"
-          class="w-76 p-0 overflow-hidden"
+          class="w-56 p-0 overflow-hidden"
         >
-          <div class="px-3 py-2.5 flex items-center justify-between border-b">
-            <span class="text-[13px] font-medium text-foreground">Tentor</span>
-            <span class="text-[13px] text-muted-foreground"
+          <div class="px-3 py-2 flex items-center justify-between border-b">
+            <span class="text-xs font-medium text-foreground">Tentor</span>
+            <span class="text-xs text-muted-foreground"
               >{{ sortedExams.length }} st</span
             >
           </div>
-          <div ref="scrollRef" class="max-h-80 overflow-y-auto p-1.5 space-y-2">
+          <div ref="scrollRef" class="max-h-72 overflow-y-auto p-1">
             <button
               v-for="e in sortedExams"
               :key="e.id"
               :data-current="e.id.toString() === examId"
-              class="w-full text-left rounded-lg px-3 py-1.5 transition-colors cursor-pointer group"
+              class="w-full flex items-center justify-between gap-2 text-left rounded-md px-2.5 py-1.5 transition-colors cursor-pointer group"
               :class="
                 e.id.toString() === examId
-                  ? 'bg-secondary dark:bg-muted border'
+                  ? 'bg-secondary dark:bg-muted'
                   : 'hover:bg-muted dark:hover:bg-secondary/60'
               "
               @click="changeExam(e)"
             >
-              <div class="flex items-start justify-between gap-2">
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center gap-2">
-                    <span
-                      class="text-sm text-foreground"
-                      :class="
-                        e.id.toString() === examId
-                          ? 'font-semibold'
-                          : 'font-normal'
-                      "
-                    >
-                      {{ e.exam_date }}
-                    </span>
-                  </div>
-                  <div
-                    class="text-[11px] text-muted-foreground mt-0.5 capitalize truncate"
-                  >
-                    {{ e.exam_name.replace(e.exam_date, "").trim() }}
-                  </div>
-                </div>
-                <div class="shrink-0 pt-0.5">
-                  <Badge v-if="e.has_solution" variant="outline"> Facit </Badge>
-                </div>
-              </div>
+              <span
+                class="text-[13px]"
+                :class="
+                  e.id.toString() === examId
+                    ? 'font-semibold text-foreground'
+                    : 'font-normal text-foreground'
+                "
+              >
+                {{ e.exam_date }}
+              </span>
+              <Badge
+                v-if="e.has_solution"
+                variant="outline"
+                class="text-[10px] px-1.5 py-0 leading-normal"
+              >
+                Facit
+              </Badge>
             </button>
           </div>
         </DropdownMenuContent>
       </DropdownMenu>
-
-      <span
-        v-if="selectedExam"
-        class="text-sm font-normal text-muted-foreground ml-2"
-        >{{
-          selectedExam.exam_name.replace(selectedExam.exam_date, "").trim()
-        }}</span
-      >
     </div>
 
     <div class="flex items-center gap-2">
-      <Button variant="secondary" size="sm" @click="chatStore.toggle()">
+      <Button variant="default" size="sm" @click="chatStore.toggle()">
         <LucideLoader2
           v-if="chatStore.isLoading"
           class="size-3.5 animate-spin"
         />
-        <LucideMessageSquareX v-else-if="chatStore.isOpen" class="size-4" />
-        <LucideMessageSquareReply v-else class="size-4" />
         <span class="text-xs">{{ chatStore.isOpen ? "Stäng" : "Chatt" }}</span>
       </Button>
+
+      <Tabs
+        :model-value="layoutMode"
+        @update:model-value="switchLayout"
+      >
+        <TabsList class="h-7 p-0.5 rounded-lg bg-muted/60 backdrop-blur-sm">
+          <TabsTrigger value="exam-with-facit" class="text-xs h-[calc(100%-1px)] px-2 rounded-md">
+            <LucideColumns2 class="size-3.5" />
+          </TabsTrigger>
+          <TabsTrigger value="exam-only" class="text-xs h-[calc(100%-1px)] px-2 rounded-md">
+            <LucidePanelRight class="size-3.5" />
+          </TabsTrigger>
+        </TabsList>
+      </Tabs>
 
       <DropdownMenu v-model:open="isActionsOpen">
         <DropdownMenuTrigger as-child>
           <Button
             variant="ghost"
-            size="icon-sm"
+            size="icon-xs"
             class="text-muted-foreground hover:text-foreground"
             aria-label="Fler åtgärder"
           >

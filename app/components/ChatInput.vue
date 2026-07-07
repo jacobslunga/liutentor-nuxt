@@ -126,12 +126,14 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
                 class="flex-1 min-w-0 text-sm italic text-muted-foreground truncate"
                 >"{{ selectionContext }}"</span
               >
-              <button
-                class="shrink-0 cursor-pointer text-muted-foreground hover:opacity-60 transition-opacity"
+              <Button
+                variant="ghost"
+                size="icon-xs"
+                class="shrink-0"
                 @click.prevent="emit('clearSelectionContext')"
               >
                 <LucideX class="w-3.5 h-3.5" />
-              </button>
+              </Button>
             </div>
           </Transition>
 
@@ -236,7 +238,7 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
 
 <style scoped>
 textarea {
-  transition: height 0.15s ease-out;
+  transition: height 0.15s var(--ease-spring);
 }
 
 .chat-textarea {
@@ -250,7 +252,7 @@ textarea {
 
 .fade-up-enter-active,
 .fade-up-leave-active {
-  transition: all 0.2s ease;
+  transition: all 0.2s var(--ease-spring);
 }
 
 .fade-up-enter-from,
@@ -261,7 +263,7 @@ textarea {
 
 .scale-enter-active,
 .scale-leave-active {
-  transition: all 0.15s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: all 0.15s var(--ease-spring);
 }
 
 .scale-enter-from,
@@ -272,7 +274,7 @@ textarea {
 
 .context-chip-enter-active,
 .context-chip-leave-active {
-  transition: all 0.15s ease;
+  transition: all 0.15s var(--ease-spring);
   overflow: hidden;
 }
 

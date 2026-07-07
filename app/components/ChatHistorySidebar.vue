@@ -376,7 +376,7 @@ onUnmounted(() => {
 
 <template>
   <div
-    class="absolute inset-0 z-90 transition-opacity duration-200 ease-out"
+    class="absolute inset-0 z-90 transition-opacity duration-200 ease-spring"
     :class="
       open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
     "
@@ -389,7 +389,7 @@ onUnmounted(() => {
     :class="[
       open ? 'translate-x-0' : 'translate-x-full',
       !isResizing
-        ? 'transition-transform duration-250 ease-[cubic-bezier(0.32,0.72,0,1)]'
+        ? 'transition-transform duration-250 ease-spring'
         : '',
     ]"
     :style="{ width: `${sidebarWidth}px` }"
@@ -433,7 +433,7 @@ onUnmounted(() => {
       </div>
 
       <div
-        class="flex-1 min-h-0 overflow-y-auto px-2 py-2 custom-scrollbar transition-opacity duration-150 ease-out"
+        class="flex-1 min-h-0 overflow-y-auto px-2 py-2 custom-scrollbar transition-opacity duration-150 ease-spring"
         :class="open && contentReady ? 'opacity-100' : 'opacity-0'"
       >
         <div v-if="isLoading" class="px-2 py-4 text-sm text-muted-foreground">
@@ -478,8 +478,9 @@ onUnmounted(() => {
                 ]"
               >
                 <div class="flex items-center gap-1 px-2">
-                  <button
-                    class="min-w-0 flex-1 cursor-pointer text-left rounded-full py-1.5 px-2"
+                  <Button
+                    variant="ghost"
+                    class="min-w-0 flex-1 justify-start text-left rounded-full py-1.5 px-2 h-auto"
                     :disabled="isOpeningConversation || isDeletingConversation"
                     @click="openConversation(item)"
                   >

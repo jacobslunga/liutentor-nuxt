@@ -172,14 +172,15 @@ const iconSize = computed(
           /
         </kbd>
       </div>
-      <button
+      <Button
         v-else
+        variant="ghost"
+        size="icon-xs"
         class="absolute right-3 top-1/2 -translate-y-1/2 z-10"
         aria-label="Rensa"
         @click="courseCode = ''"
       >
         <LucideX
-          class="text-muted-foreground hover:text-foreground transition-colors"
           :class="iconSize"
         />
       </button>

@@ -10,7 +10,6 @@ useSeoMeta({
 </script>
 
 <template>
-  <div class="w-full max-w-3xl">
     <h1 class="text-3xl font-medium text-foreground mb-2">Om oss</h1>
     <p class="text-sm font-medium text-muted-foreground mb-6">
       Studentdrivet projekt för enklare tentplugg
@@ -40,5 +39,4 @@ useSeoMeta({
         älskar feedback.
       </p>
     </div>
-  </div>
 </template>

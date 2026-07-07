@@ -1,69 +1,39 @@
 <script setup lang="ts">
 const route = useRoute();
-const isCurrentPath = (path: string) =>
-  path === "/" ? route.path === "/" : route.path.startsWith(path);
+const sidebarOpen = ref(false);
 
-const navLinks = [
-  { to: "/faq", label: "Vanliga frågor" },
-  { to: "/om-oss", label: "Om oss" },
-  { to: "/upload-exams", label: "Ladda upp" },
-  { to: "/feedback", label: "Feedback" },
-  { to: "/privacy-policy", label: "Integritet" },
-];
+const pageTitles: Record<string, string> = {
+  "/om-oss": "Om oss",
+  "/faq": "Vanliga frågor",
+  "/upload-exams": "Ladda upp tenta",
+  "/feedback": "Feedback",
+  "/privacy-policy": "Integritetspolicy",
+  "/copyright-policy": "Upphovsrätt",
+  "/ai-policy": "AI-policy",
+};
 
-const mobileOpen = ref(false);
+const currentTitle = computed(() => pageTitles[route.path] ?? "");
 </script>
 
 <template>
-  <div class="flex flex-col min-h-screen bg-background">
-    <header class="sticky top-0 z-40 w-full bg-linear-to-b from-background to-background/0">
-      <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
-        <NuxtLink to="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity shrink-0">
-          <LogoIcon class="w-7 h-7" />
-          <span class="font-normal text-lg font-logo tracking-tighter">LiU Tentor</span>
-        </NuxtLink>
+  <div class="flex min-h-screen bg-background">
+    <InfoSidebar v-model:open="sidebarOpen" />
 
-        <nav class="hidden md:flex items-center gap-1">
-          <NuxtLink v-for="link in navLinks" :key="link.to" :to="link.to"
-            class="px-3 py-1.5 font-normal text-sm rounded-md transition-colors" :class="isCurrentPath(link.to)
-              ? 'bg-secondary text-foreground'
-              : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
-              ">
-            {{ link.label }}
-          </NuxtLink>
-        </nav>
+    <div class="flex min-h-screen flex-1 flex-col lg:pl-56">
+      <header class="sticky top-0 z-30 flex h-14 shrink-0 items-center gap-3 border-b bg-background/95 backdrop-blur-sm px-4 lg:hidden">
+        <Button variant="ghost" size="icon-sm" @click="sidebarOpen = true">
+          <LucideMenu class="size-4" />
+        </Button>
+        <span class="text-sm font-medium truncate">{{ currentTitle }}</span>
+      </header>
 
-        <Sheet v-model:open="mobileOpen">
-          <SheetTrigger as-child>
-            <Button variant="ghost" size="icon" class="md:hidden">
-              <LucideMenu class="h-5 w-5" />
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="right" class="w-70">
-            <SheetHeader>
-              <SheetTitle class="flex items-center gap-2">
-                <LogoIcon class="w-7 h-7" />
-                <span class="font-normal text-lg font-logo tracking-tighter">LiU Tentor</span>
-              </SheetTitle>
-            </SheetHeader>
-            <div class="mt-6 space-y-1">
-              <NuxtLink v-for="link in navLinks" :key="link.to" :to="link.to"
-                class="block px-3 py-2 text-sm rounded-md transition-colors" :class="isCurrentPath(link.to)
-                  ? 'bg-secondary text-foreground'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-secondary/50'
-                  " @click="mobileOpen = false">
-                {{ link.label }}
-              </NuxtLink>
-            </div>
-          </SheetContent>
-        </Sheet>
-      </div>
-    </header>
+      <main class="flex-1">
+        <div class="mx-auto max-w-3xl px-4 py-12 lg:py-16">
+          <slot />
+        </div>
+      </main>
 
-    <main class="flex-1 max-w-5xl mx-auto w-full px-4 py-12">
-      <slot />
-    </main>
-
-    <AppFooter />
+      <AppFooter />
+    </div>
   </div>
 </template>

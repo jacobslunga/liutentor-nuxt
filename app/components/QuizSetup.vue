@@ -176,15 +176,15 @@ function handleGenerate() {
                 </div>
 
                 <div class="min-h-0 flex-1 overflow-y-auto">
-                  <button
+                  <Button
                     v-for="exam in availableExams"
                     :key="exam.id"
-                    type="button"
+                    variant="ghost"
+                    class="w-full justify-start h-auto px-4 py-3 border-b border-border/40 last:border-b-0 rounded-none disabled:opacity-40"
                     :disabled="
                       !selectedIds.has(exam.id) &&
                       selectedCount >= MAX_SELECTION
                     "
-                    class="flex w-full items-center gap-3 px-4 py-3 text-left text-sm border-b border-border/40 last:border-b-0 transition-colors hover:bg-muted/40 disabled:opacity-40 disabled:cursor-not-allowed"
                     :class="selectedIds.has(exam.id) ? 'bg-muted/30' : ''"
                     @click="toggleExam(exam.id)"
                   >
