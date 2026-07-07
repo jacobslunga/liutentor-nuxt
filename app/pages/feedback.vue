@@ -67,7 +67,6 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <div class="w-full max-w-2xl">
     <h1 class="text-3xl font-medium text-foreground mb-2">Feedback</h1>
     <p class="text-sm font-medium text-muted-foreground mb-6">
       Hjälp oss bli bättre – dela dina tankar och förslag.
@@ -158,5 +157,4 @@ async function handleSubmit() {
         </Button>
       </div>
     </form>
-  </div>
 </template>

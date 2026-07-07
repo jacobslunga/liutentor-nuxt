@@ -9,7 +9,5 @@ useSeoMeta({
 </script>
 
 <template>
-  <div class="w-full max-w-2xl">
     <ExamUploadForm />
-  </div>
 </template>

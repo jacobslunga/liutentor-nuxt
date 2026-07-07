@@ -31,12 +31,12 @@ const groupedLinks = [
     <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
         <div class="md:col-span-1 space-y-4">
-          <div class="flex items-center gap-2">
+          <NuxtLink to="/" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <LogoIcon class="w-8 h-8 text-primary" />
             <span class="text-xl font-logo font-medium tracking-tighter">
               LiU Tentor
             </span>
-          </div>
+          </NuxtLink>
           <p class="text-sm font-normal text-muted-foreground">
             Din resurs för tentamensarkiv vid Linköpings Universitet.
           </p>

@@ -61,7 +61,6 @@ const sections: Section[] = [
 </script>
 
 <template>
-  <div class="w-full max-w-3xl">
     <h1 class="text-3xl font-medium text-foreground mb-1">AI-policy</h1>
     <p class="text-xs text-muted-foreground mb-6">
       Senast uppdaterad: 2026-04-20
@@ -104,10 +103,9 @@ const sections: Section[] = [
     <div class="mt-12 text-center">
       <p class="text-xs text-muted-foreground">
         Har du sett AI:n svara ovanligt märkligt?
-        <button @click="openMail" class="underline hover:text-foreground">
+        <Button variant="link" size="sm" class="text-foreground underline-offset-2 h-auto p-0 text-xs" @click="openMail">
           Rapportera det till oss.
-        </button>
+        </Button>
       </p>
     </div>
-  </div>
 </template>

@@ -47,11 +47,13 @@ const historyItems = computed(() =>
         </p>
 
         <div v-else class="flex flex-col gap-2">
-          <button v-for="item in historyItems" :key="item.id" type="button"
-            class="group cursor-pointer w-full rounded-md border px-3 py-3 text-left transition-colors" :class="item.id === activeQuizId
-              ? 'border-primary/40 bg-primary/5'
-              : 'border-border/50 hover:border-border hover:bg-muted/30'
-              " @click="emit('loadHistory', item.id)">
+          <Button v-for="item in historyItems" :key="item.id"
+            variant="ghost"
+            class="group w-full rounded-md px-3 py-3 h-auto text-left justify-start"
+            :class="item.id === activeQuizId
+              ? 'border-primary/40 bg-primary/5 border'
+              : 'border border-border/50 hover:border-border hover:bg-muted/30'
+            " @click="emit('loadHistory', item.id)">
             <div class="flex items-start justify-between gap-3">
               <div class="min-w-0">
                 <p class="truncate text-sm font-medium">{{ item.label }}</p>

@@ -40,7 +40,6 @@ const faqs = [
 </script>
 
 <template>
-  <div class="w-full max-w-3xl">
     <h1 class="text-3xl font-medium text-foreground mb-2">Vanliga frågor</h1>
     <p class="text-sm text-muted-foreground mb-6">
       Hitta svar på de vanligaste frågorna om LiU Tentor
@@ -52,5 +51,4 @@ const faqs = [
         <AccordionContent>{{ faq.a }}</AccordionContent>
       </AccordionItem>
     </Accordion>
-  </div>
 </template>

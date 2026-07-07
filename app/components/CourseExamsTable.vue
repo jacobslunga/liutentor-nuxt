@@ -55,10 +55,12 @@ function toggleFilter(p: string) {
 <template>
   <div class="flex flex-col gap-4 w-full">
     <div v-if="prefixes.length > 1" class="flex flex-wrap gap-2 w-full">
-      <button
+      <Button
         v-for="p in prefixes"
         :key="p"
-        class="text-xs cursor-pointer font-mono px-3 py-1.5 rounded-md border transition-all"
+        variant="outline"
+        size="sm"
+        class="font-mono text-xs"
         :class="
           activeFilters.has(p)
             ? 'bg-foreground text-background border-foreground shadow-sm'
@@ -67,7 +69,7 @@ function toggleFilter(p: string) {
         @click="toggleFilter(p)"
       >
         {{ p }}
-      </button>
+      </Button>
     </div>
 
     <div class="w-full overflow-x-auto rounded-2xl border border-border/60">
@@ -75,13 +77,15 @@ function toggleFilter(p: string) {
         <div
           class="grid grid-cols-[1fr_80px_64px_80px] gap-x-4 px-6 py-3.5 border-b border-border/50 bg-muted/30"
         >
-          <button
-            class="text-xs text-muted-foreground flex items-center gap-1.5 hover:text-foreground transition-colors w-fit"
+          <Button
+            variant="ghost"
+            size="sm"
+            class="text-xs text-muted-foreground hover:text-foreground"
             @click="sortOrder = sortOrder === 'desc' ? 'asc' : 'desc'"
           >
             Tentamen
             <LucideArrowDownWideNarrow class="w-3.5 h-3.5" />
-          </button>
+          </Button>
           <div class="text-xs text-muted-foreground">Typ</div>
           <div class="text-xs text-muted-foreground text-center">Facit</div>
           <div class="text-xs text-muted-foreground text-right">Godkänd</div>
