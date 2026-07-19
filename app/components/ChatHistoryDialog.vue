@@ -9,6 +9,12 @@ type ConversationItem = {
   createdAt: string;
 };
 
+type ConversationMeta = {
+  courseCode: string | null;
+  examId: number | null;
+  examDate: string | null;
+};
+
 const props = defineProps<{
   open: boolean;
 }>();
@@ -21,17 +27,27 @@ const user = useSupabaseUser();
 const supabase = useSupabaseClient();
 const chatStore = useChatStore();
 
-const conversations = ref<ConversationItem[]>([]);
+// Global cache — kept i minne mellan öppningar och över komponent-remounts.
+const conversations = useState<ConversationItem[]>(
+  "chat-history-conversations",
+  () => [],
+);
+const conversationMeta = useState<Record<string, ConversationMeta>>(
+  "chat-history-meta",
+  () => ({}),
+);
+const searchQuery = ref("");
+const animateReveal = ref(false);
+let revealTimer: ReturnType<typeof setTimeout> | null = null;
+const searchInputRef = ref<HTMLInputElement | null>(null);
 const isLoading = ref(false);
 const isOpeningConversation = ref(false);
 const isDeletingConversation = ref(false);
 const isDeletingAll = ref(false);
 const loadError = ref<string | null>(null);
-const contentReady = ref(false);
 const showDeleteConfirm = ref(false);
 const showDeleteAllConfirm = ref(false);
 const pendingDeleteConversation = ref<ConversationItem | null>(null);
-let contentRevealTimer: ReturnType<typeof setTimeout> | null = null;
 
 const userId = computed(
   () =>
@@ -86,20 +102,29 @@ function getGroupLabel(value: string): string {
   return "Äldre";
 }
 
-function formatCreatedAt(value: string): string {
-  return new Intl.DateTimeFormat("sv-SE", {
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(new Date(value));
+function metaLabel(id: string): string {
+  const meta = conversationMeta.value[id];
+  if (!meta) return "";
+  const parts: string[] = [];
+  if (meta.courseCode) parts.push(meta.courseCode);
+  if (meta.examDate) parts.push(`Tenta ${meta.examDate}`);
+  return parts.join(" · ");
 }
+
+const filteredConversations = computed(() => {
+  const query = searchQuery.value.trim().toLowerCase();
+  if (!query) return conversations.value;
+  return conversations.value.filter((item) => {
+    if (item.title.toLowerCase().includes(query)) return true;
+    return metaLabel(item.id).toLowerCase().includes(query);
+  });
+});
 
 const groupedConversations = computed(() => {
   const order = ["Idag", "Igår", "Denna veckan", "Denna månaden", "Äldre"];
   const groups = new Map<string, ConversationItem[]>();
 
-  for (const item of conversations.value) {
+  for (const item of filteredConversations.value) {
     const key = getGroupLabel(item.createdAt);
     const existing = groups.get(key) ?? [];
     existing.push(item);
@@ -111,41 +136,15 @@ const groupedConversations = computed(() => {
     .filter((group) => group.items.length > 0);
 });
 
-const itemDelayIndex = computed(() => {
-  const indexMap = new Map<string, number>();
-  let index = 0;
-
-  for (const group of groupedConversations.value) {
-    for (const item of group.items) {
-      indexMap.set(item.id, index);
-      index += 1;
-    }
-  }
-
-  return indexMap;
-});
-
-function itemMotionStyle(id: string) {
-  const index = itemDelayIndex.value.get(id) ?? 0;
-  const baseDelay = 90;
-  const delay =
-    props.open && contentReady.value
-      ? baseDelay + Math.min(index * 18, 180)
-      : 0;
-  const duration = 170;
-  return {
-    transitionDelay: `${delay}ms`,
-    transitionDuration: `${duration}ms`,
-  };
-}
-
 async function loadConversations() {
   if (!userId.value) {
     conversations.value = [];
     return;
   }
 
-  isLoading.value = true;
+  // Med cachad data: uppdatera tyst i bakgrunden istället för att blanka listan.
+  const isInitialLoad = conversations.value.length === 0;
+  if (isInitialLoad) isLoading.value = true;
   loadError.value = null;
 
   try {
@@ -165,11 +164,74 @@ async function loadConversations() {
         title: (row.title as string) || "Ny chatt",
         createdAt: row.created_at as string,
       }));
+
+    loadConversationMeta(conversations.value.map((c) => c.id));
+    if (isInitialLoad) startReveal();
   } catch {
-    loadError.value = "Kunde inte hämta konversationshistorik.";
-    conversations.value = [];
+    // En misslyckad bakgrundsuppdatering behåller den cachade listan tyst.
+    if (isInitialLoad) {
+      loadError.value = "Kunde inte hämta konversationshistorik.";
+      conversations.value = [];
+      conversationMeta.value = {};
+    }
   } finally {
     isLoading.value = false;
+  }
+}
+
+async function loadConversationMeta(ids: string[]) {
+  if (ids.length === 0) {
+    conversationMeta.value = {};
+    return;
+  }
+
+  try {
+    const { data, error } = await (supabase as any)
+      .from("ai_chat_logs")
+      .select("conversation_id, course_code, exam_id, created_at")
+      .in("conversation_id", ids)
+      .order("created_at", { ascending: true });
+
+    if (error) throw error;
+
+    const meta: Record<string, ConversationMeta> = {};
+    for (const row of Array.isArray(data) ? data : []) {
+      if (!row?.conversation_id || meta[row.conversation_id]) continue;
+      meta[row.conversation_id as string] = {
+        courseCode: (row.course_code as string) || null,
+        examId: typeof row.exam_id === "number" ? row.exam_id : null,
+        examDate: null,
+      };
+    }
+
+    const examIds = [
+      ...new Set(
+        Object.values(meta)
+          .map((m) => m.examId)
+          .filter((id): id is number => id !== null),
+      ),
+    ];
+
+    if (examIds.length > 0) {
+      const { data: exams } = await (supabase as any)
+        .from("exams")
+        .select("id, exam_date")
+        .in("id", examIds);
+
+      const dateById = new Map(
+        (Array.isArray(exams) ? exams : [])
+          .filter((e: any) => e?.id && e?.exam_date)
+          .map((e: any) => [e.id as number, e.exam_date as string]),
+      );
+
+      for (const m of Object.values(meta)) {
+        if (m.examId !== null) m.examDate = dateById.get(m.examId) ?? null;
+      }
+    }
+
+    conversationMeta.value = meta;
+  } catch {
+    // Behåll ev. tidigare metadata vid fel.
   }
 }
 
@@ -302,6 +364,7 @@ async function confirmDeleteAllConversations() {
     }
 
     conversations.value = [];
+    conversationMeta.value = {};
     chatStore.messages = [];
     chatStore.currentConversationId = null;
     chatStore.currentConversationTitle = null;
@@ -317,125 +380,94 @@ async function confirmDeleteAllConversations() {
   }
 }
 
-const sidebarWidth = ref(320);
-const isResizing = ref(false);
-
-function startResizing(e: MouseEvent) {
-  isResizing.value = true;
-  document.addEventListener("mousemove", handleMouseMove);
-  document.addEventListener("mouseup", stopResizing);
-  document.body.style.cursor = "col-resize";
-  document.body.style.userSelect = "none";
+function startReveal() {
+  animateReveal.value = true;
+  if (revealTimer) clearTimeout(revealTimer);
+  revealTimer = setTimeout(() => {
+    animateReveal.value = false;
+  }, 700);
 }
 
-function handleMouseMove(e: MouseEvent) {
-  if (!isResizing.value) return;
-  const newWidth = window.innerWidth - e.clientX;
-  if (newWidth > 240 && newWidth < 600) {
-    sidebarWidth.value = newWidth;
+const itemDelayIndex = computed(() => {
+  const map: Record<string, number> = {};
+  let index = 0;
+  for (const group of groupedConversations.value) {
+    for (const item of group.items) {
+      map[item.id] = index;
+      index += 1;
+    }
   }
-}
+  return map;
+});
 
-function stopResizing() {
-  isResizing.value = false;
-  document.removeEventListener("mousemove", handleMouseMove);
-  document.removeEventListener("mouseup", stopResizing);
-  document.body.style.cursor = "";
-  document.body.style.userSelect = "";
+function itemRevealStyle(id: string) {
+  if (!animateReveal.value) return undefined;
+  const index = itemDelayIndex.value[id] ?? 0;
+  return { animationDelay: `${Math.min(index * 22, 260)}ms` };
 }
 
 watch(
   [() => props.open, userId],
   ([open]) => {
-    if (contentRevealTimer) {
-      clearTimeout(contentRevealTimer);
-      contentRevealTimer = null;
-    }
-
-    if (!open) {
-      contentReady.value = false;
-      return;
-    }
-
+    if (!open) return;
+    searchQuery.value = "";
+    if (conversations.value.length > 0) startReveal();
     loadConversations();
-    contentReady.value = false;
-    contentRevealTimer = setTimeout(() => {
-      contentReady.value = true;
-    }, 110);
   },
   { immediate: true },
 );
 
-onUnmounted(() => {
-  if (contentRevealTimer) {
-    clearTimeout(contentRevealTimer);
-    contentRevealTimer = null;
-  }
+// Ingen replay av intro-animationen medan användaren filtrerar.
+watch(searchQuery, () => {
+  animateReveal.value = false;
 });
+
+onUnmounted(() => {
+  if (revealTimer) clearTimeout(revealTimer);
+});
+
+function focusSearch(event: Event) {
+  event.preventDefault();
+  searchInputRef.value?.focus();
+}
 </script>
 
 <template>
-  <div
-    class="absolute inset-0 z-90 transition-opacity duration-200 ease-spring"
-    :class="
-      open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-    "
-    aria-hidden="true"
-    @click="emit('update:open', false)"
-  />
-
-  <aside
-    class="absolute inset-y-0 right-0 z-100 h-full border-l border-border bg-background"
-    :class="[
-      open ? 'translate-x-0' : 'translate-x-full',
-      !isResizing
-        ? 'transition-transform duration-250 ease-spring'
-        : '',
-    ]"
-    :style="{ width: `${sidebarWidth}px` }"
-    aria-label="Konversationshistorik"
-  >
-    <!-- Resize Handler -->
-    <div
-      class="absolute left-0 top-0 bottom-0 w-4 cursor-col-resize z-60 group/resizer -translate-x-1/2 flex items-center justify-center"
-      @mousedown="startResizing"
+  <Dialog :open="open" @update:open="emit('update:open', $event)">
+    <DialogContent
+      class="sm:max-w-md p-0 gap-0 overflow-hidden"
+      @open-auto-focus="focusSearch"
     >
-      <div
-        class="absolute inset-y-0 left-1/2 w-px opacity-0 group-hover/resizer:opacity-100 bg-foreground/10 transition-opacity"
-      />
-      <div
-        class="w-1 h-8 rounded-full bg-foreground/60 group-hover/resizer:bg-foreground transition-colors"
-      />
-    </div>
-    <div class="flex h-full min-h-0 flex-col">
-      <div class="border-b px-4 py-3 flex items-center justify-between gap-2">
-        <h2 class="text-sm font-medium">Chatthistorik</h2>
-        <div class="flex items-center gap-1">
-          <Button
-            v-if="conversations.length > 0"
-            variant="ghost"
-            size="icon"
-            class="size-7 shrink-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-            :disabled="isDeletingAll || isDeletingConversation"
-            @click="showDeleteAllConfirm = true"
-          >
-            <LucideTrash2 class="w-3.5 h-3.5" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            class="size-7 shrink-0"
-            @click="emit('update:open', false)"
-          >
-            <LucideX class="w-4 h-4" />
-          </Button>
-        </div>
+      <DialogHeader class="px-4 pt-4 pb-0">
+        <DialogTitle class="text-sm font-medium">Chatthistorik</DialogTitle>
+        <DialogDescription class="sr-only">
+          Sök och öppna tidigare chattar
+        </DialogDescription>
+      </DialogHeader>
+
+      <div class="flex items-center gap-2 border-b px-4 py-2.5">
+        <LucideSearch class="size-4 shrink-0 text-muted-foreground" />
+        <input
+          ref="searchInputRef"
+          v-model="searchQuery"
+          type="text"
+          placeholder="Sök bland chattar..."
+          class="flex-1 min-w-0 bg-transparent text-sm outline-none placeholder:text-muted-foreground/70"
+        />
+        <Button
+          v-if="conversations.length > 0"
+          variant="ghost"
+          size="icon"
+          class="size-7 shrink-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+          :disabled="isDeletingAll || isDeletingConversation"
+          aria-label="Radera alla chattar"
+          @click="showDeleteAllConfirm = true"
+        >
+          <LucideTrash2 class="w-3.5 h-3.5" />
+        </Button>
       </div>
 
-      <div
-        class="flex-1 min-h-0 overflow-y-auto px-2 py-2 custom-scrollbar transition-opacity duration-150 ease-spring"
-        :class="open && contentReady ? 'opacity-100' : 'opacity-0'"
-      >
+      <div class="max-h-[55vh] min-h-40 overflow-y-auto px-2 py-2 custom-scrollbar">
         <div v-if="isLoading" class="px-2 py-4 text-sm text-muted-foreground">
           Hämtar historik...
         </div>
@@ -455,66 +487,77 @@ onUnmounted(() => {
           v-else-if="groupedConversations.length === 0"
           class="px-2 py-4 text-sm text-muted-foreground"
         >
-          Inga chattar hittades.
+          {{
+            searchQuery.trim()
+              ? `Inga chattar matchar "${searchQuery.trim()}".`
+              : "Inga chattar hittades."
+          }}
         </div>
 
-        <div v-else class="space-y-6">
+        <div v-else class="space-y-4">
           <section v-for="group in groupedConversations" :key="group.label">
             <h3
-              class="px-4 pb-2 text-[13px] font-normal text-muted-foreground/60"
+              class="px-3 pb-1.5 text-[13px] font-normal text-muted-foreground/60"
             >
               {{ group.label }}
             </h3>
 
-            <div class="space-y-0.5 px-2">
+            <div class="space-y-0.5">
               <div
                 v-for="item in group.items"
                 :key="item.id"
-                class="group rounded-lg transition-colors"
+                class="group flex items-center gap-1 rounded-lg px-1 transition-colors"
                 :class="[
                   item.id === chatStore.currentConversationId
                     ? 'bg-secondary'
                     : 'bg-transparent hover:bg-secondary/80',
+                  animateReveal ? 'history-item-reveal' : '',
                 ]"
+                :style="itemRevealStyle(item.id)"
               >
-                <div class="flex items-center gap-1 px-2">
-                  <Button
-                    variant="ghost"
-                    class="min-w-0 flex-1 justify-start text-left rounded-full py-1.5 px-2 h-auto"
-                    :disabled="isOpeningConversation || isDeletingConversation"
-                    @click="openConversation(item)"
+                <button
+                  type="button"
+                  class="min-w-0 flex-1 cursor-pointer text-left px-2 py-1.5"
+                  :disabled="isOpeningConversation || isDeletingConversation"
+                  @click="openConversation(item)"
+                >
+                  <p
+                    class="text-sm truncate text-foreground/90"
+                    :class="
+                      item.id === chatStore.currentConversationId
+                        ? 'font-medium'
+                        : 'font-normal'
+                    "
                   >
-                    <p
-                      class="text-sm truncate text-foreground/90"
-                      :class="
-                        item.id === chatStore.currentConversationId
-                          ? 'font-medium'
-                          : 'font-normal'
-                      "
-                    >
-                      {{ item.title || "Ny chatt" }}
-                    </p>
-                  </button>
+                    {{ item.title || "Ny chatt" }}
+                  </p>
+                  <p
+                    v-if="metaLabel(item.id)"
+                    class="text-xs truncate text-muted-foreground/70"
+                  >
+                    {{ metaLabel(item.id) }}
+                  </p>
+                </button>
 
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    class="size-7 shrink-0 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity hover:bg-transparent"
-                    :disabled="isDeletingConversation"
-                    @click="askDeleteConversation(item)"
-                  >
-                    <LucideTrash2
-                      class="w-3.5 h-3.5 text-muted-foreground/60 hover:text-destructive"
-                    />
-                  </Button>
-                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  class="size-7 shrink-0 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity hover:bg-transparent"
+                  :disabled="isDeletingConversation"
+                  aria-label="Radera chatt"
+                  @click="askDeleteConversation(item)"
+                >
+                  <LucideTrash2
+                    class="w-3.5 h-3.5 text-muted-foreground/60 hover:text-destructive"
+                  />
+                </Button>
               </div>
             </div>
           </section>
         </div>
       </div>
-    </div>
-  </aside>
+    </DialogContent>
+  </Dialog>
 
   <AlertDialog v-model:open="showDeleteConfirm">
     <AlertDialogContent>
@@ -561,3 +604,24 @@ onUnmounted(() => {
     </AlertDialogContent>
   </AlertDialog>
 </template>
+
+<style scoped>
+.history-item-reveal {
+  opacity: 0;
+  animation: history-item-in 240ms var(--ease-spring) forwards;
+}
+
+@keyframes history-item-in {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateY(0);
+  }
+}
+</style>
