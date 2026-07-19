@@ -1,5 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Cascadia+Code:ital,wght@0,200..700;1,200..700&display=swap");
-
 @import "tailwindcss";
 
 @plugin "tailwindcss-animate";
@@ -10,6 +8,38 @@
   src: url("/fonts/GT-Super-Text-Bold.otf") format("opentype");
   font-display: swap;
 }
+
+/* @font-face {
+  font-family: "Arizona Mix";
+  src: url("/fonts/ArizonaMixRegular.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Arizona Mix";
+  src: url("/fonts/ArizonaMixRegular.woff") format("woff");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Arizona Mix";
+  src: url("/fonts/ArizonaMixBold.woff") format("woff");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Arizona Mix";
+  src: url("/fonts/ArizonaMixBold.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+} */
 
 @theme {
   --ease-spring: cubic-bezier(0.25, 0.1, 0.25, 1);
@@ -101,23 +131,13 @@ body {
 }
 
 :root *::selection {
-  background: oklch(0.6193 0.1154 172.06 / 0.28);
-  color: oklch(0.2 0 0);
+  background: color-mix(in oklch, var(--primary) 20%, transparent);
+  color: var(--primary);
 }
 
 :root *::-moz-selection {
-  background: oklch(0.6193 0.1154 172.06 / 0.28);
-  color: oklch(0.2 0 0);
-}
-
-.dark *::selection {
-  background: oklch(0.8332 0.088 144.73 / 0.35);
-  color: oklch(0.985 0 0);
-}
-
-.dark *::-moz-selection {
-  background: oklch(0.8332 0.088 144.73 / 0.35);
-  color: oklch(0.985 0 0);
+  background: color-mix(in oklch, var(--primary) 10%, transparent);
+  color: var(--primary);
 }
 
 @custom-variant dark (&:is(.dark *));
@@ -167,7 +187,7 @@ body {
   --popover-foreground: oklch(0.145 0 0);
   --primary: oklch(0.6193 0.1154 172.06);
   --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(96.416% 0.00011 271.152);
+  --secondary: oklch(97.9% 0.00011 271.152);
   --secondary-foreground: oklch(0.2 0 0);
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.5 0 0);
@@ -201,7 +221,7 @@ body {
   --popover-foreground: #efefed;
   --primary: oklch(0.8332 0.088 144.73);
   --primary-foreground: #1a1a19;
-  --secondary: #222221;
+  --secondary: oklch(19.5% 0.002 271);
   --secondary-foreground: #efefed;
   --muted: #292927;
   --muted-foreground: #888886;

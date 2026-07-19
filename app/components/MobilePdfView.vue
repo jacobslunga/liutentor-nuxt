@@ -76,7 +76,7 @@ const downloadFile = async (url: string, filename: string) => {
 <template>
   <div class="flex flex-col h-screen w-full bg-background relative">
     <div
-      class="absolute top-0 left-0 right-0 z-40 flex h-14 items-center gap-3 px-3 bg-gradient-to-b from-background/95 via-background/80 to-transparent"
+      class="z-40 flex h-14 shrink-0 items-center gap-3 px-3 bg-background"
     >
       <NuxtLink :to="`/search/${courseCode}`">
         <Button aria-label="Gå tillbaka" variant="outline" size="icon-sm">
@@ -158,7 +158,7 @@ const downloadFile = async (url: string, filename: string) => {
         aria-modal="true"
       >
         <div
-          class="absolute top-0 left-0 right-0 z-10 flex h-14 items-center gap-3 px-3 bg-gradient-to-b from-background/95 via-background/80 to-transparent"
+          class="z-10 flex h-14 shrink-0 items-center gap-3 px-3 bg-background"
         >
           <div class="min-w-0 flex-1">
             <p

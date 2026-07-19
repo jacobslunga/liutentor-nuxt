@@ -29,7 +29,7 @@ const sections: Section[] = [
     content:
       "Vi använder toppmoderna modeller från världsledande leverantörer för att säkerställa högsta möjliga kvalitet på svaren:",
     items: [
-      "Google (Gemini 3.1 Flash/Flash Lite) för bearbetning av stora tentamens-PDF:er.",
+      "Anthropic (Claude Sonnet 4.6) för chatt, quizgenerering och bearbetning av tentamens-PDF:er.",
     ],
   },
   {

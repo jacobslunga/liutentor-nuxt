@@ -1,14 +1,18 @@
 export const CHAT_MODELS = [
-  { id: "gemini-3-flash-preview", label: "Tänkande" },
-  { id: "gemini-3.1-flash-lite", label: "Direkt" },
+  { id: "claude-haiku-4-5", label: "Haiku", description: "Snabba svar" },
+  {
+    id: "claude-sonnet-4-6",
+    label: "Sonnet",
+    description: "Djupare resonemang",
+  },
 ] as const;
 
 const VALID_MODEL_IDS = CHAT_MODELS.map((m) => m.id);
-const DEFAULT_MODEL_ID = "gemini-3.1-flash-lite";
+const DEFAULT_MODEL_ID = "claude-haiku-4-5";
 const VALID_MODEL_ID_SET = new Set<string>(VALID_MODEL_IDS);
-const MODEL_COOKIE_KEY = "liutentor_selected_model_v6";
+const MODEL_COOKIE_KEY = "liutentor_selected_model_v7";
 const LEGACY_MODEL_COOKIE_KEYS = [
-  "liutentor_selected_model_v4",
+  "liutentor_selected_model_v6",
   "liutentor_selected_model_v4",
   "liutentor_selected_model_v3",
   "liutentor_selected_model_v2",

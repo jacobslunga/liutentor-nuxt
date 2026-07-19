@@ -11,20 +11,13 @@ const emit = defineEmits<{ reply: [] }>();
 <template>
   <Teleport to="body">
     <Transition name="popover-fade">
-      <div
-        v-if="visible"
-        class="fixed z-100"
-        :style="{
-          left: `${x}px`,
-          top: `${y}px`,
-          transform: 'translate(-50%, calc(-100% - 8px))',
-        }"
-      >
-        <Button
-          size="sm"
-          class="bg-foreground text-background hover:opacity-90"
-          @mousedown.prevent.stop="emit('reply')"
-        >
+      <div v-if="visible" class="fixed z-100" :style="{
+        left: `${x}px`,
+        top: `${y}px`,
+        transform: 'translate(-50%, calc(-100% - 8px))',
+      }">
+        <Button size="sm" class="bg-foreground text-background hover:opacity-90 hover:bg-foreground/90"
+          @mousedown.prevent.stop="emit('reply')">
           Svara
           <LucideCornerUpLeft class="w-3.5 h-3.5" />
         </Button>

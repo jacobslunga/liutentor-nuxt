@@ -160,9 +160,9 @@ watch(
       </div>
     </Transition>
 
-    <Transition enter-active-class="transition-all duration-200 ease-spring"
-      enter-from-class="translate-x-full opacity-0" enter-to-class="translate-x-0 opacity-100 blur-0"
-      leave-active-class="transition-all duration-200 ease-spring"
+    <Transition enter-active-class="transition-all duration-150 ease-spring"
+      enter-from-class="translate-x-full opacity-0 blur-sm" enter-to-class="translate-x-0 opacity-100 blur-0"
+      leave-active-class="transition-all duration-150 ease-spring"
       leave-from-class="translate-x-0 opacity-100 blur-0" leave-to-class="translate-x-full opacity-0 blur-sm">
       <div v-if="chatHasBeenOpened" v-show="chatStore.isOpen"
         class="fixed right-0 bottom-0 z-80 flex h-screen bg-background shadow-2xl"
