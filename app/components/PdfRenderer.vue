@@ -27,6 +27,7 @@ import { RotatePluginPackage, Rotate } from "@embedpdf/plugin-rotate/vue";
 const props = defineProps<{
   pdfUrl: string;
   layoutMode?: "exam-only" | "exam-with-facit" | "default";
+  topInset?: number;
 }>();
 
 const colorMode = useColorMode();
@@ -119,6 +120,7 @@ const plugins = computed(() => {
                 v-else
                 :document-id="activeDocumentId"
                 class="h-full w-full bg-background pdf-viewport"
+                :style="props.topInset ? { paddingTop: `${props.topInset}px` } : undefined"
                 @scroll="handleViewportScroll"
               >
                 <template v-if="isMobile">
@@ -138,7 +140,7 @@ const plugins = computed(() => {
                         >
                           <div
                             class="absolute inset-0 z-0 pdf-render-surface"
-                            :style="isDark ? { filter: 'invert(93%)' } : {}"
+                            :style="isDark ? { filter: 'invert(90%)' } : {}"
                           >
                             <RenderLayer
                               :document-id="activeDocumentId"
@@ -179,7 +181,7 @@ const plugins = computed(() => {
                                 <div
                                   class="absolute inset-0 z-0 pdf-render-surface"
                                   :style="
-                                    isDark ? { filter: 'invert(93.6%)' } : {}
+                                    isDark ? { filter: 'invert(90%)' } : {}
                                   "
                                 >
                                   <RenderLayer

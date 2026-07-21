@@ -74,72 +74,74 @@ const downloadFile = async (url: string, filename: string) => {
 </script>
 
 <template>
-  <div class="flex flex-col h-screen w-full bg-background relative">
-    <div
-      class="z-40 flex h-14 shrink-0 items-center gap-3 px-3 bg-background"
-    >
-      <NuxtLink :to="`/search/${courseCode}`">
-        <Button aria-label="Gå tillbaka" variant="outline" size="icon-sm">
-          <LucideArrowLeft class="w-4 h-4" />
-        </Button>
-      </NuxtLink>
-      <div class="min-w-0 flex-1">
-        <p class="text-sm font-semibold text-foreground truncate leading-tight">
-          {{ courseCode }}
-        </p>
-        <p class="text-xs text-muted-foreground truncate leading-tight">
-          {{ examDate }}
-        </p>
-      </div>
-      <DropdownMenu v-model:open="isDownloadOpen">
-        <DropdownMenuTrigger as-child>
-          <Button
-            variant="outline"
-            size="icon-sm"
-            :disabled="!hasDownload"
-            aria-label="Ladda ned"
-          >
-            <LucideDownload class="w-4 h-4" />
+  <div class="relative h-screen w-full bg-background overflow-hidden">
+    <div class="absolute inset-x-0 top-0 z-40">
+      <div
+        class="pointer-events-none absolute inset-x-0 -top-10 h-24 -z-10 bg-linear-to-b from-background via-background to-background/0" />
+      <div class="flex h-14 shrink-0 items-center gap-3 px-3">
+        <NuxtLink :to="`/search/${courseCode}`">
+          <Button aria-label="Gå tillbaka" variant="outline" size="icon-sm">
+            <LucideArrowLeft class="w-4 h-4" />
           </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" :side-offset="8">
-          <DropdownMenuItem
-            class="gap-2 text-sm cursor-pointer"
-            :disabled="!examPdfUrl"
-            @click="
-              downloadFile(examPdfUrl, `${courseCode}_${examDate}_EXAM.pdf`)
-            "
-          >
-            <LucideDownload class="size-4" /> Ladda ned tenta
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            class="gap-2 text-sm cursor-pointer"
-            :disabled="!solutionPdfUrl"
-            @click="
-              downloadFile(
-                solutionPdfUrl!,
-                `${courseCode}_${examDate}_SOLUTION.pdf`,
-              )
-            "
-          >
-            <LucideDownload class="size-4" /> Ladda ned facit
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-      <Button
-        v-if="hasSolution"
-        variant="outline"
-        size="sm"
-        @click="showSolution = true"
-      >
-        <LucideBookOpen class="w-3.5 h-3.5 text-primary" />
-        Facit
-      </Button>
+        </NuxtLink>
+        <div class="min-w-0 flex-1">
+          <p class="text-sm font-semibold text-foreground truncate leading-tight">
+            {{ courseCode }}
+          </p>
+          <p class="text-xs text-muted-foreground truncate leading-tight">
+            {{ examDate }}
+          </p>
+        </div>
+        <DropdownMenu v-model:open="isDownloadOpen">
+          <DropdownMenuTrigger as-child>
+            <Button
+              variant="outline"
+              size="icon-sm"
+              :disabled="!hasDownload"
+              aria-label="Ladda ned"
+            >
+              <LucideDownload class="w-4 h-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" :side-offset="8">
+            <DropdownMenuItem
+              class="gap-2 text-sm cursor-pointer"
+              :disabled="!examPdfUrl"
+              @click="
+                downloadFile(examPdfUrl, `${courseCode}_${examDate}_EXAM.pdf`)
+              "
+            >
+              <LucideDownload class="size-4" /> Ladda ned tenta
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              class="gap-2 text-sm cursor-pointer"
+              :disabled="!solutionPdfUrl"
+              @click="
+                downloadFile(
+                  solutionPdfUrl!,
+                  `${courseCode}_${examDate}_SOLUTION.pdf`,
+                )
+              "
+            >
+              <LucideDownload class="size-4" /> Ladda ned facit
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <Button
+          v-if="hasSolution"
+          variant="outline"
+          size="sm"
+          @click="showSolution = true"
+        >
+          <LucideBookOpen class="w-3.5 h-3.5 text-primary" />
+          Facit
+        </Button>
+      </div>
     </div>
 
-    <div class="min-h-0 w-full flex-1 overflow-hidden">
+    <div class="h-full w-full overflow-hidden">
       <ClientOnly>
-        <PdfRenderer :pdf-url="examPdfUrl" />
+        <PdfRenderer :pdf-url="examPdfUrl" :top-inset="72" />
       </ClientOnly>
     </div>
 
@@ -153,35 +155,37 @@ const downloadFile = async (url: string, filename: string) => {
     >
       <section
         v-show="showSolution"
-        class="fixed inset-0 z-50 h-screen w-screen bg-background flex flex-col overflow-hidden"
+        class="fixed inset-0 z-50 h-screen w-screen bg-background overflow-hidden"
         role="dialog"
         aria-modal="true"
       >
-        <div
-          class="z-10 flex h-14 shrink-0 items-center gap-3 px-3 bg-background"
-        >
-          <div class="min-w-0 flex-1">
-            <p
-              class="text-sm font-semibold text-foreground truncate leading-tight"
+        <div class="absolute inset-x-0 top-0 z-10">
+          <div
+            class="pointer-events-none absolute inset-x-0 -top-10 h-24 -z-10 bg-linear-to-b from-background via-background to-background/0" />
+          <div class="flex h-14 shrink-0 items-center gap-3 px-3">
+            <div class="min-w-0 flex-1">
+              <p
+                class="text-sm font-semibold text-foreground truncate leading-tight"
+              >
+                Facit
+              </p>
+              <p class="text-xs text-muted-foreground truncate leading-tight">
+                {{ courseCode }} - {{ examDate }}
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              size="icon-sm"
+              aria-label="Stäng"
+              @click="showSolution = false"
             >
-              Facit
-            </p>
-            <p class="text-xs text-muted-foreground truncate leading-tight">
-              {{ courseCode }} - {{ examDate }}
-            </p>
+              <LucideX class="w-4 h-4" />
+            </Button>
           </div>
-          <Button
-            variant="outline"
-            size="icon-sm"
-            aria-label="Stäng"
-            @click="showSolution = false"
-          >
-            <LucideX class="w-4 h-4" />
-          </Button>
         </div>
-        <div class="min-h-0 w-full flex-1 overflow-hidden">
+        <div class="h-full w-full overflow-hidden">
           <ClientOnly>
-            <PdfRenderer v-if="solutionPdfUrl" :pdf-url="solutionPdfUrl" />
+            <PdfRenderer v-if="solutionPdfUrl" :pdf-url="solutionPdfUrl" :top-inset="72" />
           </ClientOnly>
         </div>
       </section>

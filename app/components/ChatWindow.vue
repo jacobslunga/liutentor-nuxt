@@ -222,7 +222,7 @@ function getCachedMarkdown(content: string): string {
   return rendered;
 }
 
-const giveDirectAnswer = ref(true);
+const { giveDirectAnswer } = useAnswerMode();
 const { selectedModelId } = useSelectedModel();
 const messagesContainer = ref<HTMLDivElement | null>(null);
 const { hydrate: hydrateMermaid } = useMermaid(messagesContainer);
@@ -451,6 +451,7 @@ async function handleSend() {
   await send(text, {
     modelId: selectedModelId.value,
     selectionContext: context,
+    giveDirectAnswer: giveDirectAnswer.value,
   });
 }
 
@@ -517,14 +518,17 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
 </script>
 
 <template>
-  <div class="h-full w-full flex bg-secondary overflow-hidden relative">
-    <div class="flex-1 min-w-0 flex flex-col transition-all duration-300 ease-spring">
-      <ChatHeader :has-solution="hasSolution" :title="chatHeaderTitle" :history-open="isHistoryOpen"
-        :selected-model-id="selectedModelId" @close="emit('close')" @open-history="toggleHistory"
-        @new-chat="startNewChat" @update:selected-model-id="selectedModelId = $event" />
+  <div class="h-full w-full flex bg-background overflow-hidden relative">
+    <div class="flex-1 min-w-0 relative overflow-hidden">
+      <div class="absolute inset-x-0 top-0 z-20">
+        <div
+          class="pointer-events-none absolute inset-x-0 -top-10 h-24 -z-10 bg-linear-to-b from-background via-background to-background/0" />
+        <ChatHeader :has-solution="hasSolution" :title="chatHeaderTitle" :history-open="isHistoryOpen"
+          @close="emit('close')" @open-history="toggleHistory" @new-chat="startNewChat" />
+      </div>
 
-      <div class="flex-1 min-h-0 relative rounded-t-4xl bg-background overflow-hidden">
-        <div ref="messagesContainer" class="h-full w-full overflow-y-auto overflow-x-hidden px-4 pt-6 custom-scrollbar"
+      <div class="h-full w-full">
+        <div ref="messagesContainer" class="h-full w-full overflow-y-auto overflow-x-hidden px-4 pt-16 custom-scrollbar"
           @scroll="handleScroll" @mouseup="handleMessageMouseUp" @click="handleCodeCopy">
           <div v-if="messages.length === 0"
             class="h-full flex flex-col items-center justify-center px-4 text-center pb-24">
@@ -568,7 +572,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
                   <span class="shimmer-text text-sm">{{ loadingPhrase }}</span>
                 </div>
                 <div
-                  class="prose prose-headings:font-semibold prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-h4:text-base prose-strong:font-semibold dark:prose-invert prose-p:font-normal prose-hr:border-secondary marker:text-foreground marker:font-medium"
+                  class="prose prose-headings:font-semibold prose-h1:text-xl prose-h2:text-lg prose-h3:text-md prose-h4:text-base prose-strong:font-semibold dark:prose-invert prose-p:font-normal prose-hr:border-secondary marker:text-foreground marker:font-medium"
                   v-html="renderedAssistantHtml[i]" />
               </div>
             </div>

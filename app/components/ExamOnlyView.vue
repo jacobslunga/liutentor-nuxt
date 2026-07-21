@@ -134,7 +134,7 @@ watch(
   <div class="w-full h-full relative bg-background overflow-hidden" :class="{ 'select-none': isDragging }">
     <div class="absolute inset-0 z-0">
       <ClientOnly>
-        <PdfRenderer :pdf-url="examPdfUrl" layout-mode="exam-only" />
+        <PdfRenderer :pdf-url="examPdfUrl" layout-mode="exam-only" :top-inset="64" />
       </ClientOnly>
     </div>
 
@@ -160,10 +160,10 @@ watch(
       </div>
     </Transition>
 
-    <Transition enter-active-class="transition-all duration-150 ease-spring"
-      enter-from-class="translate-x-full opacity-0 blur-sm" enter-to-class="translate-x-0 opacity-100 blur-0"
-      leave-active-class="transition-all duration-150 ease-spring"
-      leave-from-class="translate-x-0 opacity-100 blur-0" leave-to-class="translate-x-full opacity-0 blur-sm">
+    <Transition enter-active-class="transition-transform duration-100 ease-out"
+      enter-from-class="translate-x-full" enter-to-class="translate-x-0"
+      leave-active-class="transition-transform duration-100 ease-out"
+      leave-from-class="translate-x-0" leave-to-class="translate-x-full">
       <div v-if="chatHasBeenOpened" v-show="chatStore.isOpen"
         class="fixed right-0 bottom-0 z-80 flex h-screen bg-background shadow-2xl"
         :style="{ width: `${panelWidth}px` }">

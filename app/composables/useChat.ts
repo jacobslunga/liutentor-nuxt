@@ -79,6 +79,7 @@ export function useChat(options: {
       modelId?: string;
       context?: string;
       selectionContext?: string;
+      giveDirectAnswer?: boolean;
     } = {},
   ) {
     if (!content.trim() || chatStore.isLoading) return;
@@ -110,7 +111,12 @@ export function useChat(options: {
       }
     }
 
-    const { modelId = DEFAULT_MODEL_ID, context, selectionContext } = opts;
+    const {
+      modelId = DEFAULT_MODEL_ID,
+      context,
+      selectionContext,
+      giveDirectAnswer,
+    } = opts;
     const resolvedModelId = modelId || DEFAULT_MODEL_ID;
 
     const userMessage = {
@@ -153,6 +159,7 @@ export function useChat(options: {
           modelId: resolvedModelId,
           conversationId: chatStore.currentConversationId,
           selectionContext: selectionContext || undefined,
+          giveDirectAnswer,
         }),
         signal: abortController.value.signal,
       });

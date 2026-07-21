@@ -140,16 +140,20 @@ function handleKeyUp(e: KeyboardEvent) {
 
 <template>
   <ClientOnly>
-    <div class="flex h-screen flex-col w-full overflow-hidden bg-background">
-      <ExamHeader v-if="exam" :exams="exams" :exam-id="examId" :course-code="courseCode"
-        :solution-pdf-url="solutionPdfUrl" />
+    <div class="relative h-screen w-full overflow-hidden bg-background">
+      <div v-if="exam" class="hidden lg:block absolute inset-x-0 top-0 z-20">
+        <div
+          class="pointer-events-none absolute inset-x-0 -top-10 h-24 -z-10 bg-linear-to-b from-background via-background to-background/0" />
+        <ExamHeader :exams="exams" :exam-id="examId" :course-code="courseCode"
+          :solution-pdf-url="solutionPdfUrl" />
+      </div>
 
-      <div v-if="isLoading" class="flex flex-1 items-center justify-center flex-col gap-2 bg-background">
+      <div v-if="isLoading" class="flex h-full items-center justify-center flex-col gap-2 bg-background">
         <LucideLoader2 class="w-8 h-8 animate-spin text-muted-foreground" />
         <p class="text-sm text-muted-foreground">Laddar tenta...</p>
       </div>
 
-      <div v-else-if="isError" class="flex flex-1 items-center justify-center flex-col gap-2 bg-background">
+      <div v-else-if="isError" class="flex h-full items-center justify-center flex-col gap-2 bg-background">
         <p class="text-2xl text-foreground/80">Något gick fel!</p>
         <p class="text-sm text-muted-foreground">
           Ibland fungerar det att bara ladda om sidan :)
@@ -161,14 +165,14 @@ function handleKeyUp(e: KeyboardEvent) {
         <MobilePdfView v-if="isMobile" class="bg-background" :exam-pdf-url="exam.pdf_url"
           :solution-pdf-url="solutionPdfUrl" :course-code="courseCode" :exam-date="exam.exam_date" />
 
-        <div v-else class="flex-1 flex flex-row overflow-hidden bg-background"
+        <div v-else class="h-full flex flex-row overflow-hidden bg-background"
           :class="{ 'select-none': isResizing }">
           <ExamOnlyView v-if="layoutMode === 'exam-only'" :exam-pdf-url="exam.pdf_url"
             :solution-pdf-url="solutionPdfUrl" />
 
           <template v-else>
             <div class="h-full overflow-hidden" :style="{ width: `${splitPercent}%` }">
-              <PdfRenderer :pdf-url="exam.pdf_url" layout-mode="exam-with-facit" />
+              <PdfRenderer :pdf-url="exam.pdf_url" layout-mode="exam-with-facit" :top-inset="64" />
             </div>
 
             <div class="relative z-60 w-0 shrink-0">
@@ -180,7 +184,7 @@ function handleKeyUp(e: KeyboardEvent) {
                 <template v-if="solution">
                   <div class="h-full relative" @mouseenter="solutionBlurred = false"
                     @mouseleave="solutionBlurred = true">
-                    <PdfRenderer :pdf-url="solution.pdf_url" layout-mode="exam-with-facit" />
+                    <PdfRenderer :pdf-url="solution.pdf_url" layout-mode="exam-with-facit" :top-inset="64" />
                     <Transition name="fade">
                       <div v-if="solutionBlurred"
                         class="absolute inset-0 z-50 backdrop-blur-md bg-background/30 flex flex-col gap-2 items-center justify-center pointer-events-none">
@@ -227,10 +231,10 @@ function handleKeyUp(e: KeyboardEvent) {
             </div>
 
             <Teleport to="body">
-              <Transition enter-active-class="transition-all duration-150 ease-spring"
-                enter-from-class="translate-x-full opacity-0 blur-sm" enter-to-class="translate-x-0 opacity-100 blur-0"
-                leave-active-class="transition-all duration-150 ease-spring"
-                leave-from-class="translate-x-0 opacity-100 blur-0" leave-to-class="translate-x-full opacity-0 blur-sm">
+              <Transition enter-active-class="transition-transform duration-100 ease-out"
+                enter-from-class="translate-x-full" enter-to-class="translate-x-0"
+                leave-active-class="transition-transform duration-100 ease-out"
+                leave-from-class="translate-x-0" leave-to-class="translate-x-full">
                 <div v-if="chatHasBeenOpened" v-show="chatStore.isOpen"
                   class="fixed right-0 bottom-0 z-80 flex h-screen bg-background shadow-2xl"
                   :class="{ 'select-none': isChatResizing }" :style="{ width: `${chatPanelWidth}px` }">

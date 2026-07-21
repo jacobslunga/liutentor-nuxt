@@ -130,7 +130,7 @@ function confirmLockIn() {
 </script>
 
 <template>
-  <div class="hidden lg:flex h-12 shrink-0 z-60 w-full items-center justify-between px-4 bg-background">
+  <div class="hidden lg:flex h-12 shrink-0 z-60 w-full items-center justify-between px-4">
     <div class="flex items-center gap-1">
       <Button size="icon-xs" variant="ghost" @click="router.push(`/search/${courseCode}`)">
         <LucideArrowLeft />
