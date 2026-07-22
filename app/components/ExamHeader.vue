@@ -142,7 +142,7 @@ function confirmLockIn() {
             <div class="flex flex-row items-center gap-2 leading-none">
               <span class="text-sm font-semibold">{{
                 selectedExam.exam_date
-              }}</span>
+                }}</span>
             </div>
             <LucideChevronDown class="w-4 h-4 text-muted-foreground transition-transform duration-200"
               :class="{ 'rotate-180': isDropdownOpen }" />
