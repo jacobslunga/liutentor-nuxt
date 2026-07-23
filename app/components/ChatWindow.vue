@@ -75,6 +75,9 @@ function escapeHtml(str: string): string {
     .replace(/'/g, "&#39;");
 }
 
+const LATEX_ENVS =
+  "array|aligned|align\\*?|cases|[pbvB]?matrix|gathered|gather\\*?|smallmatrix";
+
 async function initMarkdown() {
   const instance = new MarkdownIt({
     html: true,
@@ -86,15 +89,65 @@ async function initMarkdown() {
   // skulle annars göra (c) → © och (r) → ®.
   instance.disable("replacements");
 
+  const katexOptions = {
+    throwOnError: false,
+    errorColor: "inherit",
+    strict: "ignore",
+  };
+
+  // "dollars" covers $...$ / $$...$$, "brackets" covers \(...\) / \[...\] —
+  // both are real parser rules, so every model's delimiter style is handled
+  // natively without any text-preprocessing conversion beforehand.
   instance.use(texmath, {
     engine: katex,
     delimiters: ["dollars", "brackets"],
-    katexOptions: {
-      throwOnError: false,
-      errorColor: "inherit",
-      strict: "ignore",
-    },
+    katexOptions,
   });
+
+  // Fallback for a math span whose closing "$$" is missing entirely (some
+  // models occasionally forget it). texmath's own rule only matches
+  // well-formed pairs and is tried first; this only fires once that has
+  // already failed, and stays within the current paragraph.
+  instance.inline.ruler.before(
+    "escape",
+    "math_inline_double_unclosed",
+    (state: any, silent: boolean) => {
+      const { src, pos, posMax } = state;
+      if (!src.startsWith("$$", pos)) return false;
+      const rest = src.slice(pos + 2, posMax);
+      if (!rest.trim() || rest.includes("$$")) return false;
+      if (silent) return true;
+      const token = state.push("math_inline_double", "math", 0);
+      token.content = rest.trim();
+      token.markup = "$$";
+      state.pos = posMax;
+      return true;
+    },
+  );
+
+  // texmath only recognizes a LaTeX environment (\begin{...}\end{...}) as
+  // math when it's already wrapped in $ delimiters. Registering it as its
+  // own block lets bare environments (piecewise functions, matrices) render
+  // too, as a genuine parser rule rather than a $-wrapping text pass.
+  const bareEnvRule = {
+    name: "math_block_bare_env",
+    rex: new RegExp(
+      `(\\\\begin\\{(${LATEX_ENVS})\\}[\\s\\S]*?\\\\end\\{\\2\\})`,
+      "gmy",
+    ),
+    tmpl: "<section><eqn>$1</eqn></section>",
+    tag: "\\begin{",
+  };
+  instance.block.ruler.before(
+    "fence",
+    bareEnvRule.name,
+    (texmath as any).block(bareEnvRule),
+  );
+  instance.renderer.rules[bareEnvRule.name] = (tokens, idx) =>
+    bareEnvRule.tmpl.replace(
+      /\$1/,
+      (texmath as any).render(tokens[idx]!.content, true, katexOptions),
+    );
 
   const highlighter = await getShikiHighlighter();
   const loadedLangs = new Set(highlighter.getLoadedLanguages());
@@ -151,33 +204,21 @@ async function initMarkdown() {
 
 initMarkdown();
 
-const LATEX_ENVS =
-  "array|aligned|align\\*?|cases|[pbvB]?matrix|gathered|gather\\*?|smallmatrix";
-
+// Only remaining job: ensure a $$...$$ block sits on its own blank-line-
+// separated paragraph so texmath's block rule (not the inline one) picks it
+// up, and collapse stray blank lines inside it. Delimiter styles themselves
+// (\(...\), \[...\], bare LaTeX environments) are handled by real parser
+// rules registered in initMarkdown, not by rewriting the text here.
 function normalizeMath(content: string): string {
   const segments = content.split(/(```[\s\S]*?(?:```|$))/g);
   return segments
     .map((seg, i) => {
       if (i % 2 === 1) return seg;
-      let out = seg;
-      out = out.replace(
-        /\\\[([\s\S]+?)\\\]/g,
-        (_, expr) => `\n\n$$\n${expr.trim()}\n$$\n\n`,
-      );
-      out = out.replace(/\\\(([\s\S]+?)\\\)/g, (_, expr) => `$${expr.trim()}$`);
-      out = out.replace(
-        new RegExp(
-          `(?<!\\$)(\\\\begin\\{(${LATEX_ENVS})\\}[\\s\\S]*?\\\\end\\{\\2\\})(?!\\$)`,
-          "g",
-        ),
-        (_, env) => `\n\n$$\n${env}\n$$\n\n`,
-      );
-      out = out.replace(/\$\$([^$]+?)\$\$/g, (_, expr) =>
+      return seg.replace(/\$\$([^$]+?)\$\$/g, (_, expr) =>
         expr.includes("\n")
           ? `\n\n$$\n${expr.replace(/\n{2,}/g, "\n").trim()}\n$$\n\n`
           : `$$${expr.trim()}$$`,
       );
-      return out;
     })
     .join("");
 }
@@ -572,7 +613,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
                   <span class="shimmer-text text-sm">{{ loadingPhrase }}</span>
                 </div>
                 <div
-                  class="prose prose-headings:font-semibold prose-h1:text-xl prose-h2:text-lg prose-h3:text-md prose-h4:text-base prose-strong:font-semibold dark:prose-invert prose-p:font-normal prose-hr:border-secondary prose-th:border-secondary prose-td:border-secondary prose-blockquote:border-secondary marker:text-foreground marker:font-medium"
+                  class="prose prose-headings:font-medium prose-h1:text-xl prose-h2:text-lg prose-h3:text-md prose-h4:text-base prose-strong:font-medium dark:prose-invert prose-p:font-normal prose-hr:border-secondary prose-th:border-secondary prose-td:border-secondary prose-blockquote:border-secondary marker:text-foreground marker:font-medium"
                   v-html="renderedAssistantHtml[i]" />
               </div>
             </div>
@@ -583,6 +624,8 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
         </div>
 
         <div class="absolute bottom-0 left-0 right-0 pt-10 pb-4 pointer-events-none z-10">
+          <div
+            class="pointer-events-none absolute inset-x-0 top-0 bottom-0 -z-10 backdrop-blur-sm [mask-image:linear-gradient(to_bottom,transparent,black_70%)] bg-linear-to-b from-background/0 to-background/80" />
           <ChatInput ref="chatInputRef" v-model="draftInput" :is-loading="isLoading"
             :give-direct-answer="giveDirectAnswer" :selected-model-id="selectedModelId"
             :show-scroll-button="showScrollButton" :course-code="courseCode" :has-solution="hasSolution"
@@ -615,6 +658,17 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
 
 .prose :deep(.katex) {
   max-width: 100%;
+  /* Inline math is made of several nested spans; without this the browser
+     can break the line in the middle of a formula (e.g. splitting a
+     parenthesis onto the next line). Keep it as one atomic unit that wraps
+     as a whole instead. */
+  white-space: nowrap;
+}
+
+.prose :deep(p .katex) {
+  overflow-x: auto;
+  overflow-y: hidden;
+  vertical-align: middle;
 }
 
 .prose :deep(p) {

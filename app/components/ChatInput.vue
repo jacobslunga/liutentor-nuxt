@@ -38,11 +38,6 @@ const emit = defineEmits<{
 const textareaRef = ref<HTMLTextAreaElement | null>(null);
 const MAX_LENGTH = 4000;
 
-const selectedModeLabel = computed(
-  () =>
-    ANSWER_MODES.find((m) => m.value === props.giveDirectAnswer)?.label ??
-    ANSWER_MODES[0].label,
-);
 const selectedModelLabel = computed(
   () =>
     CHAT_MODELS.find((m) => m.id === props.selectedModelId)?.label ??
@@ -117,27 +112,26 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
             @input="handleInput" @keydown="handleKeyDown" />
 
           <div class="flex items-center justify-between gap-2 px-3 pb-2.5 pt-1">
-            <DropdownMenu>
-              <DropdownMenuTrigger as-child>
-                <Button variant="ghost" size="sm"
-                  class="gap-1 px-2.5 text-xs font-medium text-muted-foreground hover:text-foreground">
-                  <LucideBrain v-if="giveDirectAnswer" class="w-3.5 h-3.5" />
-                  <LucideLightbulb v-else class="w-3.5 h-3.5" />
-                  {{ selectedModeLabel }}
-                  <LucideChevronDown class="w-3.5 h-3.5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" class="w-64">
-                <DropdownMenuItem v-for="mode in ANSWER_MODES" :key="String(mode.value)"
-                  class="cursor-pointer items-start gap-2" @click="emit('update:giveDirectAnswer', mode.value)">
-                  <div class="flex-1 min-w-0">
-                    <p class="text-sm font-medium">{{ mode.label }}</p>
-                    <p class="text-xs text-muted-foreground">{{ mode.description }}</p>
-                  </div>
-                  <LucideCheck v-if="mode.value === giveDirectAnswer" class="w-4 h-4 shrink-0 mt-0.5" />
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <TooltipProvider>
+              <Tabs :model-value="giveDirectAnswer ? 'direct' : 'hint'"
+                @update:model-value="(v) => emit('update:giveDirectAnswer', v === 'direct')">
+                <TabsList class="h-7 p-0.5 rounded-lg bg-muted/60">
+                  <Tooltip v-for="mode in ANSWER_MODES" :key="String(mode.value)">
+                    <TooltipTrigger as-child>
+                      <TabsTrigger :value="mode.value ? 'direct' : 'hint'"
+                        class="h-[calc(100%-1px)] px-2 rounded-md">
+                        <LucideBrain v-if="mode.value" class="w-3.5 h-3.5" />
+                        <LucideLightbulb v-else class="w-3.5 h-3.5" />
+                      </TabsTrigger>
+                    </TooltipTrigger>
+                    <TooltipContent side="top">
+                      <p class="font-medium">{{ mode.label }}</p>
+                      <p class="text-[11px] opacity-80">{{ mode.description }}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TabsList>
+              </Tabs>
+            </TooltipProvider>
 
             <div class="flex shrink-0 items-center gap-1.5">
               <DropdownMenu>

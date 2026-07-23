@@ -135,7 +135,7 @@ export function useChat(options: {
     try {
       const recentMessages = chatStore.messages
         .slice(0, -1)
-        .slice(-10)
+        .slice(-20)
         .map((m) => ({
           role: m.role,
           content: m.content,
