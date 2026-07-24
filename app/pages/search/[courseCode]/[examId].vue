@@ -59,8 +59,10 @@ const chatPanelWidth = ref(
   import.meta.client ? window.innerWidth / 2 : 600,
 );
 const isChatResizing = ref(false);
+let activeResizeCleanup: (() => void) | null = null;
 
 function startChatResize() {
+  activeResizeCleanup?.();
   isChatResizing.value = true;
   const onMouseMove = (e: MouseEvent) => {
     const newWidth = window.innerWidth - e.clientX;
@@ -73,10 +75,16 @@ function startChatResize() {
     isChatResizing.value = false;
     window.removeEventListener("mousemove", onMouseMove);
     window.removeEventListener("mouseup", onMouseUp);
+    activeResizeCleanup = null;
   };
   window.addEventListener("mousemove", onMouseMove);
   window.addEventListener("mouseup", onMouseUp);
+  activeResizeCleanup = onMouseUp;
 }
+
+onUnmounted(() => {
+  activeResizeCleanup?.();
+});
 
 onBeforeRouteUpdate((to, from) => {
   if (to.params.examId !== from.params.examId) {
@@ -242,7 +250,7 @@ function handleKeyUp(e: KeyboardEvent) {
                     <ResizeHandle :is-resizing="isChatResizing" @start-resize="startChatResize" />
                   </div>
                   <div class="flex-1 overflow-hidden">
-                    <ChatWindow :exam-id="examId" :exam-url="exam.pdf_url" :course-code="courseCode"
+                    <LazyChatWindow :exam-id="examId" :exam-url="exam.pdf_url" :course-code="courseCode"
                       :solution-url="solutionPdfUrl" :has-solution="!!solution" class="h-full w-full"
                       @close="chatStore.close()" />
                   </div>

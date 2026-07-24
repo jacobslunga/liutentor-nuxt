@@ -27,7 +27,10 @@ watch(
   },
 );
 
+let activeResizeCleanup: (() => void) | null = null;
+
 function startResize() {
+  activeResizeCleanup?.();
   isDragging.value = true;
   const onMouseMove = (e: MouseEvent) => {
     const newWidth = window.innerWidth - e.clientX;
@@ -40,9 +43,11 @@ function startResize() {
     isDragging.value = false;
     window.removeEventListener("mousemove", onMouseMove);
     window.removeEventListener("mouseup", onMouseUp);
+    activeResizeCleanup = null;
   };
   window.addEventListener("mousemove", onMouseMove);
   window.addEventListener("mouseup", onMouseUp);
+  activeResizeCleanup = onMouseUp;
 }
 
 function handleMouseMove(e: MouseEvent) {
@@ -112,6 +117,7 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener("mousemove", handleMouseMove);
   window.removeEventListener("keydown", handleKeyDown);
+  activeResizeCleanup?.();
 });
 
 const chatHasBeenOpened = ref(false);
