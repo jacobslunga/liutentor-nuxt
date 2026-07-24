@@ -606,14 +606,14 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
                 </div>
               </div>
 
-              <div v-else class="w-full px-1 py-2" data-role="assistant" :data-streaming="isLoading && i === messages.length - 1 ? 'true' : undefined
+              <div v-else class="w-full min-w-0 px-1 py-2 overflow-hidden" data-role="assistant" :data-streaming="isLoading && i === messages.length - 1 ? 'true' : undefined
                 ">
                 <div v-if="!msg.content && isLoading && i === messages.length - 1" class="flex items-center gap-2 h-6">
                   <LucideLoader class="variable-spin w-4 h-4 text-muted-foreground" />
                   <span class="shimmer-text text-sm">{{ loadingPhrase }}</span>
                 </div>
                 <div
-                  class="prose prose-headings:font-medium prose-h1:text-xl prose-h2:text-lg prose-h3:text-md prose-h4:text-base prose-strong:font-medium dark:prose-invert prose-p:font-normal prose-hr:border-secondary prose-th:border-secondary prose-td:border-secondary prose-blockquote:border-secondary marker:text-foreground marker:font-medium"
+                  class="prose max-w-full min-w-0 prose-headings:font-medium prose-h1:text-xl prose-h2:text-lg prose-h3:text-md prose-h4:text-base prose-strong:font-medium dark:prose-invert prose-p:font-normal prose-hr:border-secondary prose-th:border-secondary prose-td:border-secondary prose-blockquote:border-secondary marker:text-foreground marker:font-medium"
                   v-html="renderedAssistantHtml[i]" />
               </div>
             </div>
@@ -649,26 +649,30 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
   overflow-y: hidden;
   max-width: 100%;
   padding: 0.5rem 0;
+  margin: 0.75rem 0;
 }
 
-.prose :deep(.katex-display)>.katex {
-  max-width: none;
-  white-space: normal;
+.prose :deep(.katex-display) > .katex {
+  max-width: 100%;
 }
 
 .prose :deep(.katex) {
   max-width: 100%;
-  /* Inline math is made of several nested spans; without this the browser
-     can break the line in the middle of a formula (e.g. splitting a
-     parenthesis onto the next line). Keep it as one atomic unit that wraps
-     as a whole instead. */
-  white-space: nowrap;
 }
 
-.prose :deep(p .katex) {
+.prose :deep(p .katex),
+.prose :deep(li .katex) {
+  display: inline-block;
+  max-width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
   vertical-align: middle;
+}
+
+.prose :deep(.katex-html) {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .prose :deep(p) {
