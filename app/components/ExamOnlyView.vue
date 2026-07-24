@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import ChatWindow from "./ChatWindow.vue";
 const props = defineProps<{
   examPdfUrl: string;
   solutionPdfUrl: string | null;
@@ -99,7 +98,7 @@ function handleKeyDown(e: KeyboardEvent) {
   }
 }
 
-const chatWindowRef = ref<InstanceType<typeof ChatWindow> | null>(null);
+const chatWindowRef = ref<any>(null);
 
 function focusChat() {
   chatWindowRef.value?.focusInput();
@@ -134,7 +133,7 @@ watch(
   <div class="w-full h-full relative bg-background overflow-hidden" :class="{ 'select-none': isDragging }">
     <div class="absolute inset-0 z-0">
       <ClientOnly>
-        <PdfRenderer :pdf-url="examPdfUrl" layout-mode="exam-only" :top-inset="64" />
+        <LazyPdfRenderer :pdf-url="examPdfUrl" layout-mode="exam-only" :top-inset="64" />
       </ClientOnly>
     </div>
 
@@ -154,7 +153,7 @@ watch(
         </div>
         <div class="flex-1 overflow-hidden">
           <ClientOnly>
-            <PdfRenderer :pdf-url="solutionPdfUrl!" layout-mode="exam-only" />
+            <LazyPdfRenderer :pdf-url="solutionPdfUrl!" layout-mode="exam-only" />
           </ClientOnly>
         </div>
       </div>
@@ -171,7 +170,7 @@ watch(
           <ResizeHandle :is-resizing="isDragging" @start-resize="startResize" />
         </div>
         <div class="flex-1 overflow-hidden">
-          <ChatWindow ref="chatWindowRef" :exam-id="String(route.params.examId)" :exam-url="examPdfUrl"
+          <LazyChatWindow ref="chatWindowRef" :exam-id="String(route.params.examId)" :exam-url="examPdfUrl"
             :course-code="String(route.params.courseCode)" :solution-url="solutionPdfUrl" :has-solution="hasFacit"
             class="h-full w-full" @close="chatStore.close()" />
         </div>
