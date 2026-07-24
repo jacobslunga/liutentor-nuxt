@@ -38,10 +38,22 @@ const emit = defineEmits<{
 const textareaRef = ref<HTMLTextAreaElement | null>(null);
 const MAX_LENGTH = 4000;
 
+const googleModels = computed(() =>
+  CHAT_MODELS.filter((m) => m.provider === "Google"),
+);
+
+const anthropicModels = computed(() =>
+  CHAT_MODELS.filter((m) => m.provider === "Anthropic"),
+);
+
 const selectedModelLabel = computed(
   () =>
     CHAT_MODELS.find((m) => m.id === props.selectedModelId)?.label ??
     CHAT_MODELS[0].label,
+);
+
+const selectedModelProvider = computed(
+  () => CHAT_MODELS.find((m) => m.id === props.selectedModelId)?.provider,
 );
 
 const updateHeight = () => {
@@ -85,10 +97,9 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
     <div class="pointer-events-none absolute inset-x-0 -bottom-20 h-40 -z-10 bg-background" />
     <div class="max-w-2xl mx-auto relative">
       <Transition name="fade-up">
-        <div v-if="showScrollButton" class="absolute -top-12 left-1/2 -translate-x-1/2 z-20">
-          <Button variant="outline" size="icon" class="rounded-full bg-background/60 backdrop-blur-sm"
-            @click="emit('scrollToBottom')">
-            <LucideArrowDown class="w-4 h-4" />
+        <div v-if="showScrollButton" class="absolute -top-12 right-3 z-20">
+          <Button variant="outline" size="icon" class="rounded-full" @click="emit('scrollToBottom')">
+            <LucideChevronDown class="w-4 h-4" />
           </Button>
         </div>
       </Transition>
@@ -118,8 +129,7 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
                 <TabsList class="h-7 p-0.5 rounded-lg bg-muted/60">
                   <Tooltip v-for="mode in ANSWER_MODES" :key="String(mode.value)">
                     <TooltipTrigger as-child>
-                      <TabsTrigger :value="mode.value ? 'direct' : 'hint'"
-                        class="h-[calc(100%-1px)] px-2 rounded-md">
+                      <TabsTrigger :value="mode.value ? 'direct' : 'hint'" class="h-[calc(100%-1px)] px-2 rounded-md">
                         <LucideBrain v-if="mode.value" class="w-3.5 h-3.5" />
                         <LucideLightbulb v-else class="w-3.5 h-3.5" />
                       </TabsTrigger>
@@ -137,19 +147,47 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
               <DropdownMenu>
                 <DropdownMenuTrigger as-child>
                   <Button variant="ghost" size="sm"
-                    class="gap-1 px-2.5 text-xs font-medium text-muted-foreground hover:text-foreground">
+                    class="gap-1.5 px-2.5 text-xs font-medium text-muted-foreground hover:text-foreground">
+                    <img v-if="selectedModelProvider === 'Google'" src="/images/llm-logos/google.svg" alt="Google"
+                      class="w-3.5 h-3.5 shrink-0" />
+                    <template v-else-if="selectedModelProvider === 'Anthropic'">
+                      <img src="/images/llm-logos/anthropic-black.svg" alt="Anthropic"
+                        class="w-3.5 h-3.5 shrink-0 dark:hidden" />
+                      <img src="/images/llm-logos/anthropic-white.svg" alt="Anthropic"
+                        class="w-3.5 h-3.5 shrink-0 hidden dark:block" />
+                    </template>
                     {{ selectedModelLabel }}
-                    <LucideChevronDown class="w-3.5 h-3.5" />
+                    <LucideChevronDown class="w-3.5 h-3.5 text-muted-foreground/70" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" class="w-52">
-                  <DropdownMenuItem v-for="model in CHAT_MODELS" :key="model.id"
-                    class="cursor-pointer items-start gap-2" @click="emit('update:selectedModelId', model.id)">
-                    <div class="flex-1 min-w-0">
-                      <p class="text-sm font-medium">{{ model.label }}</p>
-                      <p class="text-xs text-muted-foreground">{{ model.description }}</p>
-                    </div>
-                    <LucideCheck v-if="model.id === selectedModelId" class="w-4 h-4 shrink-0 mt-0.5" />
+                <DropdownMenuContent align="end" class="w-56">
+                  <DropdownMenuLabel
+                    class="flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground/70 px-2 py-1">
+                    <img src="/images/llm-logos/google.svg" alt="Google" class="w-3.5 h-3.5 shrink-0" />
+                    Google Gemini
+                  </DropdownMenuLabel>
+                  <DropdownMenuItem v-for="model in googleModels" :key="model.id"
+                    class="cursor-pointer items-center justify-between gap-2"
+                    @click="emit('update:selectedModelId', model.id)">
+                    <span class="text-sm font-medium">{{ model.label }}</span>
+                    <LucideCheck v-if="model.id === selectedModelId" class="w-4 h-4 shrink-0 text-primary" />
+                  </DropdownMenuItem>
+
+                  <DropdownMenuSeparator />
+
+                  <DropdownMenuLabel
+                    class="flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground/70 px-2 py-1">
+                    <img src="/images/llm-logos/anthropic-black.svg" alt="Anthropic"
+                      class="w-3.5 h-3.5 shrink-0 dark:hidden" />
+                    <img src="/images/llm-logos/anthropic-white.svg" alt="Anthropic"
+                      class="w-3.5 h-3.5 shrink-0 hidden dark:block" />
+                    Anthropic Claude
+                  </DropdownMenuLabel>
+                  <DropdownMenuItem v-for="model in anthropicModels" :key="model.id"
+                    class="cursor-pointer items-center justify-between gap-2"
+                    @click="emit('update:selectedModelId', model.id)">
+                    <span class="text-sm font-medium">{{ model.label }}</span>
+                    <LucideCheck v-if="model.id === selectedModelId" class="w-4 h-4 shrink-0 text-primary" />
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

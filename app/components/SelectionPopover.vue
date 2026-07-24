@@ -16,8 +16,7 @@ const emit = defineEmits<{ reply: [] }>();
         top: `${y}px`,
         transform: 'translate(-50%, calc(-100% - 8px))',
       }">
-        <Button size="sm" class="bg-foreground text-background hover:opacity-90 hover:bg-foreground/90"
-          @mousedown.prevent.stop="emit('reply')">
+        <Button size="sm" variant="outline" @mousedown.prevent.stop="emit('reply')">
           Svara
           <LucideCornerUpLeft class="w-3.5 h-3.5" />
         </Button>
