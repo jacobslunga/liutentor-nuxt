@@ -13,17 +13,85 @@ const exams = computed<Exam[]>(() => courseData.value?.exams ?? []);
 const activeTab = ref("exams");
 
 watchEffect(() => {
+  const canonicalUrl = `https://liutentor.se/search/${courseCode}`;
+
   if (courseData.value) {
+    const title = `${courseCode} - Gamla tentor & facit | ${courseData.value.courseName}`;
+    const description = `Plugga på ${exams.value.length} gamla tentor och facit för ${courseCode} (${courseData.value.courseName}) från Linköpings Universitet. Se betygsstatistik och godkända i snitt.`;
+
     useSeoMeta({
-      title: `${courseCode} - ${courseData.value.courseName}`,
-      description: `Plugga ${exams.value.length} tentor för ${courseCode} - ${courseData.value.courseName}`,
+      title,
+      description,
+      ogTitle: title,
+      ogDescription: description,
+      ogType: "website",
+      ogUrl: canonicalUrl,
+      ogSiteName: "LiU Tentor",
+      ogLocale: "sv_SE",
+      ogImage: "https://liutentor.se/logo.svg",
+      twitterCard: "summary",
+      twitterTitle: title,
+      twitterDescription: description,
+    });
+
+    useHead({
+      link: [{ rel: "canonical", href: canonicalUrl }],
+      script: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Course",
+            name: `${courseCode} - ${courseData.value.courseName}`,
+            courseCode: courseCode,
+            description: description,
+            provider: {
+              "@type": "CollegeOrUniversity",
+              name: "Linköpings Universitet",
+              url: "https://liu.se",
+            },
+          }),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "Hem",
+                item: "https://liutentor.se",
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: courseCode,
+                item: canonicalUrl,
+              },
+            ],
+          }),
+        },
+      ],
     });
     return;
   }
+
   if (status.value === "success") {
+    const title = `${courseCode} - Inga tentor hittades | LiU Tentor`;
+    const description = `Inga tentor hittades för ${courseCode}. Var den första att ladda upp tentor för ${courseCode} på LiU Tentor.`;
+
     useSeoMeta({
-      title: `${courseCode} - Inga tentor hittades`,
-      description: `Inga tentor hittades för ${courseCode}. Var den första att ladda upp tentor.`,
+      title,
+      description,
+      ogTitle: title,
+      ogDescription: description,
+      ogUrl: canonicalUrl,
+    });
+
+    useHead({
+      link: [{ rel: "canonical", href: canonicalUrl }],
     });
   }
 });
