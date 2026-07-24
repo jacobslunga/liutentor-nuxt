@@ -93,56 +93,16 @@ export default defineNuxtConfig({
     bundledLangs: [
       "typescript",
       "javascript",
-      "jsx",
-      "tsx",
-      "json",
-      "jsonc",
-      "json5",
       "python",
       "java",
-      "kotlin",
-      "rust",
-      "go",
       "c",
       "cpp",
       "csharp",
-      "php",
-      "ruby",
-      "swift",
-      "scala",
-      "dart",
-      "lua",
-      "r",
-      "julia",
-      "haskell",
-      "elixir",
-      "vue",
-      "svelte",
-      "astro",
       "html",
       "css",
-      "scss",
-      "sass",
-      "less",
+      "json",
       "sql",
-      "graphql",
-      "prisma",
       "bash",
-      "shellscript",
-      "powershell",
-      "dockerfile",
-      "yaml",
-      "toml",
-      "ini",
-      "nginx",
-      "markdown",
-      "mdc",
-      "latex",
-      "diff",
-      "regex",
-      "makefile",
-      "wasm",
-      "solidity",
     ],
     defaultTheme: "one-light",
   },
@@ -154,12 +114,30 @@ export default defineNuxtConfig({
   // ─── Build & Infra ────────────────────────────────────────────
   nitro: {
     preset: "netlify",
+    compressPublicAssets: true,
   },
 
   css: ["~/assets/css/tailwind.css"],
 
   vite: {
     plugins: [tailwindcss()],
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes("node_modules/shiki")) return "vendor-shiki";
+            if (id.includes("node_modules/@embedpdf")) return "vendor-embedpdf";
+            if (
+              id.includes("node_modules/chart.js") ||
+              id.includes("node_modules/vue-chartjs")
+            )
+              return "vendor-chart";
+            if (id.includes("node_modules/katex")) return "vendor-katex";
+            if (id.includes("node_modules/@supabase")) return "vendor-supabase";
+          },
+        },
+      },
+    },
   },
 
   imports: {

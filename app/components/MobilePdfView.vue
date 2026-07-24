@@ -141,7 +141,7 @@ const downloadFile = async (url: string, filename: string) => {
 
     <div class="h-full w-full overflow-hidden">
       <ClientOnly>
-        <PdfRenderer :pdf-url="examPdfUrl" :top-inset="72" />
+        <LazyPdfRenderer :pdf-url="examPdfUrl" :top-inset="72" />
       </ClientOnly>
     </div>
 
@@ -185,7 +185,7 @@ const downloadFile = async (url: string, filename: string) => {
         </div>
         <div class="h-full w-full overflow-hidden">
           <ClientOnly>
-            <PdfRenderer v-if="solutionPdfUrl" :pdf-url="solutionPdfUrl" :top-inset="72" />
+            <LazyPdfRenderer v-if="solutionPdfUrl" :pdf-url="solutionPdfUrl" :top-inset="72" />
           </ClientOnly>
         </div>
       </section>

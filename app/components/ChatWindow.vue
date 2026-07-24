@@ -16,8 +16,6 @@ import DOMPurify from "dompurify";
 import { getShikiHighlighter } from "#imports";
 import { useChatStore } from "@/stores/chat";
 import { useChat } from "@/composables/useChat";
-import { useMermaid } from "@/composables/useMermaid";
-import { usePlot } from "@/composables/usePlot";
 
 const props = defineProps<{
   examId: string;
@@ -158,17 +156,7 @@ async function initMarkdown() {
     const info = token.info ? token.info.trim() : "";
     const rawLang = info.split(/\s+/)[0] || "";
 
-    if (rawLang === "mermaid") {
-      return `<div class="mermaid-block" data-state="pending"><pre class="mermaid-source">${escapeHtml(
-        token.content,
-      )}</pre></div>`;
-    }
 
-    if (rawLang === "plot") {
-      return `<div class="plot-block" data-state="pending"><span class="plot-loading shimmer-text">Ritar graf...</span><pre class="plot-source">${escapeHtml(
-        token.content,
-      )}</pre></div>`;
-    }
 
     const language =
       rawLang && loadedLangs.has(rawLang as never) ? rawLang : "text";
@@ -266,13 +254,6 @@ function getCachedMarkdown(content: string): string {
 const { giveDirectAnswer } = useAnswerMode();
 const { selectedModelId } = useSelectedModel();
 const messagesContainer = ref<HTMLDivElement | null>(null);
-const { hydrate: hydrateMermaid } = useMermaid(messagesContainer);
-const { hydrate: hydratePlots } = usePlot(messagesContainer);
-
-function hydrateBlocks() {
-  hydrateMermaid();
-  hydratePlots();
-}
 const chatInputRef = ref<{ focus: () => void } | null>(null);
 const isUserScrolling = ref(false);
 const isAtBottom = ref(true);
@@ -419,16 +400,11 @@ function handleScroll() {
   }
 }
 
-watch(renderedAssistantHtml, () => {
-  nextTick(() => hydrateBlocks());
-});
-
 watch(
   () => chatStore.currentConversationId,
   () => {
     nextTick(() => {
       scrollToBottom("auto");
-      hydrateBlocks();
     });
   },
 );
@@ -473,7 +449,6 @@ onMounted(() => {
     } else {
       scrollToBottom("auto");
     }
-    hydrateBlocks();
   });
 });
 
