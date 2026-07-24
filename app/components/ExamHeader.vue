@@ -39,6 +39,8 @@ watch(isDropdownOpen, (open) => {
   }
 });
 
+const { open: openUploadModal } = useUploadModal();
+
 const TIME_OPTIONS = [
   { value: "30", label: "30 min" },
   { value: "60", label: "1 timme" },
@@ -203,6 +205,11 @@ function confirmLockIn() {
           <DropdownMenuItem class="cursor-pointer" @click="isSettingsOpen = true">
             <LucideSettings class="size-4" />
             Inställningar
+          </DropdownMenuItem>
+
+          <DropdownMenuItem class="cursor-pointer" @click="openUploadModal(courseCode)">
+            <LucideUpload class="size-4" />
+            Ladda upp tenta/facit
           </DropdownMenuItem>
 
           <DropdownMenuSeparator />

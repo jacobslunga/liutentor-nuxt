@@ -4,6 +4,7 @@
       <NuxtPage />
     </NuxtLayout>
     <Toaster />
+    <ExamUploadDialog />
   </div>
 </template>
 

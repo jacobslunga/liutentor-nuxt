@@ -2,53 +2,84 @@
 definePageMeta({ layout: "info" });
 
 useSeoMeta({
-  title: "Vanliga frågor",
-  description: "Hitta svar på de vanligaste frågorna om LiU Tentor.",
+  title: "Vanliga frågor (FAQ)",
+  description: "Svar på vanliga frågor om LiU Tentor, tentamaterial, uppladdningar och statistik.",
   robots: "index, follow",
 });
+
+const { open: openUploadModal } = useUploadModal();
 
 const faqs = [
   {
     q: "Är det här en officiell LiU-sida?",
-    a: "Nej, detta är ett studentdrivet projekt och är inte kopplat till Linköpings universitet.",
+    a: "Nej, LiU Tentor är ett studentdrivet, fristående projekt som är skapat av studenter för studenter vid Linköpings universitet.",
   },
   {
     q: "Var kommer tentorna ifrån?",
-    a: "Tentorna är offentliga dokument som hämtas från universitetets hemsida eller laddas upp av användare.",
+    a: "Alla tentor är offentliga handlingar som antingen har hämtats från universitetets öppna kurshemsidor eller laddats upp av hjälpsamma studenter.",
   },
   {
-    q: "Hur kan jag bidra med fler tentor?",
-    a: "Du kan enkelt ladda upp tentor via uppladdningssidan. Vi granskar materialet innan det publiceras.",
+    q: "Hur laddar jag upp nya tentor eller facit?",
+    a: "Du kan när som helst klicka på 'Ladda upp tenta' i menyn för att dra och släppa dina PDF-filer. Materialet granskas och blir därefter tillgängligt för alla.",
   },
   {
-    q: "Varför finns det inga tentor för min kurs?",
-    a: "Antingen har vi inte fått in några tentor för den kursen än, eller så är de ännu inte uppladdade. Du får gärna bidra själv!",
+    q: "Varför saknas tentor för min kurs?",
+    a: "Om din kurs saknar tentor beror det oftast på att materialet inte publicerats öppet än. Ladda gärna upp tentor om du har dem på din dator!",
   },
   {
-    q: "Vad är facit och hur vet jag om en tenta har det?",
-    a: "Ett facit är en lösningsdel eller svarsmall till tentan. Om ett facit finns bifogat visas det som en separat fil bredvid tentan.",
+    q: "Hur fungerar tentastatistiken och betygsfördelningen?",
+    a: "Betygsstatistik och godkändprocent hämtas från offentlig tentastatistik vid LiU och sammanställs automatiskt på respektive kurssida.",
   },
   {
-    q: "Hur fungerar statistiken på kurssidorna?",
-    a: "Statistiken baseras på data från tidigare tentor, såsom betygsfördelning och godkändprocent. All data är hämtad från universitetets officiella källor.",
-  },
-  {
-    q: "Vad gör jag om en tenta inte laddas?",
-    a: "Försök att ladda om sidan eller öppna tentan i en ny flik. Om problemet kvarstår, kontakta oss gärna via mejl eller via feedbackformuläret.",
+    q: "Hur fungerar AI-assistenten för tentor?",
+    a: "AI-assistenten analyserar den valda tentan och facit i realtid för att ge förklaringar, stegvisa ledtrådar eller besvara dina frågor direkt i webbläsaren.",
   },
 ];
 </script>
 
 <template>
-    <h1 class="text-3xl font-medium text-foreground mb-2">Vanliga frågor</h1>
-    <p class="text-sm text-muted-foreground mb-6">
-      Hitta svar på de vanligaste frågorna om LiU Tentor
-    </p>
+  <div class="space-y-8">
+    <div>
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium mb-3">
+        <LucideHelpCircle class="size-3.5" />
+        <span>FAQ & Svar</span>
+      </div>
+      <h1 class="text-3xl font-semibold text-foreground tracking-tight">Vanliga frågor</h1>
+      <p class="text-base text-muted-foreground mt-2">
+        Här samlar vi svar på de vanligaste frågorna om LiU Tentor.
+      </p>
+    </div>
 
-    <Accordion type="multiple" class="w-full space-y-3">
-      <AccordionItem v-for="(faq, i) in faqs" :key="i" :value="String(i)">
-        <AccordionTrigger>{{ faq.q }}</AccordionTrigger>
-        <AccordionContent>{{ faq.a }}</AccordionContent>
-      </AccordionItem>
-    </Accordion>
+    <div class="space-y-4">
+      <div
+        v-for="(faq, i) in faqs"
+        :key="i"
+        class="rounded-xl border border-border/70 bg-card p-6 shadow-xs transition-colors hover:border-border"
+      >
+        <h3 class="text-base font-semibold text-foreground flex items-center gap-2 mb-2">
+          <LucideHelpCircle class="size-4 text-primary shrink-0" />
+          <span>{{ faq.q }}</span>
+        </h3>
+        <p class="text-sm text-muted-foreground leading-relaxed pl-6">
+          {{ faq.a }}
+        </p>
+      </div>
+    </div>
+
+    <div class="rounded-xl border border-primary/20 bg-primary/5 p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>
+        <h4 class="text-base font-semibold text-foreground">Hittade du inte svaret du sökte?</h4>
+        <p class="text-sm text-muted-foreground mt-0.5">Ladda upp nya tentor eller skicka feedback till oss.</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <Button variant="default" size="sm" @click="openUploadModal()">
+          <LucideUpload class="size-4" />
+          Ladda upp tenta
+        </Button>
+        <Button variant="outline" size="sm" as-child>
+          <NuxtLink to="/feedback">Feedback</NuxtLink>
+        </Button>
+      </div>
+    </div>
+  </div>
 </template>

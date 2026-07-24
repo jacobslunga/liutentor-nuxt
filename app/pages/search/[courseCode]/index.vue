@@ -11,6 +11,7 @@ const { data, status } = useFetch(`/api/exams/${courseCode}`);
 const courseData = computed(() => (data.value as any)?.data);
 const exams = computed<Exam[]>(() => courseData.value?.exams ?? []);
 const activeTab = ref("exams");
+const { open: openUploadModal } = useUploadModal();
 
 watchEffect(() => {
   const canonicalUrl = `https://liutentor.se/search/${courseCode}`;
@@ -219,11 +220,9 @@ function passColor(rate: number) {
               </TabsList>
 
               <div class="flex items-center gap-2 pb-2">
-                <Button variant="default" size="sm" as-child>
-                  <NuxtLink to="/upload-exams">
-                    <LucideUpload class="w-4.5 h-4.5" />
-                    Ladda upp
-                  </NuxtLink>
+                <Button variant="default" size="sm" @click="openUploadModal(courseCode)">
+                  <LucideUpload class="w-4.5 h-4.5" />
+                  Ladda upp
                 </Button>
                 <Button variant="outline" size="sm" as-child>
                   <NuxtLink :to="`/quiz/${courseCode}`">

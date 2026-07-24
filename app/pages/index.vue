@@ -8,6 +8,7 @@ useSeoMeta({
 });
 
 const focusInput = ref(false);
+const { open: openUploadModal } = useUploadModal();
 </script>
 
 <template>
@@ -45,12 +46,10 @@ const focusInput = ref(false);
 
       <RecentSearches />
 
-      <NuxtLink to="/upload-exams">
-        <Button variant="outline">
-          <LucideUpload />
-          Ladda upp fler tentor
-        </Button>
-      </NuxtLink>
+      <Button variant="outline" @click="openUploadModal()">
+        <LucideUpload />
+        Ladda upp fler tentor
+      </Button>
     </div>
   </div>
 </template>
