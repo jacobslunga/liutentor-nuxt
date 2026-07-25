@@ -57,11 +57,26 @@ export default defineNuxtConfig({
         { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
         { rel: "manifest", href: "/site.webmanifest" },
         {
-          rel: "stylesheet",
-          href: "https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css",
+          rel: "preload",
+          as: "font",
+          type: "font/woff2",
+          href: "/fonts/GitLabSansVF.woff2",
+          crossorigin: "anonymous",
         },
       ],
     },
+  },
+
+  // ─── Route Rules & Caching ─────────────────────────────────────
+  routeRules: {
+    "/": { swr: 3600 },
+    "/om-oss": { prerender: true },
+    "/faq": { prerender: true },
+    "/ai-policy": { prerender: true },
+    "/copyright-policy": { prerender: true },
+    "/privacy-policy": { prerender: true },
+    "/search/**": { swr: 3600 },
+    "/api/exams/**": { swr: 3600 },
   },
 
   // ─── Runtime Config ───────────────────────────────────────────

@@ -244,7 +244,7 @@ function passColor(rate: number) {
               </TabsContent>
 
               <TabsContent v-else key="stats" value="stats" class="mt-5">
-                <CourseStats :exams="exams" />
+                <LazyCourseStats :exams="exams" />
               </TabsContent>
             </Transition>
           </Tabs>
