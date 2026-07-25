@@ -4,15 +4,20 @@ import type { Exam } from "~/types/exam";
 definePageMeta({ layout: "search" });
 
 const route = useRoute();
-const courseCode = route.params.courseCode as string;
+const courseCode = computed(() => route.params.courseCode as string);
 
 const { add: addRecentSearch } = useRecentSearches();
-if (courseCode) {
-  addRecentSearch(courseCode);
-}
+watch(
+  courseCode,
+  (code) => {
+    if (code) addRecentSearch(code);
+  },
+  { immediate: true },
+);
 
-const { data, status } = useFetch(`/api/exams/${courseCode}`, {
+const { data, status } = useFetch(() => `/api/exams/${courseCode.value}`, {
   lazy: true,
+  getCachedData: () => undefined,
 });
 
 const courseData = computed(() => (data.value as any)?.data);
@@ -21,11 +26,11 @@ const activeTab = ref("exams");
 const { open: openUploadModal } = useUploadModal();
 
 watchEffect(() => {
-  const canonicalUrl = `https://liutentor.se/search/${courseCode}`;
+  const canonicalUrl = `https://liutentor.se/search/${courseCode.value}`;
 
   if (courseData.value) {
-    const title = `${courseCode} - Gamla tentor & facit | ${courseData.value.courseName}`;
-    const description = `Plugga på ${exams.value.length} gamla tentor och facit för ${courseCode} (${courseData.value.courseName}) från Linköpings Universitet. Se betygsstatistik och godkända i snitt.`;
+    const title = `${courseCode.value} - Gamla tentor & facit | ${courseData.value.courseName}`;
+    const description = `Plugga på ${exams.value.length} gamla tentor och facit för ${courseCode.value} (${courseData.value.courseName}) från Linköpings Universitet. Se betygsstatistik och godkända i snitt.`;
 
     useSeoMeta({
       title,
