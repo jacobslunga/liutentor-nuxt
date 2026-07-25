@@ -588,7 +588,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
                   <span class="shimmer-text text-sm">{{ loadingPhrase }}</span>
                 </div>
                 <div
-                  class="prose font-serif max-w-full min-w-0 prose-headings:font-medium prose-h1:text-xl prose-h2:text-lg prose-h3:text-md prose-h4:text-base prose-strong:font-medium dark:prose-invert prose-p:font-normal prose-hr:border-secondary prose-th:border-secondary prose-td:border-secondary prose-blockquote:border-secondary marker:text-foreground marker:font-medium"
+                  class="prose font-serif max-w-full min-w-0 prose-headings:font-semibold prose-h1:text-xl prose-h2:text-lg prose-h3:text-md prose-h4:text-base prose-strong:font-semibold dark:prose-invert prose-p:font-normal prose-hr:border-secondary prose-th:border-secondary prose-td:border-secondary prose-blockquote:border-secondary marker:text-foreground marker:font-semibold"
                   v-html="renderedAssistantHtml[i]" />
               </div>
             </div>
@@ -600,7 +600,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
 
         <div class="absolute bottom-0 left-0 right-0 pt-10 pb-4 pointer-events-none z-10">
           <div
-            class="pointer-events-none absolute inset-x-0 top-0 bottom-0 -z-10 backdrop-blur-sm [mask-image:linear-gradient(to_bottom,transparent,black_70%)] bg-linear-to-b from-background/0 to-background/80" />
+            class="pointer-events-none absolute inset-x-0 top-0 bottom-0 -z-10 backdrop-blur-sm mask-[linear-gradient(to_bottom,transparent,black_70%)] bg-linear-to-b from-background/0 to-background/80" />
           <ChatInput ref="chatInputRef" v-model="draftInput" :is-loading="isLoading"
             :give-direct-answer="giveDirectAnswer" :selected-model-id="selectedModelId"
             :show-scroll-button="showScrollButton" :course-code="courseCode" :has-solution="hasSolution"
@@ -635,12 +635,13 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
   margin: 0.75rem 0;
 }
 
-.prose :deep(.katex-display) > .katex {
+.prose :deep(.katex-display)>.katex {
   max-width: 100%;
 }
 
 .prose :deep(.katex) {
   max-width: 100%;
+  white-space: nowrap;
 }
 
 .prose :deep(p),
