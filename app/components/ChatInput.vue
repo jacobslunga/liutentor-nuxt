@@ -84,6 +84,15 @@ const handleKeyDown = (e: KeyboardEvent) => {
   }
 };
 
+watch(
+  () => props.modelValue,
+  () => {
+    nextTick(() => {
+      updateHeight();
+    });
+  }
+);
+
 onMounted(() => {
   updateHeight();
   textareaRef.value?.focus();
