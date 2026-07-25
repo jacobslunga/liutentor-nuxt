@@ -25,9 +25,12 @@ const props = defineProps<{
 }>();
 
 const sorted = computed(() =>
-  [...props.exams].sort(
-    (a, b) => new Date(a.exam_date).getTime() - new Date(b.exam_date).getTime(),
-  ),
+  [...props.exams].sort((a, b) => {
+    const diff =
+      new Date(a.exam_date).getTime() - new Date(b.exam_date).getTime();
+    if (diff !== 0) return diff;
+    return a.exam_name.localeCompare(b.exam_name);
+  }),
 );
 
 const colorMode = useColorMode();

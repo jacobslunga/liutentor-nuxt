@@ -51,9 +51,12 @@ const TIME_OPTIONS = [
 ];
 
 const sortedExams = computed(() =>
-  [...props.exams].sort(
-    (a, b) => new Date(b.exam_date).getTime() - new Date(a.exam_date).getTime(),
-  ),
+  [...props.exams].sort((a, b) => {
+    const diff =
+      new Date(b.exam_date).getTime() - new Date(a.exam_date).getTime();
+    if (diff !== 0) return diff;
+    return a.exam_name.localeCompare(b.exam_name);
+  }),
 );
 
 const selectedExam = computed(
@@ -172,12 +175,18 @@ function confirmLockIn() {
                 "
               @click="changeExam(e)"
             >
-              <div class="flex items-center gap-2.5 min-w-0">
+              <div class="flex items-center gap-2 min-w-0">
                 <LucideCheck
                   class="size-4 text-primary shrink-0 transition-opacity"
                   :class="e.id.toString() === examId ? 'opacity-100' : 'opacity-0'"
                 />
-                <span class="text-sm tracking-tight" :class="e.id.toString() === examId ? 'font-semibold' : 'font-medium'">
+                <span
+                  v-if="e.exam_name"
+                  class="text-[10px] px-1.5 py-0.5 rounded border border-border/50 bg-muted/50 font-mono text-muted-foreground shrink-0"
+                >
+                  {{ e.exam_name.split(' ')[0] }}
+                </span>
+                <span class="text-sm tracking-tight truncate" :class="e.id.toString() === examId ? 'font-semibold' : 'font-medium'">
                   {{ e.exam_date }}
                 </span>
               </div>
