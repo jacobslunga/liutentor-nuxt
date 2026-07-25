@@ -58,4 +58,9 @@ const html = computed(() =>
 
 <style>
 @import "katex/dist/katex.min.css";
+
+.prose .katex {
+  max-width: 100%;
+  white-space: nowrap;
+}
 </style>
