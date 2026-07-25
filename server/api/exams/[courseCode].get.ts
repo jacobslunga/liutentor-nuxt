@@ -1,4 +1,5 @@
 export default defineEventHandler(async (e) => {
+  setHeader(e, "Cache-Control", "no-cache, no-store, must-revalidate");
   const courseCode = getRouterParam(e, "courseCode");
 
   try {

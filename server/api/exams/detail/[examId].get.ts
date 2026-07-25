@@ -1,4 +1,5 @@
 export default defineEventHandler(async (event) => {
+  setHeader(event, "Cache-Control", "no-cache, no-store, must-revalidate");
   const examId = getRouterParam(event, "examId");
 
   const data = await $fetch(
