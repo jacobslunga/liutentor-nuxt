@@ -74,7 +74,6 @@ export default defineNuxtConfig({
     "/ai-policy": { prerender: true },
     "/copyright-policy": { prerender: true },
     "/privacy-policy": { prerender: true },
-    "/api/exams/**": { swr: 3600 },
   },
 
   // ─── Runtime Config ───────────────────────────────────────────

@@ -19,7 +19,10 @@ const sortedExams = computed<Exam[]>(() => {
   return [...props.exams].sort((a, b) => {
     const diff =
       new Date(b.exam_date).getTime() - new Date(a.exam_date).getTime();
-    return sortOrder.value === "desc" ? diff : -diff;
+    if (diff !== 0) {
+      return sortOrder.value === "desc" ? diff : -diff;
+    }
+    return a.exam_name.localeCompare(b.exam_name);
   });
 });
 
