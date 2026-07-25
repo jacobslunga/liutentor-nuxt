@@ -639,22 +639,8 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
   max-width: 100%;
 }
 
-.prose :deep(p .katex),
-.prose :deep(li .katex) {
-  display: inline-block;
-  max-width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
-  vertical-align: middle;
-}
-
-.prose :deep(.katex-html) {
-  max-width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
-}
-
-.prose :deep(p) {
+.prose :deep(p),
+.prose :deep(li) {
   overflow-wrap: break-word;
   word-wrap: break-word;
 }
