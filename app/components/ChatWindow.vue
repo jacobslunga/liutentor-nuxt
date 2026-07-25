@@ -588,7 +588,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
                   <span class="shimmer-text text-sm">{{ loadingPhrase }}</span>
                 </div>
                 <div
-                  class="prose max-w-full min-w-0 prose-headings:font-medium prose-h1:text-xl prose-h2:text-lg prose-h3:text-md prose-h4:text-base prose-strong:font-medium dark:prose-invert prose-p:font-normal prose-hr:border-secondary prose-th:border-secondary prose-td:border-secondary prose-blockquote:border-secondary marker:text-foreground marker:font-medium"
+                  class="prose font-serif max-w-full min-w-0 prose-headings:font-medium prose-h1:text-xl prose-h2:text-lg prose-h3:text-md prose-h4:text-base prose-strong:font-medium dark:prose-invert prose-p:font-normal prose-hr:border-secondary prose-th:border-secondary prose-td:border-secondary prose-blockquote:border-secondary marker:text-foreground marker:font-medium"
                   v-html="renderedAssistantHtml[i]" />
               </div>
             </div>
@@ -623,6 +623,10 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
 </style>
 
 <style scoped>
+[data-role="assistant"] :deep(.prose) {
+  font-family: var(--font-serif, "Lora", Georgia, serif);
+}
+
 .prose :deep(.katex-display) {
   overflow-x: auto;
   overflow-y: hidden;
