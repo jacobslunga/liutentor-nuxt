@@ -84,9 +84,9 @@ function scrollToIndex(index: number) {
 }
 
 function handleSelectCourse(course: string) {
-  const searchCode = course.toUpperCase();
+  const searchCode = course.trim().toUpperCase();
   if (!searchCode) return;
-  add(courseCode.value);
+  add(searchCode);
   courseCode.value = "";
   showSuggestions.value = false;
   router.push(`/search/${searchCode}`);
