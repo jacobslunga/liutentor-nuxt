@@ -173,7 +173,7 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
                   <DropdownMenuLabel
                     class="flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground/70 px-2 py-1">
                     <img src="/images/llm-logos/google.svg" alt="Google" class="w-3.5 h-3.5 shrink-0" />
-                    Google Gemini
+                    Gemini
                   </DropdownMenuLabel>
                   <DropdownMenuItem v-for="model in googleModels" :key="model.id"
                     class="cursor-pointer items-center justify-between gap-2"
@@ -190,7 +190,7 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
                       class="w-3.5 h-3.5 shrink-0 dark:hidden" />
                     <img src="/images/llm-logos/anthropic-white.svg" alt="Anthropic"
                       class="w-3.5 h-3.5 shrink-0 hidden dark:block" />
-                    Anthropic Claude
+                    Anthropic
                   </DropdownMenuLabel>
                   <DropdownMenuItem v-for="model in anthropicModels" :key="model.id"
                     class="cursor-pointer items-center justify-between gap-2"
