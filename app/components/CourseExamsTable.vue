@@ -10,9 +10,16 @@ const sortOrder = ref<"asc" | "desc">("desc");
 const activeFilters = ref<Set<string>>(new Set());
 const prefetchedRoutes = new Set<string>();
 
+function getExamPrefix(exam: Exam): string {
+  if (!exam?.exam_name) return "";
+  const firstWord = exam.exam_name.trim().split(" ")[0] ?? "";
+  if (/^\d{4}-\d{2}-\d{2}$/.test(firstWord)) return "";
+  return firstWord;
+}
+
 const prefixes = computed(() => {
-  const all = props.exams.map((e) => e.exam_name.split(" ")[0]);
-  return [...new Set(all)] as string[];
+  const all = props.exams.map((e) => getExamPrefix(e)).filter(Boolean);
+  return [...new Set(all)];
 });
 
 const sortedExams = computed<Exam[]>(() => {
@@ -22,16 +29,14 @@ const sortedExams = computed<Exam[]>(() => {
     if (diff !== 0) {
       return sortOrder.value === "desc" ? diff : -diff;
     }
-    return a.exam_name.localeCompare(b.exam_name);
+    return (a.exam_name ?? "").localeCompare(b.exam_name ?? "");
   });
 });
 
 const filteredExams = computed<Exam[]>(() => {
   let result = sortedExams.value;
   if (activeFilters.value.size > 0) {
-    result = result.filter((e) =>
-      activeFilters.value.has(e.exam_name.split(" ")[0] ?? ""),
-    );
+    result = result.filter((e) => activeFilters.value.has(getExamPrefix(e)));
   }
   return result;
 });
@@ -115,9 +120,10 @@ function toggleFilter(p: string) {
 
           <div>
             <span
+              v-if="getExamPrefix(exam)"
               class="text-[10px] px-2 py-0.5 rounded-md border border-border/50 bg-muted/40 text-muted-foreground font-mono"
             >
-              {{ exam.exam_name.split(" ")[0] }}
+              {{ getExamPrefix(exam) }}
             </span>
           </div>
 
