@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&display=swap');
+
 @import "tailwindcss";
 
 @plugin "tailwindcss-animate";
@@ -87,8 +90,8 @@
 
 @theme {
   --font-logo: "Logo", serif;
-  --font-mono: "SF Mono", monospace;
-  --font-serif: "Lora", Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-mono:  "Source Code Pro", monospace;
+  --font-serif: "Source Serif 4", Georgia, Cambria, "Times New Roman", Times, serif;
   --font-sans:  "LiU Tentor Sans", system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue",
     sans-serif;
@@ -109,6 +112,18 @@ body {
 ::-moz-selection {
   background: #CFEBFF;
   color: #007DCC;
+}
+
+.dark ::selection,
+.dark::selection {
+  background: #007DCC;
+  color: #CFEBFF;
+}
+
+.dark ::-moz-selection,
+.dark::-moz-selection {
+  background: #007DCC;
+  color: #CFEBFF;
 }
 
 @custom-variant dark (&:is(.dark *));
