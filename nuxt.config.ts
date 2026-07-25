@@ -69,13 +69,11 @@ export default defineNuxtConfig({
 
   // ─── Route Rules & Caching ─────────────────────────────────────
   routeRules: {
-    "/": { swr: 3600 },
     "/om-oss": { prerender: true },
     "/faq": { prerender: true },
     "/ai-policy": { prerender: true },
     "/copyright-policy": { prerender: true },
     "/privacy-policy": { prerender: true },
-    "/search/**": { swr: 3600 },
     "/api/exams/**": { swr: 3600 },
   },
 

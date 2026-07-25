@@ -6,7 +6,14 @@ definePageMeta({ layout: "search" });
 const route = useRoute();
 const courseCode = route.params.courseCode as string;
 
-const { data, status } = useFetch(`/api/exams/${courseCode}`);
+const { add: addRecentSearch } = useRecentSearches();
+if (courseCode) {
+  addRecentSearch(courseCode);
+}
+
+const { data, status } = useFetch(`/api/exams/${courseCode}`, {
+  lazy: true,
+});
 
 const courseData = computed(() => (data.value as any)?.data);
 const exams = computed<Exam[]>(() => courseData.value?.exams ?? []);

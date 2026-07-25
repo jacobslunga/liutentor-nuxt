@@ -30,7 +30,7 @@ const { open: openUploadModal } = useUploadModal();
       </div>
     </div>
 
-    <div class="w-full max-w-150 flex flex-col items-center space-y-6 mb-20">
+    <div class="w-full max-w-150 flex flex-col items-center gap-6 mb-20">
       <div class="relative w-full">
         <div
           class="w-full border border-foreground/20 bg-background flex flex-row items-center justify-center rounded-full transition-all duration-200 text-sm text-foreground/80 outline-none"
