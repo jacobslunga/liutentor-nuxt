@@ -116,13 +116,13 @@ body {
 
 .dark ::selection,
 .dark::selection {
-  background: #007DCC;
+  background: #355872;
   color: #CFEBFF;
 }
 
 .dark ::-moz-selection,
 .dark::-moz-selection {
-  background: #007DCC;
+  background: #355872;
   color: #CFEBFF;
 }
 
