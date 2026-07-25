@@ -618,6 +618,10 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
   </div>
 </template>
 
+<style>
+@import "katex/dist/katex.min.css";
+</style>
+
 <style scoped>
 .prose :deep(.katex-display) {
   overflow-x: auto;

@@ -180,7 +180,7 @@ function handleKeyUp(e: KeyboardEvent) {
 
           <template v-else>
             <div class="h-full overflow-hidden" :style="{ width: `${splitPercent}%` }">
-              <PdfRenderer :pdf-url="exam.pdf_url" layout-mode="exam-with-facit" :top-inset="64" />
+              <LazyPdfRenderer :pdf-url="exam.pdf_url" layout-mode="exam-with-facit" :top-inset="64" />
             </div>
 
             <div class="relative z-60 w-0 shrink-0">
@@ -192,7 +192,7 @@ function handleKeyUp(e: KeyboardEvent) {
                 <template v-if="solution">
                   <div class="h-full relative" @mouseenter="solutionBlurred = false"
                     @mouseleave="solutionBlurred = true">
-                    <PdfRenderer :pdf-url="solution.pdf_url" layout-mode="exam-with-facit" :top-inset="64" />
+                    <LazyPdfRenderer :pdf-url="solution.pdf_url" layout-mode="exam-with-facit" :top-inset="64" />
                     <Transition name="fade">
                       <div v-if="solutionBlurred"
                         class="absolute inset-0 z-50 backdrop-blur-md bg-background/30 flex flex-col gap-2 items-center justify-center pointer-events-none">

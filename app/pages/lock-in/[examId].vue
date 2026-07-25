@@ -148,7 +148,7 @@ function formatTime(ms: number): string {
     <div class="flex-1 w-full h-full pt-14 pb-4 px-4 overflow-hidden">
       <div class="w-full h-full rounded-md overflow-hidden shadow-2xl border">
         <ClientOnly>
-          <PdfRenderer v-if="exam" :pdf-url="exam.pdf_url" />
+          <LazyPdfRenderer v-if="exam" :pdf-url="exam.pdf_url" />
         </ClientOnly>
       </div>
     </div>

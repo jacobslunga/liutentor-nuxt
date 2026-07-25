@@ -55,3 +55,7 @@ const html = computed(() =>
 <template>
   <div v-bind="$attrs" class="prose dark:prose-invert max-w-none [&>p]:mb-0 [&>p:last-child]:mb-0" v-html="html" />
 </template>
+
+<style>
+@import "katex/dist/katex.min.css";
+</style>
