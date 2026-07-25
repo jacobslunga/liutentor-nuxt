@@ -680,7 +680,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
 }
 
 .prose :deep(.code-lang) {
-  font-family: "SF Mono", monospace;
+  font-family: "Source Code Pro", monospace;
   font-size: 0.7rem;
   letter-spacing: 0.04em;
   color: var(--muted-foreground);
@@ -795,7 +795,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
   overflow-x: auto;
   font-size: 0.8rem;
   line-height: 1.6;
-  font-family: "SF Mono", monospace;
+  font-family: "Source Code Pro", monospace;
   color: var(--muted-foreground);
   background-color: color-mix(in oklch, var(--secondary) 60%, transparent);
 }
@@ -857,13 +857,13 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
   overflow-x: auto;
   font-size: 0.8rem;
   line-height: 1.6;
-  font-family: "SF Mono", monospace;
+  font-family: "Source Code Pro", monospace;
   color: var(--muted-foreground);
   background-color: color-mix(in oklch, var(--secondary) 60%, transparent);
 }
 
 .prose :deep(.plot-title) {
-  font-family: "SF Mono", monospace;
+  font-family: "Source Code Pro", monospace;
   font-size: 0.7rem;
   letter-spacing: 0.04em;
   color: var(--muted-foreground);
