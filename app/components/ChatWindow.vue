@@ -548,6 +548,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
           @scroll="handleScroll" @mouseup="handleMessageMouseUp" @click="handleCodeCopy">
           <div v-if="messages.length === 0"
             class="h-full flex flex-col items-center justify-center px-4 text-center pb-24">
+            <ChatMascot class="w-16 h-16 mb-5" />
             <h2 class="text-2xl font-semibold mb-3 text-foreground">
               Vad kan jag hjälpa till med?
             </h2>
