@@ -28,7 +28,16 @@ export default defineNuxtConfig({
         },
         { name: "robots", content: "index, follow" },
         { name: "format-detection", content: "telephone=no" },
-        { name: "theme-color", content: "#ffffff" },
+        {
+          name: "theme-color",
+          content: "#ffffff",
+          media: "(prefers-color-scheme: light)",
+        },
+        {
+          name: "theme-color",
+          content: "#181818",
+          media: "(prefers-color-scheme: dark)",
+        },
         { property: "og:site_name", content: "LiU Tentor" },
         { property: "og:type", content: "website" },
         {
@@ -53,19 +62,10 @@ export default defineNuxtConfig({
         },
       ],
       link: [
-        { rel: "icon", type: "image/svg+xml", href: "/logo.svg" },
-        { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
+        // The tab icon is registered in app.vue so it can follow the active
+        // colour mode. Declaring it here as well would leave two competing
+        // <link rel="icon"> tags in the document.
         { rel: "manifest", href: "/site.webmanifest" },
-        { rel: "preconnect", href: "https://fonts.googleapis.com" },
-        {
-          rel: "preconnect",
-          href: "https://fonts.gstatic.com",
-          crossorigin: "",
-        },
-        {
-          rel: "stylesheet",
-          href: "https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap",
-        },
         {
           rel: "preload",
           as: "font",
@@ -88,6 +88,9 @@ export default defineNuxtConfig({
 
   // ─── Runtime Config ───────────────────────────────────────────
   runtimeConfig: {
+    // Set via NUXT_REVALIDATE_SECRET. Shared with the Supabase webhook that
+    // purges course caches when exams are published.
+    revalidateSecret: "",
     public: {
       supabaseUrl: "",
       supabaseKey: "",
@@ -143,23 +146,6 @@ export default defineNuxtConfig({
 
   vite: {
     plugins: [tailwindcss()],
-    build: {
-      rollupOptions: {
-        output: {
-          manualChunks(id) {
-            if (id.includes("node_modules/shiki")) return "vendor-shiki";
-            if (id.includes("node_modules/@embedpdf")) return "vendor-embedpdf";
-            if (
-              id.includes("node_modules/chart.js") ||
-              id.includes("node_modules/vue-chartjs")
-            )
-              return "vendor-chart";
-            if (id.includes("node_modules/katex")) return "vendor-katex";
-            if (id.includes("node_modules/@supabase")) return "vendor-supabase";
-          },
-        },
-      },
-    },
   },
 
   imports: {
