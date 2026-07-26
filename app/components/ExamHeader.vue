@@ -160,7 +160,8 @@ function confirmLockIn() {
               :class="{ 'rotate-180': isDropdownOpen }" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" :side-offset="8" class="w-68 sm:w-72 p-0 overflow-hidden shadow-xl border-border/60">
+        <DropdownMenuContent align="start" :side-offset="8"
+          class="w-68 sm:w-72 p-0 overflow-hidden shadow-xl border-border/60">
           <div class="px-3.5 py-2.5 flex items-center justify-between border-b border-border/60 bg-muted/30">
             <span class="text-xs font-semibold text-foreground">Alla tentor</span>
             <span class="text-xs font-mono px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
@@ -168,39 +169,25 @@ function confirmLockIn() {
             </span>
           </div>
           <div ref="scrollRef" class="max-h-80 overflow-y-auto p-1.5 space-y-0.5 custom-scrollbar">
-            <button
-              v-for="e in sortedExams"
-              :key="e.id"
-              :data-current="e.id.toString() === examId"
+            <button v-for="e in sortedExams" :key="e.id" :data-current="e.id.toString() === examId"
               class="w-full flex items-center justify-between gap-2.5 text-left rounded-lg px-3 py-2 transition-all duration-150 cursor-pointer group"
               :class="e.id.toString() === examId
                 ? 'bg-accent font-semibold text-accent-foreground shadow-xs'
                 : 'hover:bg-muted/70 text-foreground/90 hover:text-foreground'
-                "
-              @click="changeExam(e)"
-            >
+                " @click="changeExam(e)">
               <div class="flex items-center gap-1.5 min-w-0">
-                <span
-                  v-if="getExamPrefix(e)"
-                  class="text-xs font-bold text-foreground shrink-0"
-                >
+                <span v-if="getExamPrefix(e)" class="text-xs font-bold text-foreground shrink-0">
                   {{ getExamPrefix(e) }}
                 </span>
                 <span class="text-xs text-muted-foreground tracking-tight shrink-0">
                   {{ e.exam_date }}
                 </span>
-                <Badge
-                  v-if="e.has_solution"
-                  variant="outline"
-                  class="text-[10px] px-1.5 py-0.5 rounded-md font-medium border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shrink-0 ml-0.5"
-                >
+                <Badge v-if="e.has_solution" variant="outline"
+                  class="text-[10px] px-1.5 py-0.5 rounded-md font-medium border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shrink-0 ml-0.5">
                   Facit
                 </Badge>
               </div>
-              <LucideCheck
-                v-if="e.id.toString() === examId"
-                class="size-4 text-primary shrink-0 ml-auto"
-              />
+              <LucideCheck v-if="e.id.toString() === examId" class="size-4 text-primary shrink-0 ml-auto" />
             </button>
           </div>
         </DropdownMenuContent>
@@ -208,25 +195,26 @@ function confirmLockIn() {
     </div>
 
     <div class="flex items-center gap-2">
-      <Button variant="default" size="sm" @click="chatStore.toggle()">
+      <Button variant="default" size="sm" class="h-8 px-3" @click="chatStore.toggle()">
         <LucideLoader2 v-if="chatStore.isLoading" class="size-3.5 animate-spin" />
-        <span class="text-xs">{{ chatStore.isOpen ? "Stäng" : "Chatt" }}</span>
+        <LucideMessageSquare v-else class="size-3.5" />
+        <span class="text-xs font-medium">{{ chatStore.isOpen ? "Stäng" : "Chatt" }}</span>
       </Button>
 
       <Tabs :model-value="layoutMode" @update:model-value="switchLayout">
-        <TabsList class="h-7 p-0.5 rounded-lg bg-muted/60 backdrop-blur-sm">
-          <TabsTrigger value="exam-with-facit" class="text-xs h-[calc(100%-1px)] px-2 rounded-md">
-            <LucideColumns2 class="size-3.5" />
+        <TabsList class="h-8 p-1 rounded-lg bg-muted/60 backdrop-blur-sm">
+          <TabsTrigger value="exam-with-facit" class="px-2.5 h-full rounded-md">
+            <LucideColumns2 class="size-4" />
           </TabsTrigger>
-          <TabsTrigger value="exam-only" class="text-xs h-[calc(100%-1px)] px-2 rounded-md">
-            <LucidePanelRight class="size-3.5" />
+          <TabsTrigger value="exam-only" class="px-2.5 h-full rounded-md">
+            <LucidePanelRight class="size-4" />
           </TabsTrigger>
         </TabsList>
       </Tabs>
 
       <DropdownMenu v-model:open="isActionsOpen">
         <DropdownMenuTrigger as-child>
-          <Button variant="ghost" size="icon-xs" class="text-muted-foreground hover:text-foreground"
+          <Button variant="ghost" size="sm" class="h-8 w-8 p-0 text-muted-foreground hover:text-foreground shrink-0"
             aria-label="Fler åtgärder">
             <LucideEllipsis class="size-4" />
           </Button>

@@ -135,12 +135,12 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
             <TooltipProvider>
               <Tabs :model-value="giveDirectAnswer ? 'direct' : 'hint'"
                 @update:model-value="(v) => emit('update:giveDirectAnswer', v === 'direct')">
-                <TabsList class="h-7 p-0.5 rounded-lg bg-muted/60">
+                <TabsList class="h-8 p-1 rounded-lg bg-muted/60">
                   <Tooltip v-for="mode in ANSWER_MODES" :key="String(mode.value)">
                     <TooltipTrigger as-child>
-                      <TabsTrigger :value="mode.value ? 'direct' : 'hint'" class="h-[calc(100%-1px)] px-2 rounded-md">
-                        <LucideBrain v-if="mode.value" class="w-3.5 h-3.5" />
-                        <LucideLightbulb v-else class="w-3.5 h-3.5" />
+                      <TabsTrigger :value="mode.value ? 'direct' : 'hint'" class="h-full px-2.5 rounded-md">
+                        <LucideBrain v-if="mode.value" class="w-4 h-4" />
+                        <LucideLightbulb v-else class="w-4 h-4" />
                       </TabsTrigger>
                     </TooltipTrigger>
                     <TooltipContent side="top">

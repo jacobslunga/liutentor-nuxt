@@ -1,0 +1,29 @@
+<script setup lang="ts">
+import type { TabsIndicatorProps } from "reka-ui";
+import type { HTMLAttributes } from "vue";
+import { reactiveOmit } from "@vueuse/core";
+import { TabsIndicator, useForwardProps } from "reka-ui";
+import { cn } from "@/lib/utils";
+
+const props = defineProps<
+  TabsIndicatorProps & { class?: HTMLAttributes["class"] }
+>();
+
+const delegatedProps = reactiveOmit(props, "class");
+const forwardedProps = useForwardProps(delegatedProps);
+</script>
+
+<template>
+  <TabsIndicator
+    data-slot="tabs-indicator"
+    v-bind="forwardedProps"
+    :class="
+      cn(
+        'absolute left-0 top-1/2 -translate-y-1/2 rounded-md bg-background border border-border/80 shadow-sm transition-all duration-250 ease-[cubic-bezier(0.2,0,0,1)] dark:bg-card dark:border-border/80 h-[var(--reka-tabs-indicator-thickness)] w-[var(--reka-tabs-indicator-size)] translate-x-[var(--reka-tabs-indicator-position)] pointer-events-none z-0',
+        props.class,
+      )
+    "
+  >
+    <slot />
+  </TabsIndicator>
+</template>

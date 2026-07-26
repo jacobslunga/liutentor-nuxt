@@ -31,12 +31,12 @@ function switchLayout(val: string | number) {
       :model-value="layoutMode"
       @update:model-value="switchLayout"
     >
-      <TabsList class="backdrop-blur-sm bg-muted/80">
-        <TabsTrigger value="exam-with-facit" class="text-xs">
-          <LucideColumns2 class="size-3.5" />
+      <TabsList class="h-9 p-1 backdrop-blur-sm bg-muted/80">
+        <TabsTrigger value="exam-with-facit" class="px-2.5 h-full">
+          <LucideColumns2 class="size-4" />
         </TabsTrigger>
-        <TabsTrigger value="exam-only" class="text-xs">
-          <LucidePanelRight class="size-3.5" />
+        <TabsTrigger value="exam-only" class="px-2.5 h-full">
+          <LucidePanelRight class="size-4" />
         </TabsTrigger>
       </TabsList>
     </Tabs>
