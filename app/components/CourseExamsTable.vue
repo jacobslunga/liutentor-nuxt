@@ -6,7 +6,6 @@ const props = defineProps<{
   exams: Exam[];
 }>();
 
-const sortOrder = ref<"asc" | "desc">("desc");
 const activeFilters = ref<Set<string>>(new Set());
 const prefetchedRoutes = new Set<string>();
 
@@ -27,7 +26,7 @@ const sortedExams = computed<Exam[]>(() => {
     const diff =
       new Date(b.exam_date).getTime() - new Date(a.exam_date).getTime();
     if (diff !== 0) {
-      return sortOrder.value === "desc" ? diff : -diff;
+      return diff;
     }
     return (a.exam_name ?? "").localeCompare(b.exam_name ?? "");
   });
@@ -83,17 +82,9 @@ function toggleFilter(p: string) {
     <div class="w-full overflow-x-auto rounded-2xl border border-border/60">
       <div class="min-w-fit w-full rounded-2xl overflow-hidden">
         <div
-          class="grid grid-cols-[1fr_80px_64px_80px] gap-x-4 px-6 py-3.5 border-b border-border/50 bg-muted/30"
+          class="grid grid-cols-[1fr_80px_64px_80px] gap-x-4 px-6 py-3.5 border-b border-border/50 bg-muted/30 items-center"
         >
-          <Button
-            variant="ghost"
-            size="sm"
-            class="text-xs text-muted-foreground hover:text-foreground"
-            @click="sortOrder = sortOrder === 'desc' ? 'asc' : 'desc'"
-          >
-            Tentamen
-            <LucideArrowDownWideNarrow class="w-3.5 h-3.5" />
-          </Button>
+          <div class="text-xs text-muted-foreground">Tentamen</div>
           <div class="text-xs text-muted-foreground">Typ</div>
           <div class="text-xs text-muted-foreground text-center">Facit</div>
           <div class="text-xs text-muted-foreground text-right">Godkänd</div>

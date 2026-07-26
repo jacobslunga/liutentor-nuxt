@@ -214,35 +214,27 @@ function passColor(rate: number) {
 
             <Tabs v-model="activeTab" class="w-full -mt-4">
               <div
-                class="sticky top-12 z-40 flex flex-col gap-3 border-b border-border/70 bg-background pt-2 sm:flex-row sm:items-end sm:justify-between md:top-0 dark:border-border/60"
+                class="sticky top-12 z-40 flex flex-col gap-3 border-b border-border/70 bg-background pt-2 pb-2.5 sm:flex-row sm:items-center sm:justify-between md:top-0 dark:border-border/60"
               >
-                <TabsList
-                  class="h-auto justify-start rounded-none border-0 bg-transparent p-0"
-                >
-                  <TabsTrigger
-                    value="exams"
-                    class="relative h-10 cursor-pointer flex-none rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 py-2 text-sm text-muted-foreground shadow-none hover:text-foreground data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none dark:data-[state=active]:border-primary dark:data-[state=active]:bg-transparent"
-                  >
+                <TabsList class="h-9 p-1 bg-muted/80 dark:bg-muted/50 rounded-xl">
+                  <TabsTrigger value="exams" class="px-3.5 h-full font-medium text-xs gap-2">
                     <LucideScrollText class="w-4 h-4" />
                     Tentor
                   </TabsTrigger>
-                  <TabsTrigger
-                    value="stats"
-                    class="relative h-10 cursor-pointer flex-none rounded-none border-0 border-b-2 border-transparent bg-transparent px-3 py-2 text-sm text-muted-foreground shadow-none hover:text-foreground data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none dark:data-[state=active]:border-primary dark:data-[state=active]:bg-transparent"
-                  >
+                  <TabsTrigger value="stats" class="px-3.5 h-full font-medium text-xs gap-2">
                     <LucideChartSpline class="w-4 h-4" />
                     Statistik
                   </TabsTrigger>
                 </TabsList>
 
-                <div class="flex items-center gap-2 pb-2">
+                <div class="flex items-center gap-2">
                   <Button variant="default" size="sm" @click="openUploadModal(courseCode)">
-                    <LucideUpload class="w-4.5 h-4.5" />
+                    <LucideUpload class="w-4 h-4" />
                     Ladda upp
                   </Button>
                   <Button variant="outline" size="sm" as-child>
                     <NuxtLink :to="`/quiz/${courseCode}`">
-                      <LucideLayers class="w-4.5 h-4.5" />
+                      <LucideLayers class="w-4 h-4" />
                       Quiz
                     </NuxtLink>
                   </Button>
