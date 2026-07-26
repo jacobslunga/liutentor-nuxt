@@ -78,12 +78,33 @@ export default defineNuxtConfig({
   },
 
   // ─── Route Rules & Caching ─────────────────────────────────────
+  //
+  // Prerendered routes are emitted as static HTML at build time, so they are
+  // served straight from the CDN and never invoke the server function. That
+  // matters more than the per-request render cost: the function bundle is
+  // ~22 MB, and a cold start costs ~4.5 s of TTFB.
+  //
+  // A route only belongs here if its rendered HTML is identical for every
+  // visitor. Anything that reads the auth cookie during SSR must not be
+  // prerendered *or* edge-cached — `layouts/auth.vue` and `layouts/profile.vue`
+  // call `navigateTo()` from an immediate watcher, so their responses can be a
+  // 302 whose target depends on who is asking. Caching one of those would pin
+  // one visitor's redirect onto everyone else.
   routeRules: {
+    // Landing page. Renders no server data: `AuthActions` and `RecentSearches`
+    // are both behind `isMounted`, so the recent-searches cookie is read on the
+    // client after hydration and never reaches the server-rendered markup.
+    "/": { prerender: true },
+
     "/om-oss": { prerender: true },
     "/faq": { prerender: true },
     "/ai-policy": { prerender: true },
     "/copyright-policy": { prerender: true },
     "/privacy-policy": { prerender: true },
+
+    // Static content under the `info` layout, same as the policy pages above.
+    "/upload-exams": { prerender: true },
+    "/feedback": { prerender: true },
   },
 
   // ─── Runtime Config ───────────────────────────────────────────
@@ -140,6 +161,14 @@ export default defineNuxtConfig({
   nitro: {
     preset: "netlify",
     compressPublicAssets: true,
+
+    prerender: {
+      // Emit `om-oss.html` rather than `om-oss/index.html`. With the subfolder
+      // form, `/om-oss` 301s to `/om-oss/` before serving — an extra round trip
+      // on every internal link, and on the sitemap entries, which list the
+      // unslashed form. Netlify resolves the flat file for `/om-oss` directly.
+      autoSubfolderIndex: false,
+    },
   },
 
   css: ["~/assets/css/tailwind.css"],
