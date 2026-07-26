@@ -15,102 +15,16 @@ watch(
   { immediate: true },
 );
 
+// Resolved during SSR so the course content and its metadata end up in the
+// server-rendered HTML rather than only after client-side hydration.
 const { data, status } = useFetch(() => `/api/exams/${courseCode.value}`, {
-  lazy: true,
-  getCachedData: () => undefined,
+  key: () => `course-exams-${courseCode.value}`,
 });
 
 const courseData = computed(() => (data.value as any)?.data);
 const exams = computed<Exam[]>(() => courseData.value?.exams ?? []);
 const activeTab = ref("exams");
 const { open: openUploadModal } = useUploadModal();
-
-watchEffect(() => {
-  const code = courseCode.value;
-  if (!code) return;
-
-  const canonicalUrl = `https://liutentor.se/search/${code}`;
-
-  if (courseData.value) {
-    const title = `${code} - Gamla tentor & facit | ${courseData.value.courseName}`;
-    const description = `Plugga på ${exams.value.length} gamla tentor och facit för ${code} (${courseData.value.courseName}) från Linköpings Universitet. Se betygsstatistik och godkända i snitt.`;
-
-    useSeoMeta({
-      title,
-      description,
-      ogTitle: title,
-      ogDescription: description,
-      ogType: "website",
-      ogUrl: canonicalUrl,
-      ogSiteName: "LiU Tentor",
-      ogLocale: "sv_SE",
-      ogImage: "https://liutentor.se/logo.svg",
-      twitterCard: "summary",
-      twitterTitle: title,
-      twitterDescription: description,
-    });
-
-    useHead({
-      link: [{ rel: "canonical", href: canonicalUrl }],
-      script: [
-        {
-          type: "application/ld+json",
-          children: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "Course",
-            name: `${code} - ${courseData.value.courseName}`,
-            courseCode: code,
-            description: description,
-            provider: {
-              "@type": "CollegeOrUniversity",
-              name: "Linköpings Universitet",
-              url: "https://liu.se",
-            },
-          }),
-        },
-        {
-          type: "application/ld+json",
-          children: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "BreadcrumbList",
-            itemListElement: [
-              {
-                "@type": "ListItem",
-                position: 1,
-                name: "Hem",
-                item: "https://liutentor.se",
-              },
-              {
-                "@type": "ListItem",
-                position: 2,
-                name: code,
-                item: canonicalUrl,
-              },
-            ],
-          }),
-        },
-      ],
-    });
-    return;
-  }
-
-  if (status.value === "success") {
-    const title = `${code} - Inga tentor hittades | LiU Tentor`;
-    const description = `Inga tentor hittades för ${code}. Var den första att ladda upp tentor för ${code} på LiU Tentor.`;
-
-    useSeoMeta({
-      title,
-      description,
-      ogTitle: title,
-      ogDescription: description,
-      ogUrl: canonicalUrl,
-    });
-
-    useHead({
-      link: [{ rel: "canonical", href: canonicalUrl }],
-    });
-  }
-});
 
 const avgPassRate = computed(() => {
   const valid = exams.value.filter((e) => e.pass_rate != null);
@@ -123,6 +37,155 @@ const avgPassRate = computed(() => {
 const examsWithSolutions = computed(
   () => exams.value.filter((e) => e.has_solution).length,
 );
+
+// ─── SEO ──────────────────────────────────────────────────────
+// Called unconditionally at setup (never inside a watcher) so unhead resolves
+// them during SSR. Reactive getters keep them correct across client-side
+// navigation between course codes.
+
+const courseName = computed<string>(() => courseData.value?.courseName ?? "");
+const canonicalUrl = computed(
+  () => `https://liutentor.se/search/${courseCode.value}`,
+);
+const hasExams = computed(() => exams.value.length > 0);
+
+/** Range of years the archive covers, e.g. "2013–2026". */
+const examYears = computed(() => {
+  const years = exams.value
+    .map((e) => Number(e.exam_date?.slice(0, 4)))
+    .filter((y) => Number.isFinite(y) && y > 1990);
+  if (!years.length) return null;
+  const min = Math.min(...years);
+  const max = Math.max(...years);
+  return min === max ? `${min}` : `${min}–${max}`;
+});
+
+/** Newest exam date — used as the page's freshness signal for crawlers. */
+const lastExamDate = computed(() => {
+  const dates = exams.value.map((e) => e.exam_date).filter(Boolean).sort();
+  return dates.length ? dates[dates.length - 1] : null;
+});
+
+// Course code first: that is the query users actually type.
+const seoTitle = computed(() => {
+  const code = courseCode.value;
+  if (!hasExams.value) return `${code} – gamla tentor`;
+  return `${code} tentor & facit – ${courseName.value}`;
+});
+
+const seoDescription = computed(() => {
+  const code = courseCode.value;
+  if (!hasExams.value) {
+    return `Vi saknar gamla tentor för ${code} vid Linköpings universitet. Ladda upp en tenta eller ett facit och hjälp nästa student som söker på ${code}.`;
+  }
+  const lead =
+    examsWithSolutions.value > 0
+      ? `${exams.value.length} gamla tentor varav ${examsWithSolutions.value} med facit`
+      : `${exams.value.length} gamla tentor`;
+  const facts: string[] = [];
+  if (examYears.value) facts.push(`Tentor från ${examYears.value}`);
+  if (avgPassRate.value !== null) {
+    facts.push(`${avgPassRate.value} % godkända i snitt`);
+  }
+  const tail = facts.length ? ` ${facts.join(", ")}.` : "";
+  return `${lead} för ${code} – ${courseName.value} vid Linköpings universitet.${tail}`;
+});
+
+const jsonLd = computed(() => {
+  const code = courseCode.value;
+  const url = canonicalUrl.value;
+
+  const graph: Record<string, any>[] = [
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Hem",
+          item: "https://liutentor.se",
+        },
+        { "@type": "ListItem", position: 2, name: code, item: url },
+      ],
+    },
+    {
+      "@type": "CollectionPage",
+      "@id": url,
+      url,
+      name: seoTitle.value,
+      description: seoDescription.value,
+      inLanguage: "sv",
+      ...(lastExamDate.value ? { dateModified: lastExamDate.value } : {}),
+      isPartOf: {
+        "@type": "WebSite",
+        name: "LiU Tentor",
+        url: "https://liutentor.se",
+      },
+    },
+  ];
+
+  if (hasExams.value) {
+    graph.push({
+      "@type": "Course",
+      "@id": `${url}#course`,
+      name: `${code} – ${courseName.value}`,
+      courseCode: code,
+      description: seoDescription.value,
+      url,
+      inLanguage: "sv",
+      provider: {
+        "@type": "CollegeOrUniversity",
+        name: "Linköpings universitet",
+        url: "https://liu.se",
+      },
+    });
+
+    // Surfaces the individual exam pages to crawlers from the course page.
+    graph.push({
+      "@type": "ItemList",
+      name: `Gamla tentor för ${code}`,
+      numberOfItems: exams.value.length,
+      itemListElement: exams.value.map((exam, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
+        name: `${code} ${exam.exam_name}`,
+        url: `${url}/${exam.id}`,
+      })),
+    });
+  }
+
+  return { "@context": "https://schema.org", "@graph": graph };
+});
+
+useSeoMeta({
+  title: () => seoTitle.value,
+  description: () => seoDescription.value,
+  ogTitle: () => seoTitle.value,
+  ogDescription: () => seoDescription.value,
+  ogType: "website",
+  ogUrl: () => canonicalUrl.value,
+  ogSiteName: "LiU Tentor",
+  ogLocale: "sv_SE",
+  ogImage: "https://liutentor.se/logo.svg",
+  twitterCard: "summary",
+  twitterTitle: () => seoTitle.value,
+  twitterDescription: () => seoDescription.value,
+  // Courses with no exams are thin content — keep them out of the index but
+  // let crawlers follow the upload links.
+  robots: () => (hasExams.value ? "index, follow" : "noindex, follow"),
+});
+
+useHead(() => ({
+  // Override the global "LiU Tentor | %s" so the course code leads the title.
+  titleTemplate: "%s | LiU Tentor",
+  link: [{ rel: "canonical", href: canonicalUrl.value }],
+  script: [
+    {
+      type: "application/ld+json",
+      innerHTML: JSON.stringify(jsonLd.value),
+    },
+  ],
+}));
 
 function passColor(rate: number) {
   if (rate >= 50) return "text-green-500";
@@ -137,16 +200,15 @@ function passColor(rate: number) {
       <CourseSearchDropdown size="md" class="mx-auto w-full max-w-xl" />
     </div>
 
-    <ClientOnly>
-      <div
-        v-if="status === 'pending'"
-        class="flex items-center justify-center min-h-[60vh]"
-      >
-        <LucideLoader2 class="w-6 h-6 animate-spin text-muted-foreground" />
-      </div>
+    <div
+      v-if="status === 'pending'"
+      class="flex items-center justify-center min-h-[60vh]"
+    >
+      <LucideLoader2 class="w-6 h-6 animate-spin text-muted-foreground" />
+    </div>
 
-      <div
-        v-else-if="status === 'success' && !courseData"
+    <div
+      v-else-if="status === 'success' && !courseData"
         class="mx-auto flex min-h-[60vh] w-full max-w-2xl flex-col items-center justify-center gap-8 py-8"
       >
         <div class="max-w-xl text-center">
@@ -177,16 +239,16 @@ function passColor(rate: number) {
               <h1
                 class="text-3xl sm:text-4xl font-semibold text-foreground leading-tight w-full wrap-break-word"
               >
+                <span
+                  class="block font-mono text-base sm:text-lg text-muted-foreground"
+                  >{{ courseCode }}</span
+                >
                 {{ courseData.courseName }}
               </h1>
 
               <p
                 class="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground"
               >
-                <span class="font-mono font-medium text-foreground">{{
-                  courseCode
-                }}</span>
-                <span aria-hidden="true">·</span>
                 <span>
                   <span class="font-medium text-foreground">{{
                     exams.length
@@ -258,8 +320,7 @@ function passColor(rate: number) {
             </Tabs>
           </div>
         </div>
-      </template>
-    </ClientOnly>
+    </template>
   </div>
 </template>
 
