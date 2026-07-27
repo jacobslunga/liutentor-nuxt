@@ -188,9 +188,9 @@ useHead(() => ({
 }));
 
 function passColor(rate: number) {
-  if (rate >= 50) return "text-green-500";
-  if (rate >= 30) return "text-amber-500";
-  return "text-red-500";
+  if (rate >= 50) return "text-success";
+  if (rate >= 30) return "text-warning";
+  return "text-destructive";
 }
 </script>
 
@@ -276,25 +276,25 @@ function passColor(rate: number) {
 
             <Tabs v-model="activeTab" class="w-full -mt-4">
               <div
-                class="sticky top-12 z-40 flex flex-col gap-3 border-b border-border/70 bg-background pt-2 pb-2.5 sm:flex-row sm:items-center sm:justify-between md:top-0 dark:border-border/60"
+                class="sticky top-12 z-40 flex flex-col gap-3 border-b border-border/60 bg-background pt-2 pb-2.5 sm:flex-row sm:items-center sm:justify-between md:top-0 dark:border-border/60"
               >
-                <TabsList class="h-9 p-1 bg-muted/80 dark:bg-muted/50 rounded-xl">
-                  <TabsTrigger value="exams" class="px-3.5 h-full font-medium text-xs gap-2">
+                <TabsList>
+                  <TabsTrigger value="exams" class="px-3 h-full font-medium text-xs gap-2">
                     <LucideScrollText class="w-4 h-4" />
                     Tentor
                   </TabsTrigger>
-                  <TabsTrigger value="stats" class="px-3.5 h-full font-medium text-xs gap-2">
+                  <TabsTrigger value="stats" class="px-3 h-full font-medium text-xs gap-2">
                     <LucideChartSpline class="w-4 h-4" />
                     Statistik
                   </TabsTrigger>
                 </TabsList>
 
                 <div class="flex items-center gap-2">
-                  <Button variant="default" size="sm" @click="openUploadModal(courseCode)">
+                  <Button variant="default" @click="openUploadModal(courseCode)">
                     <LucideUpload class="w-4 h-4" />
                     Ladda upp
                   </Button>
-                  <Button variant="outline" size="sm" as-child>
+                  <Button variant="outline" as-child>
                     <NuxtLink :to="`/quiz/${courseCode}`">
                       <LucideLayers class="w-4 h-4" />
                       Quiz
@@ -328,8 +328,8 @@ function passColor(rate: number) {
 .tab-panel-enter-active,
 .tab-panel-leave-active {
   transition:
-    opacity 0.15s ease,
-    transform 0.15s ease;
+    opacity var(--duration-fast) var(--ease-spring),
+    transform var(--duration-fast) var(--ease-spring);
 }
 
 .tab-panel-enter-from,

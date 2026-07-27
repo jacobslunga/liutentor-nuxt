@@ -36,9 +36,9 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
 <template>
   <DialogPortal>
     <DialogOverlay
-      class="fixed inset-0 z-100 grid place-items-center overflow-y-auto bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 duration-150 ease-spring">
+      class="fixed inset-0 z-100 grid place-items-center overflow-y-auto bg-black/40 backdrop-blur-[2px] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 duration-150 ease-spring">
       <DialogContent :class="cn(
-        'relative z-50 grid w-full max-w-lg my-8 gap-4 border border-border bg-background p-6 shadow-lg duration-150 sm:rounded-xl md:w-full',
+        'relative z-100 grid w-full max-w-lg my-8 gap-4 rounded-3xl border border-border bg-background p-6 duration-150 ease-spring md:w-full',
         props.class,
       )
         " v-bind="{ ...$attrs, ...forwarded }" @pointer-down-outside="
@@ -56,7 +56,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
         <slot />
 
         <DialogClose v-if="showCloseButton"
-          class="absolute top-4 right-4 p-0.5 transition-colors rounded-md hover:bg-secondary">
+          class="absolute top-4 right-4 p-0.5 transition-colors duration-150 ease-spring rounded-md hover:bg-accent">
           <LucideX class="w-4 h-4" />
           <span class="sr-only">Close</span>
         </DialogClose>

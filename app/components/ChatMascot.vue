@@ -101,11 +101,8 @@ onUnmounted(() => {
 
 <style scoped>
 .mascot {
-  --mascot-eye: oklch(0.28 0.05 172);
-}
-
-.dark .mascot {
-  --mascot-eye: oklch(0.26 0.04 145);
+  /* A deepened primary, so the eyes track the brand hue in both modes. */
+  --mascot-eye: color-mix(in oklch, var(--primary) 45%, #000);
 }
 
 .eye {
@@ -113,7 +110,7 @@ onUnmounted(() => {
   transform-box: fill-box;
   transform-origin: center;
   transform: scaleY(1);
-  transition: transform 130ms var(--ease-spring);
+  transition: transform var(--duration-fast) var(--ease-spring);
 }
 
 .is-blinking .eye {

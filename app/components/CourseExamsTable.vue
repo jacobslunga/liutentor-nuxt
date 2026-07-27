@@ -70,8 +70,8 @@ function toggleFilter(p: string) {
         class="font-mono text-xs"
         :class="
           activeFilters.has(p)
-            ? 'bg-foreground text-background border-foreground shadow-sm'
-            : 'border-border/50 text-muted-foreground hover:text-foreground hover:border-border'
+            ? 'bg-foreground text-background border-foreground'
+            : 'border-border text-muted-foreground hover:text-foreground hover:border-border'
         "
         @click="toggleFilter(p)"
       >
@@ -79,10 +79,10 @@ function toggleFilter(p: string) {
       </Button>
     </div>
 
-    <div class="w-full overflow-x-auto rounded-2xl border border-border/60">
-      <div class="min-w-fit w-full rounded-2xl overflow-hidden">
+    <div class="w-full overflow-x-auto rounded-3xl border border-border">
+      <div class="min-w-fit w-full rounded-3xl overflow-hidden">
         <div
-          class="grid grid-cols-[1fr_80px_64px_80px] gap-x-4 px-6 py-3.5 border-b border-border/50 bg-muted/30 items-center"
+          class="grid grid-cols-[1fr_80px_64px_80px] gap-x-4 px-6 py-3 border-b border-border/60 bg-muted/30 items-center"
         >
           <div class="text-xs text-muted-foreground">Tentamen</div>
           <div class="text-xs text-muted-foreground">Typ</div>
@@ -93,7 +93,7 @@ function toggleFilter(p: string) {
         <div
           v-for="exam in filteredExams"
           :key="exam.id"
-          class="grid grid-cols-[1fr_80px_64px_80px] gap-x-4 cursor-pointer px-3 py-2 border-b border-border/20 last:border-0 hover:bg-muted/20 transition-colors items-center group"
+          class="grid grid-cols-[1fr_80px_64px_80px] gap-x-4 cursor-pointer px-3 py-2 border-b border-border/60 last:border-0 hover:bg-muted/20 transition-colors items-center group"
           @mouseenter="prefetchExamRoute(exam.id)"
           @focusin="prefetchExamRoute(exam.id)"
           @click="navigateTo(examRoutePath(exam.id))"
@@ -112,7 +112,7 @@ function toggleFilter(p: string) {
           <div>
             <span
               v-if="getExamPrefix(exam)"
-              class="text-[10px] px-2 py-0.5 rounded-md border border-border/50 bg-muted/40 text-muted-foreground font-mono"
+              class="text-2xs px-2 py-0.5 rounded-md border border-border bg-muted/40 text-muted-foreground font-mono"
             >
               {{ getExamPrefix(exam) }}
             </span>
@@ -121,7 +121,7 @@ function toggleFilter(p: string) {
           <div class="flex justify-center">
             <LucideCheck
               v-if="exam.has_solution"
-              class="w-4 h-4 text-green-500"
+              class="w-4 h-4 text-success"
             />
             <LucideMinus v-else class="w-4 h-4 text-muted-foreground/30" />
           </div>

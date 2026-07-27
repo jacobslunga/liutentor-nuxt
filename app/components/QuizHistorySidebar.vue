@@ -38,11 +38,11 @@ const historyItems = computed(() =>
 
       <div class="max-h-[calc(100vh-7rem)] overflow-y-auto border-l border-border/60 pl-3">
         <p v-if="!historyEnabled"
-          class="rounded-md border border-dashed border-border/70 px-3 py-4 text-sm text-muted-foreground">
+          class="rounded-md border border-dashed border-border px-3 py-4 text-sm text-muted-foreground">
           Logga in för att se tidigare quiz.
         </p>
         <p v-else-if="historyItems.length === 0"
-          class="rounded-md border border-dashed border-border/70 px-3 py-4 text-sm text-muted-foreground">
+          class="rounded-md border border-dashed border-border px-3 py-4 text-sm text-muted-foreground">
           Inga sparade quiz än.
         </p>
 
@@ -52,7 +52,7 @@ const historyItems = computed(() =>
             class="group w-full rounded-md px-3 py-3 h-auto text-left justify-start"
             :class="item.id === activeQuizId
               ? 'border-primary/40 bg-primary/5 border'
-              : 'border border-border/50 hover:border-border hover:bg-muted/30'
+              : 'border border-border hover:border-border hover:bg-muted/30'
             " @click="emit('loadHistory', item.id)">
             <div class="flex items-start justify-between gap-3">
               <div class="min-w-0">

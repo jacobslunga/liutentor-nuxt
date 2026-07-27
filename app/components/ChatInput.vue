@@ -115,10 +115,10 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
 
       <div class="space-y-2">
         <div
-          class="rounded-3xl border border-border bg-background transition-colors duration-150 focus-within:border-border/80">
+          class="rounded-3xl border border-border bg-background transition-colors duration-150 focus-within:border-border">
           <!-- Selection context chip -->
           <Transition name="context-chip">
-            <div v-if="selectionContext" class="flex items-center gap-2 w-full border-b border-border/70 px-5 py-2.5">
+            <div v-if="selectionContext" class="flex items-center gap-2 w-full border-b border-border/60 px-5 py-2.5">
               <LucideCornerUpLeft class="w-3.5 h-3.5 shrink-0 text-muted-foreground" />
               <span class="flex-1 min-w-0 text-sm italic text-muted-foreground truncate">"{{ selectionContext }}"</span>
               <Button variant="ghost" size="icon-xs" class="shrink-0" @click.prevent="emit('clearSelectionContext')">
@@ -128,14 +128,14 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
           </Transition>
 
           <textarea ref="textareaRef" :value="modelValue" rows="1" placeholder="Fråga vad som helst"
-            class="chat-textarea block w-full min-h-11 resize-none border-0 bg-transparent px-5 pt-4 pb-1 text-[15px] leading-relaxed outline-none placeholder:text-muted-foreground/70 focus:ring-0 max-h-45"
+            class="chat-textarea block w-full min-h-11 resize-none border-0 bg-transparent px-5 pt-4 pb-1 text-base leading-relaxed outline-none placeholder:text-muted-foreground/70 focus:ring-0 max-h-45"
             @input="handleInput" @keydown="handleKeyDown" />
 
           <div class="flex items-center justify-between gap-2 px-3 pb-2.5 pt-1">
             <TooltipProvider>
               <Tabs :model-value="giveDirectAnswer ? 'direct' : 'hint'"
                 @update:model-value="(v) => emit('update:giveDirectAnswer', v === 'direct')">
-                <TabsList class="h-8 p-1 rounded-lg bg-muted/60">
+                <TabsList class="h-8">
                   <Tooltip v-for="mode in ANSWER_MODES" :key="String(mode.value)">
                     <TooltipTrigger as-child>
                       <TabsTrigger :value="mode.value ? 'direct' : 'hint'" class="h-full px-2.5 rounded-md">
@@ -145,7 +145,7 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
                     </TooltipTrigger>
                     <TooltipContent side="top">
                       <p class="font-medium">{{ mode.label }}</p>
-                      <p class="text-[11px] opacity-80">{{ mode.description }}</p>
+                      <p class="text-2xs opacity-80">{{ mode.description }}</p>
                     </TooltipContent>
                   </Tooltip>
                 </TabsList>
@@ -171,7 +171,7 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" class="w-56">
                   <DropdownMenuLabel
-                    class="flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground/70 px-2 py-1">
+                    class="flex items-center gap-1.5 text-2xs font-semibold text-muted-foreground/70 px-2 py-1">
                     <img src="/images/llm-logos/google.svg" alt="Google" class="w-3.5 h-3.5 shrink-0" />
                     Gemini
                   </DropdownMenuLabel>
@@ -185,7 +185,7 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
                   <DropdownMenuSeparator />
 
                   <DropdownMenuLabel
-                    class="flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground/70 px-2 py-1">
+                    class="flex items-center gap-1.5 text-2xs font-semibold text-muted-foreground/70 px-2 py-1">
                     <img src="/images/llm-logos/anthropic-black.svg" alt="Anthropic"
                       class="w-3.5 h-3.5 shrink-0 dark:hidden" />
                     <img src="/images/llm-logos/anthropic-white.svg" alt="Anthropic"
@@ -216,7 +216,7 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
         </div>
 
         <div class="flex items-center justify-center gap-2 px-4 text-center">
-          <p class="text-[10px] text-muted-foreground/60">
+          <p class="text-2xs text-muted-foreground/60">
             AI kan göra misstag. Kontrollera viktig information.
           </p>
           <p v-if="modelValue.length > MAX_LENGTH * 0.8" class="text-xs" :class="modelValue.length > MAX_LENGTH
@@ -233,7 +233,7 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
 
 <style scoped>
 textarea {
-  transition: height 0.15s var(--ease-spring);
+  transition: height var(--duration-fast) var(--ease-spring);
 }
 
 .chat-textarea {
@@ -247,7 +247,7 @@ textarea {
 
 .fade-up-enter-active,
 .fade-up-leave-active {
-  transition: all 0.2s var(--ease-spring);
+  transition: all var(--duration-base) var(--ease-spring);
 }
 
 .fade-up-enter-from,
@@ -258,7 +258,7 @@ textarea {
 
 .scale-enter-active,
 .scale-leave-active {
-  transition: all 0.15s var(--ease-spring);
+  transition: all var(--duration-fast) var(--ease-spring);
 }
 
 .scale-enter-from,
@@ -269,7 +269,7 @@ textarea {
 
 .context-chip-enter-active,
 .context-chip-leave-active {
-  transition: all 0.15s var(--ease-spring);
+  transition: all var(--duration-fast) var(--ease-spring);
   overflow: hidden;
 }
 

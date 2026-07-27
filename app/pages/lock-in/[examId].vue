@@ -115,10 +115,10 @@ function formatTime(ms: number): string {
   <div class="relative h-screen w-screen overflow-hidden bg-background flex flex-col">
     <div class="absolute top-0 left-0 right-0 z-40 px-4 py-2 flex items-center justify-center pointer-events-none">
       <div
-        class="bg-background/80 backdrop-blur-md border border-border/60 shadow-sm rounded-full px-4 py-2 flex items-center gap-6 pointer-events-auto">
+        class="bg-background/80 backdrop-blur-sm border border-border/60 rounded-full px-4 py-2 flex items-center gap-6 pointer-events-auto">
         <div class="flex items-center gap-3 min-w-30 justify-center">
           <LucideTimer class="w-5 h-5" :class="timeRemaining < 300000
-            ? 'text-red-500 animate-pulse'
+            ? 'text-destructive animate-pulse'
             : 'text-primary'
             " />
           <span class="font-mono text-xl font-medium tracking-widest tabular-nums">
@@ -132,7 +132,7 @@ function formatTime(ms: number): string {
             <LucideMaximize v-else class="w-4 h-4" />
           </Button>
 
-          <Button variant="ghost" size="icon" class="h-8 w-8" :class="paused ? 'text-yellow-500 bg-yellow-500/10' : ''"
+          <Button variant="ghost" size="icon" class="h-8 w-8" :class="paused ? 'text-warning bg-warning/10' : ''"
             @click="handlePauseResume">
             <LucidePlay v-if="paused" class="w-4 h-4 fill-current" />
             <LucidePause v-else class="w-4 h-4 fill-current" />
@@ -146,7 +146,7 @@ function formatTime(ms: number): string {
     </div>
 
     <div class="flex-1 w-full h-full pt-14 pb-4 px-4 overflow-hidden">
-      <div class="w-full h-full rounded-md overflow-hidden shadow-2xl border">
+      <div class="w-full h-full rounded-md overflow-hidden border">
         <ClientOnly>
           <LazyPdfRenderer v-if="exam" :pdf-url="exam.pdf_url" />
         </ClientOnly>
@@ -157,9 +157,9 @@ function formatTime(ms: number): string {
       enter-to-class="opacity-100" leave-active-class="transition-opacity duration-200" leave-from-class="opacity-100"
       leave-to-class="opacity-0">
       <div v-if="paused"
-        class="absolute inset-0 z-50 bg-background/60 backdrop-blur-xl flex flex-col items-center justify-center gap-6">
-        <div class="p-4 rounded-md bg-yellow-500/10 mb-2">
-          <LucidePause class="w-16 h-16 text-yellow-500 fill-current" />
+        class="absolute inset-0 z-50 bg-background/60 backdrop-blur-sm flex flex-col items-center justify-center gap-6">
+        <div class="p-4 rounded-md bg-warning/10 mb-2">
+          <LucidePause class="w-16 h-16 text-warning fill-current" />
         </div>
         <h2 class="text-4xl font-medium">PAUSAD</h2>
         <div class="flex flex-col items-center gap-2">

@@ -240,14 +240,14 @@ async function handleSignOut() {
     <div class="flex flex-col gap-8">
         <template v-if="profileLoading">
             <section
-                class="relative overflow-hidden rounded-md border border-border/70 p-8"
+                class="relative overflow-hidden rounded-3xl bg-card p-8"
             >
-                <div class="h-8 w-40 rounded bg-muted animate-pulse mx-auto" />
+                <div class="h-8 w-40 rounded-md bg-muted animate-pulse mx-auto" />
                 <div
                     class="h-28 w-28 rounded-full bg-muted animate-pulse mx-auto mt-5"
                 />
                 <div
-                    class="h-4 w-56 rounded bg-muted animate-pulse mx-auto mt-4"
+                    class="h-4 w-56 rounded-md bg-muted animate-pulse mx-auto mt-4"
                 />
                 <div class="grid grid-cols-3 gap-3 mt-6">
                     <div
@@ -272,7 +272,7 @@ async function handleSignOut() {
                         <div
                             v-if="avatarUrl"
                             :class="[
-                                'relative h-30 w-30 sm:h-36 sm:w-36 rounded-full overflow-hidden border-4 shadow-lg',
+                                'relative h-30 w-30 sm:h-36 sm:w-36 rounded-full overflow-hidden border-4',
                                 COLOR_BORDER_MAP[avatarColor],
                             ]"
                         >
@@ -291,7 +291,7 @@ async function handleSignOut() {
                         <div
                             v-else
                             :class="[
-                                'relative h-30 w-30 sm:h-36 sm:w-36 rounded-full flex items-center justify-center text-white text-5xl font-medium border-4 shadow-lg',
+                                'relative h-30 w-30 sm:h-36 sm:w-36 rounded-full flex items-center justify-center text-white text-5xl font-medium border-4',
                                 avatarUploading
                                     ? 'opacity-40'
                                     : 'group-hover:opacity-85 transition-opacity',
@@ -307,11 +307,11 @@ async function handleSignOut() {
                             class="absolute inset-0 flex items-center justify-center z-10"
                         >
                             <LucideLoader2
-                                class="h-7 w-7 text-white animate-spin drop-shadow" />
+                                class="h-7 w-7 text-white animate-spin" />
                         </div>
 
                         <div
-                            class="absolute bottom-1 right-1 h-8 w-8 rounded-full bg-background border border-border flex items-center justify-center shadow-sm z-10"
+                            class="absolute bottom-1 right-1 h-8 w-8 rounded-full bg-background border border-border flex items-center justify-center z-10"
                         >
                             <LucideLoader2
                                 v-if="avatarUploading"
@@ -346,14 +346,14 @@ async function handleSignOut() {
 
                     <div class="mt-6 w-full max-w-2xl">
                         <div
-                            class="rounded-md border border-border/70 bg-card p-5 sm:p-6"
+                            class="rounded-md border border-border bg-card p-5 sm:p-6"
                         >
                             <div class="grid grid-cols-3 gap-2 sm:gap-3">
                                 <div
-                                    class="rounded-md border border-border/70 bg-background/70 p-3 sm:p-4"
+                                    class="rounded-md border border-border bg-background/70 p-3 sm:p-4"
                                 >
                                     <p
-                                        class="text-[11px] text-muted-foreground"
+                                        class="text-2xs text-muted-foreground"
                                     >
                                         Quiz
                                     </p>
@@ -366,10 +366,10 @@ async function handleSignOut() {
                                     </p>
                                 </div>
                                 <div
-                                    class="rounded-md border border-border/70 bg-background/70 p-3 sm:p-4"
+                                    class="rounded-md border border-border bg-background/70 p-3 sm:p-4"
                                 >
                                     <p
-                                        class="text-[11px] text-muted-foreground"
+                                        class="text-2xs text-muted-foreground"
                                     >
                                         AI Chattar
                                     </p>
@@ -384,10 +384,10 @@ async function handleSignOut() {
                                     </p>
                                 </div>
                                 <div
-                                    class="rounded-md border border-border/70 bg-background/70 p-3 sm:p-4"
+                                    class="rounded-md border border-border bg-background/70 p-3 sm:p-4"
                                 >
                                     <p
-                                        class="text-[11px] text-muted-foreground"
+                                        class="text-2xs text-muted-foreground"
                                     >
                                         Meddelanden
                                     </p>
@@ -415,7 +415,7 @@ async function handleSignOut() {
                 </h2>
 
                 <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
-                    <div class="rounded-md border border-border/70 bg-card p-5">
+                    <div class="rounded-md border border-border bg-card p-5">
                         <p class="text-sm font-medium mb-3">Namn</p>
                         <div class="space-y-3">
                             <div class="flex flex-col gap-1.5">
@@ -462,7 +462,7 @@ async function handleSignOut() {
                     </div>
 
                     <div
-                        class="rounded-md border border-border/70 bg-card divide-y divide-border/70"
+                        class="rounded-md border border-border bg-card divide-y divide-border/60"
                     >
                         <div class="p-5">
                             <p class="text-sm font-medium mb-3">
@@ -496,7 +496,7 @@ async function handleSignOut() {
                                         >Kontostatus</span
                                     >
                                     <span
-                                        class="text-xs font-medium text-emerald-600 bg-emerald-500/10 px-2 py-0.5 rounded-full"
+                                        class="text-xs font-medium text-success bg-success/10 px-2 py-0.5 rounded-full"
                                         >Aktiv</span
                                     >
                                 </p>
@@ -510,7 +510,7 @@ async function handleSignOut() {
                                     v-for="color in COLORS"
                                     :key="color"
                                     :class="[
-                                        'w-6 h-6 rounded-full cursor-pointer transition-all',
+                                        'w-6 h-6 rounded-full cursor-pointer transition-colors duration-150 ease-spring',
                                         COLOR_BG_MAP[color],
                                         colorCookie === color
                                             ? 'ring-2 ring-offset-2 ring-offset-background ring-foreground scale-110'

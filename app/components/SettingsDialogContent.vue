@@ -31,7 +31,7 @@ const categories = [{ id: "visibility", label: "Synlighet" }];
         <div
           v-for="opt in themeOptions"
           :key="opt.id"
-          class="flex-1 cursor-pointer rounded-xl border transition-all select-none flex flex-col items-center justify-center gap-2 py-4 hover:bg-primary/5 hover:border-primary"
+          class="flex-1 cursor-pointer rounded-xl border transition-colors duration-150 ease-spring select-none flex flex-col items-center justify-center gap-2 py-4 hover:bg-primary/5 hover:border-primary"
           :class="
             theme === opt.id
               ? 'bg-primary/5 border-primary'
@@ -52,7 +52,7 @@ const categories = [{ id: "visibility", label: "Synlighet" }];
       <div class="space-y-4">
         <div v-for="cat in categories" :key="cat.id" class="space-y-2">
           <h4 class="text-sm text-muted-foreground">{{ cat.label }}</h4>
-          <div class="rounded-xl border bg-card">
+          <div class="rounded-3xl border bg-card">
             <table class="w-full">
               <tbody class="divide-y divide-border">
                 <tr
@@ -63,7 +63,7 @@ const categories = [{ id: "visibility", label: "Synlighet" }];
                   <td class="px-4 py-3 text-foreground">{{ s.action }}</td>
                   <td class="px-4 py-3 text-right">
                     <kbd
-                      class="inline-flex h-7 items-center rounded border bg-muted px-2 font-mono text-sm text-muted-foreground"
+                      class="inline-flex h-7 items-center rounded-sm border bg-muted px-2 font-mono text-sm text-muted-foreground"
                     >
                       {{ s.key }}
                     </kbd>

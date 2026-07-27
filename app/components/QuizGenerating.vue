@@ -28,12 +28,12 @@ const t = {
 
 <template>
   <div class="flex min-h-[55vh] flex-col items-center justify-center py-12">
-    <div class="flex flex-col items-center gap-7">
+    <div class="flex flex-col items-center gap-6">
       <div class="flex items-center gap-2">
         <div
           v-for="(step, i) in STEP_ORDER"
           :key="step"
-          class="rounded-full transition-all duration-500"
+          class="rounded-full transition-[width] duration-200 ease-spring"
           :class="[
             i < currentStepIndex ? 'h-1.5 w-1.5 bg-foreground' : '',
             i === currentStepIndex ? 'h-2 w-2 bg-foreground animate-pulse' : '',

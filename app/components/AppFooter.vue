@@ -62,7 +62,7 @@ const groupedLinks = [
       </div>
 
       <div
-        class="mt-12 pt-8 border-t border-border/50 flex flex-col sm:flex-row items-center justify-between gap-4"
+        class="mt-12 pt-8 border-t border-border/60 flex flex-col sm:flex-row items-center justify-between gap-4"
       >
         <p class="text-xs font-medium text-muted-foreground">
           &copy; {{ year }} LiU Tentor. Alla rättigheter förbehållna.

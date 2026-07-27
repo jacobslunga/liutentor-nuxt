@@ -35,9 +35,9 @@ const maxCount = computed(() =>
 );
 
 function passColor(rate: number) {
-  if (rate >= 50) return "text-green-500";
-  if (rate >= 30) return "text-amber-500";
-  return "text-red-500";
+  if (rate >= 50) return "text-success";
+  if (rate >= 30) return "text-warning";
+  return "text-destructive";
 }
 </script>
 
@@ -72,7 +72,7 @@ function passColor(rate: number) {
               :key="grade"
               class="flex-1 flex flex-col items-center gap-1"
             >
-              <span class="text-[10px] text-muted-foreground">{{ count }}</span>
+              <span class="text-2xs text-muted-foreground">{{ count }}</span>
               <div
                 class="w-full rounded-t-sm"
                 :style="{
@@ -80,7 +80,7 @@ function passColor(rate: number) {
                   backgroundColor: color,
                 }"
               />
-              <span class="text-[11px] text-muted-foreground">{{ grade }}</span>
+              <span class="text-2xs text-muted-foreground">{{ grade }}</span>
             </div>
           </div>
         </div>
@@ -112,7 +112,7 @@ function passColor(rate: number) {
       </div>
 
       <div
-        class="flex items-center justify-between pt-2 border-t border-border/40 text-xs text-muted-foreground"
+        class="flex items-center justify-between pt-2 border-t border-border/60 text-xs text-muted-foreground"
       >
         <span>
           Data från

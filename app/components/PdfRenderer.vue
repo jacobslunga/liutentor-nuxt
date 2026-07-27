@@ -37,9 +37,18 @@ const isDark = computed(() => colorMode.value === "dark");
 
 const selectionColor = computed(() =>
   isDark.value
-    ? "oklch(0.8332 0.088 144.73 / 0.35)"
-    : "oklch(0.6193 0.1154 172.06 / 0.28)",
+    ? "color-mix(in oklch, var(--primary) 35%, transparent)"
+    : "color-mix(in oklch, var(--primary) 28%, transparent)",
 );
+
+// Dark mode: fully invert the page (hue-rotate keeps coloured content roughly
+// true), which turns the white paper black. `screen` then leaves the backdrop
+// untouched wherever the page is black, so the paper renders as exactly
+// --background — no invert percentage to keep in sync with the token.
+const darkPageStyle = {
+  filter: "invert(1) hue-rotate(180deg)",
+  mixBlendMode: "screen",
+} as const;
 
 const isMobile = ref(window.innerWidth < 1024);
 const windowWidth = ref(window.innerWidth);
@@ -136,11 +145,11 @@ const plugins = computed(() => {
                         <Rotate
                           :document-id="activeDocumentId"
                           :page-index="page.pageIndex"
-                          class="relative h-full w-full"
+                          class="relative h-full w-full dark:bg-background"
                         >
                           <div
                             class="absolute inset-0 z-0 pdf-render-surface"
-                            :style="isDark ? { filter: 'invert(90%)' } : {}"
+                            :style="isDark ? darkPageStyle : {}"
                           >
                             <RenderLayer
                               :document-id="activeDocumentId"
@@ -176,13 +185,11 @@ const plugins = computed(() => {
                               <Rotate
                                 :document-id="activeDocumentId"
                                 :page-index="page.pageIndex"
-                                class="relative h-full w-full"
+                                class="relative h-full w-full dark:bg-background"
                               >
                                 <div
                                   class="absolute inset-0 z-0 pdf-render-surface"
-                                  :style="
-                                    isDark ? { filter: 'invert(90%)' } : {}
-                                  "
+                                  :style="isDark ? darkPageStyle : {}"
                                 >
                                   <RenderLayer
                                     :document-id="activeDocumentId"

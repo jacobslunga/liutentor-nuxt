@@ -557,7 +557,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
               lösningarna.
             </p>
             <NuxtLink to="/ai-policy" target="_blank"
-              class="text-[11px] text-muted-foreground/60 hover:text-foreground transition-all duration-200 border-b border-transparent hover:border-foreground/30 pb-0.5">
+              class="text-2xs text-muted-foreground/60 hover:text-foreground transition-colors duration-200 border-b border-transparent hover:border-foreground/30 pb-0.5">
               Läs vår AI-policy
             </NuxtLink>
           </div>
@@ -575,8 +575,8 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
                   class="border-l-2 border-muted-foreground/30 pl-3 text-sm text-muted-foreground italic line-clamp-3 text-right">
                   "{{ msg.selectionContext }}"
                 </div>
-                <div class="bg-primary/10 text-foreground px-4 py-2 rounded-3xl w-fit">
-                  <p class="text-[15px] leading-relaxed whitespace-pre-wrap">
+                <div class="bg-primary/10 text-foreground px-4 py-2 rounded-2xl w-fit">
+                  <p class="text-base leading-relaxed whitespace-pre-wrap">
                     {{ msg.content }}
                   </p>
                 </div>
@@ -589,7 +589,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
                   <span class="shimmer-text text-sm">{{ loadingPhrase }}</span>
                 </div>
                 <div
-                  class="prose max-w-full min-w-0 prose-headings:font-semibold prose-h1:text-xl prose-h2:text-lg prose-h3:text-md prose-h4:text-base prose-strong:font-semibold dark:prose-invert prose-p:font-normal prose-hr:border-secondary prose-th:border-secondary prose-td:border-secondary prose-blockquote:border-secondary marker:text-foreground marker:font-semibold"
+                  class="prose max-w-full min-w-0 prose-headings:font-medium prose-h1:text-xl prose-h2:text-lg prose-h3:text-md prose-h4:text-base prose-strong:font-medium dark:prose-invert prose-p:font-normal prose-hr:border-secondary prose-th:border-secondary prose-td:border-secondary prose-blockquote:border-secondary marker:text-foreground marker:font-medium"
                   v-html="renderedAssistantHtml[i]" />
               </div>
             </div>
@@ -744,8 +744,8 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
   border: 1px solid transparent;
   cursor: pointer;
   transition:
-    background-color 0.15s var(--ease-spring),
-    color 0.15s var(--ease-spring);
+    background-color var(--duration-fast) var(--ease-spring),
+    color var(--duration-fast) var(--ease-spring);
 }
 
 .prose :deep(.code-copy-label) {

@@ -102,18 +102,18 @@ function handleGenerate() {
     <div class="flex flex-col gap-6 lg:flex-row lg:items-start">
       <div class="flex-1 min-w-0">
         <p
-          class="mb-2 text-[10px] font-medium uppercase text-muted-foreground/60"
+          class="mb-2 text-2xs font-medium uppercase text-muted-foreground/60"
         >
           Urval av tentor
         </p>
 
         <div
           v-if="examsLoading"
-          class="rounded-md border border-border/50 overflow-hidden p-4 space-y-2"
+          class="rounded-md border border-border overflow-hidden p-4 space-y-2"
         >
-          <div class="h-4 w-36 rounded bg-muted animate-pulse" />
-          <div class="h-3 w-full rounded bg-muted animate-pulse" />
-          <div class="h-3 w-4/5 rounded bg-muted animate-pulse" />
+          <div class="h-4 w-36 rounded-md bg-muted animate-pulse" />
+          <div class="h-3 w-full rounded-md bg-muted animate-pulse" />
+          <div class="h-3 w-4/5 rounded-md bg-muted animate-pulse" />
         </div>
 
         <div
@@ -125,7 +125,7 @@ function handleGenerate() {
 
         <div
           v-else
-          class="rounded-md border border-border/50 bg-background p-4"
+          class="rounded-md border border-border bg-background p-4"
         >
           <div class="flex items-start justify-between gap-3">
             <div>
@@ -155,7 +155,7 @@ function handleGenerate() {
                 :show-close-button="false"
               >
                 <div
-                  class="p-4 border-b border-border/50 flex items-center justify-between gap-2"
+                  class="p-4 border-b border-border/60 flex items-center justify-between gap-2"
                 >
                   <div>
                     <DialogTitle>Välj tentor</DialogTitle>
@@ -180,7 +180,7 @@ function handleGenerate() {
                     v-for="exam in availableExams"
                     :key="exam.id"
                     variant="ghost"
-                    class="w-full justify-start h-auto px-4 py-3 border-b border-border/40 last:border-b-0 rounded-none disabled:opacity-40"
+                    class="w-full justify-start h-auto px-4 py-3 border-b border-border/60 last:border-b-0 rounded-none disabled:opacity-40"
                     :disabled="
                       !selectedIds.has(exam.id) &&
                       selectedCount >= MAX_SELECTION
@@ -189,7 +189,7 @@ function handleGenerate() {
                     @click="toggleExam(exam.id)"
                   >
                     <span
-                      class="flex h-4 w-4 shrink-0 items-center justify-center rounded border transition-colors"
+                      class="flex h-4 w-4 shrink-0 items-center justify-center rounded-sm border transition-colors"
                       :class="
                         selectedIds.has(exam.id)
                           ? 'bg-foreground border-foreground'
@@ -217,7 +217,7 @@ function handleGenerate() {
                     </span>
                     <span
                       v-if="exam.has_solution"
-                      class="text-[9px] font-medium px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 shrink-0"
+                      class="text-2xs font-medium px-1.5 py-0.5 rounded-sm bg-success/10 text-success border border-success/30 shrink-0"
                     >
                       Facit
                     </span>
@@ -225,7 +225,7 @@ function handleGenerate() {
                 </div>
 
                 <div
-                  class="flex items-center justify-between border-t border-border/50 p-4"
+                  class="flex items-center justify-between border-t border-border/60 p-4"
                 >
                   <p class="text-xs text-muted-foreground/60">
                     {{ selectedCount }} av {{ MAX_SELECTION }} valda
@@ -249,7 +249,7 @@ function handleGenerate() {
             <span
               v-for="exam in selectedExams"
               :key="exam.id"
-              class="inline-flex items-center rounded-md border border-border/60 px-2 py-1 text-[11px] text-muted-foreground"
+              class="inline-flex items-center rounded-md border border-border/60 px-2 py-1 text-2xs text-muted-foreground"
             >
               {{ exam.exam_date ?? exam.exam_name }}
             </span>
@@ -262,11 +262,11 @@ function handleGenerate() {
       >
         <div>
           <p
-            class="mb-2 text-[10px] font-medium uppercase text-muted-foreground/60"
+            class="mb-2 text-2xs font-medium uppercase text-muted-foreground/60"
           >
             Anpassa (valfritt)
           </p>
-          <div class="rounded-md border border-border/50 bg-background p-3">
+          <div class="rounded-md border border-border bg-background p-3">
             <textarea
               v-model="customPrompt"
               :maxlength="MAX_PROMPT_LENGTH"
@@ -275,13 +275,13 @@ function handleGenerate() {
               class="w-full resize-none bg-transparent text-sm outline-none placeholder:text-muted-foreground/50 leading-relaxed"
             />
             <div
-              class="flex items-center justify-between pt-2 border-t border-border/40 mt-1"
+              class="flex items-center justify-between pt-2 border-t border-border/60 mt-1"
             >
-              <span class="text-[10px] text-muted-foreground/50"
+              <span class="text-2xs text-muted-foreground/50"
                 >Styr AI:n i en viss riktning</span
               >
               <span
-                class="text-[10px] tabular-nums"
+                class="text-2xs tabular-nums"
                 :class="
                   customPrompt.length > MAX_PROMPT_LENGTH * 0.9
                     ? 'text-destructive'
@@ -307,7 +307,7 @@ function handleGenerate() {
             type="button"
             variant="outline"
             size="sm"
-            class="w-full gap-1.5 border-border/50 shadow-none"
+            class="w-full gap-1.5 border-border"
             @click="randomize"
           >
             <LucideShuffle class="h-3.5 w-3.5" />
@@ -315,7 +315,7 @@ function handleGenerate() {
           </Button>
         </div>
 
-        <p class="text-[10px] text-muted-foreground/40 leading-relaxed">
+        <p class="text-2xs text-muted-foreground/40 leading-relaxed">
           Beta — AI-genererade frågor kan innehålla fel.
         </p>
       </div>

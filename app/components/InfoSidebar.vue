@@ -46,7 +46,7 @@ const mobileOpen = defineModel<boolean>("open", { default: false });
               :class="
                 isActive(link.to)
                   ? 'bg-primary/10 text-primary font-medium'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-secondary/60'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-accent'
               "
               @click="mobileOpen = false"
             >
@@ -78,7 +78,7 @@ const mobileOpen = defineModel<boolean>("open", { default: false });
             :class="
               isActive(link.to)
                 ? 'bg-primary/10 text-primary font-medium'
-                : 'text-muted-foreground hover:text-foreground hover:bg-secondary/60'
+                : 'text-muted-foreground hover:text-foreground hover:bg-accent'
             "
           >
             <component :is="link.icon" class="size-4 shrink-0" />
