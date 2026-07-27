@@ -66,13 +66,6 @@ export default defineNuxtConfig({
         // colour mode. Declaring it here as well would leave two competing
         // <link rel="icon"> tags in the document.
         { rel: "manifest", href: "/site.webmanifest" },
-        {
-          rel: "preload",
-          as: "font",
-          type: "font/woff2",
-          href: "/fonts/GitLabSansVF.woff2",
-          crossorigin: "anonymous",
-        },
       ],
     },
   },

@@ -34,7 +34,9 @@ const gradientOpacity = computed(() => {
 
 const backgroundImage = computed(() => {
   const o = gradientOpacity.value;
-  return `radial-gradient(ellipse 90px 42% at 100% 50%, oklch(0.6193 0.1154 172.06 / ${o}) 0%, oklch(0.6193 0.1154 172.06 / ${o * 0.7}) 22%, oklch(0.6193 0.1154 172.06 / ${o * 0.28}) 48%, transparent 72%)`;
+  const tint = (a: number) =>
+    `color-mix(in oklch, var(--primary) ${a * 100}%, transparent)`;
+  return `radial-gradient(ellipse 90px 42% at 100% 50%, ${tint(o)} 0%, ${tint(o * 0.7)} 22%, ${tint(o * 0.28)} 48%, transparent 72%)`;
 });
 
 const iconOpacity = computed(() => 0.5 + spring.value * 0.5);

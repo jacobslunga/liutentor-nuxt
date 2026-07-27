@@ -243,7 +243,7 @@ onUnmounted(() => {
       </div>
 
       <div ref="dropZoneRef"
-        class="relative border-2 border-dashed rounded-md p-8 text-center cursor-pointer transition-all" :class="isOverDropZone
+        class="relative border-2 border-dashed rounded-3xl p-8 text-center cursor-pointer transition-colors duration-150 ease-spring" :class="isOverDropZone
             ? 'border-primary bg-primary/5 scale-[1.02]'
             : 'border-muted hover:border-primary/50'
           " :style="loading ? 'opacity: 0.5; pointer-events: none' : ''" @click="fileInputRef?.click()">
@@ -260,7 +260,7 @@ onUnmounted(() => {
       <div v-if="files.length > 0" class="space-y-3">
         <div class="space-y-2 rounded-md border p-2">
           <div v-for="(file, index) in files" :key="`${file.name}-${index}`"
-            class="flex items-center justify-between text-sm p-2 bg-muted/50 rounded">
+            class="flex items-center justify-between text-sm p-2 bg-muted/50 rounded-md">
             <div class="flex items-center gap-2 overflow-hidden">
               <LucideFileText class="h-4 w-4 shrink-0 text-muted-foreground" />
               <span class="truncate">{{ file.name }}</span>
@@ -289,8 +289,8 @@ onUnmounted(() => {
       <AlertDialogContent>
         <AlertDialogHeader class="text-center">
           <div class="flex justify-center mb-2">
-            <LucideCheckCircle v-if="uploadStatus === 'success'" class="h-12 w-12 text-green-500" />
-            <LucideAlertCircle v-else class="h-12 w-12 text-red-500" />
+            <LucideCheckCircle v-if="uploadStatus === 'success'" class="h-12 w-12 text-success" />
+            <LucideAlertCircle v-else class="h-12 w-12 text-destructive" />
           </div>
           <AlertDialogTitle class="text-xl">
             {{

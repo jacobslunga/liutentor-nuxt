@@ -497,7 +497,7 @@ function focusSearch(event: Event) {
         <div v-else class="space-y-4">
           <section v-for="group in groupedConversations" :key="group.label">
             <h3
-              class="px-3 pb-1.5 text-[13px] font-normal text-muted-foreground/60"
+              class="px-3 pb-1.5 text-sm font-normal text-muted-foreground/60"
             >
               {{ group.label }}
             </h3>
@@ -506,11 +506,11 @@ function focusSearch(event: Event) {
               <div
                 v-for="item in group.items"
                 :key="item.id"
-                class="group flex items-center gap-1 rounded-lg px-1 transition-colors"
+                class="group flex items-center gap-1 rounded-md px-1 transition-colors"
                 :class="[
                   item.id === chatStore.currentConversationId
                     ? 'bg-secondary'
-                    : 'bg-transparent hover:bg-secondary/80',
+                    : 'bg-transparent hover:bg-accent',
                   animateReveal ? 'history-item-reveal' : '',
                 ]"
                 :style="itemRevealStyle(item.id)"

@@ -43,6 +43,7 @@ const resolvedColors = ref({
   chart5: "",
   destructive: "",
   mutedForeground: "",
+  border: "",
 });
 
 function resolveColors() {
@@ -55,6 +56,7 @@ function resolveColors() {
     chart5: s.getPropertyValue("--chart-5").trim(),
     destructive: s.getPropertyValue("--destructive").trim(),
     mutedForeground: s.getPropertyValue("--muted-foreground").trim(),
+    border: s.getPropertyValue("--border").trim(),
   };
 }
 
@@ -117,7 +119,7 @@ const passChartOptions = computed(() => ({
     y: {
       min: 0,
       max: 100,
-      grid: { color: "rgba(128,128,128,0.15)", lineWidth: 1 },
+      grid: { color: resolvedColors.value.border, lineWidth: 1 },
       ticks: {
         color: resolvedColors.value.mutedForeground,
         font: { size: 11 },

@@ -54,7 +54,7 @@ const faqs = [
       <div
         v-for="(faq, i) in faqs"
         :key="i"
-        class="rounded-xl border border-border/70 bg-card p-6 shadow-xs transition-colors hover:border-border"
+        class="rounded-3xl bg-card p-6 transition-colors duration-150 ease-spring hover:bg-accent"
       >
         <h3 class="text-base font-semibold text-foreground flex items-center gap-2 mb-2">
           <LucideHelpCircle class="size-4 text-primary shrink-0" />
@@ -66,7 +66,7 @@ const faqs = [
       </div>
     </div>
 
-    <div class="rounded-xl border border-primary/20 bg-primary/5 p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+    <div class="rounded-3xl bg-primary/5 p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
       <div>
         <h4 class="text-base font-semibold text-foreground">Hittade du inte svaret du sökte?</h4>
         <p class="text-sm text-muted-foreground mt-0.5">Ladda upp nya tentor eller skicka feedback till oss.</p>

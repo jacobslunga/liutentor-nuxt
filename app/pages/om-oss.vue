@@ -23,7 +23,7 @@ useSeoMeta({
     </div>
 
     <div class="grid gap-6 md:grid-cols-2">
-      <div class="rounded-xl border border-border/70 bg-card p-6 shadow-xs space-y-3">
+      <div class="rounded-3xl bg-card p-6 space-y-3">
         <div class="size-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
           <LucideSparkles class="size-5" />
         </div>
@@ -33,7 +33,7 @@ useSeoMeta({
         </p>
       </div>
 
-      <div class="rounded-xl border border-border/70 bg-card p-6 shadow-xs space-y-3">
+      <div class="rounded-3xl bg-card p-6 space-y-3">
         <div class="size-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
           <LucideTarget class="size-5" />
         </div>
@@ -44,7 +44,7 @@ useSeoMeta({
       </div>
     </div>
 
-    <div class="rounded-xl border border-border/70 bg-card p-6 sm:p-8 space-y-4">
+    <div class="rounded-3xl bg-card p-6 sm:p-8 space-y-4">
       <h2 class="text-xl font-semibold text-foreground">Byggt för studenter, av studenter</h2>
       <div class="text-sm text-muted-foreground leading-relaxed space-y-3">
         <p>

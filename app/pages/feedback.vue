@@ -73,8 +73,8 @@ async function handleSubmit() {
     </p>
 
     <div v-if="isSuccess === true" class="flex flex-col items-center gap-4 text-center py-8">
-      <div class="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-        <LucideCheck class="h-6 w-6 text-green-600 dark:text-green-400" />
+      <div class="w-12 h-12 rounded-full bg-success/10 dark:bg-success/15 flex items-center justify-center">
+        <LucideCheck class="h-6 w-6 text-success" />
       </div>
       <div>
         <h2 class="text-xl font-medium mb-1">Tack!</h2>
@@ -86,8 +86,8 @@ async function handleSubmit() {
     </div>
 
     <div v-else-if="isSuccess === false" class="flex flex-col items-center gap-4 text-center py-8">
-      <div class="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-        <LucideAlertCircle class="h-6 w-6 text-red-600 dark:text-red-400" />
+      <div class="w-12 h-12 rounded-full bg-destructive/10 dark:bg-destructive/15 flex items-center justify-center">
+        <LucideAlertCircle class="h-6 w-6 text-destructive" />
       </div>
       <div>
         <h2 class="text-xl font-medium mb-1">Något gick fel</h2>

@@ -195,7 +195,7 @@ function handleKeyUp(e: KeyboardEvent) {
                     <LazyPdfRenderer :pdf-url="solution.pdf_url" layout-mode="exam-with-facit" :top-inset="64" />
                     <Transition name="fade">
                       <div v-if="solutionBlurred"
-                        class="absolute inset-0 z-50 backdrop-blur-md bg-background/30 flex flex-col gap-2 items-center justify-center pointer-events-none">
+                        class="absolute inset-0 z-50 backdrop-blur-sm bg-background/30 flex flex-col gap-2 items-center justify-center pointer-events-none">
                         <p class="text-sm font-normal text-muted-foreground">
                           Håll muspekaren för att visa facit
                         </p>
@@ -244,7 +244,7 @@ function handleKeyUp(e: KeyboardEvent) {
                 leave-active-class="transition-all duration-200 ease-spring"
                 leave-from-class="translate-x-0 opacity-100 blur-0" leave-to-class="translate-x-full opacity-0 blur-sm">
                 <div v-if="chatHasBeenOpened" v-show="chatStore.isOpen"
-                  class="fixed right-0 bottom-0 z-80 flex h-screen bg-background shadow-2xl"
+                  class="fixed right-0 bottom-0 z-80 flex h-screen bg-background"
                   :class="{ 'select-none': isChatResizing }" :style="{ width: `${chatPanelWidth}px` }">
                   <div class="relative z-100 w-0 shrink-0">
                     <ResizeHandle :is-resizing="isChatResizing" @start-resize="startChatResize" />
@@ -267,7 +267,7 @@ function handleKeyUp(e: KeyboardEvent) {
 <style scoped>
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity 0.2s var(--ease-spring);
+  transition: opacity var(--duration-base) var(--ease-spring);
 }
 
 .fade-enter-from,

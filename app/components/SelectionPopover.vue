@@ -29,8 +29,8 @@ const emit = defineEmits<{ reply: [] }>();
 .popover-fade-enter-active,
 .popover-fade-leave-active {
   transition:
-    opacity 0.15s var(--ease-spring),
-    transform 0.15s var(--ease-spring);
+    opacity var(--duration-fast) var(--ease-spring),
+    transform var(--duration-fast) var(--ease-spring);
 }
 
 .popover-fade-enter-from,

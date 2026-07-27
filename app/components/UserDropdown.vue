@@ -95,7 +95,7 @@ const gotoProfile = () => {
           :src="avatarUrl"
           alt="Avatar"
           :class="[
-            'w-full h-full object-cover transition-opacity duration-300',
+            'w-full h-full object-cover transition-opacity duration-200',
             isImageLoading ? 'opacity-0' : 'opacity-100',
           ]"
           @load="isImageLoading = false"

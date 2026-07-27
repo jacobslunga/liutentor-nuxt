@@ -15,7 +15,7 @@ watch(
   <div class="flex flex-col min-h-screen bg-background">
     <header class="sticky top-0 z-40 w-full">
       <div
-        class="absolute inset-0 bg-background/80 backdrop-blur-xl -z-10 mask-[linear-gradient(to_bottom,black,transparent)]"
+        class="absolute inset-0 bg-background/80 backdrop-blur-sm -z-10 mask-[linear-gradient(to_bottom,black,transparent)]"
       />
       <div
         class="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between"

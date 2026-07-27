@@ -67,7 +67,7 @@ function submit() {
       </div>
       <div class="h-1 w-full overflow-hidden rounded-full bg-muted">
         <div
-          class="h-full rounded-full bg-primary transition-all duration-300 ease-out"
+          class="h-full rounded-full bg-primary transition-[width] duration-200 ease-spring"
           :style="{ width: `${progress}%` }"
         />
       </div>
@@ -82,12 +82,12 @@ function submit() {
     />
 
     <div
-      class="sticky bottom-0 mt-8 border-t border-border/40 bg-background/80 py-4 backdrop-blur-sm"
+      class="sticky bottom-0 mt-8 border-t border-border/60 bg-background/80 py-4 backdrop-blur-sm"
     >
       <div class="flex items-center justify-end gap-3">
         <span
           v-if="!hasAnsweredCurrent && !isLastQuestion"
-          class="text-[11px] text-muted-foreground/60"
+          class="text-2xs text-muted-foreground/60"
         >
           Svara för att fortsätta
         </span>
@@ -96,7 +96,7 @@ function submit() {
             variant="outline"
             size="sm"
             :disabled="currentIndex === 0"
-            class="gap-1.5 border-border/50 shadow-none"
+            class="gap-1.5 border-border"
             @click="emit('previous')"
           >
             <LucideArrowLeft class="h-3.5 w-3.5" />
@@ -107,7 +107,7 @@ function submit() {
             variant="outline"
             size="sm"
             :disabled="!hasAnsweredCurrent"
-            class="gap-1.5 border-border/50 shadow-none"
+            class="gap-1.5 border-border"
             @click="emit('next', hasAnsweredCurrent)"
           >
             Nästa
