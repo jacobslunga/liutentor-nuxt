@@ -160,7 +160,7 @@ function confirmLockIn() {
               :class="{ 'rotate-180': isDropdownOpen }" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" :side-offset="8" class="w-68 sm:w-72 p-0 overflow-hidden border-border/60">
+        <DropdownMenuContent align="start" :side-offset="8" class="p-0 overflow-hidden border-border/60">
           <div class="px-4 py-2.5 flex items-center justify-between border-b border-border/60 bg-muted/30">
             <span class="text-xs font-semibold text-foreground">Alla tentor</span>
             <span class="text-xs font-mono px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
@@ -175,10 +175,10 @@ function confirmLockIn() {
                 : 'hover:bg-muted/70 text-foreground/90 hover:text-foreground'
                 " @click="changeExam(e)">
               <div class="flex items-center gap-1.5 min-w-0">
-                <span v-if="getExamPrefix(e)" class="text-xs font-bold text-foreground shrink-0">
+                <span v-if="getExamPrefix(e)" class="text-sm font-thin text-foreground shrink-0">
                   {{ getExamPrefix(e) }}
                 </span>
-                <span class="text-xs text-muted-foreground tracking-tight shrink-0">
+                <span class="text-sm font-semibold shrink-0">
                   {{ e.exam_date }}
                 </span>
                 <Badge v-if="e.has_solution" variant="outline"
