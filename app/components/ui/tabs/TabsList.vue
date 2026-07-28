@@ -27,10 +27,10 @@ const delegatedProps = reactiveOmit(props, "class", "showIndicator");
     v-bind="delegatedProps"
     :class="
       cn(
-        // The track is recessed and the indicator raised. In dark mode --muted
-        // is *lighter* than the page, so the track has to go the other way
-        // (black/20) for the active pill to read as raised at all.
-        'relative bg-muted text-muted-foreground inline-flex h-9 w-fit items-center justify-center rounded-xl p-1 dark:bg-black/20 border border-border',
+        // A single container, not a track with a pill inside it: the outer
+        // capsule sits on the page background and the active segment fills it
+        // edge to edge, clipped to the capsule's own radius by overflow-hidden.
+        'relative isolate bg-background text-muted-foreground inline-flex h-9 w-fit items-center justify-center overflow-hidden rounded-lg border border-border p-0',
         props.class,
       )
     "

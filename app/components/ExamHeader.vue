@@ -202,10 +202,10 @@ function confirmLockIn() {
 
       <Tabs :model-value="layoutMode" @update:model-value="switchLayout">
         <TabsList class="h-8 backdrop-blur-sm">
-          <TabsTrigger value="exam-with-facit" class="px-2.5 h-full rounded-md">
+          <TabsTrigger value="exam-with-facit" class="px-2.5 h-full">
             <LucideColumns2 class="size-4" />
           </TabsTrigger>
-          <TabsTrigger value="exam-only" class="px-2.5 h-full rounded-md">
+          <TabsTrigger value="exam-only" class="px-2.5 h-full">
             <LucidePanelRight class="size-4" />
           </TabsTrigger>
         </TabsList>

@@ -103,7 +103,9 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
 
 <template>
   <div class="px-4 bg-transparent relative w-full pointer-events-auto z-10">
-    <div class="pointer-events-none absolute inset-x-0 -bottom-20 h-40 -z-10 bg-background" />
+    <!-- No backdrop of its own: the input container is already opaque, and any
+         solid block here would put a hard top edge across the scrolling text.
+         The single fade lives on the parent's backdrop layer in ChatWindow. -->
     <div class="max-w-2xl mx-auto relative">
       <Transition name="fade-up">
         <div v-if="showScrollButton" class="absolute -top-12 right-3 z-20">
@@ -138,7 +140,7 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
                 <TabsList class="h-8">
                   <Tooltip v-for="mode in ANSWER_MODES" :key="String(mode.value)">
                     <TooltipTrigger as-child>
-                      <TabsTrigger :value="mode.value ? 'direct' : 'hint'" class="h-full px-2.5 rounded-md">
+                      <TabsTrigger :value="mode.value ? 'direct' : 'hint'" class="h-full px-2.5">
                         <LucideBrain v-if="mode.value" class="w-4 h-4" />
                         <LucideLightbulb v-else class="w-4 h-4" />
                       </TabsTrigger>
