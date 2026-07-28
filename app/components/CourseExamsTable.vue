@@ -62,46 +62,30 @@ function toggleFilter(p: string) {
 <template>
   <div class="flex flex-col gap-4 w-full">
     <div v-if="prefixes.length > 1" class="flex flex-wrap gap-2 w-full">
-      <Button
-        v-for="p in prefixes"
-        :key="p"
-        variant="outline"
-        size="sm"
-        class="font-mono text-xs"
-        :class="
-          activeFilters.has(p)
-            ? 'bg-foreground text-background border-foreground'
-            : 'border-border text-muted-foreground hover:text-foreground hover:border-border'
-        "
-        @click="toggleFilter(p)"
-      >
+      <Button v-for="p in prefixes" :key="p" variant="outline" size="sm" class="font-mono text-xs" :class="activeFilters.has(p)
+        ? 'bg-foreground text-background border-foreground'
+        : 'border-border text-muted-foreground hover:text-foreground hover:border-border'
+        " @click="toggleFilter(p)">
         {{ p }}
       </Button>
     </div>
 
-    <div class="w-full overflow-x-auto rounded-3xl border border-border">
+    <div class="w-full overflow-x-auto rounded-xl border border-border">
       <div class="min-w-fit w-full rounded-3xl overflow-hidden">
         <div
-          class="grid grid-cols-[1fr_80px_64px_80px] gap-x-4 px-6 py-3 border-b border-border/60 bg-muted/30 items-center"
-        >
+          class="grid grid-cols-[1fr_80px_64px_80px] gap-x-4 px-6 py-3 border-b border-border/60 bg-muted/30 items-center">
           <div class="text-xs text-muted-foreground">Tentamen</div>
           <div class="text-xs text-muted-foreground">Typ</div>
           <div class="text-xs text-muted-foreground text-center">Facit</div>
           <div class="text-xs text-muted-foreground text-right">Godkänd</div>
         </div>
 
-        <div
-          v-for="exam in filteredExams"
-          :key="exam.id"
+        <div v-for="exam in filteredExams" :key="exam.id"
           class="grid grid-cols-[1fr_80px_64px_80px] gap-x-4 cursor-pointer px-3 py-2 border-b border-border/60 last:border-0 hover:bg-muted/20 transition-colors items-center group"
-          @mouseenter="prefetchExamRoute(exam.id)"
-          @focusin="prefetchExamRoute(exam.id)"
-          @click="navigateTo(examRoutePath(exam.id))"
-        >
+          @mouseenter="prefetchExamRoute(exam.id)" @focusin="prefetchExamRoute(exam.id)"
+          @click="navigateTo(examRoutePath(exam.id))">
           <div class="min-w-0">
-            <div
-              class="text-sm font-medium text-foreground group-hover:text-foreground/80 transition-colors truncate"
-            >
+            <div class="text-sm font-medium text-foreground group-hover:text-foreground/80 transition-colors truncate">
               {{ exam.exam_name }}
             </div>
             <div class="text-xs text-muted-foreground/70 mt-0.5">
@@ -110,28 +94,19 @@ function toggleFilter(p: string) {
           </div>
 
           <div>
-            <span
-              v-if="getExamPrefix(exam)"
-              class="text-2xs px-2 py-0.5 rounded-md border border-border bg-muted/40 text-muted-foreground font-mono"
-            >
+            <span v-if="getExamPrefix(exam)"
+              class="text-2xs px-2 py-0.5 rounded-md border border-border bg-muted/40 text-muted-foreground font-mono">
               {{ getExamPrefix(exam) }}
             </span>
           </div>
 
           <div class="flex justify-center">
-            <LucideCheck
-              v-if="exam.has_solution"
-              class="w-4 h-4 text-success"
-            />
+            <LucideCheck v-if="exam.has_solution" class="w-4 h-4 text-success" />
             <LucideMinus v-else class="w-4 h-4 text-muted-foreground/30" />
           </div>
 
           <div class="text-right flex flex-col items-end gap-1">
-            <ExamStatsDialog
-              :statistics="exam.statistics"
-              :date="exam.exam_date"
-              :pass-rate="exam.pass_rate"
-            />
+            <ExamStatsDialog :statistics="exam.statistics" :date="exam.exam_date" :pass-rate="exam.pass_rate" />
           </div>
         </div>
       </div>

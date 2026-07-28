@@ -227,22 +227,24 @@ function passColor(rate: number) {
           <div class="w-full">
             <h1
               class="text-3xl sm:text-4xl font-semibold font-serif text-foreground leading-tight w-full wrap-break-word">
-              <span class="block font-sans text-base sm:text-lg text-muted-foreground">{{ courseCode }}</span>
               {{ courseData.courseName }}
             </h1>
 
             <p class="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
+              <span class="font-sans text-sm text-muted-foreground">{{ courseCode }}
+              </span>
+              <span aria-hidden="true">·</span>
               <span>
                 <span class="font-medium text-foreground">{{
                   exams.length
-                  }}</span>
+                }}</span>
                 tentor
               </span>
               <span aria-hidden="true">·</span>
               <span>
                 <span class="font-medium text-foreground">{{
                   examsWithSolutions
-                  }}</span>
+                }}</span>
                 med facit
               </span>
               <template v-if="avgPassRate !== null">
