@@ -62,16 +62,14 @@ function toggleFilter(p: string) {
 <template>
   <div class="flex flex-col gap-4 w-full">
     <div v-if="prefixes.length > 1" class="flex flex-wrap gap-2 w-full">
-      <Button v-for="p in prefixes" :key="p" variant="outline" size="sm" class="font-mono text-xs" :class="activeFilters.has(p)
-        ? 'bg-foreground text-background border-foreground'
-        : 'border-border text-muted-foreground hover:text-foreground hover:border-border'
-        " @click="toggleFilter(p)">
+      <Button v-for="p in prefixes" :key="p" :variant="activeFilters.has(p) ? 'default' : 'outline'"
+        size="sm" " @click=" toggleFilter(p)">
         {{ p }}
       </Button>
     </div>
 
     <div class="w-full overflow-x-auto rounded-xl border border-border">
-      <div class="min-w-fit w-full rounded-3xl overflow-hidden">
+      <div class="min-w-fit w-full rounded-xl overflow-hidden">
         <div
           class="grid grid-cols-[1fr_80px_64px_80px] gap-x-4 px-6 py-3 border-b border-border/60 bg-muted/30 items-center">
           <div class="text-xs text-muted-foreground">Tentamen</div>
