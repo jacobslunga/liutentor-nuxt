@@ -152,8 +152,7 @@ function handleKeyUp(e: KeyboardEvent) {
       <div v-if="exam" class="hidden lg:block absolute inset-x-0 top-0 z-70">
         <div
           class="pointer-events-none absolute inset-x-0 -top-10 h-24 -z-10 bg-linear-to-b from-background via-background to-background/0" />
-        <ExamHeader :exams="exams" :exam-id="examId" :course-code="courseCode"
-          :solution-pdf-url="solutionPdfUrl" />
+        <ExamHeader :exams="exams" :exam-id="examId" :course-code="courseCode" :solution-pdf-url="solutionPdfUrl" />
       </div>
 
       <div v-if="isLoading" class="flex h-full items-center justify-center flex-col gap-2 bg-background">
@@ -173,8 +172,7 @@ function handleKeyUp(e: KeyboardEvent) {
         <MobilePdfView v-if="isMobile" class="bg-background" :exam-pdf-url="exam.pdf_url"
           :solution-pdf-url="solutionPdfUrl" :course-code="courseCode" :exam-date="exam.exam_date" />
 
-        <div v-else class="h-full flex flex-row overflow-hidden bg-background"
-          :class="{ 'select-none': isResizing }">
+        <div v-else class="h-full flex flex-row overflow-hidden bg-background" :class="{ 'select-none': isResizing }">
           <ExamOnlyView v-if="layoutMode === 'exam-only'" :exam-pdf-url="exam.pdf_url"
             :solution-pdf-url="solutionPdfUrl" />
 
@@ -244,7 +242,7 @@ function handleKeyUp(e: KeyboardEvent) {
                 leave-active-class="transition-all duration-200 ease-spring"
                 leave-from-class="translate-x-0 opacity-100 blur-0" leave-to-class="translate-x-full opacity-0 blur-sm">
                 <div v-if="chatHasBeenOpened" v-show="chatStore.isOpen"
-                  class="fixed right-0 bottom-0 z-80 flex h-screen bg-background"
+                  class="fixed right-0 bottom-0 z-80 flex h-screen shadow-xl bg-background"
                   :class="{ 'select-none': isChatResizing }" :style="{ width: `${chatPanelWidth}px` }">
                   <div class="relative z-100 w-0 shrink-0">
                     <ResizeHandle :is-resizing="isChatResizing" @start-resize="startChatResize" />

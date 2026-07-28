@@ -149,11 +149,10 @@ watch(
   <Teleport to="body">
     <Transition enter-active-class="transition-all duration-200 ease-spring"
       enter-from-class="translate-x-full opacity-0" enter-to-class="translate-x-0 opacity-100 blur-0"
-      leave-active-class="transition-all duration-200 ease-spring"
-      leave-from-class="translate-x-0 opacity-100 blur-0" leave-to-class="translate-x-full opacity-0 blur-sm">
+      leave-active-class="transition-all duration-200 ease-spring" leave-from-class="translate-x-0 opacity-100 blur-0"
+      leave-to-class="translate-x-full opacity-0 blur-sm">
       <div v-show="hasFacit && isFacitVisible && !chatStore.isOpen" ref="panelRef"
-        class="fixed right-0 bottom-0 z-70 flex h-screen bg-background"
-        :style="{ width: `${panelWidth}px` }">
+        class="fixed right-0 bottom-0 z-70 flex h-screen shadow-xl bg-background" :style="{ width: `${panelWidth}px` }">
         <div class="relative z-100 w-0 shrink-0">
           <ResizeHandle :is-resizing="isDragging" @start-resize="startResize" />
         </div>
@@ -167,11 +166,10 @@ watch(
 
     <Transition enter-active-class="transition-all duration-200 ease-spring"
       enter-from-class="translate-x-full opacity-0" enter-to-class="translate-x-0 opacity-100 blur-0"
-      leave-active-class="transition-all duration-200 ease-spring"
-      leave-from-class="translate-x-0 opacity-100 blur-0" leave-to-class="translate-x-full opacity-0 blur-sm">
+      leave-active-class="transition-all duration-200 ease-spring" leave-from-class="translate-x-0 opacity-100 blur-0"
+      leave-to-class="translate-x-full opacity-0 blur-sm">
       <div v-if="chatHasBeenOpened" v-show="chatStore.isOpen"
-        class="fixed right-0 bottom-0 z-80 flex h-screen bg-background"
-        :style="{ width: `${panelWidth}px` }">
+        class="fixed right-0 bottom-0 z-80 flex h-screen bg-background shadow-xl" :style="{ width: `${panelWidth}px` }">
         <div class="relative z-100 w-0 shrink-0">
           <ResizeHandle :is-resizing="isDragging" @start-resize="startResize" />
         </div>

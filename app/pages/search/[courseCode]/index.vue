@@ -200,126 +200,103 @@ function passColor(rate: number) {
       <CourseSearchDropdown size="md" class="mx-auto w-full max-w-xl" />
     </div>
 
-    <div
-      v-if="status === 'pending'"
-      class="flex items-center justify-center min-h-[60vh]"
-    >
+    <div v-if="status === 'pending'" class="flex items-center justify-center min-h-[60vh]">
       <LucideLoader2 class="w-6 h-6 animate-spin text-muted-foreground" />
     </div>
 
-    <div
-      v-else-if="status === 'success' && !courseData"
-        class="mx-auto flex min-h-[60vh] w-full max-w-2xl flex-col items-center justify-center gap-8 py-8"
-      >
-        <div class="max-w-xl text-center">
-          <div
-            class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted"
-          >
-            <LucideInbox class="h-6 w-6 text-muted-foreground" />
-          </div>
-          <h1 class="text-2xl font-medium text-foreground">
-            Vi saknar tentor för {{ courseCode }}
-          </h1>
-          <p class="mt-2 text-sm text-muted-foreground">
-            Har du en gammal tenta eller ett facit? Ladda upp den här så blir
-            nästa student som söker på {{ courseCode }} hjälpt direkt.
-          </p>
+    <div v-else-if="status === 'success' && !courseData"
+      class="mx-auto flex min-h-[60vh] w-full max-w-2xl flex-col items-center justify-center gap-8 py-8">
+      <div class="max-w-xl text-center">
+        <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+          <LucideInbox class="h-6 w-6 text-muted-foreground" />
         </div>
-        <ExamUploadForm
-          :initial-course-code="courseCode"
-          fixed-course-code
-          :show-heading="false"
-        />
+        <h1 class="text-2xl font-medium text-foreground">
+          Vi saknar tentor för {{ courseCode }}
+        </h1>
+        <p class="mt-2 text-sm text-muted-foreground">
+          Har du en gammal tenta eller ett facit? Ladda upp den här så blir
+          nästa student som söker på {{ courseCode }} hjälpt direkt.
+        </p>
       </div>
+      <ExamUploadForm :initial-course-code="courseCode" fixed-course-code :show-heading="false" />
+    </div>
 
-      <template v-else-if="courseData">
-        <div class="flex justify-center">
-          <div class="flex flex-col items-start w-full max-w-4xl gap-8">
-            <div class="w-full">
-              <h1
-                class="text-3xl sm:text-4xl font-semibold text-foreground leading-tight w-full wrap-break-word"
-              >
-                <span
-                  class="block font-mono text-base sm:text-lg text-muted-foreground"
-                  >{{ courseCode }}</span
-                >
-                {{ courseData.courseName }}
-              </h1>
+    <template v-else-if="courseData">
+      <div class="flex justify-center">
+        <div class="flex flex-col items-start w-full max-w-4xl gap-8">
+          <div class="w-full">
+            <h1
+              class="text-3xl sm:text-4xl font-semibold font-serif text-foreground leading-tight w-full wrap-break-word">
+              <span class="block font-sans text-base sm:text-lg text-muted-foreground">{{ courseCode }}</span>
+              {{ courseData.courseName }}
+            </h1>
 
-              <p
-                class="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground"
-              >
-                <span>
-                  <span class="font-medium text-foreground">{{
-                    exams.length
+            <p class="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
+              <span>
+                <span class="font-medium text-foreground">{{
+                  exams.length
                   }}</span>
-                  tentor
-                </span>
+                tentor
+              </span>
+              <span aria-hidden="true">·</span>
+              <span>
+                <span class="font-medium text-foreground">{{
+                  examsWithSolutions
+                  }}</span>
+                med facit
+              </span>
+              <template v-if="avgPassRate !== null">
                 <span aria-hidden="true">·</span>
                 <span>
-                  <span class="font-medium text-foreground">{{
-                    examsWithSolutions
-                  }}</span>
-                  med facit
-                </span>
-                <template v-if="avgPassRate !== null">
-                  <span aria-hidden="true">·</span>
-                  <span>
-                    <span class="font-medium" :class="passColor(avgPassRate)">
-                      {{ avgPassRate }}%
-                    </span>
-                    godkända i snitt
+                  <span class="font-medium" :class="passColor(avgPassRate)">
+                    {{ avgPassRate }}%
                   </span>
-                </template>
-              </p>
+                  godkända i snitt
+                </span>
+              </template>
+            </p>
+          </div>
+
+          <Tabs v-model="activeTab" class="w-full -mt-4">
+            <div
+              class="sticky top-12 z-40 flex flex-col gap-3 border-b border-border/60 bg-background pt-2 pb-2.5 sm:flex-row sm:items-center sm:justify-between md:top-0 dark:border-border/60">
+              <TabsList>
+                <TabsTrigger value="exams" class="h-full font-medium text-xs gap-2">
+                  <LucideScrollText class="w-4 h-4" />
+                  Tentor
+                </TabsTrigger>
+                <TabsTrigger value="stats" class="h-full font-medium text-xs gap-2">
+                  <LucideChartSpline class="w-4 h-4" />
+                  Statistik
+                </TabsTrigger>
+              </TabsList>
+
+              <div class="flex items-center gap-2">
+                <Button variant="default" @click="openUploadModal(courseCode)">
+                  <LucideUpload class="w-4 h-4" />
+                  Ladda upp
+                </Button>
+                <Button variant="outline" as-child>
+                  <NuxtLink :to="`/quiz/${courseCode}`">
+                    <LucideLayers class="w-4 h-4" />
+                    Quiz
+                  </NuxtLink>
+                </Button>
+              </div>
             </div>
 
-            <Tabs v-model="activeTab" class="w-full -mt-4">
-              <div
-                class="sticky top-12 z-40 flex flex-col gap-3 border-b border-border/60 bg-background pt-2 pb-2.5 sm:flex-row sm:items-center sm:justify-between md:top-0 dark:border-border/60"
-              >
-                <TabsList>
-                  <TabsTrigger value="exams" class="px-3 h-full font-medium text-xs gap-2">
-                    <LucideScrollText class="w-4 h-4" />
-                    Tentor
-                  </TabsTrigger>
-                  <TabsTrigger value="stats" class="px-3 h-full font-medium text-xs gap-2">
-                    <LucideChartSpline class="w-4 h-4" />
-                    Statistik
-                  </TabsTrigger>
-                </TabsList>
+            <Transition name="tab-panel" mode="out-in">
+              <TabsContent v-if="activeTab === 'exams'" key="exams" value="exams" class="mt-5">
+                <CourseExamsTable :course-code="courseCode" :exams="exams" />
+              </TabsContent>
 
-                <div class="flex items-center gap-2">
-                  <Button variant="default" @click="openUploadModal(courseCode)">
-                    <LucideUpload class="w-4 h-4" />
-                    Ladda upp
-                  </Button>
-                  <Button variant="outline" as-child>
-                    <NuxtLink :to="`/quiz/${courseCode}`">
-                      <LucideLayers class="w-4 h-4" />
-                      Quiz
-                    </NuxtLink>
-                  </Button>
-                </div>
-              </div>
-
-              <Transition name="tab-panel" mode="out-in">
-                <TabsContent
-                  v-if="activeTab === 'exams'"
-                  key="exams"
-                  value="exams"
-                  class="mt-5"
-                >
-                  <CourseExamsTable :course-code="courseCode" :exams="exams" />
-                </TabsContent>
-
-                <TabsContent v-else key="stats" value="stats" class="mt-5">
-                  <LazyCourseStats :exams="exams" />
-                </TabsContent>
-              </Transition>
-            </Tabs>
-          </div>
+              <TabsContent v-else key="stats" value="stats" class="mt-5">
+                <LazyCourseStats :exams="exams" />
+              </TabsContent>
+            </Transition>
+          </Tabs>
         </div>
+      </div>
     </template>
   </div>
 </template>

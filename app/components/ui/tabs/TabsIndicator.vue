@@ -19,7 +19,7 @@ const forwardedProps = useForwardProps(delegatedProps);
     v-bind="forwardedProps"
     :class="
       cn(
-        'absolute left-0 top-1/2 -translate-y-1/2 rounded-lg bg-background border border-border transition-all duration-200 ease-spring dark:bg-accent dark:border-border/80 h-[var(--reka-tabs-indicator-thickness)] w-[var(--reka-tabs-indicator-size)] translate-x-[var(--reka-tabs-indicator-position)] pointer-events-none z-0',
+        'absolute inset-y-0 left-0 -z-10 bg-primary/10 transition-all duration-200 ease-spring dark:bg-primary/15 w-[var(--reka-tabs-indicator-size)] translate-x-[var(--reka-tabs-indicator-position)] pointer-events-none',
         props.class,
       )
     "
