@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Funnel+Sans:ital,wght@0,300..800;1,300..800&display=swap');
-
 @import "tailwindcss";
 
 @plugin "tailwindcss-animate";
@@ -91,8 +89,8 @@
 @theme {
   --font-logo: "Logo", serif;
   --font-mono:  "SF Mono", monospace;
-  --font-serif:  Georgia, Cambria, "Times New Roman", Times, serif;
-  --font-sans:  "Funnel Sans", system-ui, -apple-system, BlinkMacSystemFont,
+  --font-serif: Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue",
     sans-serif;
 }
