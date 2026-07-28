@@ -14,7 +14,7 @@ const props = withDefaults(
     }
   >(),
   {
-    showIndicator: true,
+    showIndicator: false,
   },
 );
 
@@ -27,10 +27,7 @@ const delegatedProps = reactiveOmit(props, "class", "showIndicator");
     v-bind="delegatedProps"
     :class="
       cn(
-        // A single container, not a track with a pill inside it: the outer
-        // capsule sits on the page background and the active segment fills it
-        // edge to edge, clipped to the capsule's own radius by overflow-hidden.
-        'relative isolate bg-background text-muted-foreground inline-flex h-9 w-fit items-center justify-center overflow-hidden rounded-lg border border-border p-0',
+        'relative bg-muted text-muted-foreground inline-flex h-9 w-fit items-center justify-center rounded-lg p-[3px]',
         props.class,
       )
     "

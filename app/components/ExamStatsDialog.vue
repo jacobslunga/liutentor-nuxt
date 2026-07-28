@@ -45,9 +45,7 @@ function passColor(rate: number) {
   <Dialog>
     <DialogTrigger
       class="text-sm cursor-pointer px-2 py-1 rounded-md hover:bg-foreground/5 transition-colors duration-150"
-      :class="passColor(passRate)"
-      @click.prevent.stop
-    >
+      :class="passColor(passRate)" @click.prevent.stop>
       {{ passRate.toFixed(1) }}%
     </DialogTrigger>
 
@@ -67,35 +65,23 @@ function passColor(rate: number) {
 
         <div class="border border-border rounded-md p-3">
           <div class="flex items-end gap-2 h-32">
-            <div
-              v-for="{ grade, count, color } in chartData"
-              :key="grade"
-              class="flex-1 flex flex-col items-center gap-1"
-            >
+            <div v-for="{ grade, count, color } in chartData" :key="grade"
+              class="flex-1 flex flex-col items-center gap-1">
               <span class="text-2xs text-muted-foreground">{{ count }}</span>
-              <div
-                class="w-full rounded-t-sm"
-                :style="{
-                  height: `${(count / maxCount) * 88}px`,
-                  backgroundColor: color,
-                }"
-              />
+              <div class="w-full rounded-t-sm" :style="{
+                height: `${(count / maxCount) * 88}px`,
+                backgroundColor: color,
+              }" />
               <span class="text-2xs text-muted-foreground">{{ grade }}</span>
             </div>
           </div>
         </div>
 
         <div class="space-y-2">
-          <div
-            v-for="{ grade, count, color } in chartData"
-            :key="grade"
-            class="flex items-center justify-between text-sm"
-          >
+          <div v-for="{ grade, count, color } in chartData" :key="grade"
+            class="flex items-center justify-between text-sm">
             <div class="flex items-center gap-2">
-              <div
-                class="w-2 h-2 rounded-md"
-                :style="{ backgroundColor: color }"
-              />
+              <div class="w-2 h-2 rounded-md" :style="{ backgroundColor: color }" />
               <span class="text-foreground">Betyg {{ grade }}</span>
             </div>
             <span class="text-muted-foreground">
@@ -111,22 +97,14 @@ function passColor(rate: number) {
         </p>
       </div>
 
-      <div
-        class="flex items-center justify-between pt-2 border-t border-border/60 text-xs text-muted-foreground"
-      >
+      <div class="flex items-center justify-between pt-2 border-t border-border/60 text-xs text-muted-foreground">
         <span>
           Data från
-          <a
-            href="https://ysektionen.se/student/tentastatistik/"
-            target="_blank"
-            class="text-primary hover:underline"
-          >
+          <a href="https://ysektionen.se/student/tentastatistik/" target="_blank" class="text-primary hover:underline">
             Y-Sektionen
           </a>
         </span>
-        <DialogClose
-          class="hover:text-foreground transition-colors cursor-pointer"
-        >
+        <DialogClose class="hover:text-foreground transition-colors cursor-pointer">
           Stäng
         </DialogClose>
       </div>
