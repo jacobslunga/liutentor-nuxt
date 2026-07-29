@@ -130,7 +130,21 @@ export function useChat(options: {
     chatStore.messages.push({ role: "assistant", content: "" });
     chatStore.setLoading(true);
 
-    abortController.value = new AbortController();
+    const controller = new AbortController();
+    abortController.value = controller;
+
+    // Coalesces stream updates to at most one per animation frame. A wall-clock
+    // interval keeps queueing re-renders even when the main thread is already
+    // behind; rAF cannot fire faster than the browser can paint, so this backs
+    // off on its own exactly when the message is long enough to be expensive.
+    let pendingFrame = 0;
+
+    const cancelPendingFlush = () => {
+      if (pendingFrame) {
+        cancelAnimationFrame(pendingFrame);
+        pendingFrame = 0;
+      }
+    };
 
     try {
       const recentMessages = chatStore.messages
@@ -161,7 +175,7 @@ export function useChat(options: {
           selectionContext: selectionContext || undefined,
           giveDirectAnswer,
         }),
-        signal: abortController.value.signal,
+        signal: controller.signal,
       });
 
       if (!response.ok) throw new Error("API error");
@@ -171,43 +185,42 @@ export function useChat(options: {
 
       const decoder = new TextDecoder("utf-8");
       let streamText = "";
-      let lastUpdate = 0;
-      const STREAM_UPDATE_INTERVAL = 50;
+
+      // Mutating the last message in place is enough for reactivity (messages
+      // is a deep ref) and avoids copying the whole array on every tick.
+      const writeStreamText = (text: string) => {
+        const msgs = chatStore.messages;
+        const last = msgs[msgs.length - 1];
+        if (last?.role === "assistant") last.content = text;
+      };
+
+      const flush = () => {
+        pendingFrame = 0;
+        if (controller.signal.aborted) return;
+        writeStreamText(streamText);
+      };
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
 
         streamText += decoder.decode(value, { stream: true });
-        const now = Date.now();
-
-        if (now - lastUpdate >= STREAM_UPDATE_INTERVAL) {
-          lastUpdate = now;
-          const updated = [...chatStore.messages];
-          updated[updated.length - 1] = {
-            role: "assistant",
-            content: streamText,
-          };
-          chatStore.messages = updated;
-        }
+        if (!pendingFrame) pendingFrame = requestAnimationFrame(flush);
       }
 
-      const final = [...chatStore.messages];
-      final[final.length - 1] = {
-        role: "assistant",
-        content: streamText.trim() || "Jag kunde inte generera ett svar.",
-      };
-      chatStore.messages = final;
+      cancelPendingFlush();
+      writeStreamText(streamText.trim() || "Jag kunde inte generera ett svar.");
     } catch (error) {
+      cancelPendingFlush();
       if (error instanceof Error && error.name === "AbortError") return;
 
-      const updated = [...chatStore.messages];
-      updated[updated.length - 1] = {
-        role: "assistant",
-        content: "Något gick fel. Försök igen senare.",
-      };
-      chatStore.messages = updated;
+      const msgs = chatStore.messages;
+      const last = msgs[msgs.length - 1];
+      if (last?.role === "assistant") {
+        last.content = "Något gick fel. Försök igen senare.";
+      }
     } finally {
+      cancelPendingFlush();
       abortController.value = null;
       chatStore.setLoading(false);
     }

@@ -10,22 +10,11 @@ const route = useRoute();
 const isFacitVisible = ref(false);
 const isManual = ref(false);
 const isDragging = ref(false);
-const panelRef = ref<HTMLDivElement | null>(null);
 
 const panelWidth = ref(
   typeof window !== "undefined" ? window.innerWidth / 2 : 600,
 );
 const hasFacit = computed(() => !!props.solutionPdfUrl);
-
-watch(
-  () => chatStore.isOpen,
-  (open) => {
-    if (open) {
-      isFacitVisible.value = false;
-      isManual.value = false;
-    }
-  },
-);
 
 let activeResizeCleanup: (() => void) | null = null;
 
@@ -68,11 +57,14 @@ function handleMouseMove(e: MouseEvent) {
   const threshold = w * 0.92;
   const offset = 40;
 
-  if (isFacitVisible.value && panelRef.value) {
-    const rect = panelRef.value.getBoundingClientRect();
-    const isInside =
-      e.clientX >= rect.left - offset && e.clientY >= rect.top - offset;
-    if (isInside) return;
+  // The panel is `fixed right-0 bottom-0 h-screen` with an explicit width, so
+  // its box is fully known from panelWidth — no need to measure it. Reading
+  // getBoundingClientRect here forced a synchronous layout on every single
+  // mousemove, on a page hosting two PDF viewports.
+  if (isFacitVisible.value) {
+    const panelLeft = w - panelWidth.value;
+    // rect.top is 0, so the original vertical half of this test was always true.
+    if (e.clientX >= panelLeft - offset) return;
   }
 
   if (e.clientX > threshold && !inSafeZone) {
@@ -151,7 +143,7 @@ watch(
       enter-from-class="translate-x-full opacity-0" enter-to-class="translate-x-0 opacity-100 blur-0"
       leave-active-class="transition-all duration-200 ease-spring" leave-from-class="translate-x-0 opacity-100 blur-0"
       leave-to-class="translate-x-full opacity-0 blur-sm">
-      <div v-show="hasFacit && isFacitVisible && !chatStore.isOpen" ref="panelRef"
+      <div v-show="hasFacit && isFacitVisible && !chatStore.isOpen"
         class="fixed right-0 bottom-0 z-70 flex h-screen shadow-xl bg-background" :style="{ width: `${panelWidth}px` }">
         <div class="relative z-100 w-0 shrink-0">
           <ResizeHandle :is-resizing="isDragging" @start-resize="startResize" />

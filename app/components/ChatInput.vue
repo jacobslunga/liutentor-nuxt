@@ -84,13 +84,16 @@ const handleKeyDown = (e: KeyboardEvent) => {
   }
 };
 
+// handleInput already resizes synchronously, so reacting to the same keystroke
+// here would measure the textarea twice per character — and `height: auto` +
+// scrollHeight forces a layout each time. Only programmatic changes (send
+// clears the draft, cancel restores it) need this.
 watch(
   () => props.modelValue,
-  () => {
-    nextTick(() => {
-      updateHeight();
-    });
-  }
+  (value) => {
+    if (value === textareaRef.value?.value) return;
+    nextTick(updateHeight);
+  },
 );
 
 onMounted(() => {
