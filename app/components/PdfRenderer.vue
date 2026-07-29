@@ -50,17 +50,15 @@ const darkPageStyle = {
   mixBlendMode: "screen",
 } as const;
 
-const isMobile = ref(window.innerWidth < 1024);
-const windowWidth = ref(window.innerWidth);
+// Resolved once, on purpose. The parent swaps between the mobile and desktop
+// trees at the same 1024px breakpoint, so crossing it remounts this component
+// anyway — and keeping these reactive meant every resize event rebuilt the
+// plugin registry below, tearing the document down mid-drag.
+const isMobile = window.innerWidth < 1024;
+const windowWidth = window.innerWidth;
+
 const viewportEl = ref<HTMLElement | null>(null);
 const showScrollTop = ref(false);
-
-onMounted(() => {
-  window.addEventListener("resize", () => {
-    isMobile.value = window.innerWidth < 1024;
-    windowWidth.value = window.innerWidth;
-  });
-});
 
 function handleViewportScroll(event: Event) {
   const target = event.currentTarget as HTMLElement;
@@ -68,6 +66,11 @@ function handleViewportScroll(event: Event) {
   showScrollTop.value = target.scrollTop > 320;
 }
 
+// Depends on `pdfUrl` and nothing else: navigating to another exam reuses this
+// instance, so the registry genuinely has to be rebuilt for a new document.
+// `defaultZoomLevel` is only an initial value, so recomputing it on resize
+// bought nothing while costing a full re-registration — and a document reload —
+// on every single resize event.
 const plugins = computed(() => {
   const base = [
     createPluginRegistration(DocumentManagerPluginPackage, {
@@ -81,13 +84,13 @@ const plugins = computed(() => {
       defaultZoomLevel:
         props.layoutMode === "exam-with-facit"
           ? ZoomMode.FitWidth
-          : windowWidth.value < 1100
+          : windowWidth < 1100
             ? ZoomMode.FitWidth
             : ZoomMode.Automatic,
     }),
   ];
 
-  if (isMobile.value) {
+  if (isMobile) {
     return base;
   }
 

@@ -33,13 +33,19 @@ const isError = computed(
   () => status.value === "error" || (!isLoading.value && !exam.value),
 );
 
-watchEffect(() => {
-  if (!exam.value) return;
-  useSeoMeta({
-    title: `${exam.value.course_code} - Tenta ${exam.value.exam_date}`,
-    description: `Se tenta för ${exam.value.course_code} från ${exam.value.exam_date}`,
-    robots: "noindex, nofollow",
-  });
+// Registered once with reactive getters. Calling useSeoMeta inside a watcher
+// registers a *new* head entry per run — and since the fetch is lazy it ran at
+// least twice, with the later runs outside the setup context.
+useSeoMeta({
+  title: () =>
+    exam.value
+      ? `${exam.value.course_code} - Tenta ${exam.value.exam_date}`
+      : "Tenta",
+  description: () =>
+    exam.value
+      ? `Se tenta för ${exam.value.course_code} från ${exam.value.exam_date}`
+      : "",
+  robots: "noindex, nofollow",
 });
 
 const isMobile = ref(import.meta.client ? window.innerWidth < 1024 : false);
@@ -82,15 +88,18 @@ function startChatResize() {
   activeResizeCleanup = onMouseUp;
 }
 
-onUnmounted(() => {
-  activeResizeCleanup?.();
-});
+// Single teardown path. This previously ran from both onBeforeRouteUpdate and
+// a watcher on the same route param, so every exam-to-exam navigation did the
+// whole reset twice.
+function resetChatForNewExam() {
+  chatStore.close();
+  chatStore.clearChat();
+  chatHasBeenOpened.value = false;
+}
 
 onBeforeRouteUpdate((to, from) => {
   if (to.params.examId !== from.params.examId) {
-    chatStore.close();
-    chatStore.clearChat();
-    chatHasBeenOpened.value = false;
+    resetChatForNewExam();
   }
 });
 
@@ -99,28 +108,24 @@ onBeforeRouteLeave(() => {
   chatStore.clearChat();
 });
 
-watch(
-  () => route.params.examId,
-  () => {
-    chatStore.close();
-    chatStore.clearChat();
-    chatHasBeenOpened.value = false;
-  },
-);
+function handleResize() {
+  isMobile.value = window.innerWidth < 1024;
+}
 
 onMounted(() => {
-  isMobile.value = window.innerWidth < 1024;
-  window.addEventListener("resize", () => {
-    isMobile.value = window.innerWidth < 1024;
-  });
+  handleResize();
+  window.addEventListener("resize", handleResize);
   document.addEventListener("keyup", handleKeyUp);
 });
 
 onUnmounted(() => {
+  window.removeEventListener("resize", handleResize);
   document.removeEventListener("keyup", handleKeyUp);
+  activeResizeCleanup?.();
 });
 
 function startResize() {
+  activeResizeCleanup?.();
   isResizing.value = true;
   function onMouseMove(e: MouseEvent) {
     const percent = (e.clientX / window.innerWidth) * 100;
@@ -130,9 +135,11 @@ function startResize() {
     isResizing.value = false;
     window.removeEventListener("mousemove", onMouseMove);
     window.removeEventListener("mouseup", onMouseUp);
+    activeResizeCleanup = null;
   }
   window.addEventListener("mousemove", onMouseMove);
   window.addEventListener("mouseup", onMouseUp);
+  activeResizeCleanup = onMouseUp;
 }
 
 function handleKeyUp(e: KeyboardEvent) {

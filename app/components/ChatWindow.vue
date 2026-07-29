@@ -1,21 +1,13 @@
 <script setup lang="ts">
-import {
-  ref,
-  shallowRef,
-  computed,
-  watch,
-  nextTick,
-  onMounted,
-  onUnmounted,
-} from "vue";
+import { ref, computed, watch, nextTick, onMounted, onUnmounted } from "vue";
 import { storeToRefs } from "pinia";
-import MarkdownIt from "markdown-it";
-import texmath from "markdown-it-texmath";
-import katex from "katex";
-import DOMPurify from "dompurify";
-import { getShikiHighlighter } from "#imports";
 import { useChatStore } from "@/stores/chat";
 import { useChat } from "@/composables/useChat";
+import {
+  initChatMarkdown,
+  renderChatMarkdown,
+  renderCachedChatMarkdown,
+} from "@/lib/chat-markdown";
 
 const props = defineProps<{
   examId: string;
@@ -52,204 +44,14 @@ const { send, cancelGeneration } = useChat({
   solutionUrl: props.solutionUrl,
 });
 
-DOMPurify.addHook("uponSanitizeAttribute", (_node, data) => {
-  if (data.attrName === "style") {
-    data.forceKeepAttr = true;
-  }
-});
-
-const md = shallowRef<MarkdownIt | null>(null);
 const mdReady = ref(false);
 
-const MAX_RENDER_CACHE = 200;
-const renderCache = new Map<string, string>();
-
-function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
-
-const LATEX_ENVS =
-  "array|aligned|align\\*?|cases|[pbvB]?matrix|gathered|gather\\*?|smallmatrix";
-
-async function initMarkdown() {
-  const instance = new MarkdownIt({
-    html: true,
-    linkify: true,
-    typographer: true,
-  });
-
-  // Uppgifter är märkta (a), (b), (c) — typografens replacements-regel
-  // skulle annars göra (c) → © och (r) → ®.
-  instance.disable("replacements");
-
-  const katexOptions = {
-    throwOnError: false,
-    errorColor: "inherit",
-    strict: "ignore",
-  };
-
-  // "dollars" covers $...$ / $$...$$, "brackets" covers \(...\) / \[...\] —
-  // both are real parser rules, so every model's delimiter style is handled
-  // natively without any text-preprocessing conversion beforehand.
-  instance.use(texmath, {
-    engine: katex,
-    delimiters: ["dollars", "brackets"],
-    katexOptions,
-  });
-
-  // Fallback for a math span whose closing "$$" is missing entirely (some
-  // models occasionally forget it). texmath's own rule only matches
-  // well-formed pairs and is tried first; this only fires once that has
-  // already failed, and stays within the current paragraph.
-  instance.inline.ruler.before(
-    "escape",
-    "math_inline_double_unclosed",
-    (state: any, silent: boolean) => {
-      const { src, pos, posMax } = state;
-      if (!src.startsWith("$$", pos)) return false;
-      const rest = src.slice(pos + 2, posMax);
-      if (!rest.trim() || rest.includes("$$")) return false;
-      if (silent) return true;
-      const token = state.push("math_inline_double", "math", 0);
-      token.content = rest.trim();
-      token.markup = "$$";
-      state.pos = posMax;
-      return true;
-    },
-  );
-
-  // texmath only recognizes a LaTeX environment (\begin{...}\end{...}) as
-  // math when it's already wrapped in $ delimiters. Registering it as its
-  // own block lets bare environments (piecewise functions, matrices) render
-  // too, as a genuine parser rule rather than a $-wrapping text pass.
-  const bareEnvRule = {
-    name: "math_block_bare_env",
-    rex: new RegExp(
-      `(\\\\begin\\{(${LATEX_ENVS})\\}[\\s\\S]*?\\\\end\\{\\2\\})`,
-      "gmy",
-    ),
-    tmpl: "<section><eqn>$1</eqn></section>",
-    tag: "\\begin{",
-  };
-  instance.block.ruler.before(
-    "fence",
-    bareEnvRule.name,
-    (texmath as any).block(bareEnvRule),
-  );
-  instance.renderer.rules[bareEnvRule.name] = (tokens, idx) =>
-    bareEnvRule.tmpl.replace(
-      /\$1/,
-      (texmath as any).render(tokens[idx]!.content, true, katexOptions),
-    );
-
-  const highlighter = await getShikiHighlighter();
-  const loadedLangs = new Set(highlighter.getLoadedLanguages());
-
-  instance.renderer.rules.fence = (tokens, idx) => {
-    const token = tokens[idx];
-    if (!token) return "";
-    const info = token.info ? token.info.trim() : "";
-    const rawLang = info.split(/\s+/)[0] || "";
-
-
-
-    const language =
-      rawLang && loadedLangs.has(rawLang as never) ? rawLang : "text";
-
-    let inner: string;
-    try {
-      inner = highlighter.highlight(token.content, {
-        lang: language,
-        themes: {
-          light: "one-light",
-          dark: "one-dark-pro",
-        },
-        defaultColor: false,
-      });
-    } catch {
-      inner = `<pre class="shiki"><code>${escapeHtml(token.content)}</code></pre>`;
-    }
-
-    const label = rawLang || "text";
-
-    const copyIcon = `<svg class="code-icon code-icon-copy" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`;
-    const checkIcon = `<svg class="code-icon code-icon-check" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>`;
-
-    return `<div class="code-block"><div class="code-header"><span class="code-lang">${escapeHtml(
-      label,
-    )}</span><button class="code-copy" type="button" aria-label="Kopiera kod">${copyIcon}${checkIcon}<span class="code-copy-label">Kopiera</span></button></div>${inner}</div>`;
-  };
-
-  md.value = instance;
+// The pipeline itself (MarkdownIt instance, KaTeX/Shiki caches, DOMPurify
+// hook) is shared at module scope — see @/lib/chat-markdown. This component
+// only needs to know when it is ready to render.
+initChatMarkdown().then(() => {
   mdReady.value = true;
-  renderCache.clear();
-}
-
-initMarkdown();
-
-// Only remaining job: ensure a $$...$$ block sits on its own blank-line-
-// separated paragraph so texmath's block rule (not the inline one) picks it
-// up, and collapse stray blank lines inside it. Delimiter styles themselves
-// (\(...\), \[...\], bare LaTeX environments) are handled by real parser
-// rules registered in initMarkdown, not by rewriting the text here.
-function normalizeMath(content: string): string {
-  const segments = content.split(/(```[\s\S]*?(?:```|$))/g);
-  return segments
-    .map((seg, i) => {
-      if (i % 2 === 1) return seg;
-      return seg.replace(/\$\$([^$]+?)\$\$/g, (_, expr) =>
-        expr.includes("\n")
-          ? `\n\n$$\n${expr.replace(/\n{2,}/g, "\n").trim()}\n$$\n\n`
-          : `$$${expr.trim()}$$`,
-      );
-    })
-    .join("");
-}
-
-function renderMarkdown(content: string): string {
-  if (!md.value) return "";
-  const normalized = normalizeMath(content);
-  return DOMPurify.sanitize(md.value.render(normalized), {
-    ADD_TAGS: [
-      "math",
-      "semantics",
-      "mrow",
-      "mi",
-      "mo",
-      "mn",
-      "msup",
-      "msub",
-      "mfrac",
-      "mover",
-      "munder",
-      "mtext",
-      "annotation",
-    ],
-    ADD_ATTR: ["xmlns", "encoding", "style", "class"],
-  });
-}
-
-function getCachedMarkdown(content: string): string {
-  const cached = renderCache.get(content);
-  if (cached) return cached;
-
-  const rendered = renderMarkdown(content);
-  if (!rendered) return "";
-
-  renderCache.set(content, rendered);
-
-  if (renderCache.size > MAX_RENDER_CACHE) {
-    const oldestKey = renderCache.keys().next().value;
-    if (oldestKey) renderCache.delete(oldestKey);
-  }
-
-  return rendered;
-}
+});
 
 const { giveDirectAnswer } = useAnswerMode();
 const { selectedModelId } = useSelectedModel();
@@ -371,8 +173,8 @@ const renderedAssistantHtml = computed(() => {
     if (msg.role !== "assistant" || !msg.content) return "";
     const isStreamingLast = isLoading.value && i === lastIndex;
     return isStreamingLast
-      ? renderMarkdown(msg.content)
-      : getCachedMarkdown(msg.content);
+      ? renderChatMarkdown(msg.content)
+      : renderCachedChatMarkdown(msg.content);
   });
 });
 
@@ -380,6 +182,15 @@ function scrollToBottom(behavior: ScrollBehavior = "smooth") {
   const container = messagesContainer.value;
   if (!container) return;
   container.scrollTo({ top: container.scrollHeight, behavior });
+}
+
+// Only read back on remount, so there is no reason to push it through the
+// store on every scroll event — it is kept in a plain local and flushed when
+// the panel goes away.
+let latestScrollTop = 0;
+
+function persistScrollPosition() {
+  chatStore.savedScrollPosition = latestScrollTop;
 }
 
 function handleScroll() {
@@ -390,7 +201,7 @@ function handleScroll() {
   );
   isAtBottom.value = distFromBottom <= 50;
   showScrollButton.value = distFromBottom > 200;
-  chatStore.savedScrollPosition = el.scrollTop;
+  latestScrollTop = el.scrollTop;
 
   if (selectionPopover.value.visible) {
     const delta = Math.abs(el.scrollTop - selectionPopoverScrollAnchor.value);
@@ -490,6 +301,7 @@ function startNewChat() {
   chatStore.currentConversationId = null;
   chatStore.currentConversationTitle = null;
   chatStore.savedScrollPosition = 0;
+  latestScrollTop = 0;
   chatStore.setLoading(false);
   isHistoryOpen.value = false;
   selectionContext.value = "";
@@ -528,6 +340,7 @@ onMounted(() => {
 onUnmounted(() => {
   document.removeEventListener("keydown", handleKeyDown, true);
   document.removeEventListener("selectionchange", handleSelectionChange);
+  persistScrollPosition();
 });
 
 defineExpose({ focusInput: () => chatInputRef.value?.focus() });
