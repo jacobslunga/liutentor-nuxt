@@ -8,6 +8,14 @@ export interface Message {
   selectionContext?: string;
 }
 
+/** A question asked about text selected outside the chat, e.g. in a PDF. */
+export interface PendingSelection {
+  /** Sent verbatim as the user message. */
+  prompt: string;
+  /** The highlighted text, quoted above that message. */
+  context: string;
+}
+
 export const useChatStore = defineStore("chat", () => {
   const isOpen = ref(false);
   const isLoading = ref(false);
@@ -18,6 +26,27 @@ export const useChatStore = defineStore("chat", () => {
   const currentConversationId = ref<string | null>(null);
   const currentConversationTitle = ref<string | null>(null);
   const isHistoryOpen = ref(false);
+  const pendingSelection = ref<PendingSelection | null>(null);
+
+  /**
+   * Open the chat with a question about text selected elsewhere. The payload
+   * waits in the store because the panel is mounted lazily — on the first ask
+   * there is no ChatWindow yet to hand it to.
+   */
+  function askAboutSelection(prompt: string, context: string) {
+    pendingSelection.value = { prompt, context };
+    isOpen.value = true;
+  }
+
+  /**
+   * Read-and-clear, so the ask is consumed exactly once no matter whether the
+   * panel picked it up on mount or through its watcher.
+   */
+  function takePendingSelection(): PendingSelection | null {
+    const pending = pendingSelection.value;
+    pendingSelection.value = null;
+    return pending;
+  }
 
   function toggle() {
     isOpen.value = !isOpen.value;
@@ -44,6 +73,7 @@ export const useChatStore = defineStore("chat", () => {
     currentConversationId.value = null;
     currentConversationTitle.value = null;
     isHistoryOpen.value = false;
+    pendingSelection.value = null;
   }
 
   function resetOnLogout() {
@@ -61,6 +91,9 @@ export const useChatStore = defineStore("chat", () => {
     currentConversationId,
     currentConversationTitle,
     isHistoryOpen,
+    pendingSelection,
+    askAboutSelection,
+    takePendingSelection,
     toggle,
     open,
     close,

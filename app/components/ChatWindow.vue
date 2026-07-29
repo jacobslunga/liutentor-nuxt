@@ -9,7 +9,7 @@ import {
   onUnmounted,
 } from "vue";
 import { storeToRefs } from "pinia";
-import { useChatStore } from "@/stores/chat";
+import { useChatStore, type PendingSelection } from "@/stores/chat";
 import { useChat } from "@/composables/useChat";
 import {
   initChatMarkdown,
@@ -252,6 +252,11 @@ watch(
 );
 
 onMounted(() => {
+  // Read before the reset below, which clears the pending ask along with the
+  // rest of the chat state. On the first ask this panel is mounted *by* that
+  // ask, so the payload has to survive the mount.
+  const pending = chatStore.takePendingSelection();
+
   if (chatStore.currentExamId !== props.examId) {
     chatStore.clearChat();
     chatStore.currentExamId = props.examId;
@@ -267,14 +272,23 @@ onMounted(() => {
       scrollToBottom("auto");
     }
   });
+
+  // After the scroll restore is queued, so its "auto" jump does not land on top
+  // of the smooth scroll this send starts.
+  if (pending) startPendingSelection(pending);
 });
 
-async function handleSend() {
-  const text = chatInputRef.value?.getText() ?? "";
-  if (!text.trim() || isLoading.value) return;
-  const context = selectionContext.value || undefined;
-  chatInputRef.value?.setText("");
-  selectionContext.value = "";
+// Asks that arrive while the panel is already mounted, open or not.
+watch(
+  () => chatStore.pendingSelection,
+  (pending) => {
+    if (!pending) return;
+    const taken = chatStore.takePendingSelection();
+    if (taken) startPendingSelection(taken);
+  },
+);
+
+async function submit(text: string, context?: string) {
   isUserScrolling.value = false;
   isAtBottom.value = true;
   showScrollButton.value = false;
@@ -286,6 +300,38 @@ async function handleSend() {
     selectionContext: context,
     giveDirectAnswer: giveDirectAnswer.value,
   });
+}
+
+async function handleSend() {
+  const text = chatInputRef.value?.getText() ?? "";
+  if (!text.trim() || isLoading.value) return;
+  const context = selectionContext.value || undefined;
+  chatInputRef.value?.setText("");
+  selectionContext.value = "";
+
+  await submit(text, context);
+}
+
+/**
+ * A question asked from outside the panel — today the PDF's "Förklara" button.
+ * The quote goes over as selection context, exactly as a reply typed in here
+ * would.
+ */
+function startPendingSelection(pending: PendingSelection) {
+  // Mid-generation the send would be dropped on the floor. Park the quote in
+  // the input instead and let the reader fire it when the answer lands.
+  if (isLoading.value) {
+    selectionContext.value = pending.context;
+    nextTick(() => {
+      if (!chatInputRef.value?.getText().trim()) {
+        chatInputRef.value?.setText(pending.prompt);
+      }
+      chatInputRef.value?.focus();
+    });
+    return;
+  }
+
+  submit(pending.prompt, pending.context);
 }
 
 function handleCancel() {

@@ -83,6 +83,11 @@ const isOverlayResizing = ref(false);
 
 const chatHasBeenOpened = ref(false);
 
+/** "Förklara" on a PDF text selection: opens the chat and asks straight away. */
+function explainSelection(text: string) {
+  chatStore.askAboutSelection("Förklara", text);
+}
+
 watch(
   () => chatStore.isOpen,
   (open) => {
@@ -306,7 +311,8 @@ onUnmounted(() => {
                what lets the document survive a layout switch. -->
           <div class="relative h-full overflow-hidden"
             :style="isExamOnly ? { width: '100%' } : { width: `${splitPercent}%` }">
-            <LazyPdfRenderer :pdf-url="exam.pdf_url" :layout-mode="layoutMode" :top-inset="64" />
+            <LazyPdfRenderer :pdf-url="exam.pdf_url" :layout-mode="layoutMode" :top-inset="64" explain-enabled
+              @explain="explainSelection" />
 
             <FacitEdge v-if="isExamOnly && hasFacit && !isFacitVisible && !chatStore.isOpen"
               :facit-pdf-url="solutionPdfUrl" :intensity="facitProximity" />
@@ -321,7 +327,8 @@ onUnmounted(() => {
               <div class="absolute inset-0 h-full w-full flex flex-col">
                 <div v-if="solution" class="h-full relative" @mouseenter="solutionBlurred = false"
                   @mouseleave="solutionBlurred = true">
-                  <LazyPdfRenderer :pdf-url="solution.pdf_url" layout-mode="exam-with-facit" :top-inset="64" />
+                  <LazyPdfRenderer :pdf-url="solution.pdf_url" layout-mode="exam-with-facit" :top-inset="64"
+                    explain-enabled @explain="explainSelection" />
                   <Transition name="fade">
                     <div v-if="solutionBlurred"
                       class="absolute inset-0 z-50 backdrop-blur-sm bg-background/30 flex flex-col gap-2 items-center justify-center pointer-events-none">
@@ -381,7 +388,8 @@ onUnmounted(() => {
                 <ResizeHandle :is-resizing="isOverlayResizing" @start-resize="startOverlayResize" />
               </div>
               <div class="flex-1 overflow-hidden">
-                <LazyPdfRenderer :pdf-url="solutionPdfUrl!" layout-mode="exam-only" />
+                <LazyPdfRenderer :pdf-url="solutionPdfUrl!" layout-mode="exam-only" explain-enabled
+                  @explain="explainSelection" />
               </div>
             </div>
           </Transition>

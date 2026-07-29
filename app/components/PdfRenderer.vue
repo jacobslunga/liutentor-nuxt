@@ -28,7 +28,14 @@ const props = defineProps<{
   pdfUrl: string;
   layoutMode?: "exam-only" | "exam-with-facit" | "default";
   topInset?: number;
+  /**
+   * Offer "Förklara" over a text selection. Opt-in: only a page that actually
+   * has somewhere to send the text (the chat panel) should ask for it.
+   */
+  explainEnabled?: boolean;
 }>();
+
+const emit = defineEmits<{ explain: [text: string] }>();
 
 const colorMode = useColorMode();
 const { engine, isLoading } = usePdfiumEngine();
@@ -217,7 +224,25 @@ const plugins = computed(() => {
                                     :document-id="activeDocumentId"
                                     :page-index="page.pageIndex"
                                     :text-style="{ background: selectionColor }"
-                                  />
+                                  >
+                                    <!-- The wrapper is a pointer-events: none
+                                         box over the selection's bounding rect,
+                                         counter-rotated and zoom-scaled by the
+                                         plugin, so the button only has to say
+                                         which side of it to sit on. -->
+                                    <template
+                                      v-if="props.explainEnabled"
+                                      #selection-menu="{ menuWrapperProps, placement }"
+                                    >
+                                      <div v-bind="menuWrapperProps">
+                                        <PdfSelectionMenu
+                                          :document-id="activeDocumentId"
+                                          :above="placement.suggestTop"
+                                          @explain="emit('explain', $event)"
+                                        />
+                                      </div>
+                                    </template>
+                                  </SelectionLayer>
                                 </div>
                               </Rotate>
                             </PagePointerProvider>
