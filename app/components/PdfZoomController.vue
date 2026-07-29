@@ -27,9 +27,13 @@ const { provides: scroll } = useScrollCapability();
 
 // The zoom we last asked for. The capped zoom is a plain number,
 // indistinguishable from one the reader chose by scrolling or pinching, so
-// remembering it is what lets a resize re-apply the cap without stomping them.
+// remembering it is what tells the two apart on a resize.
 let lastApplied = 0;
 const EPSILON = 0.0005;
+
+// Width the current zoom was computed against, so a resize can scale a manual
+// zoom by how much the viewport actually changed.
+let lastWidth = 0;
 
 function availableWidth(): number | null {
   const vp = viewport.value;
@@ -73,6 +77,8 @@ function apply() {
   const available = availableWidth();
   if (!available) return;
 
+  lastWidth = available;
+
   const cap = props.maxPageWidth;
   if (cap === null || available <= cap) {
     lastApplied = 0;
@@ -94,6 +100,23 @@ function apply() {
   scope.requestZoom(lastApplied, { vx: 0, vy: 0 });
 }
 
+/**
+ * A manual zoom is a fixed number, so the plugin leaves it alone on resize and
+ * the page keeps its absolute size while the pane around it changes — the one
+ * case where the document stops tracking the layout. Scaling it by the change
+ * in viewport width preserves the proportion the reader chose, taking their
+ * current zoom as the reference rather than snapping back to a fit.
+ */
+function rescaleManualZoom(previousWidth: number, nextWidth: number) {
+  const scope = zoom.value;
+  if (!scope || !previousWidth || !nextWidth) return;
+
+  const current = scope.getState().currentZoomLevel;
+  if (!current) return;
+
+  scope.requestZoom(current * (nextWidth / previousWidth), { vx: 0, vy: 0 });
+}
+
 function scrollToTop() {
   viewport.value?.forDocument(props.documentId).scrollTo({ x: 0, y: 0 });
 }
@@ -109,6 +132,7 @@ watch(
   () => props.documentId,
   () => {
     lastApplied = 0;
+    lastWidth = 0;
   },
 );
 
@@ -142,15 +166,27 @@ watch(
   { immediate: true },
 );
 
-// Once capped the level is a number, and the plugin only re-resolves resizes
-// for *mode* levels, so the cap would otherwise never be re-evaluated when the
-// window crosses it. Skipped outright if the reader has since zoomed manually.
+// The plugin only re-resolves a resize for *mode* levels, so anything we or the
+// reader pinned to a number stops tracking the pane without this: our own value
+// needs the cap re-evaluated, theirs needs scaling by the same proportion.
 watch(
   viewport,
   (vp, _prev, onCleanup) => {
     if (!vp) return;
-    const off = vp.onViewportResize(() => {
+    const off = vp.onViewportResize((event) => {
+      if (event.documentId !== props.documentId) return;
+
+      const width = availableWidth();
+      if (!width) return;
+
+      const previousWidth = lastWidth;
+      // Sub-pixel churn only, e.g. a scrollbar appearing because we just
+      // rezoomed. Acting on it would feed back into itself.
+      if (Math.abs(width - previousWidth) < 1) return;
+      lastWidth = width;
+
       if (isOurs()) apply();
+      else rescaleManualZoom(previousWidth, width);
     });
     if (typeof off === "function") onCleanup(off);
   },

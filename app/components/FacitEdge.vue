@@ -40,6 +40,14 @@ function animateTo(target: number) {
 const REST_WIDTH = 3;
 const OPEN_WIDTH = 84;
 
+// Every mix here is `in oklab`, not oklch. --border and --foreground are
+// achromatic, so their hue is recorded as 0deg; oklch interpolates hue as an
+// angle, which drags an 18% mix of a 172deg teal all the way down to ~31deg and
+// renders the border orange. oklab is rectangular and blends through the true
+// neutral axis instead.
+const surface = (percent: number) =>
+  `color-mix(in oklab, var(--foreground) ${percent.toFixed(2)}%, var(--background))`;
+
 const sheetStyle = computed(() => {
   const v = spring.value;
   return {
@@ -48,9 +56,22 @@ const sheetStyle = computed(() => {
     // margin beside the page is already --background. A few percent of
     // --foreground reads as a distinct surface in both themes without
     // introducing a colour of its own.
-    backgroundColor: `color-mix(in oklch, var(--foreground) ${(3 + v * 3).toFixed(2)}%, var(--background))`,
-    borderLeftColor: `color-mix(in oklch, var(--primary) ${(18 + v * 52).toFixed(0)}%, var(--border))`,
-    boxShadow: `-14px 0 30px -14px color-mix(in oklch, var(--foreground) ${(v * 22).toFixed(0)}%, transparent)`,
+    backgroundColor: surface(3 + v * 3),
+    borderLeftColor: `color-mix(in oklab, var(--primary) ${(18 + v * 52).toFixed(0)}%, var(--border))`,
+    boxShadow: `-14px 0 30px -14px color-mix(in oklab, var(--foreground) ${(v * 22).toFixed(0)}%, transparent)`,
+  };
+});
+
+// The permanent affordance. Without something visible at rest there is nothing
+// telling you the right edge is worth approaching at all. It shares the sheet's
+// fill, so as the sheet widens past it the nub stops reading as a separate
+// object and simply becomes the sheet's edge.
+const nubStyle = computed(() => {
+  const v = spring.value;
+  return {
+    opacity: 1 - Math.min(v / 0.45, 1),
+    backgroundColor: surface(5),
+    borderColor: `color-mix(in oklab, var(--primary) 22%, var(--border))`,
   };
 });
 
@@ -74,6 +95,12 @@ onUnmounted(() => {
 <template>
   <div class="pointer-events-none absolute inset-y-0 right-0 w-32">
     <div class="absolute inset-y-0 right-0 border-l" :style="sheetStyle" />
+
+    <div
+      class="absolute right-0 top-1/2 flex h-12 w-6 -translate-y-1/2 items-center justify-center rounded-l-lg border-y border-l"
+      :style="nubStyle">
+      <LucideChevronLeft class="size-4 text-muted-foreground" />
+    </div>
 
     <div class="absolute right-0 top-1/2 flex items-center gap-2 whitespace-nowrap pr-4" :style="labelStyle">
       <template v-if="facitPdfUrl">
