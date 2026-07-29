@@ -59,9 +59,18 @@ const isExamOnly = computed(() => layoutMode.value === "exam-only");
 const isMobile = ref(import.meta.client ? window.innerWidth < 1024 : false);
 
 // Split mode
+const SPLIT_MIN = 20;
+const SPLIT_MAX = 80;
+/** Percentage points the split moves per arrow-key press. */
+const SPLIT_KEY_STEP = 2;
+
 const splitPercent = ref(55);
 const isResizing = ref(false);
 const solutionBlurred = ref(true);
+
+function clampSplit(percent: number) {
+  return Math.min(Math.max(percent, SPLIT_MIN), SPLIT_MAX);
+}
 
 // Exam-only mode: facit slides in as an overlay on approach to the right edge
 const isFacitVisible = ref(false);
@@ -104,8 +113,7 @@ function startSplitResize() {
   isResizing.value = true;
   beginDrag(
     (e) => {
-      const percent = (e.clientX / window.innerWidth) * 100;
-      splitPercent.value = Math.min(Math.max(percent, 20), 80);
+      splitPercent.value = clampSplit((e.clientX / window.innerWidth) * 100);
     },
     () => {
       isResizing.value = false;
@@ -189,6 +197,19 @@ function handleKeyDown(e: KeyboardEvent) {
       target.tagName === "INPUT" ||
       target.tagName === "TEXTAREA")
   ) {
+    return;
+  }
+
+  // Nudge the divider, in the same range the drag handle uses. Exam-only has
+  // no divider to move, and the panes resizing drives the zoom through the
+  // usual viewport-resize path, so the documents rescale as they would on a
+  // drag. Repeats are deliberately not filtered: holding the key should keep
+  // moving it.
+  if (!isExamOnly.value && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
+    e.preventDefault();
+    splitPercent.value = clampSplit(
+      splitPercent.value + (e.key === "ArrowRight" ? SPLIT_KEY_STEP : -SPLIT_KEY_STEP),
+    );
     return;
   }
 
