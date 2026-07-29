@@ -65,6 +65,12 @@ const selectedModelProvider = computed(
   () => CHAT_MODELS.find((m) => m.id === props.selectedModelId)?.provider,
 );
 
+const answerModeLabel = computed(
+  () =>
+    ANSWER_MODES.find((m) => m.value === props.giveDirectAnswer)?.label ??
+    ANSWER_MODES[0].label,
+);
+
 const updateHeight = () => {
   const el = textareaRef.value;
   if (!el) return;
@@ -131,25 +137,25 @@ defineExpose({
             @input="updateHeight" @keydown="handleKeyDown" />
 
           <div class="flex items-center justify-between gap-2 px-3 pb-2.5 pt-1">
-            <TooltipProvider>
-              <Tabs :model-value="giveDirectAnswer ? 'direct' : 'hint'"
-                @update:model-value="(v) => emit('update:giveDirectAnswer', v === 'direct')">
-                <TabsList class="h-8">
-                  <Tooltip v-for="mode in ANSWER_MODES" :key="String(mode.value)">
-                    <TooltipTrigger as-child>
-                      <TabsTrigger :value="mode.value ? 'direct' : 'hint'" class="h-full px-2.5">
-                        <LucideBrain v-if="mode.value" class="w-4 h-4" />
-                        <LucideLightbulb v-else class="w-4 h-4" />
-                      </TabsTrigger>
-                    </TooltipTrigger>
-                    <TooltipContent side="top">
-                      <p class="font-medium">{{ mode.label }}</p>
-                      <p class="text-2xs opacity-80">{{ mode.description }}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TabsList>
-              </Tabs>
-            </TooltipProvider>
+            <DropdownMenu>
+              <DropdownMenuTrigger as-child>
+                <Button variant="ghost" size="sm"
+                  class="px-2.5 text-xs font-medium text-muted-foreground hover:text-foreground">
+                  {{ answerModeLabel }}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" class="w-56">
+                <DropdownMenuItem v-for="mode in ANSWER_MODES" :key="String(mode.value)"
+                  class="cursor-pointer items-start justify-between gap-2"
+                  @click="emit('update:giveDirectAnswer', mode.value)">
+                  <div class="flex flex-col gap-0.5">
+                    <span class="text-sm font-medium">{{ mode.label }}</span>
+                    <span class="text-2xs text-muted-foreground">{{ mode.description }}</span>
+                  </div>
+                  <LucideCheck v-if="mode.value === giveDirectAnswer" class="w-4 h-4 shrink-0 text-primary" />
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
             <div class="flex shrink-0 items-center gap-1.5">
               <DropdownMenu>

@@ -66,12 +66,21 @@ function handleViewportScroll(event: Event) {
   showScrollTop.value = target.scrollTop > 320;
 }
 
-// Resolved once: it is an *initial* zoom, so re-deriving it later cannot apply
-// anyway, and doing so would discard whatever the reader has zoomed to.
-const defaultZoomLevel =
-  props.layoutMode === "exam-with-facit" || windowWidth < 1100
-    ? ZoomMode.FitWidth
-    : ZoomMode.Automatic;
+// Reading the exam full-bleed on a wide monitor gives an unreadably long line,
+// but the old ZoomMode.Automatic capped at 100% of the PDF's own scale, which
+// on a 1700px window left the page occupying about a third of the width. In
+// exam-only mode the page fills the viewport up to this cap instead.
+const MAX_EXAM_ONLY_PAGE_WIDTH = 980;
+
+// null means "always fill the pane" — in split view the pane is already narrow
+// enough to be the constraint.
+const maxPageWidth = computed(() =>
+  props.layoutMode === "exam-only" ? MAX_EXAM_ONLY_PAGE_WIDTH : null,
+);
+
+// Only the starting point; PdfZoomController owns it from the first resolve on,
+// which is what lets the zoom follow a layout toggle without a plugin rebuild.
+const defaultZoomLevel = ZoomMode.FitWidth;
 
 // Depends on `pdfUrl` and nothing else: navigating to another exam reuses this
 // instance, so the registry genuinely has to be rebuilt for a new document.
@@ -117,6 +126,8 @@ const plugins = computed(() => {
     <EmbedPDF v-else :engine="engine" :plugins="plugins">
       <template #default="{ activeDocumentId }">
         <template v-if="activeDocumentId">
+          <PdfZoomController :document-id="activeDocumentId" :max-page-width="maxPageWidth" />
+
           <DocumentContent :document-id="activeDocumentId">
             <template #default="{ isLoaded }">
               <div
