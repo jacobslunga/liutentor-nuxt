@@ -1,5 +1,13 @@
 <script setup lang="ts">
-import { ref, computed, watch, nextTick, onMounted, onUnmounted } from "vue";
+import {
+  ref,
+  computed,
+  watch,
+  nextTick,
+  onMounted,
+  onBeforeUnmount,
+  onUnmounted,
+} from "vue";
 import { storeToRefs } from "pinia";
 import { useChatStore } from "@/stores/chat";
 import { useChat } from "@/composables/useChat";
@@ -21,14 +29,8 @@ const emit = defineEmits<{ close: [] }>();
 
 const chatStore = useChatStore();
 const user = useSupabaseUser();
-const {
-  isOpen,
-  messages,
-  isLoading,
-  draftInput,
-  currentConversationTitle,
-  isHistoryOpen,
-} = storeToRefs(chatStore);
+const { isOpen, messages, isLoading, currentConversationTitle, isHistoryOpen } =
+  storeToRefs(chatStore);
 
 const currentUserId = computed(
   () =>
@@ -56,7 +58,11 @@ initChatMarkdown().then(() => {
 const { giveDirectAnswer } = useAnswerMode();
 const { selectedModelId } = useSelectedModel();
 const messagesContainer = ref<HTMLDivElement | null>(null);
-const chatInputRef = ref<{ focus: () => void } | null>(null);
+const chatInputRef = ref<{
+  focus: () => void;
+  getText: () => string;
+  setText: (value: string) => void;
+} | null>(null);
 const isUserScrolling = ref(false);
 const isAtBottom = ref(true);
 const showScrollButton = ref(false);
@@ -264,10 +270,10 @@ onMounted(() => {
 });
 
 async function handleSend() {
-  if (!draftInput.value.trim() || isLoading.value) return;
-  const text = draftInput.value;
+  const text = chatInputRef.value?.getText() ?? "";
+  if (!text.trim() || isLoading.value) return;
   const context = selectionContext.value || undefined;
-  draftInput.value = "";
+  chatInputRef.value?.setText("");
   selectionContext.value = "";
   isUserScrolling.value = false;
   isAtBottom.value = true;
@@ -285,7 +291,7 @@ async function handleSend() {
 function handleCancel() {
   const cancelled = cancelGeneration();
   if (cancelled) {
-    draftInput.value = cancelled;
+    chatInputRef.value?.setText(cancelled);
     chatInputRef.value?.focus();
   }
 }
@@ -298,6 +304,7 @@ function toggleHistory() {
 function startNewChat() {
   chatStore.messages = [];
   chatStore.draftInput = "";
+  chatInputRef.value?.setText("");
   chatStore.currentConversationId = null;
   chatStore.currentConversationTitle = null;
   chatStore.savedScrollPosition = 0;
@@ -337,6 +344,12 @@ onMounted(() => {
   document.addEventListener("keydown", handleKeyDown, true);
   document.addEventListener("selectionchange", handleSelectionChange);
 });
+// Children are still mounted during onBeforeUnmount, so the draft can still be
+// read off the input. It is the only point the store needs to hear about it.
+onBeforeUnmount(() => {
+  chatStore.draftInput = chatInputRef.value?.getText() ?? "";
+});
+
 onUnmounted(() => {
   document.removeEventListener("keydown", handleKeyDown, true);
   document.removeEventListener("selectionchange", handleSelectionChange);
@@ -420,7 +433,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
                visible line across the text. -->
           <div
             class="pointer-events-none absolute inset-x-0 top-0 bottom-0 -z-10 bg-linear-to-b from-background/0 via-background/60 via-50% to-background to-88%" />
-          <ChatInput ref="chatInputRef" v-model="draftInput" :is-loading="isLoading"
+          <ChatInput ref="chatInputRef" :initial-text="chatStore.draftInput" :is-loading="isLoading"
             :give-direct-answer="giveDirectAnswer" :selected-model-id="selectedModelId"
             :show-scroll-button="showScrollButton" :course-code="courseCode" :has-solution="hasSolution"
             :selection-context="selectionContext" class="pointer-events-auto" @send="handleSend" @cancel="handleCancel"

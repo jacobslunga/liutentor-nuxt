@@ -15,7 +15,12 @@ const ANSWER_MODES = [
 ] as const;
 
 const props = defineProps<{
-  modelValue: string;
+  /**
+   * Seed value only — read once, on mount. The draft deliberately lives here
+   * rather than in the parent or the store: routing every keystroke through
+   * either one re-rendered the whole chat panel per character.
+   */
+  initialText?: string;
   isLoading: boolean;
   giveDirectAnswer: boolean;
   selectedModelId: string;
@@ -26,7 +31,6 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  "update:modelValue": [value: string];
   send: [];
   cancel: [];
   scrollToBottom: [];
@@ -36,7 +40,12 @@ const emit = defineEmits<{
 }>();
 
 const textareaRef = ref<HTMLTextAreaElement | null>(null);
+const text = ref(props.initialText ?? "");
 const MAX_LENGTH = 4000;
+
+const canSend = computed(
+  () => !!text.value.trim() && text.value.length <= MAX_LENGTH,
+);
 
 const googleModels = computed(() =>
   CHAT_MODELS.filter((m) => m.provider === "Google"),
@@ -65,43 +74,28 @@ const updateHeight = () => {
   el.style.overflowY = el.scrollHeight > 180 ? "auto" : "hidden";
 };
 
-const handleInput = (e: Event) => {
-  const target = e.target as HTMLTextAreaElement;
-  emit("update:modelValue", target.value);
-  updateHeight();
-};
-
 const handleKeyDown = (e: KeyboardEvent) => {
   if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();
-    if (
-      props.modelValue.trim() &&
-      !props.isLoading &&
-      props.modelValue.length <= MAX_LENGTH
-    ) {
-      emit("send");
-    }
+    if (canSend.value && !props.isLoading) emit("send");
   }
 };
 
-// handleInput already resizes synchronously, so reacting to the same keystroke
-// here would measure the textarea twice per character — and `height: auto` +
-// scrollHeight forces a layout each time. Only programmatic changes (send
-// clears the draft, cancel restores it) need this.
-watch(
-  () => props.modelValue,
-  (value) => {
-    if (value === textareaRef.value?.value) return;
-    nextTick(updateHeight);
-  },
-);
+function setText(value: string) {
+  text.value = value;
+  nextTick(updateHeight);
+}
 
 onMounted(() => {
   updateHeight();
   textareaRef.value?.focus();
 });
 
-defineExpose({ focus: () => textareaRef.value?.focus() });
+defineExpose({
+  focus: () => textareaRef.value?.focus(),
+  getText: () => text.value,
+  setText,
+});
 </script>
 
 <template>
@@ -132,9 +126,9 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
             </div>
           </Transition>
 
-          <textarea ref="textareaRef" :value="modelValue" rows="1" placeholder="Fråga vad som helst"
+          <textarea ref="textareaRef" v-model="text" rows="1" placeholder="Fråga vad som helst"
             class="chat-textarea block w-full min-h-11 resize-none border-0 bg-transparent px-5 pt-4 pb-1 text-base leading-relaxed outline-none placeholder:text-muted-foreground/70 focus:ring-0 max-h-45"
-            @input="handleInput" @keydown="handleKeyDown" />
+            @input="updateHeight" @keydown="handleKeyDown" />
 
           <div class="flex items-center justify-between gap-2 px-3 pb-2.5 pt-1">
             <TooltipProvider>
@@ -211,8 +205,7 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
                   @click="emit('cancel')">
                   <LucideSquare class="size-3.5 fill-current" />
                 </Button>
-                <Button v-else key="send" size="icon" class="size-8" :disabled="!modelValue.trim() || modelValue.length > MAX_LENGTH
-                  " @click="emit('send')">
+                <Button v-else key="send" size="icon" class="size-8" :disabled="!canSend" @click="emit('send')">
                   <LucideArrowUp class="size-4" />
                 </Button>
               </Transition>
@@ -224,11 +217,11 @@ defineExpose({ focus: () => textareaRef.value?.focus() });
           <p class="text-2xs text-muted-foreground/60">
             AI kan göra misstag. Kontrollera viktig information.
           </p>
-          <p v-if="modelValue.length > MAX_LENGTH * 0.8" class="text-xs" :class="modelValue.length > MAX_LENGTH
+          <p v-if="text.length > MAX_LENGTH * 0.8" class="text-xs" :class="text.length > MAX_LENGTH
             ? 'text-destructive font-bold'
             : 'text-muted-foreground'
             ">
-            {{ modelValue.length }} / {{ MAX_LENGTH }}
+            {{ text.length }} / {{ MAX_LENGTH }}
           </p>
         </div>
       </div>

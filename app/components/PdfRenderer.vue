@@ -66,11 +66,18 @@ function handleViewportScroll(event: Event) {
   showScrollTop.value = target.scrollTop > 320;
 }
 
+// Resolved once: it is an *initial* zoom, so re-deriving it later cannot apply
+// anyway, and doing so would discard whatever the reader has zoomed to.
+const defaultZoomLevel =
+  props.layoutMode === "exam-with-facit" || windowWidth < 1100
+    ? ZoomMode.FitWidth
+    : ZoomMode.Automatic;
+
 // Depends on `pdfUrl` and nothing else: navigating to another exam reuses this
 // instance, so the registry genuinely has to be rebuilt for a new document.
-// `defaultZoomLevel` is only an initial value, so recomputing it on resize
-// bought nothing while costing a full re-registration — and a document reload —
-// on every single resize event.
+// Anything else in here — the old reactive windowWidth, or layoutMode once the
+// layout switcher stopped remounting this component — silently triggers a full
+// re-registration and a document reload.
 const plugins = computed(() => {
   const base = [
     createPluginRegistration(DocumentManagerPluginPackage, {
@@ -80,14 +87,7 @@ const plugins = computed(() => {
     createPluginRegistration(ScrollPluginPackage),
     createPluginRegistration(RenderPluginPackage),
     createPluginRegistration(RotatePluginPackage),
-    createPluginRegistration(ZoomPluginPackage, {
-      defaultZoomLevel:
-        props.layoutMode === "exam-with-facit"
-          ? ZoomMode.FitWidth
-          : windowWidth < 1100
-            ? ZoomMode.FitWidth
-            : ZoomMode.Automatic,
-    }),
+    createPluginRegistration(ZoomPluginPackage, { defaultZoomLevel }),
   ];
 
   if (isMobile) {

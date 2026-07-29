@@ -27,6 +27,7 @@ const exams = computed(() => (courseData.value as any)?.data?.exams ?? []);
 const exam = computed(() => (examData.value as any)?.data?.exam);
 const solution = computed(() => (examData.value as any)?.data?.solution);
 const solutionPdfUrl = computed(() => solution.value?.pdf_url ?? null);
+const hasFacit = computed(() => !!solutionPdfUrl.value);
 
 const isLoading = computed(() => status.value === "pending");
 const isError = computed(
@@ -48,44 +49,167 @@ useSeoMeta({
   robots: "noindex, nofollow",
 });
 
+// The two layout modes used to live in separate component trees behind a
+// v-if, so flipping the switcher tore down both PDF viewers (re-downloading
+// and re-parsing each document) and the chat panel. They are one tree now:
+// only the facit presentation differs, and the exam viewer and chat panel are
+// rendered in the same position either way, so they survive the toggle.
+const isExamOnly = computed(() => layoutMode.value === "exam-only");
+
 const isMobile = ref(import.meta.client ? window.innerWidth < 1024 : false);
-const solutionBlurred = ref(true);
+
+// Split mode
 const splitPercent = ref(55);
 const isResizing = ref(false);
+const solutionBlurred = ref(true);
+
+// Exam-only mode: facit slides in as an overlay on approach to the right edge
+const isFacitVisible = ref(false);
+const isFacitManual = ref(false);
+const gradientIntensity = ref(0);
+
+// Shared by the facit overlay and the chat panel, as it was in exam-only mode.
+const overlayWidth = ref(import.meta.client ? window.innerWidth / 2 : 600);
+const isOverlayResizing = ref(false);
+
 const chatHasBeenOpened = ref(false);
 
 watch(
   () => chatStore.isOpen,
   (open) => {
-    if (open && !chatHasBeenOpened.value) chatHasBeenOpened.value = true;
+    if (!open) return;
+    isFacitVisible.value = false;
+    isFacitManual.value = false;
+    if (!chatHasBeenOpened.value) chatHasBeenOpened.value = true;
   },
 );
 
-const chatPanelWidth = ref(
-  import.meta.client ? window.innerWidth / 2 : 600,
-);
-const isChatResizing = ref(false);
 let activeResizeCleanup: (() => void) | null = null;
 
-function startChatResize() {
+function beginDrag(onMove: (e: MouseEvent) => void, onDone: () => void) {
   activeResizeCleanup?.();
-  isChatResizing.value = true;
-  const onMouseMove = (e: MouseEvent) => {
-    const newWidth = window.innerWidth - e.clientX;
-    chatPanelWidth.value = Math.max(
-      300,
-      Math.min(newWidth, window.innerWidth * 0.85),
-    );
-  };
-  const onMouseUp = () => {
-    isChatResizing.value = false;
-    window.removeEventListener("mousemove", onMouseMove);
-    window.removeEventListener("mouseup", onMouseUp);
+  const move = (e: MouseEvent) => onMove(e);
+  const up = () => {
+    onDone();
+    window.removeEventListener("mousemove", move);
+    window.removeEventListener("mouseup", up);
     activeResizeCleanup = null;
   };
-  window.addEventListener("mousemove", onMouseMove);
-  window.addEventListener("mouseup", onMouseUp);
-  activeResizeCleanup = onMouseUp;
+  window.addEventListener("mousemove", move);
+  window.addEventListener("mouseup", up);
+  activeResizeCleanup = up;
+}
+
+function startSplitResize() {
+  isResizing.value = true;
+  beginDrag(
+    (e) => {
+      const percent = (e.clientX / window.innerWidth) * 100;
+      splitPercent.value = Math.min(Math.max(percent, 20), 80);
+    },
+    () => {
+      isResizing.value = false;
+    },
+  );
+}
+
+function startOverlayResize() {
+  isOverlayResizing.value = true;
+  beginDrag(
+    (e) => {
+      overlayWidth.value = Math.max(
+        300,
+        Math.min(window.innerWidth - e.clientX, window.innerWidth * 0.85),
+      );
+    },
+    () => {
+      isOverlayResizing.value = false;
+    },
+  );
+}
+
+// Drives GradientIndicator, which used to run a second window mousemove
+// listener recomputing the same viewport geometry on every move.
+function handleMouseMove(e: MouseEvent) {
+  if (
+    !isExamOnly.value ||
+    !hasFacit.value ||
+    isFacitManual.value ||
+    isOverlayResizing.value ||
+    chatStore.isOpen
+  )
+    return;
+
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  const safeZone = h * 0.25;
+  const inSafeZone = e.clientY < safeZone || e.clientY > h - safeZone;
+
+  const gradientTrigger = w * 0.7;
+  gradientIntensity.value =
+    e.clientX > gradientTrigger && !inSafeZone
+      ? Math.min(Math.max((e.clientX - gradientTrigger) / (w - gradientTrigger), 0), 1)
+      : 0;
+
+  if (inSafeZone && !isFacitVisible.value) return;
+  if (!isFacitVisible.value && e.clientY < 80) return;
+
+  // The overlay is `fixed right-0 bottom-0 h-screen` with an explicit width, so
+  // its box is fully known — measuring it with getBoundingClientRect forced a
+  // synchronous layout on every mousemove, over two live PDF viewports.
+  if (isFacitVisible.value && e.clientX >= w - overlayWidth.value - 40) return;
+
+  isFacitVisible.value = e.clientX > w * 0.92 && !inSafeZone;
+}
+
+function handleKeyDown(e: KeyboardEvent) {
+  if (e.defaultPrevented) return;
+
+  if (e.key === "Escape") {
+    if (chatStore.isOpen && chatStore.isHistoryOpen) {
+      e.preventDefault();
+      chatStore.isHistoryOpen = false;
+      return;
+    }
+    isFacitManual.value = false;
+    isFacitVisible.value = false;
+    chatStore.close();
+    return;
+  }
+
+  if (chatStore.isOpen) return;
+
+  // The chat input keeps DOM focus after the panel is closed, so without this
+  // the single-letter shortcuts also type themselves into the draft. Escape is
+  // handled above and must keep working from inside the input.
+  const target = e.target as HTMLElement | null;
+  if (
+    target &&
+    (target.isContentEditable ||
+      target.tagName === "INPUT" ||
+      target.tagName === "TEXTAREA")
+  ) {
+    return;
+  }
+
+  // Both shortcuts must preventDefault: opening the chat focuses its input
+  // within the same keystroke, so the character would otherwise be inserted
+  // into the freshly focused draft.
+  if (e.key === "c") {
+    e.preventDefault();
+    chatStore.open();
+    return;
+  }
+
+  if (e.key.toLowerCase() === "e") {
+    e.preventDefault();
+    if (isExamOnly.value) {
+      isFacitVisible.value = !isFacitVisible.value;
+      isFacitManual.value = isFacitVisible.value;
+    } else {
+      solutionBlurred.value = !solutionBlurred.value;
+    }
+  }
 }
 
 // Single teardown path. This previously ran from both onBeforeRouteUpdate and
@@ -95,6 +219,8 @@ function resetChatForNewExam() {
   chatStore.close();
   chatStore.clearChat();
   chatHasBeenOpened.value = false;
+  isFacitVisible.value = false;
+  isFacitManual.value = false;
 }
 
 onBeforeRouteUpdate((to, from) => {
@@ -115,42 +241,16 @@ function handleResize() {
 onMounted(() => {
   handleResize();
   window.addEventListener("resize", handleResize);
-  document.addEventListener("keyup", handleKeyUp);
+  window.addEventListener("mousemove", handleMouseMove, { passive: true });
+  window.addEventListener("keydown", handleKeyDown);
 });
 
 onUnmounted(() => {
   window.removeEventListener("resize", handleResize);
-  document.removeEventListener("keyup", handleKeyUp);
+  window.removeEventListener("mousemove", handleMouseMove);
+  window.removeEventListener("keydown", handleKeyDown);
   activeResizeCleanup?.();
 });
-
-function startResize() {
-  activeResizeCleanup?.();
-  isResizing.value = true;
-  function onMouseMove(e: MouseEvent) {
-    const percent = (e.clientX / window.innerWidth) * 100;
-    splitPercent.value = Math.min(Math.max(percent, 20), 80);
-  }
-  function onMouseUp() {
-    isResizing.value = false;
-    window.removeEventListener("mousemove", onMouseMove);
-    window.removeEventListener("mouseup", onMouseUp);
-    activeResizeCleanup = null;
-  }
-  window.addEventListener("mousemove", onMouseMove);
-  window.addEventListener("mouseup", onMouseUp);
-  activeResizeCleanup = onMouseUp;
-}
-
-function handleKeyUp(e: KeyboardEvent) {
-  if (chatStore.isOpen) return;
-  if (e.key === "c") {
-    chatStore.open();
-  }
-  if (e.key === "e") {
-    solutionBlurred.value = !solutionBlurred.value;
-  }
-}
 </script>
 
 <template>
@@ -179,36 +279,38 @@ function handleKeyUp(e: KeyboardEvent) {
         <MobilePdfView v-if="isMobile" class="bg-background" :exam-pdf-url="exam.pdf_url"
           :solution-pdf-url="solutionPdfUrl" :course-code="courseCode" :exam-date="exam.exam_date" />
 
-        <div v-else class="h-full flex flex-row overflow-hidden bg-background" :class="{ 'select-none': isResizing }">
-          <ExamOnlyView v-if="layoutMode === 'exam-only'" :exam-pdf-url="exam.pdf_url"
-            :solution-pdf-url="solutionPdfUrl" />
+        <div v-else class="h-full flex flex-row overflow-hidden bg-background"
+          :class="{ 'select-none': isResizing || isOverlayResizing }">
+          <!-- Exam viewer. Same vnode position in both modes on purpose: this is
+               what lets the document survive a layout switch. -->
+          <div class="relative h-full overflow-hidden"
+            :style="isExamOnly ? { width: '100%' } : { width: `${splitPercent}%` }">
+            <LazyPdfRenderer :pdf-url="exam.pdf_url" :layout-mode="layoutMode" :top-inset="64" />
 
-          <template v-else>
-            <div class="h-full overflow-hidden" :style="{ width: `${splitPercent}%` }">
-              <LazyPdfRenderer :pdf-url="exam.pdf_url" layout-mode="exam-with-facit" :top-inset="64" />
-            </div>
+            <GradientIndicator v-if="isExamOnly && hasFacit && !isFacitVisible && !chatStore.isOpen"
+              :facit-pdf-url="solutionPdfUrl" :intensity="gradientIntensity" />
+          </div>
 
+          <template v-if="!isExamOnly">
             <div class="relative z-60 w-0 shrink-0">
-              <ResizeHandle :is-resizing="isResizing" @start-resize="startResize" />
+              <ResizeHandle :is-resizing="isResizing" @start-resize="startSplitResize" />
             </div>
 
             <div class="relative h-full flex-1 min-w-0 overflow-hidden bg-background">
               <div class="absolute inset-0 h-full w-full flex flex-col">
-                <template v-if="solution">
-                  <div class="h-full relative" @mouseenter="solutionBlurred = false"
-                    @mouseleave="solutionBlurred = true">
-                    <LazyPdfRenderer :pdf-url="solution.pdf_url" layout-mode="exam-with-facit" :top-inset="64" />
-                    <Transition name="fade">
-                      <div v-if="solutionBlurred"
-                        class="absolute inset-0 z-50 backdrop-blur-sm bg-background/30 flex flex-col gap-2 items-center justify-center pointer-events-none">
-                        <p class="text-sm font-normal text-muted-foreground">
-                          Håll muspekaren för att visa facit
-                        </p>
-                        <LucideMousePointerClick class="text-muted-foreground animate-in" />
-                      </div>
-                    </Transition>
-                  </div>
-                </template>
+                <div v-if="solution" class="h-full relative" @mouseenter="solutionBlurred = false"
+                  @mouseleave="solutionBlurred = true">
+                  <LazyPdfRenderer :pdf-url="solution.pdf_url" layout-mode="exam-with-facit" :top-inset="64" />
+                  <Transition name="fade">
+                    <div v-if="solutionBlurred"
+                      class="absolute inset-0 z-50 backdrop-blur-sm bg-background/30 flex flex-col gap-2 items-center justify-center pointer-events-none">
+                      <p class="text-sm font-normal text-muted-foreground">
+                        Håll muspekaren för att visa facit
+                      </p>
+                      <LucideMousePointerClick class="text-muted-foreground animate-in" />
+                    </div>
+                  </Transition>
+                </div>
 
                 <div v-else class="flex h-full items-center justify-center p-6">
                   <div class="group relative w-full max-w-sm">
@@ -240,30 +342,49 @@ function handleKeyUp(e: KeyboardEvent) {
                   </div>
                 </div>
               </div>
-
             </div>
-
-            <Teleport to="body">
-              <Transition enter-active-class="transition-all duration-200 ease-spring"
-                enter-from-class="translate-x-full opacity-0" enter-to-class="translate-x-0 opacity-100 blur-0"
-                leave-active-class="transition-all duration-200 ease-spring"
-                leave-from-class="translate-x-0 opacity-100 blur-0" leave-to-class="translate-x-full opacity-0 blur-sm">
-                <div v-if="chatHasBeenOpened" v-show="chatStore.isOpen"
-                  class="fixed right-0 bottom-0 z-80 flex h-screen shadow-xl bg-background"
-                  :class="{ 'select-none': isChatResizing }" :style="{ width: `${chatPanelWidth}px` }">
-                  <div class="relative z-100 w-0 shrink-0">
-                    <ResizeHandle :is-resizing="isChatResizing" @start-resize="startChatResize" />
-                  </div>
-                  <div class="flex-1 overflow-hidden">
-                    <LazyChatWindow :exam-id="examId" :exam-url="exam.pdf_url" :course-code="courseCode"
-                      :solution-url="solutionPdfUrl" :has-solution="!!solution" class="h-full w-full"
-                      @close="chatStore.close()" />
-                  </div>
-                </div>
-              </Transition>
-            </Teleport>
           </template>
         </div>
+
+        <Teleport to="body">
+          <!-- Facit overlay, exam-only mode -->
+          <Transition enter-active-class="transition-all duration-200 ease-spring"
+            enter-from-class="translate-x-full opacity-0" enter-to-class="translate-x-0 opacity-100 blur-0"
+            leave-active-class="transition-all duration-200 ease-spring"
+            leave-from-class="translate-x-0 opacity-100 blur-0" leave-to-class="translate-x-full opacity-0 blur-sm">
+            <div v-if="!isMobile && isExamOnly && hasFacit"
+              v-show="isFacitVisible && !chatStore.isOpen"
+              class="fixed right-0 bottom-0 z-70 flex h-screen shadow-xl bg-background"
+              :class="{ 'select-none': isOverlayResizing }" :style="{ width: `${overlayWidth}px` }">
+              <div class="relative z-100 w-0 shrink-0">
+                <ResizeHandle :is-resizing="isOverlayResizing" @start-resize="startOverlayResize" />
+              </div>
+              <div class="flex-1 overflow-hidden">
+                <LazyPdfRenderer :pdf-url="solutionPdfUrl!" layout-mode="exam-only" />
+              </div>
+            </div>
+          </Transition>
+
+          <!-- Chat panel. Rendered outside the mode branches so it is not torn
+               down and rebuilt when the layout switcher flips. -->
+          <Transition enter-active-class="transition-all duration-200 ease-spring"
+            enter-from-class="translate-x-full opacity-0" enter-to-class="translate-x-0 opacity-100 blur-0"
+            leave-active-class="transition-all duration-200 ease-spring"
+            leave-from-class="translate-x-0 opacity-100 blur-0" leave-to-class="translate-x-full opacity-0 blur-sm">
+            <div v-if="!isMobile && chatHasBeenOpened" v-show="chatStore.isOpen"
+              class="fixed right-0 bottom-0 z-80 flex h-screen shadow-xl bg-background"
+              :class="{ 'select-none': isOverlayResizing }" :style="{ width: `${overlayWidth}px` }">
+              <div class="relative z-100 w-0 shrink-0">
+                <ResizeHandle :is-resizing="isOverlayResizing" @start-resize="startOverlayResize" />
+              </div>
+              <div class="flex-1 overflow-hidden">
+                <LazyChatWindow :key="examId" :exam-id="examId" :exam-url="exam.pdf_url" :course-code="courseCode"
+                  :solution-url="solutionPdfUrl" :has-solution="hasFacit" class="h-full w-full"
+                  @close="chatStore.close()" />
+              </div>
+            </div>
+          </Transition>
+        </Teleport>
       </template>
     </div>
   </ClientOnly>
