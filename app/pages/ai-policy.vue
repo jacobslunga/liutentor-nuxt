@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { DocSection } from "~/types/doc";
+
 definePageMeta({ layout: "info" });
 
 useSeoMeta({
@@ -12,13 +14,7 @@ function openMail() {
   window.location.href = "mailto:liutentor@gmail.com";
 }
 
-interface Section {
-  title: string;
-  content: string;
-  items?: string[];
-}
-
-const sections: Section[] = [
+const sections: DocSection[] = [
   {
     title: "Vårt syfte med AI",
     content:
@@ -61,51 +57,38 @@ const sections: Section[] = [
 </script>
 
 <template>
-    <h1 class="text-3xl font-medium text-foreground mb-1">AI-policy</h1>
-    <p class="text-xs text-muted-foreground mb-6">
-      Senast uppdaterad: 2026-04-20
-    </p>
-    <p class="text-sm text-foreground/80 leading-relaxed mb-6">
-      Den här policyn förklarar hur LiU Tentor använder artificiell intelligens,
-      vad du kan förvänta dig av tjänsten och vilket ansvar du har som
-      användare. Vårt mål är att vara en trygg och transparent partner i dina
-      studier.
-    </p>
+  <div>
+    <PageIntro
+      eyebrow="Juridiskt"
+      title="AI-policy"
+      lead="Den här policyn förklarar hur LiU Tentor använder artificiell intelligens, vad du kan förvänta dig av tjänsten och vilket ansvar du har som användare. Vårt mål är att vara en trygg och transparent partner i dina studier."
+      meta="Senast uppdaterad 29 juli 2026"
+    />
 
-    <Separator />
-
-    <div class="space-y-6 mt-8">
-      <div v-for="section in sections" :key="section.title" class="mb-6">
-        <h2 class="text-lg font-medium text-foreground mb-2">
-          {{ section.title }}
-        </h2>
-        <p class="text-sm text-foreground/80 leading-relaxed">
-          {{ section.content }}
-        </p>
-        <ul v-if="section.items" class="mt-3 list-disc pl-5 space-y-1 text-sm text-foreground/70">
-          <li v-for="item in section.items" :key="item">{{ item }}</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="mt-8 pt-6 border-t bg-primary/5 rounded-md p-6 border border-primary/10">
-      <div class="flex items-center gap-2 mb-2">
-        <LucideShieldCheck class="h-5 w-5 text-primary" />
-        <h3 class="text-sm font-medium">Använd AI med omdöme</h3>
-      </div>
-      <p class="text-sm text-muted-foreground leading-relaxed">
-        Kom ihåg: AI:n är en assistent, inte en ersättare för ditt eget kritiska
-        tänkande. Genom att använda LiU Tentor godkänner du att du förstår
-        teknikens begränsningar.
-      </p>
-    </div>
-
-    <div class="mt-12 text-center">
-      <p class="text-xs text-muted-foreground">
-        Har du sett AI:n svara ovanligt märkligt?
-        <Button variant="link" size="sm" class="text-foreground underline-offset-2 h-auto p-0 text-xs" @click="openMail">
-          Rapportera det till oss.
-        </Button>
-      </p>
-    </div>
+    <LegalDocument :sections="sections">
+      <template #footer>
+        <div class="grid gap-x-12 gap-y-5 border-t py-14 lg:grid-cols-[13rem_minmax(0,1fr)] lg:py-20">
+          <h2 class="text-lg font-medium text-foreground">
+            Använd AI med omdöme
+          </h2>
+          <div class="max-w-2xl">
+            <p class="text-[0.9375rem] leading-[1.75] text-foreground/75">
+              AI:n är en assistent, inte en ersättare för ditt eget kritiska tänkande. Genom att
+              använda LiU Tentor godkänner du att du förstår teknikens begränsningar.
+            </p>
+            <p class="mt-6 text-sm text-muted-foreground">
+              Har du sett AI:n svara ovanligt märkligt?
+              <button
+                type="button"
+                class="text-foreground underline underline-offset-2 transition-colors duration-150 ease-spring hover:text-primary"
+                @click="openMail"
+              >
+                Rapportera det till oss.
+              </button>
+            </p>
+          </div>
+        </div>
+      </template>
+    </LegalDocument>
+  </div>
 </template>

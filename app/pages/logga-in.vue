@@ -188,45 +188,27 @@ async function handleSignup() {
     <Tabs v-model="activeTab" class="w-full">
       <TabsList class="w-full">
         <TabsTrigger value="logga-in" class="flex-1">Logga in</TabsTrigger>
-        <TabsTrigger value="skapa-konto" class="flex-1"
-          >Skapa konto</TabsTrigger
-        >
+        <TabsTrigger value="skapa-konto" class="flex-1">Skapa konto</TabsTrigger>
       </TabsList>
 
       <!-- Login tab -->
       <TabsContent value="logga-in" class="mt-6">
-        <div
-          v-if="loginSuccess"
-          class="flex flex-col items-center space-y-3 py-6 text-center"
-        >
-          <div
-            class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center"
-          >
+        <div v-if="loginSuccess" class="flex flex-col items-center space-y-3 py-6 text-center">
+          <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
             <LucideCheck class="w-6 h-6 text-primary" />
           </div>
           <p class="font-medium">Inloggad!</p>
           <p class="text-sm text-muted-foreground">
             Loggar in dig, tar dig till första sidan...
           </p>
-          <LucideLoader2
-            class="w-4 h-4 animate-spin text-muted-foreground mt-1" />
+          <LucideLoader2 class="w-4 h-4 animate-spin text-muted-foreground mt-1" />
         </div>
 
-        <form
-          v-else
-          @submit.prevent="handleLogin"
-          class="flex flex-col space-y-4"
-        >
+        <form v-else @submit.prevent="handleLogin" class="flex flex-col space-y-4">
           <div class="flex flex-col space-y-1.5">
             <label class="text-sm font-medium">LiU mail</label>
-            <Input
-              v-model="loginForm.email"
-              type="email"
-              placeholder="abcde123@student.liu.se"
-              autocomplete="email"
-              :aria-invalid="!!loginErrors.email"
-              :class="loginErrors.email ? 'border-destructive' : ''"
-            />
+            <Input v-model="loginForm.email" type="email" placeholder="abcde123@student.liu.se" autocomplete="email"
+              :aria-invalid="!!loginErrors.email" :class="loginErrors.email ? 'border-destructive' : ''" />
             <p v-if="loginErrors.email" class="text-xs text-destructive">
               {{ loginErrors.email }}
             </p>
@@ -235,22 +217,11 @@ async function handleSignup() {
           <div class="flex flex-col space-y-1.5">
             <label class="text-sm font-medium">Lösenord</label>
             <div class="relative">
-              <Input
-                v-model="loginForm.password"
-                :type="showLoginPassword ? 'text' : 'password'"
-                placeholder="••••••••"
-                autocomplete="current-password"
-                :aria-invalid="!!loginErrors.password"
-                :class="
-                  loginErrors.password ? 'border-destructive pr-10' : 'pr-10'
-                "
-              />
-              <Button
-                variant="ghost"
-                size="icon-xs"
-                class="absolute right-3 top-1/2 -translate-y-1/2"
-                @click="showLoginPassword = !showLoginPassword"
-              >
+              <Input v-model="loginForm.password" :type="showLoginPassword ? 'text' : 'password'" placeholder="••••••••"
+                autocomplete="current-password" :aria-invalid="!!loginErrors.password" :class="loginErrors.password ? 'border-destructive pr-10' : 'pr-10'
+                  " />
+              <Button variant="ghost" size="icon-xs" class="absolute right-3 top-1/2 -translate-y-1/2"
+                @click="showLoginPassword = !showLoginPassword">
                 <LucideEye v-if="!showLoginPassword" class="w-4 h-4" />
                 <LucideEyeOff v-else class="w-4 h-4" />
               </Button>
@@ -260,10 +231,7 @@ async function handleSignup() {
             </p>
           </div>
 
-          <p
-            v-if="loginGeneralError"
-            class="text-xs text-destructive text-center"
-          >
+          <p v-if="loginGeneralError" class="text-xs text-destructive text-center">
             {{ loginGeneralError }}
           </p>
 
@@ -274,12 +242,8 @@ async function handleSignup() {
 
           <p class="text-xs text-center text-muted-foreground">
             Inget konto?
-            <Button
-              variant="link"
-              size="sm"
-              class="text-foreground underline-offset-2 hover:text-primary h-auto p-0"
-              @click="activeTab = 'skapa-konto'"
-            >
+            <Button variant="link" size="sm" class="text-foreground underline-offset-2 hover:text-primary h-auto p-0"
+              @click="activeTab = 'skapa-konto'">
               Skapa ett här
             </Button>
           </p>
@@ -288,13 +252,8 @@ async function handleSignup() {
 
       <!-- Signup tab -->
       <TabsContent value="skapa-konto" class="mt-6">
-        <div
-          v-if="signupSuccess"
-          class="flex flex-col items-center space-y-3 py-6 text-center"
-        >
-          <div
-            class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center"
-          >
+        <div v-if="signupSuccess" class="flex flex-col items-center space-y-3 py-6 text-center">
+          <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
             <LucideMailCheck class="w-6 h-6 text-primary" />
           </div>
           <p class="font-medium">Konto skapat!</p>
@@ -302,40 +261,24 @@ async function handleSignup() {
             Vi har skickat en bekräftelse till
             <span class="font-medium text-foreground">{{
               signupForm.email
-            }}</span
-            >. Kontrollera din inkorg.
+              }}</span>. Kontrollera din inkorg.
           </p>
-          <Button
-            size="sm"
-            variant="outline"
-            class="mt-2"
-            @click="
-              () => {
-                signupSuccess = false;
-                activeTab = 'logga-in';
-              }
-            "
-          >
+          <Button size="sm" variant="outline" class="mt-2" @click="
+            () => {
+              signupSuccess = false;
+              activeTab = 'logga-in';
+            }
+          ">
             Gå till inloggning
           </Button>
         </div>
 
-        <form
-          v-else
-          @submit.prevent="handleSignup"
-          class="flex flex-col space-y-4"
-        >
+        <form v-else @submit.prevent="handleSignup" class="flex flex-col space-y-4">
           <div class="flex gap-3">
             <div class="flex flex-col space-y-1.5 flex-1">
               <label class="text-sm font-medium">Förnamn</label>
-              <Input
-                v-model="signupForm.firstName"
-                type="text"
-                placeholder="Förnamn"
-                autocomplete="given-name"
-                :aria-invalid="!!signupErrors.firstName"
-                :class="signupErrors.firstName ? 'border-destructive' : ''"
-              />
+              <Input v-model="signupForm.firstName" type="text" placeholder="Förnamn" autocomplete="given-name"
+                :aria-invalid="!!signupErrors.firstName" :class="signupErrors.firstName ? 'border-destructive' : ''" />
               <p v-if="signupErrors.firstName" class="text-xs text-destructive">
                 {{ signupErrors.firstName }}
               </p>
@@ -343,14 +286,8 @@ async function handleSignup() {
 
             <div class="flex flex-col space-y-1.5 flex-1">
               <label class="text-sm font-medium">Efternamn</label>
-              <Input
-                v-model="signupForm.lastName"
-                type="text"
-                placeholder="Efternamn"
-                autocomplete="family-name"
-                :aria-invalid="!!signupErrors.lastName"
-                :class="signupErrors.lastName ? 'border-destructive' : ''"
-              />
+              <Input v-model="signupForm.lastName" type="text" placeholder="Efternamn" autocomplete="family-name"
+                :aria-invalid="!!signupErrors.lastName" :class="signupErrors.lastName ? 'border-destructive' : ''" />
               <p v-if="signupErrors.lastName" class="text-xs text-destructive">
                 {{ signupErrors.lastName }}
               </p>
@@ -359,14 +296,8 @@ async function handleSignup() {
 
           <div class="flex flex-col space-y-1.5">
             <label class="text-sm font-medium">LiU mail</label>
-            <Input
-              v-model="signupForm.email"
-              type="email"
-              placeholder="abcde123@student.liu.se"
-              autocomplete="email"
-              :aria-invalid="!!signupErrors.email"
-              :class="signupErrors.email ? 'border-destructive' : ''"
-            />
+            <Input v-model="signupForm.email" type="email" placeholder="abcde123@student.liu.se" autocomplete="email"
+              :aria-invalid="!!signupErrors.email" :class="signupErrors.email ? 'border-destructive' : ''" />
             <p v-if="signupErrors.email" class="text-xs text-destructive">
               {{ signupErrors.email }}
             </p>
@@ -378,22 +309,11 @@ async function handleSignup() {
           <div class="flex flex-col space-y-1.5">
             <label class="text-sm font-medium">Lösenord</label>
             <div class="relative">
-              <Input
-                v-model="signupForm.password"
-                :type="showSignupPassword ? 'text' : 'password'"
-                placeholder="••••••••"
-                autocomplete="new-password"
-                :aria-invalid="!!signupErrors.password"
-                :class="
-                  signupErrors.password ? 'border-destructive pr-10' : 'pr-10'
-                "
-              />
-              <Button
-                variant="ghost"
-                size="icon-xs"
-                class="absolute right-3 top-1/2 -translate-y-1/2"
-                @click="showSignupPassword = !showSignupPassword"
-              >
+              <Input v-model="signupForm.password" :type="showSignupPassword ? 'text' : 'password'"
+                placeholder="••••••••" autocomplete="new-password" :aria-invalid="!!signupErrors.password" :class="signupErrors.password ? 'border-destructive pr-10' : 'pr-10'
+                  " />
+              <Button variant="ghost" size="icon-xs" class="absolute right-3 top-1/2 -translate-y-1/2"
+                @click="showSignupPassword = !showSignupPassword">
                 <LucideEye v-if="!showSignupPassword" class="w-4 h-4" />
                 <LucideEyeOff v-else class="w-4 h-4" />
               </Button>
@@ -407,40 +327,24 @@ async function handleSignup() {
           <div class="flex flex-col space-y-1.5">
             <label class="text-sm font-medium">Bekräfta lösenord</label>
             <div class="relative">
-              <Input
-                v-model="signupForm.confirmPassword"
-                :type="showSignupConfirm ? 'text' : 'password'"
-                placeholder="••••••••"
-                autocomplete="new-password"
-                :aria-invalid="!!signupErrors.confirmPassword"
-                :class="
-                  signupErrors.confirmPassword
+              <Input v-model="signupForm.confirmPassword" :type="showSignupConfirm ? 'text' : 'password'"
+                placeholder="••••••••" autocomplete="new-password" :aria-invalid="!!signupErrors.confirmPassword"
+                :class="signupErrors.confirmPassword
                     ? 'border-destructive pr-10'
                     : 'pr-10'
-                "
-              />
-              <Button
-                variant="ghost"
-                size="icon-xs"
-                class="absolute right-3 top-1/2 -translate-y-1/2"
-                @click="showSignupConfirm = !showSignupConfirm"
-              >
+                  " />
+              <Button variant="ghost" size="icon-xs" class="absolute right-3 top-1/2 -translate-y-1/2"
+                @click="showSignupConfirm = !showSignupConfirm">
                 <LucideEye v-if="!showSignupConfirm" class="w-4 h-4" />
                 <LucideEyeOff v-else class="w-4 h-4" />
               </Button>
             </div>
-            <p
-              v-if="signupErrors.confirmPassword"
-              class="text-xs text-destructive"
-            >
+            <p v-if="signupErrors.confirmPassword" class="text-xs text-destructive">
               {{ signupErrors.confirmPassword }}
             </p>
           </div>
 
-          <p
-            v-if="signupGeneralError"
-            class="text-xs text-destructive text-center"
-          >
+          <p v-if="signupGeneralError" class="text-xs text-destructive text-center">
             {{ signupGeneralError }}
           </p>
 
@@ -451,12 +355,8 @@ async function handleSignup() {
 
           <p class="text-xs text-center text-muted-foreground">
             Har du redan ett konto?
-            <Button
-              variant="link"
-              size="sm"
-              class="text-foreground underline-offset-2 hover:text-primary h-auto p-0"
-              @click="activeTab = 'logga-in'"
-            >
+            <Button variant="link" size="sm" class="text-foreground underline-offset-2 hover:text-primary h-auto p-0"
+              @click="activeTab = 'logga-in'">
               Logga in
             </Button>
           </p>

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { DocSection } from "~/types/doc";
+
 definePageMeta({ layout: "info" });
 
 useSeoMeta({
@@ -12,13 +14,7 @@ function openMail() {
   window.location.href = "mailto:liutentor@gmail.com";
 }
 
-interface Section {
-  title: string;
-  content: string;
-  items?: string[];
-}
-
-const sections: Section[] = [
+const sections: DocSection[] = [
   {
     title: "Personuppgiftsansvarig",
     content:
@@ -98,45 +94,26 @@ const sections: Section[] = [
 </script>
 
 <template>
-    <h1 class="text-3xl font-medium text-foreground mb-1">Integritetspolicy</h1>
-    <p class="text-xs text-muted-foreground mb-6">
-      Senast uppdaterad: 2026-04-19
-    </p>
-    <p class="text-sm text-foreground/80 leading-relaxed mb-6">
-      Hos LiU Tentor värnar vi om din integritet och behandlar dina
-      personuppgifter i enlighet med EU:s dataskyddsförordning (GDPR). Denna
-      policy beskriver vilka uppgifter vi samlar in, hur de hanteras säkert i
-      Frankfurt (EU), och vilka rättigheter du har som användare.
-    </p>
+  <div>
+    <PageIntro
+      eyebrow="Juridiskt"
+      title="Integritetspolicy"
+      lead="Hos LiU Tentor värnar vi om din integritet och behandlar dina personuppgifter i enlighet med EU:s dataskyddsförordning (GDPR). Här beskriver vi vilka uppgifter vi samlar in, hur de hanteras säkert i Frankfurt (EU), och vilka rättigheter du har som användare."
+      meta="Senast uppdaterad 29 juli 2026"
+    />
 
-    <Separator />
-
-    <div class="space-y-6 mt-8">
-      <div v-for="section in sections" :key="section.title" class="mb-6">
-        <h2 class="text-lg font-medium text-foreground mb-2">
-          {{ section.title }}
-        </h2>
-        <p class="text-sm text-foreground/80 leading-relaxed">
-          {{ section.content }}
-        </p>
-        <ul
-          v-if="section.items"
-          class="mt-3 list-disc pl-5 space-y-1 text-sm text-foreground/70"
+    <LegalDocument :sections="sections">
+      <template #footer>
+        <DocContact
+          title="Kontakta oss"
+          body="Har du frågor om din data eller vill utöva dina rättigheter, till exempel radera ditt konto? Hör av dig så hjälper vi dig."
         >
-          <li v-for="item in section.items" :key="item">{{ item }}</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="mt-8 pt-6 border-t space-y-2">
-      <div class="flex items-center gap-2">
-        <LucideMailbox class="h-5 w-5 text-primary" />
-        <h3 class="text-sm font-medium">Kontakta oss</h3>
-      </div>
-      <p class="text-sm text-muted-foreground">
-        Har du frågor om din data eller vill utöva dina rättigheter (t.ex.
-        radera ditt konto)? Kontakta oss så hjälper vi dig.
-      </p>
-      <Button size="sm" @click="openMail"> liutentor@gmail.com </Button>
-    </div>
+          <Button size="sm" variant="outline" @click="openMail">
+            <LucideMail class="size-3.5" />
+            liutentor@gmail.com
+          </Button>
+        </DocContact>
+      </template>
+    </LegalDocument>
+  </div>
 </template>
