@@ -66,7 +66,7 @@ const solutionBlurred = ref(true);
 // Exam-only mode: facit slides in as an overlay on approach to the right edge
 const isFacitVisible = ref(false);
 const isFacitManual = ref(false);
-const gradientIntensity = ref(0);
+const facitProximity = ref(0);
 
 // Shared by the facit overlay and the chat panel, as it was in exam-only mode.
 const overlayWidth = ref(import.meta.client ? window.innerWidth / 2 : 600);
@@ -128,8 +128,8 @@ function startOverlayResize() {
   );
 }
 
-// Drives GradientIndicator, which used to run a second window mousemove
-// listener recomputing the same viewport geometry on every move.
+// Drives FacitEdge, which used to run a second window mousemove listener
+// recomputing the same viewport geometry on every move.
 function handleMouseMove(e: MouseEvent) {
   if (
     !isExamOnly.value ||
@@ -145,10 +145,10 @@ function handleMouseMove(e: MouseEvent) {
   const safeZone = h * 0.25;
   const inSafeZone = e.clientY < safeZone || e.clientY > h - safeZone;
 
-  const gradientTrigger = w * 0.7;
-  gradientIntensity.value =
-    e.clientX > gradientTrigger && !inSafeZone
-      ? Math.min(Math.max((e.clientX - gradientTrigger) / (w - gradientTrigger), 0), 1)
+  const proximityStart = w * 0.7;
+  facitProximity.value =
+    e.clientX > proximityStart && !inSafeZone
+      ? Math.min(Math.max((e.clientX - proximityStart) / (w - proximityStart), 0), 1)
       : 0;
 
   if (inSafeZone && !isFacitVisible.value) return;
@@ -287,8 +287,8 @@ onUnmounted(() => {
             :style="isExamOnly ? { width: '100%' } : { width: `${splitPercent}%` }">
             <LazyPdfRenderer :pdf-url="exam.pdf_url" :layout-mode="layoutMode" :top-inset="64" />
 
-            <GradientIndicator v-if="isExamOnly && hasFacit && !isFacitVisible && !chatStore.isOpen"
-              :facit-pdf-url="solutionPdfUrl" :intensity="gradientIntensity" />
+            <FacitEdge v-if="isExamOnly && hasFacit && !isFacitVisible && !chatStore.isOpen"
+              :facit-pdf-url="solutionPdfUrl" :intensity="facitProximity" />
           </div>
 
           <template v-if="!isExamOnly">
