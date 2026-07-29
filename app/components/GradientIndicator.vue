@@ -1,7 +1,13 @@
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
   facitPdfUrl: string | null;
   label?: string;
+  /**
+   * Pointer proximity, 0..1, supplied by the parent. This used to be derived
+   * from a second window-level mousemove listener running alongside the
+   * parent's own, both recomputing the same viewport geometry on every move.
+   */
+  intensity: number;
 }>();
 
 const spring = ref(0);
@@ -42,24 +48,9 @@ const backgroundImage = computed(() => {
 const iconOpacity = computed(() => 0.5 + spring.value * 0.5);
 const arrowX = computed(() => `${-10 + spring.value * -20}px`);
 
-function handleMouseMove(e: MouseEvent) {
-  const w = window.innerWidth;
-  const h = window.innerHeight;
-  const xTrigger = w * 0.7;
-  const safeZoneY = h * 0.25;
-  const inSafeZone = e.clientY < safeZoneY || e.clientY > h - safeZoneY;
+watch(() => props.intensity, animateTo, { immediate: true });
 
-  if (e.clientX > xTrigger && !inSafeZone) {
-    const xRatio = (e.clientX - xTrigger) / (w - xTrigger);
-    animateTo(Math.min(Math.max(xRatio, 0), 1));
-  } else {
-    animateTo(0);
-  }
-}
-
-onMounted(() => window.addEventListener("mousemove", handleMouseMove));
 onUnmounted(() => {
-  window.removeEventListener("mousemove", handleMouseMove);
   if (rafId) cancelAnimationFrame(rafId);
 });
 </script>
