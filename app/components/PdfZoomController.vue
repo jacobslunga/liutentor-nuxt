@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { useZoom, ZoomMode } from "@embedpdf/plugin-zoom/vue";
 import { useViewportCapability } from "@embedpdf/plugin-viewport/vue";
+import { useScrollCapability } from "@embedpdf/plugin-scroll/vue";
 
 /**
- * Renderless — must live inside <EmbedPDF>, since the zoom and viewport
- * capabilities come from the plugin registry.
+ * Renderless — must live inside <EmbedPDF>, since the capabilities it uses
+ * come from the plugin registry.
  *
  * `defaultZoomLevel` is applied once at registration, so it cannot answer a
  * layout change on a viewer that (deliberately) survives one. This keeps the
@@ -20,19 +21,14 @@ const props = defineProps<{
   maxPageWidth: number | null;
 }>();
 
-const { state, provides: zoom } = useZoom(() => props.documentId);
+const { provides: zoom } = useZoom(() => props.documentId);
 const { provides: viewport } = useViewportCapability();
+const { provides: scroll } = useScrollCapability();
 
-// Unscaled page width. Derived the first time a fit mode resolves — after that
-// any target width maps straight to a zoom factor, so a layout change is a
-// single request with no intermediate frame at the wrong size.
-let pageWidth = 0;
-
-// The capped zoom is a plain number, indistinguishable from one the reader
-// chose by scrolling or pinching. Remembering what we asked for is what lets a
-// resize re-apply the cap without stomping on a manual zoom.
+// The zoom we last asked for. The capped zoom is a plain number,
+// indistinguishable from one the reader chose by scrolling or pinching, so
+// remembering it is what lets a resize re-apply the cap without stomping them.
 let lastApplied = 0;
-
 const EPSILON = 0.0005;
 
 function availableWidth(): number | null {
@@ -44,19 +40,30 @@ function availableWidth(): number | null {
   return width > 0 ? width : null;
 }
 
-/** A fit mode has resolved, so currentZoomLevel reveals the page's real width. */
-function learnPageWidth() {
-  if (pageWidth) return;
-  const available = availableWidth();
-  const resolved = state.value.currentZoomLevel;
-  if (!available || !resolved) return;
-  pageWidth = available / resolved;
-}
+/**
+ * The widest spread, unscaled — the same quantity the zoom plugin divides by
+ * when it resolves a fit mode. Read straight from the layout rather than
+ * inferred from a resolved zoom: before the first resolve the reported zoom is
+ * still the initial 1, and dividing by that yields a page "width" equal to the
+ * viewport, which then caps to a wildly zoomed-out page.
+ */
+function contentWidth(): number | null {
+  const sc = scroll.value;
+  if (!sc) return null;
 
-function isOurs(): boolean {
-  const level = state.value.zoomLevel;
-  if (typeof level !== "number") return true;
-  return !!lastApplied && Math.abs(level - lastApplied) < EPSILON;
+  const spreads = sc.forDocument(props.documentId).getSpreadPagesWithRotatedSize();
+  if (!spreads?.length) return null;
+
+  const pageGap = sc.getPageGap();
+  let widest = 0;
+  for (const spread of spreads) {
+    const width = spread.reduce(
+      (total, page, i) => total + page.rotatedSize.width + (i ? pageGap : 0),
+      0,
+    );
+    widest = Math.max(widest, width);
+  }
+  return widest > 0 ? widest : null;
 }
 
 function apply() {
@@ -67,51 +74,72 @@ function apply() {
   if (!available) return;
 
   const cap = props.maxPageWidth;
-
   if (cap === null || available <= cap) {
     lastApplied = 0;
     scope.requestZoom(ZoomMode.FitWidth);
     return;
   }
 
-  learnPageWidth();
-  if (!pageWidth) {
-    // Page width unknown: fit first. Resolving it feeds the watcher below,
-    // which re-runs this with enough information to cap it.
+  const content = contentWidth();
+  if (!content) {
+    // Layout not ready yet; onLayoutReady below runs this again.
     lastApplied = 0;
     scope.requestZoom(ZoomMode.FitWidth);
     return;
   }
 
-  lastApplied = cap / pageWidth;
-  scope.requestZoom(lastApplied);
+  lastApplied = cap / content;
+  // Anchor on the viewport's top-left. requestZoom otherwise preserves the
+  // centre point, which silently scrolls you down the page as it zooms in.
+  scope.requestZoom(lastApplied, { vx: 0, vy: 0 });
 }
 
-// A different document means a different page size.
+function scrollToTop() {
+  viewport.value?.forDocument(props.documentId).scrollTo({ x: 0, y: 0 });
+}
+
+function isOurs(): boolean {
+  const level = zoom.value?.getState().zoomLevel;
+  if (typeof level !== "number") return true;
+  return !!lastApplied && Math.abs(level - lastApplied) < EPSILON;
+}
+
+// A different document means different page dimensions.
 watch(
   () => props.documentId,
   () => {
-    pageWidth = 0;
     lastApplied = 0;
   },
 );
 
-// Re-fit when the cap changes (layout toggled) and once the zoom scope exists.
-watch([() => props.maxPageWidth, zoom], apply, { immediate: true });
-
-// Fit modes resolve asynchronously — on document load, and again on resize.
-// Each resolve is a chance to learn the page width and clamp what it produced.
+// Re-fit when the cap changes (layout toggled) and once the capabilities exist.
+// Both entering and leaving exam-only mode restart the reader at the top.
 watch(
-  () => state.value.currentZoomLevel,
-  () => {
-    if (state.value.zoomLevel !== ZoomMode.FitWidth) return;
-    learnPageWidth();
-    const available = availableWidth();
-    const cap = props.maxPageWidth;
-    if (!available || cap === null || available <= cap || !pageWidth) return;
-    lastApplied = cap / pageWidth;
-    zoom.value?.requestZoom(lastApplied);
+  [() => props.maxPageWidth, zoom, scroll, viewport],
+  ([, , , vp], prev) => {
+    if (!vp) return;
+    apply();
+    // Not on the very first run: that one only establishes the initial zoom,
+    // and the load-time scroll reset is handled by onLayoutReady below.
+    if (prev) nextTick(scrollToTop);
   },
+  { immediate: true },
+);
+
+// The layout is what tells us the real page size, and it lands asynchronously
+// after the document parses. This is the pass that gets the initial zoom right.
+watch(
+  scroll,
+  (sc, _prev, onCleanup) => {
+    if (!sc) return;
+    const off = sc.onLayoutReady((event) => {
+      if (event.documentId !== props.documentId) return;
+      apply();
+      nextTick(scrollToTop);
+    });
+    if (typeof off === "function") onCleanup(off);
+  },
+  { immediate: true },
 );
 
 // Once capped the level is a number, and the plugin only re-resolves resizes
