@@ -1,56 +1,36 @@
 <script setup lang="ts">
-const route = useRoute();
-const sidebarOpen = ref(false);
+import { useWindowScroll } from "@vueuse/core";
+
 const { open: openUploadModal } = useUploadModal();
+const { y } = useWindowScroll();
 
-const pageTitles: Record<string, string> = {
-  "/om-oss": "Om oss",
-  "/faq": "Vanliga frågor",
-  "/feedback": "Feedback",
-  "/privacy-policy": "Integritetspolicy",
-  "/copyright-policy": "Upphovsrätt",
-  "/ai-policy": "AI-policy",
-};
-
-const currentTitle = computed(() => pageTitles[route.path] ?? "");
+// The header is borderless at rest so the page opens on uninterrupted white,
+// and only picks up a hairline once content slides under it.
+const scrolled = computed(() => y.value > 8);
 </script>
 
 <template>
-  <div class="flex min-h-screen bg-background">
-    <InfoSidebar v-model:open="sidebarOpen" />
+  <div class="flex min-h-screen flex-col bg-background">
+    <header class="sticky top-0 z-30 h-14 shrink-0 border-b bg-background transition-colors duration-200 ease-spring"
+      :class="scrolled ? 'border-border' : 'border-transparent'">
+      <div class="mx-auto flex h-full max-w-6xl items-center justify-between px-5 sm:px-8">
+        <NuxtLink to="/" class="flex items-center gap-2 transition-opacity duration-150 ease-spring hover:opacity-70">
+          <LogoIcon class="size-6 text-primary" />
+          <span class="font-logo text-lg font-medium tracking-tighter">LiU Tentor</span>
+        </NuxtLink>
 
-    <div class="flex min-h-screen flex-1 flex-col lg:pl-60">
-      <!-- Top header bar for both mobile & desktop -->
-      <header class="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between border-b bg-background/95 backdrop-blur-sm px-4 lg:px-8">
-        <div class="flex items-center gap-3">
-          <Button variant="ghost" size="icon-sm" class="lg:hidden" @click="sidebarOpen = true">
-            <LucideMenu class="size-4" />
-          </Button>
+        <Button variant="outline" size="sm" @click="openUploadModal()">
+          <LucideUpload class="size-3.5" />
+          <span class="hidden sm:inline">Ladda upp tenta</span>
+          <span class="sm:hidden">Ladda upp</span>
+        </Button>
+      </div>
+    </header>
 
-          <NuxtLink to="/" class="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
-            <LucideArrowLeft class="size-3.5" />
-            <span>Hem</span>
-          </NuxtLink>
-          <span class="hidden sm:inline text-muted-foreground/40">/</span>
-          <span class="text-sm font-medium text-foreground truncate">{{ currentTitle }}</span>
-        </div>
+    <main class="flex-1">
+      <slot />
+    </main>
 
-        <div class="flex items-center gap-2">
-          <Button variant="outline" size="sm" @click="openUploadModal()">
-            <LucideUpload class="size-3.5" />
-            <span class="hidden sm:inline">Ladda upp tenta</span>
-            <span class="sm:hidden">Ladda upp</span>
-          </Button>
-        </div>
-      </header>
-
-      <main class="flex-1">
-        <div class="mx-auto max-w-4xl px-4 sm:px-6 py-8 lg:py-12">
-          <slot />
-        </div>
-      </main>
-
-      <AppFooter />
-    </div>
+    <AppFooter />
   </div>
 </template>

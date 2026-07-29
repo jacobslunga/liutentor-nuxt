@@ -12,12 +12,8 @@ const { open: openUploadModal } = useUploadModal();
 </script>
 
 <template>
-  <div
-    class="relative flex flex-col items-center justify-start w-full min-h-screen p-4 pt-[20vh] bg-background"
-  >
-    <div
-      class="flex flex-row items-center justify-center gap-2 absolute top-5 right-5"
-    >
+  <div class="relative flex flex-col items-center justify-start w-full min-h-screen p-4 pt-[20vh] bg-background">
+    <div class="flex flex-row items-center justify-center gap-2 absolute top-5 right-5">
       <AuthActions />
     </div>
 
@@ -34,12 +30,10 @@ const { open: openUploadModal } = useUploadModal();
       <div class="relative w-full">
         <div
           class="w-full border border-foreground/20 bg-background flex flex-row items-center justify-center rounded-full transition-colors duration-200 ease-spring text-sm text-foreground/80 outline-none"
-          :class="
-            focusInput
+          :class="focusInput
               ? 'border-primary ring-1 ring-primary'
               : 'hover:border-foreground/40'
-          "
-        >
+            ">
           <MainInput v-model:focusInput="focusInput" />
         </div>
       </div>

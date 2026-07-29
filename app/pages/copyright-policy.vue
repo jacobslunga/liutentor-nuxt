@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { DocSection } from "~/types/doc";
+
 definePageMeta({ layout: "info" });
 
 useSeoMeta({
@@ -13,13 +15,7 @@ function openMail() {
     "mailto:liutentor@gmail.com?subject=Begäran om borttagning av material";
 }
 
-interface Section {
-  title: string;
-  content: string;
-  items?: string[];
-}
-
-const sections: Section[] = [
+const sections: DocSection[] = [
   {
     title: "Vår utgångspunkt",
     content:
@@ -27,8 +23,10 @@ const sections: Section[] = [
   },
   {
     title: "Upphovsrätt och offentliga handlingar",
-    content:
-      "I Sverige är tentamina vid statliga lärosäten i regel allmänna handlingar enligt offentlighetsprincipen (2 kap. tryckfrihetsförordningen) och kan begäras ut av vem som helst. Detta innebär att handlingarna i sig är offentliga. Däremot innebär inte offentlighetsprincipen att upphovsrätten upphör – den som skapat materialet (exempelvis en examinator) kan i vissa fall ha upphovsrätt till verket även om det är en allmän handling. Vi publicerar material i enlighet med vad vi bedömer vara tillåten vidarespridning för icke-kommersiellt studieändamål, men vi gör inte anspråk på att varje enskilt publicerat dokument är helt fritt från upphovsrättsliga anspråk.",
+    content: [
+      "I Sverige är tentamina vid statliga lärosäten i regel allmänna handlingar enligt offentlighetsprincipen (2 kap. tryckfrihetsförordningen) och kan begäras ut av vem som helst. Detta innebär att handlingarna i sig är offentliga.",
+      "Däremot innebär inte offentlighetsprincipen att upphovsrätten upphör – den som skapat materialet (exempelvis en examinator) kan i vissa fall ha upphovsrätt till verket även om det är en allmän handling. Vi publicerar material i enlighet med vad vi bedömer vara tillåten vidarespridning för icke-kommersiellt studieändamål, men vi gör inte anspråk på att varje enskilt publicerat dokument är helt fritt från upphovsrättsliga anspråk.",
+    ],
   },
   {
     title: "Examinatorers och rättighetsinnehavares rättigheter",
@@ -70,44 +68,26 @@ const sections: Section[] = [
 </script>
 
 <template>
-    <h1 class="text-3xl font-medium text-foreground mb-1">Upphovsrätt</h1>
-    <p class="text-xs text-muted-foreground mb-6">
-      Senast uppdaterad: 2026/03/23
-    </p>
-    <p class="text-sm text-foreground/80 leading-relaxed mb-6">
-      LiU Tentor publicerar tentamaterial i syfte att hjälpa studenter att
-      förbereda sig inför examinationer. Vi tar upphovsrätt och
-      rättighetsinnehavares intressen på allvar. På denna sida förklarar vi hur
-      vi förhåller oss till upphovsrättsliga frågor och hur du snabbt och enkelt
-      kan begära att material tas bort.
-    </p>
+  <div>
+    <PageIntro
+      eyebrow="Juridiskt"
+      title="Upphovsrätt"
+      lead="LiU Tentor publicerar tentamaterial för att hjälpa studenter att förbereda sig inför examinationer. Vi tar upphovsrätt och rättighetsinnehavares intressen på allvar. Här förklarar vi hur vi förhåller oss till upphovsrättsliga frågor och hur du snabbt kan begära att material tas bort."
+      meta="Senast uppdaterad 29 juli 2026"
+    />
 
-    <Separator />
-
-    <div class="space-y-6 mt-8">
-      <div v-for="section in sections" :key="section.title" class="mb-6">
-        <h2 class="text-lg font-medium text-foreground mb-2">
-          {{ section.title }}
-        </h2>
-        <p class="text-sm text-foreground/80 leading-relaxed">
-          {{ section.content }}
-        </p>
-        <ul v-if="section.items" class="mt-3 list-disc pl-5 space-y-1 text-sm text-foreground/70">
-          <li v-for="item in section.items" :key="item">{{ item }}</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="mt-8 pt-6 border-t space-y-4">
-      <div class="flex items-center gap-2">
-        <LucideShieldAlert class="h-5 w-5 text-primary" />
-        <h3 class="text-sm font-medium">Begär borttagning av material</h3>
-      </div>
-      <p class="text-sm text-muted-foreground">
-        Anser du att vi publicerat material som kränker din upphovsrätt eller
-        dina personuppgifter? Kontakta oss så hanterar vi ditt ärende inom 48
-        timmar.
-      </p>
-      <Button size="sm" @click="openMail"> Skicka borttagningsbegäran </Button>
-    </div>
+    <LegalDocument :sections="sections">
+      <template #footer>
+        <DocContact
+          title="Begär borttagning"
+          body="Anser du att vi publicerat material som kränker din upphovsrätt eller dina personuppgifter? Kontakta oss så hanterar vi ditt ärende inom 48 timmar."
+        >
+          <Button size="sm" variant="outline" @click="openMail">
+            <LucideMail class="size-3.5" />
+            Skicka borttagningsbegäran
+          </Button>
+        </DocContact>
+      </template>
+    </LegalDocument>
+  </div>
 </template>
