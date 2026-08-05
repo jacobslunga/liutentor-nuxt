@@ -77,7 +77,7 @@ const groups = [
         :class="i > 0 ? 'border-t' : ''"
       >
         <p
-          class="pt-6 font-mono text-2xs uppercase tracking-[0.18em] text-muted-foreground lg:sticky lg:top-24 lg:self-start"
+          class="pt-6 text-sm font-medium text-muted-foreground lg:sticky lg:top-24 lg:self-start"
         >
           {{ group.label }}
         </p>

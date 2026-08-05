@@ -14,7 +14,7 @@ defineProps<{
 <template>
   <header class="border-b">
     <div class="mx-auto max-w-6xl px-5 pb-12 pt-16 sm:px-8 sm:pb-16 sm:pt-24">
-      <p class="font-mono text-2xs uppercase tracking-[0.18em] text-muted-foreground">
+      <p class="text-sm font-medium text-muted-foreground">
         {{ eyebrow }}
       </p>
 
@@ -33,7 +33,7 @@ defineProps<{
         {{ lead }}
       </p>
 
-      <p v-if="meta" class="mt-8 font-mono text-2xs uppercase tracking-[0.14em] text-muted-foreground/70">
+      <p v-if="meta" class="mt-8 text-sm text-muted-foreground/70">
         {{ meta }}
       </p>
 

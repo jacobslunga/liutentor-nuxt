@@ -9,16 +9,6 @@ export const CHAT_MODELS = [
     label: "3.6 Flash",
     provider: "Google",
   },
-  {
-    id: "claude-haiku-4-5",
-    label: "Haiku",
-    provider: "Anthropic",
-  },
-  {
-    id: "claude-sonnet-4-6",
-    label: "Sonnet",
-    provider: "Anthropic",
-  },
 ] as const;
 
 const VALID_MODEL_IDS = CHAT_MODELS.map((m) => m.id);
@@ -51,7 +41,9 @@ export function useSelectedModel() {
     }
   }
 
-  // Ensure stored value is valid, otherwise default to Gemini 3.1 Flash Lite
+  // Anything not on the list above falls back to the default. This is also
+  // what migrates the users still holding a retired `claude-*` id in their
+  // cookie — no separate cleanup pass needed.
   if (!VALID_MODEL_ID_SET.has(selectedModelId.value)) {
     selectedModelId.value = DEFAULT_MODEL_ID;
   }

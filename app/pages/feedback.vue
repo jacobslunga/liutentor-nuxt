@@ -79,7 +79,7 @@ async function handleSubmit() {
 
     <div class="mx-auto max-w-6xl px-5 sm:px-8">
       <div class="grid gap-x-12 gap-y-8 py-12 lg:grid-cols-[13rem_minmax(0,1fr)] lg:py-16">
-        <p class="font-mono text-2xs uppercase tracking-[0.18em] text-muted-foreground lg:sticky lg:top-24 lg:self-start">
+        <p class="text-sm font-medium text-muted-foreground lg:sticky lg:top-24 lg:self-start">
           Formulär
         </p>
 

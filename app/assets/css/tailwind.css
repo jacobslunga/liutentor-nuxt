@@ -2,12 +2,10 @@
    remote stylesheet cannot be preloaded, so the browser only discovers the
    font files after that request resolves — and it sends every visitor's IP to
    a third party, which this site has no reason to do. Same variable axes as
-   before (Inter opsz+wght, Platypi wght, both with italics), still subsetted
+   before (Inter opsz+wght, Vollkorn wght, both with italics), still subsetted
    per unicode-range and still font-display: swap. */
-@import "@fontsource-variable/inter/opsz.css";
-@import "@fontsource-variable/inter/opsz-italic.css";
-@import "@fontsource-variable/platypi/index.css";
-@import "@fontsource-variable/platypi/wght-italic.css";
+@import "@fontsource-variable/vollkorn/index.css";
+@import "@fontsource-variable/vollkorn/wght-italic.css";
 
 @import "tailwindcss";
 
@@ -19,7 +17,6 @@
   src: url("/fonts/GT-Super-Text-Bold.otf") format("opentype");
   font-display: swap;
 }
-
 
 @theme {
   /* Motion: one easing, two durations. --duration-fast for hover/color/opacity/
@@ -100,14 +97,15 @@
 @theme {
   --font-logo: "Logo", serif;
   --font-mono:  "SF Mono", monospace;
-  --font-serif: "Platypi Variable", Georgia, Cambria, "Times New Roman", Times, serif;
-  --font-sans: "Inter Variable", system-ui, -apple-system, BlinkMacSystemFont,
+  --font-serif: "Vollkorn Variable", Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-sans: system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue",
     sans-serif;
 }
 
 body {
   font-family: var(--font-sans);
+  letter-spacing: 0.2px;
 }
 
 ::selection {
@@ -286,30 +284,6 @@ body {
 
   body {
     @apply bg-background text-foreground;
-  }
-
-  /* Optical tracking: small text needs tightening, large text needs almost
-     none. Bucketed by size utility so it applies everywhere without touching
-     individual components — a `tracking-*` utility still overrides it. */
-  .text-2xs,
-  .text-xs {
-    letter-spacing: -0.02em;
-  }
-
-  .text-sm,
-  .text-base {
-    letter-spacing: -0.005em;
-  }
-
-  .text-lg,
-  .text-xl,
-  .text-2xl,
-  .text-3xl,
-  .text-4xl,
-  .text-5xl,
-  .text-6xl,
-  .text-7xl {
-    letter-spacing: -0.002em;
   }
 
   /* Inline prose links keep a persistent underline (editorial convention),

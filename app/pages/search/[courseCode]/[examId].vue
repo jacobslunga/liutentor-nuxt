@@ -7,6 +7,7 @@ const route = useRoute();
 const layoutStore = useLayoutStore();
 const { layoutMode } = storeToRefs(layoutStore);
 const chatStore = useChatStore();
+const { showExplainPopover, blurFacitUntilHover } = useSettings();
 
 const examId = computed(() => route.params.examId as string);
 const courseCode = computed(() => route.params.courseCode as string);
@@ -66,7 +67,7 @@ const SPLIT_KEY_STEP = 2;
 
 const splitPercent = ref(55);
 const isResizing = ref(false);
-const solutionBlurred = ref(true);
+const solutionBlurred = ref(blurFacitUntilHover.value);
 
 function clampSplit(percent: number) {
   return Math.min(Math.max(percent, SPLIT_MIN), SPLIT_MAX);
@@ -87,6 +88,12 @@ const chatHasBeenOpened = ref(false);
 function explainSelection(text: string) {
   chatStore.askAboutSelection("Förklara", text);
 }
+
+// Flipping the preference from the settings overlay should land on the facit
+// behind it straight away, not on the next page load.
+watch(blurFacitUntilHover, (blur) => {
+  solutionBlurred.value = blur;
+});
 
 watch(
   () => chatStore.isOpen,
@@ -311,8 +318,8 @@ onUnmounted(() => {
                what lets the document survive a layout switch. -->
           <div class="relative h-full overflow-hidden"
             :style="isExamOnly ? { width: '100%' } : { width: `${splitPercent}%` }">
-            <LazyPdfRenderer :pdf-url="exam.pdf_url" :layout-mode="layoutMode" :top-inset="64" explain-enabled
-              @explain="explainSelection" />
+            <LazyPdfRenderer :pdf-url="exam.pdf_url" :layout-mode="layoutMode" :top-inset="64"
+              :explain-enabled="showExplainPopover" @explain="explainSelection" />
 
             <FacitEdge v-if="isExamOnly && hasFacit && !isFacitVisible && !chatStore.isOpen"
               :facit-pdf-url="solutionPdfUrl" :intensity="facitProximity" />
@@ -326,9 +333,9 @@ onUnmounted(() => {
             <div class="relative h-full flex-1 min-w-0 overflow-hidden bg-background">
               <div class="absolute inset-0 h-full w-full flex flex-col">
                 <div v-if="solution" class="h-full relative" @mouseenter="solutionBlurred = false"
-                  @mouseleave="solutionBlurred = true">
+                  @mouseleave="solutionBlurred = blurFacitUntilHover">
                   <LazyPdfRenderer :pdf-url="solution.pdf_url" layout-mode="exam-with-facit" :top-inset="64"
-                    explain-enabled @explain="explainSelection" />
+                    :explain-enabled="showExplainPopover" @explain="explainSelection" />
                   <Transition name="fade">
                     <div v-if="solutionBlurred"
                       class="absolute inset-0 z-50 backdrop-blur-sm bg-background/30 flex flex-col gap-2 items-center justify-center pointer-events-none">
@@ -388,8 +395,8 @@ onUnmounted(() => {
                 <ResizeHandle :is-resizing="isOverlayResizing" @start-resize="startOverlayResize" />
               </div>
               <div class="flex-1 overflow-hidden">
-                <LazyPdfRenderer :pdf-url="solutionPdfUrl!" layout-mode="exam-only" explain-enabled
-                  @explain="explainSelection" />
+                <LazyPdfRenderer :pdf-url="solutionPdfUrl!" layout-mode="exam-only"
+                  :explain-enabled="showExplainPopover" @explain="explainSelection" />
               </div>
             </div>
           </Transition>

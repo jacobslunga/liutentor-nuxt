@@ -27,7 +27,7 @@ function jumpTo(id: string) {
   <div class="mx-auto max-w-6xl px-5 sm:px-8">
     <!-- Index -->
     <nav aria-label="Innehåll" class="pt-12 sm:pt-16">
-      <p class="font-mono text-2xs uppercase tracking-[0.18em] text-muted-foreground">
+      <p class="text-sm font-medium text-muted-foreground">
         Innehåll
       </p>
       <ol class="mt-5 grid gap-x-10 sm:grid-cols-2">
@@ -37,7 +37,7 @@ function jumpTo(id: string) {
             class="group flex items-baseline gap-4 border-b py-3 text-sm text-muted-foreground transition-colors duration-150 ease-spring hover:text-foreground"
             @click.prevent="jumpTo(entry.id)"
           >
-            <span class="font-mono text-2xs tabular-nums text-muted-foreground/60 transition-colors duration-150 ease-spring group-hover:text-primary">
+            <span class="text-xs tabular-nums text-muted-foreground/60 transition-colors duration-150 ease-spring group-hover:text-primary">
               {{ entry.number }}
             </span>
             <span class="flex-1">{{ entry.title }}</span>
@@ -55,7 +55,7 @@ function jumpTo(id: string) {
         class="grid scroll-mt-24 gap-x-12 gap-y-5 border-t py-10 lg:grid-cols-[13rem_minmax(0,1fr)] lg:py-14"
       >
         <div class="lg:sticky lg:top-24 lg:self-start">
-          <span class="font-mono text-2xs tabular-nums text-primary">{{ entry.number }}</span>
+          <span class="text-xs tabular-nums text-primary">{{ entry.number }}</span>
           <h2 class="mt-2 text-lg font-medium leading-snug text-foreground">
             {{ entry.title }}
           </h2>

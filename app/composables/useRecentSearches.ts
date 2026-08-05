@@ -53,5 +53,9 @@ export function useRecentSearches() {
       .slice(0, 3);
   });
 
-  return { latest, add };
+  function clear() {
+    cookie.value = [];
+  }
+
+  return { latest, add, clear };
 }

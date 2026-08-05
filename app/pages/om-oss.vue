@@ -80,7 +80,7 @@ const principles = [
 
       <!-- Principles -->
       <section class="border-t py-14 lg:py-20">
-        <p class="font-mono text-2xs uppercase tracking-[0.18em] text-muted-foreground">
+        <p class="text-sm font-medium text-muted-foreground">
           Tre saker vi står för
         </p>
         <div class="mt-10 grid gap-10 sm:grid-cols-3 sm:gap-8">
