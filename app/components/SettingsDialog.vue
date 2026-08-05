@@ -1,15 +1,5 @@
 <script setup lang="ts">
-import {
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogOverlay,
-  DialogPortal,
-  DialogRoot,
-  DialogTitle,
-  DialogTrigger,
-  VisuallyHidden,
-} from "reka-ui";
+import { VisuallyHidden } from "reka-ui";
 // Imported rather than auto-imported: the nav is a list, so the icon has to be
 // bound through `:is`, and that needs the component itself, not a tag name.
 import {
@@ -40,7 +30,7 @@ const SECTIONS = [
 
 const activeSection = ref<string>(SECTIONS[0].id);
 
-// Every open starts on the first section. Reopening the overlay on whichever
+// Every open starts on the first section. Reopening the dialog on whichever
 // pane was last read is disorienting when the trigger is a plain cog.
 watch(open, (isOpen) => {
   if (isOpen) activeSection.value = SECTIONS[0].id;
@@ -48,134 +38,93 @@ watch(open, (isOpen) => {
 </script>
 
 <template>
-  <DialogRoot v-model:open="open">
+  <Dialog v-model:open="open">
     <DialogTrigger v-if="!hideTrigger" as-child>
       <Button variant="ghost" size="icon-sm">
         <LucideSettings />
       </Button>
     </DialogTrigger>
 
-    <DialogPortal>
-      <DialogOverlay class="settings-overlay fixed inset-0 z-100 bg-background/60 backdrop-blur-sm" />
+    <!-- The dialog owns its own close button inside the content pane, so the
+         one baked into DialogContent is turned off. -->
+    <DialogContent
+      :show-close-button="false"
+      class="flex h-[85vh] max-h-[620px] w-full flex-col gap-0 overflow-hidden p-0 sm:max-w-3xl"
+    >
+      <VisuallyHidden>
+        <DialogDescription>Anpassa hur LiU Tentor beter sig.</DialogDescription>
+      </VisuallyHidden>
 
-      <DialogContent class="settings-shell fixed inset-0 z-100 flex flex-col bg-background outline-none">
-        <VisuallyHidden>
-          <DialogDescription>Anpassa hur LiU Tentor beter sig.</DialogDescription>
-        </VisuallyHidden>
-
-        <header class="flex h-14 shrink-0 items-center justify-between border-b px-4 sm:px-6">
-          <div class="flex items-center gap-2.5">
-            <LogoIcon class="size-6 text-primary" />
-            <DialogTitle class="text-base font-medium text-foreground">
-              Inställningar
-            </DialogTitle>
-          </div>
-
-          <DialogClose as-child>
-            <Button variant="ghost" size="icon-sm">
-              <LucideX />
-              <span class="sr-only">Stäng</span>
-            </Button>
-          </DialogClose>
-        </header>
-
-        <div class="flex min-h-0 flex-1 flex-col lg:flex-row">
-          <!-- Rail on desktop, a scrollable chip row above the content on
-               narrow screens where a 16rem column would eat half the width. -->
-          <nav
-            class="shrink-0 gap-1 overflow-x-auto border-b p-3 lg:flex lg:w-60 lg:flex-col lg:overflow-x-visible lg:border-b-0 lg:border-r lg:p-4"
+      <div class="flex min-h-0 flex-1">
+        <!-- Rail on desktop. Below lg it collapses into the chip row in the
+             content pane's top bar, where a 14rem column would eat half the
+             dialog. -->
+        <aside class="hidden w-56 shrink-0 flex-col border-r bg-muted/40 p-3 lg:flex">
+          <DialogTitle
+            class="px-3 pt-2 pb-3 text-xs font-medium tracking-wide text-muted-foreground"
           >
-            <div class="flex gap-1 lg:contents">
+            Inställningar
+          </DialogTitle>
+
+          <nav class="flex flex-col gap-0.5">
+            <Button
+              v-for="section in SECTIONS"
+              :key="section.id"
+              variant="ghost"
+              class="h-auto w-full justify-start gap-2.5 px-3 py-2 text-sm"
+              :class="
+                activeSection === section.id
+                  ? 'bg-background text-foreground shadow-xs hover:bg-background'
+                  : 'font-normal text-muted-foreground hover:bg-background/60'
+              "
+              @click="activeSection = section.id"
+            >
+              <component :is="section.icon" class="size-4 shrink-0" />
+              {{ section.label }}
+            </Button>
+          </nav>
+        </aside>
+
+        <div class="flex min-h-0 min-w-0 flex-1 flex-col">
+          <div class="flex shrink-0 items-start gap-2 p-3 lg:justify-end lg:p-2">
+            <nav class="custom-scrollbar flex min-w-0 flex-1 gap-1 overflow-x-auto lg:hidden">
               <Button
-                v-for="(section, i) in SECTIONS"
+                v-for="section in SECTIONS"
                 :key="section.id"
                 variant="ghost"
-                class="settings-nav-item h-auto justify-start gap-2.5 rounded-xl px-3 py-2 text-sm lg:w-full"
+                class="h-auto shrink-0 gap-2 px-3 py-1.5 text-sm"
                 :class="
                   activeSection === section.id
                     ? 'bg-muted text-foreground hover:bg-muted'
                     : 'font-normal text-muted-foreground'
                 "
-                :style="{ '--nav-index': i }"
                 @click="activeSection = section.id"
               >
                 <component :is="section.icon" class="size-4 shrink-0" />
                 {{ section.label }}
               </Button>
-            </div>
-          </nav>
+            </nav>
 
-          <div class="min-h-0 flex-1 overflow-y-auto px-4 py-8 sm:px-6 lg:px-12 lg:py-12">
+            <DialogClose as-child>
+              <Button variant="ghost" size="icon-sm" class="shrink-0 text-muted-foreground">
+                <LucideX />
+                <span class="sr-only">Stäng</span>
+              </Button>
+            </DialogClose>
+          </div>
+
+          <div class="custom-scrollbar min-h-0 flex-1 overflow-y-auto px-5 pt-1 pb-8 sm:px-8">
             <Transition name="settings-section" mode="out-in">
               <SettingsPanel :key="activeSection" :section="activeSection" />
             </Transition>
           </div>
         </div>
-      </DialogContent>
-    </DialogPortal>
-  </DialogRoot>
+      </div>
+    </DialogContent>
+  </Dialog>
 </template>
 
 <style scoped>
-/* The shell covers the whole viewport, so it cannot slide in from an edge
-   without a visible empty band. It grows into place from just under full size
-   instead, which reads as the page stepping forward rather than a panel
-   arriving. */
-.settings-shell[data-state="open"] {
-  animation: settings-shell-in var(--duration-base) var(--ease-spring);
-}
-
-.settings-shell[data-state="closed"] {
-  animation: settings-shell-out var(--duration-fast) var(--ease-spring);
-}
-
-@keyframes settings-shell-in {
-  from {
-    opacity: 0;
-    transform: scale(0.97) translateY(12px);
-  }
-}
-
-@keyframes settings-shell-out {
-  to {
-    opacity: 0;
-    transform: scale(0.99) translateY(6px);
-  }
-}
-
-.settings-overlay[data-state="open"] {
-  animation: settings-fade-in var(--duration-base) var(--ease-spring);
-}
-
-.settings-overlay[data-state="closed"] {
-  animation: settings-fade-out var(--duration-fast) var(--ease-spring);
-}
-
-@keyframes settings-fade-in {
-  from {
-    opacity: 0;
-  }
-}
-
-@keyframes settings-fade-out {
-  to {
-    opacity: 0;
-  }
-}
-
-/* The rail arrives a beat after the shell, top item first. */
-.settings-shell[data-state="open"] .settings-nav-item {
-  animation: settings-nav-in var(--duration-base) var(--ease-spring) backwards;
-  animation-delay: calc(80ms + var(--nav-index) * 30ms);
-}
-
-@keyframes settings-nav-in {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-}
-
 /* Between sections: short enough that clicking through the rail never feels
    like waiting for the pane to catch up. */
 .settings-section-enter-active,
@@ -196,12 +145,6 @@ watch(open, (isOpen) => {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .settings-shell[data-state="open"],
-  .settings-shell[data-state="closed"],
-  .settings-shell[data-state="open"] .settings-nav-item {
-    animation: none;
-  }
-
   .settings-section-enter-active,
   .settings-section-leave-active {
     transition: none;
