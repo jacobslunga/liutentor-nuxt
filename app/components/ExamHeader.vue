@@ -175,7 +175,7 @@ function confirmLockIn() {
                 : 'hover:bg-muted/70 text-foreground/90 hover:text-foreground'
                 " @click="changeExam(e)">
               <div class="flex items-center gap-1.5 min-w-0">
-                <span v-if="getExamPrefix(e)" class="text-sm font-thin text-foreground shrink-0">
+                <span v-if="getExamPrefix(e)" class="text-sm font-normal text-foreground shrink-0">
                   {{ getExamPrefix(e) }}
                 </span>
                 <span class="text-sm font-semibold shrink-0">
