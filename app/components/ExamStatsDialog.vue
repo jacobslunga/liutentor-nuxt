@@ -42,7 +42,11 @@ function passColor(rate: number) {
 </script>
 
 <template>
-  <Dialog>
+  <!-- Nothing to open a dialog onto, so the cell reads as empty rather than as
+       a 0.0% result — same dash the facit column uses. -->
+  <LucideMinus v-if="total === 0" class="w-4 h-4 text-muted-foreground/30" />
+
+  <Dialog v-else>
     <DialogTrigger
       class="text-sm cursor-pointer px-2 py-1 rounded-md hover:bg-foreground/5 transition-colors duration-150"
       :class="passColor(passRate)" @click.prevent.stop>
@@ -55,7 +59,7 @@ function passColor(rate: number) {
         <DialogDescription>Betygsfördelning {{ date }}</DialogDescription>
       </DialogHeader>
 
-      <div v-if="total > 0" class="flex flex-col gap-4">
+      <div class="flex flex-col gap-4">
         <div class="flex items-center justify-between text-sm">
           <span class="text-muted-foreground">{{ total }} studenter</span>
           <span class="font-mono" :class="passColor(passRate)">
@@ -89,12 +93,6 @@ function passColor(rate: number) {
             </span>
           </div>
         </div>
-      </div>
-
-      <div v-else class="py-6 text-center">
-        <p class="text-sm text-muted-foreground">
-          Ingen statistik tillgänglig.
-        </p>
       </div>
 
       <div class="flex items-center justify-between pt-2 border-t border-border/60 text-xs text-muted-foreground">

@@ -62,8 +62,8 @@ function toggleFilter(p: string) {
 <template>
   <div class="flex flex-col gap-4 w-full">
     <div v-if="prefixes.length > 1" class="flex flex-wrap gap-2 w-full">
-      <Button v-for="p in prefixes" :key="p" :variant="activeFilters.has(p) ? 'default' : 'outline'"
-        size="sm" " @click=" toggleFilter(p)">
+      <Button v-for="p in prefixes" :key="p" :variant="activeFilters.has(p) ? 'default' : 'outline'" size="sm"
+        @click="toggleFilter(p)">
         {{ p }}
       </Button>
     </div>

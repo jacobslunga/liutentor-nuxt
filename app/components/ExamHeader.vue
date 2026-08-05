@@ -276,15 +276,7 @@ function confirmLockIn() {
     </div>
   </div>
 
-  <Dialog v-model:open="isSettingsOpen">
-    <DialogContent class="max-w-md">
-      <DialogHeader>
-        <DialogTitle>Inställningar</DialogTitle>
-        <DialogDescription>Anpassa din studieupplevelse</DialogDescription>
-      </DialogHeader>
-      <SettingsDialogContent />
-    </DialogContent>
-  </Dialog>
+  <SettingsDialog v-model:open="isSettingsOpen" hide-trigger />
 
   <AlertDialog :open="showLockInConfirm" @update:open="showLockInConfirm = $event">
     <AlertDialogContent>

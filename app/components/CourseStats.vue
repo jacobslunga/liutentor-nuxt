@@ -183,6 +183,17 @@ const donutData = computed(() => ({
   ],
 }));
 
+// Statistics are scraped per exam and are simply absent for plenty of courses,
+// so each chart has to be able to say it has nothing rather than draw an empty
+// axis — and when neither has anything, the tab says it once instead of twice.
+const hasPassRateData = computed(() =>
+  sorted.value.some((e) => Number(e.pass_rate ?? 0) > 0),
+);
+
+const hasGradeData = computed(() => aggregate.value.grand > 0);
+
+const hasAnyData = computed(() => hasPassRateData.value || hasGradeData.value);
+
 const donutOptions = computed(() => ({
   responsive: true,
   maintainAspectRatio: false,
@@ -197,7 +208,13 @@ const donutOptions = computed(() => ({
 </script>
 
 <template>
-  <div class="flex flex-col gap-14 w-full">
+  <CourseStatsEmpty
+    v-if="!hasAnyData"
+    title="Ingen statistik för den här kursen"
+    body="Vi har inga betygsfördelningar eller godkändprocent för kursens tentor. Statistiken hämtas från Y-Sektionen och saknas för en del kurser."
+  />
+
+  <div v-else class="flex flex-col gap-14 w-full">
     <section class="space-y-6">
       <div>
         <div class="flex items-center gap-2 mb-1">
@@ -211,11 +228,16 @@ const donutOptions = computed(() => ({
         </p>
       </div>
 
-      <div class="h-72 w-full">
+      <div v-if="hasPassRateData" class="h-72 w-full">
         <ClientOnly>
           <Bar :data="passChartData" :options="passChartOptions" />
         </ClientOnly>
       </div>
+      <CourseStatsEmpty
+        v-else
+        title="Ingen godkändprocent registrerad"
+        body="Vi saknar godkändprocent för kursens tentor."
+      />
     </section>
 
     <section class="space-y-6">
@@ -229,7 +251,13 @@ const donutOptions = computed(() => ({
         <p class="text-sm text-muted-foreground">Total fördelning av betyg</p>
       </div>
 
-      <div class="flex flex-col md:flex-row gap-10 md:gap-14 items-center">
+      <CourseStatsEmpty
+        v-if="!hasGradeData"
+        title="Ingen betygsfördelning registrerad"
+        body="Vi saknar betygsfördelning för kursens tentor."
+      />
+
+      <div v-else class="flex flex-col md:flex-row gap-10 md:gap-14 items-center">
         <div class="h-64 w-full md:w-1/2">
           <ClientOnly>
             <Doughnut :data="donutData" :options="donutOptions" />

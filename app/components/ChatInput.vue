@@ -47,22 +47,10 @@ const canSend = computed(
   () => !!text.value.trim() && text.value.length <= MAX_LENGTH,
 );
 
-const googleModels = computed(() =>
-  CHAT_MODELS.filter((m) => m.provider === "Google"),
-);
-
-const anthropicModels = computed(() =>
-  CHAT_MODELS.filter((m) => m.provider === "Anthropic"),
-);
-
 const selectedModelLabel = computed(
   () =>
     CHAT_MODELS.find((m) => m.id === props.selectedModelId)?.label ??
     CHAT_MODELS[0].label,
-);
-
-const selectedModelProvider = computed(
-  () => CHAT_MODELS.find((m) => m.id === props.selectedModelId)?.provider,
 );
 
 const answerModeLabel = computed(
@@ -162,14 +150,7 @@ defineExpose({
                 <DropdownMenuTrigger as-child>
                   <Button variant="ghost" size="sm"
                     class="gap-1.5 px-2.5 text-xs font-medium text-muted-foreground hover:text-foreground">
-                    <img v-if="selectedModelProvider === 'Google'" src="/images/llm-logos/google.svg" alt="Google"
-                      class="w-3.5 h-3.5 shrink-0" />
-                    <template v-else-if="selectedModelProvider === 'Anthropic'">
-                      <img src="/images/llm-logos/anthropic-black.svg" alt="Anthropic"
-                        class="w-3.5 h-3.5 shrink-0 dark:hidden" />
-                      <img src="/images/llm-logos/anthropic-white.svg" alt="Anthropic"
-                        class="w-3.5 h-3.5 shrink-0 hidden dark:block" />
-                    </template>
+                    <img src="/images/llm-logos/google.svg" alt="Google" class="w-3.5 h-3.5 shrink-0" />
                     {{ selectedModelLabel }}
                     <LucideChevronDown class="w-3.5 h-3.5 text-muted-foreground/70" />
                   </Button>
@@ -180,24 +161,7 @@ defineExpose({
                     <img src="/images/llm-logos/google.svg" alt="Google" class="w-3.5 h-3.5 shrink-0" />
                     Gemini
                   </DropdownMenuLabel>
-                  <DropdownMenuItem v-for="model in googleModels" :key="model.id"
-                    class="cursor-pointer items-center justify-between gap-2"
-                    @click="emit('update:selectedModelId', model.id)">
-                    <span class="text-sm font-medium">{{ model.label }}</span>
-                    <LucideCheck v-if="model.id === selectedModelId" class="w-4 h-4 shrink-0 text-primary" />
-                  </DropdownMenuItem>
-
-                  <DropdownMenuSeparator />
-
-                  <DropdownMenuLabel
-                    class="flex items-center gap-1.5 text-2xs font-semibold text-muted-foreground/70 px-2 py-1">
-                    <img src="/images/llm-logos/anthropic-black.svg" alt="Anthropic"
-                      class="w-3.5 h-3.5 shrink-0 dark:hidden" />
-                    <img src="/images/llm-logos/anthropic-white.svg" alt="Anthropic"
-                      class="w-3.5 h-3.5 shrink-0 hidden dark:block" />
-                    Anthropic
-                  </DropdownMenuLabel>
-                  <DropdownMenuItem v-for="model in anthropicModels" :key="model.id"
+                  <DropdownMenuItem v-for="model in CHAT_MODELS" :key="model.id"
                     class="cursor-pointer items-center justify-between gap-2"
                     @click="emit('update:selectedModelId', model.id)">
                     <span class="text-sm font-medium">{{ model.label }}</span>

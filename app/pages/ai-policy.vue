@@ -25,7 +25,7 @@ const sections: DocSection[] = [
     content:
       "Vi använder toppmoderna modeller från världsledande leverantörer för att säkerställa högsta möjliga kvalitet på svaren:",
     items: [
-      "Google Gemini (3.1 Flash Lite & 3.6 Flash) och Anthropic Claude för chatt, quizgenerering och bearbetning av tentamens-PDF:er.",
+      "Google Gemini (3.1 Flash Lite & 3.6 Flash) för chatt, quizgenerering och bearbetning av tentamens-PDF:er.",
     ],
   },
   {
