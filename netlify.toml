@@ -1,0 +1,11 @@
+# Build command and publish directory stay in the Netlify UI; this file only
+# pins the toolchain.
+#
+# Without a pin, Netlify picks its own Bun, which resolves `entities` for
+# @vue/compiler-core by flattening 4.5.0 to the root instead of installing the
+# 7.0.1 the lockfile asks for. compiler-core then does
+# `require('entities/decode')` during `nuxt prepare` and the install dies on a
+# subpath 4.5.0 does not export. The lockfile is correct — it records both
+# copies — so this is only about the Bun that reads it.
+[build.environment]
+  BUN_VERSION = "1.3.14"
