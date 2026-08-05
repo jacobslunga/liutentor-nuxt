@@ -27,9 +27,6 @@
 
   --animate-accordion-down: accordion-down 150ms cubic-bezier(0.25, 0.1, 0.25, 1);
   --animate-accordion-up: accordion-up 150ms cubic-bezier(0.25, 0.1, 0.25, 1);
-
-  /* Absorbs the off-scale text-[9px]/[10px]/[11px] sizes */
-  --text-2xs: 0.6875rem;
 }
 
 @keyframes accordion-down {
@@ -105,7 +102,6 @@
 
 body {
   font-family: var(--font-sans);
-  letter-spacing: 0.2px;
 }
 
 ::selection {
