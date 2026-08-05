@@ -15,7 +15,12 @@ const tokens = useChartTokens([
   "grade-mid",
 ] as const);
 
-const color = (d: GradeEntry) => tokens.value[d.token];
+// A computed returning the accessor, not a plain function: unovis only re-reads
+// `color` when the prop identity changes, and a stable function never does — the
+// donut would keep whichever palette it was first handed while the swatches
+// beside it, which read `var(--grade-*)` straight from the cascade, follow the
+// colour mode.
+const color = computed(() => (d: GradeEntry) => tokens.value[d.token]);
 const value = (d: GradeEntry) => d.value;
 
 const totalLabel = computed(() => props.total.toLocaleString("sv-SE"));

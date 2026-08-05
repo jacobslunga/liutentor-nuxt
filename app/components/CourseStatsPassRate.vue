@@ -1,19 +1,14 @@
 <script setup lang="ts">
 import {
-  VisArea,
   VisAxis,
   VisCrosshair,
-  VisLine,
   VisPlotline,
+  VisStackedBar,
   VisTooltip,
   VisXYContainer,
 } from "@unovis/vue";
-import {
-  CurveType,
-  PlotlineLabelPosition,
-  Position,
-  Scale,
-} from "@unovis/ts";
+import { PlotlineLabelPosition, Position, Scale } from "@unovis/ts";
+import { useElementSize } from "@vueuse/core";
 import type { PassRatePoint } from "~/composables/useCourseStats";
 
 const props = defineProps<{
@@ -22,20 +17,55 @@ const props = defineProps<{
 }>();
 
 const tokens = useChartTokens([
-  "primary",
   "background",
+  "destructive",
   "foreground",
+  "success",
+  "warning",
 ] as const);
 
+// Same thresholds as the pass rate in the course header, so a sitting that
+// reads as red there is red here too.
+//
+// A computed returning the accessor rather than a plain function: unovis only
+// re-reads `color` when the prop itself changes, and a stable function never
+// does — the bars would keep the palette they were first handed when the
+// colour mode flips.
+const barColor = computed(() => (d: PassRatePoint) => {
+  const rate = d.rate ?? 0;
+  if (rate >= 50) return tokens.value.success;
+  if (rate >= 30) return tokens.value.warning;
+  return tokens.value.destructive;
+});
+
 // A time scale rather than an evenly-spaced category axis: exam sittings are
-// irregular, and the old bar chart's one-slot-per-exam layout quietly implied
-// they weren't. A four-year gap now looks like a four-year gap.
+// irregular, and a one-slot-per-exam layout quietly implies they aren't. A
+// four-year gap looks like a four-year gap.
 const xScale = Scale.scaleTime();
 
 const x = (d: PassRatePoint) => d.timestamp;
 const y = (d: PassRatePoint) => d.rate;
 
 const yTicks = [0, 25, 50, 75, 100];
+
+// Bars, not a line: each value is one sitting, a closed event with nothing
+// between it and the next. A line would draw a value for every day in the gap.
+// On a time scale unovis derives bar width from the smallest gap in the data,
+// which turns every bar into a hairline as soon as two retakes fall a fortnight
+// apart — so the width is set from the space each sitting actually gets.
+const chartEl = ref<HTMLElement | null>(null);
+const { width: chartWidth } = useElementSize(chartEl);
+
+/** Roughly what the "100%" tick label reserves on the left. */
+const Y_AXIS_WIDTH = 44;
+
+const barWidth = computed(() => {
+  const count = props.points.length || 1;
+  // Falls back to a typical container on the server pass, where nothing is
+  // measured yet; the ref resolves on mount and the bars settle.
+  const plotWidth = (chartWidth.value || 640) - Y_AXIS_WIDTH;
+  return Math.round(Math.min(20, Math.max(3, (plotWidth / count) * 0.62)));
+});
 
 const dateFormatter = new Intl.DateTimeFormat("sv-SE", {
   year: "numeric",
@@ -80,37 +110,34 @@ function tooltipTemplate(d: PassRatePoint) {
   `;
 }
 
-const averageLabel = computed(() => `Snitt ${props.average.toFixed(0)}%`);
+// Math.round, matching the header on the course page: the two numbers are the
+// same figure and must not round apart at a .5.
+const averageLabel = computed(() => `Snitt ${Math.round(props.average)}%`);
 </script>
 
 <template>
-  <div class="vis-chart pass-rate-chart w-full">
+  <div ref="chartEl" class="vis-chart pass-rate-chart w-full">
     <VisXYContainer
       :data="points"
       :height="300"
       :x-scale="xScale"
       :y-domain="[0, 100]"
-      :margin="{ top: 16, right: 8, bottom: 0, left: 0 }"
+      :margin="{ top: 16, right: 12, bottom: 0, left: 0 }"
+      :duration="200"
     >
-      <VisArea
+      <VisStackedBar
         :x="x"
         :y="y"
-        :color="tokens.primary"
-        :curve-type="CurveType.MonotoneX"
-      />
-      <VisLine
-        :x="x"
-        :y="y"
-        :color="tokens.primary"
-        :line-width="2"
-        :curve-type="CurveType.MonotoneX"
+        :color="barColor"
+        :bar-width="barWidth"
+        :rounded-corners="3"
       />
 
       <!-- The one reference the reader actually wants: is this sitting above or
            below what the course usually does? Dashed and anchored at the left
            edge — dashed because it is a reference rather than data (the grid
            stays solid), left because a right-anchored label collides with the
-           series wherever the last sitting happens to land. -->
+           bars wherever the last sitting happens to land. -->
       <VisPlotline
         :value="average"
         axis="y"
@@ -143,11 +170,14 @@ const averageLabel = computed(() => `Snitt ${props.average.toFixed(0)}%`);
         :tick-format="(v: number | Date) => `${v}%`"
       />
 
+      <!-- Snapping to the nearest sitting rather than requiring a hit on the
+           bar itself: at this density a bar is a few pixels wide, which is not
+           a pointer target on a phone. -->
       <VisCrosshair
         :x="x"
         :y="y"
-        :color="tokens.primary"
-        :circle-radius="4"
+        :color="barColor"
+        :circle-radius="3"
         :stroke-color="tokens.background"
         :stroke-width="2"
         :template="tooltipTemplate"
@@ -158,19 +188,12 @@ const averageLabel = computed(() => `Snitt ${props.average.toFixed(0)}%`);
 </template>
 
 <style scoped>
-/* A wash, not a block — the line carries the value, the fill only ties it to
-   the baseline.
-   The hover values have to be set too: unovis defaults them to the literal
-   `none`, which is invalid for `fill-opacity`, so the browser falls back to the
-   initial value of 1 and the whole area goes solid the moment the pointer
-   enters it. */
 .pass-rate-chart {
-  --vis-area-fill-opacity: 0.12;
-  --vis-area-hover-fill-opacity: 0.12;
-  --vis-area-hover-stroke-width: 0px;
-  /* Recessive enough to stay behind the series, dark enough to survive being
-     drawn over the fill. */
+  /* Recessive enough to stay behind the bars, dark enough to survive being
+     drawn over them. */
   --vis-plotline-color: color-mix(in oklch, var(--foreground) 45%, transparent);
   --vis-plotline-label-font-size: 11px;
+  /* The crosshair line would otherwise sit on top of the bar it points at. */
+  --vis-crosshair-line-stroke-opacity: 0.35;
 }
 </style>

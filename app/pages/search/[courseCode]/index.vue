@@ -26,13 +26,16 @@ const exams = computed<Exam[]>(() => courseData.value?.exams ?? []);
 const activeTab = ref("exams");
 const { open: openUploadModal } = useUploadModal();
 
-const avgPassRate = computed(() => {
-  const valid = exams.value.filter((e) => e.pass_rate != null);
-  if (!valid.length) return null;
-  return Math.round(
-    valid.reduce((sum, e) => sum + e.pass_rate, 0) / valid.length,
-  );
-});
+// Same source as the statistics tab rather than a second average computed
+// here: the header used to take a plain mean of every `pass_rate` — counting
+// the zeros the scrape writes for "not recorded" as real sittings, and letting
+// a 12-student retake weigh as much as a 300-student main sitting — so it
+// disagreed with the average line drawn on the chart.
+const { overallPassRate } = useCourseStats(() => exams.value);
+
+const avgPassRate = computed(() =>
+  overallPassRate.value === undefined ? null : Math.round(overallPassRate.value),
+);
 
 const examsWithSolutions = computed(
   () => exams.value.filter((e) => e.has_solution).length,
@@ -292,7 +295,15 @@ function passColor(rate: number) {
               </TabsContent>
 
               <TabsContent v-else key="stats" value="stats" class="mt-5">
-                <LazyCourseStats :exams="exams" />
+                <!-- The charts are a separate chunk, fetched the first time the
+                     tab is opened. Without a fallback the panel is blank for as
+                     long as that request takes. -->
+                <Suspense>
+                  <LazyCourseStats :exams="exams" />
+                  <template #fallback>
+                    <CourseStatsSkeleton />
+                  </template>
+                </Suspense>
               </TabsContent>
             </Transition>
           </Tabs>
