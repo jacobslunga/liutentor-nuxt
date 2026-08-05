@@ -93,11 +93,20 @@
 
 @theme {
   --font-logo: "Logo", serif;
-  --font-mono:  "SF Mono", monospace;
+  /* System mono. `ui-monospace` resolves to SF Mono on Apple platforms — same
+     face as before — and gives the other platforms their own default instead of
+     falling through to the generic `monospace`. */
+  --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
   --font-serif: "Vollkorn Variable", Georgia, Cambria, "Times New Roman", Times, serif;
   --font-sans: system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue",
     sans-serif;
+
+  /* One step below text-xs, for badges, chips and table micro-labels. Tailwind
+     generates no class for an undefined token and reports nothing, so dropping
+     this silently turned every `text-2xs` in the app into a no-op and let those
+     elements inherit their parent's size. */
+  --text-2xs: 0.6875rem;
 }
 
 body {
@@ -172,6 +181,10 @@ body {
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
+  --color-grade-low: var(--grade-low);
+  --color-grade-mid: var(--grade-mid);
+  --color-grade-high: var(--grade-high);
+  --color-grade-fail: var(--grade-fail);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -216,6 +229,15 @@ body {
   --chart-3: oklch(0.7521 0.1557 160.22);
   --chart-4: oklch(0.6506 0.138 159.72);
   --chart-5: oklch(0.5382 0.1159 159.4);
+  /* Grades are an *ordered* scale, so the pass grades get a single-hue ordinal
+     ramp (higher grade = darker here, lighter in dark mode) rather than
+     arbitrary categorical hues. Validated for monotone lightness, adjacent ΔL
+     >= 0.06 and contrast against the surface. --grade-fail is the status red
+     and is never reused as a series color. */
+  --grade-low: oklch(0.755 0.155 160);
+  --grade-mid: oklch(0.6 0.145 160);
+  --grade-high: oklch(0.46 0.11 160);
+  --grade-fail: var(--destructive);
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
@@ -263,6 +285,13 @@ body {
   --chart-3: oklch(0.7521 0.1557 160.22);
   --chart-4: oklch(0.6506 0.138 159.72);
   --chart-5: oklch(0.5382 0.1159 159.4);
+  /* The dark ramp is re-stepped against the dark surface, not flipped: it runs
+     the other direction (higher grade = lighter) so the strongest grade stays
+     the most prominent segment. */
+  --grade-low: oklch(0.55 0.12 160);
+  --grade-mid: oklch(0.68 0.145 160);
+  --grade-high: oklch(0.83 0.13 160);
+  --grade-fail: var(--destructive);
   --sidebar: oklch(0.13 0.004 265);
   --sidebar-foreground: oklch(0.94 0.002 265);
   --sidebar-primary: oklch(78% 0.055 168);
@@ -374,4 +403,54 @@ body {
 .custom-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: color-mix(in oklch, var(--muted-foreground) 30%, transparent) transparent;
+}
+
+/* ─── Unovis chart theming ─────────────────────────────────────────────────
+   Unovis ships its own CSS custom properties for chrome (axes, grid,
+   crosshair, tooltip). Mapping them onto the design tokens here — rather than
+   passing colors through component props — is what keeps the charts following
+   the colour mode without a re-render, since the tokens themselves swap under
+   `.dark`. Only chrome lives here; series colours stay data-driven. */
+.vis-chart {
+  --vis-font-family: var(--font-sans);
+
+  --vis-axis-font-family: var(--font-sans);
+  --vis-axis-tick-label-font-size: 11px;
+  --vis-axis-tick-label-color: var(--muted-foreground);
+  --vis-axis-tick-color: transparent;
+  --vis-axis-domain-color: transparent;
+  --vis-axis-grid-color: var(--border);
+  --vis-axis-grid-line-width: 1;
+  --vis-axis-label-color: var(--muted-foreground);
+  --vis-axis-label-font-size: 11px;
+
+  --vis-crosshair-line-stroke-color: var(--muted-foreground);
+  --vis-crosshair-line-stroke-opacity: 0.35;
+  --vis-crosshair-line-stroke-width: 1;
+  --vis-crosshair-circle-stroke-color: var(--background);
+  --vis-crosshair-circle-stroke-width: 2;
+
+  --vis-tooltip-background-color: var(--popover);
+  --vis-tooltip-border-color: var(--border);
+  --vis-tooltip-text-color: var(--popover-foreground);
+  --vis-tooltip-border-radius: var(--radius-md);
+  --vis-tooltip-padding: 0;
+  --vis-tooltip-shadow-color: oklch(0 0 0 / 0.1);
+  --vis-tooltip-backdrop-filter: none;
+
+  /* The 2px "surface gap" that separates touching marks. Drawing it in the
+     surface colour is what lets neighbouring donut segments read as distinct
+     without a stroke outlining each one. */
+  --vis-donut-segment-stroke-color: var(--background);
+  --vis-donut-segment-stroke-width: 2;
+  --vis-donut-central-label-font-family: var(--font-sans);
+  --vis-donut-central-label-text-color: var(--foreground);
+  --vis-donut-central-sub-label-font-family: var(--font-sans);
+  --vis-donut-central-sub-label-text-color: var(--muted-foreground);
+}
+
+/* Unovis renders its dark-mode overrides behind `--vis-dark`, which we don't
+   use — the tokens above already switch. This keeps its defaults from winning. */
+.vis-chart .vis-tooltip-container {
+  font-family: var(--font-sans);
 }
