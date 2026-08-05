@@ -11,13 +11,16 @@
 export type ChartToken =
   | "background"
   | "border"
+  | "destructive"
   | "foreground"
   | "grade-fail"
   | "grade-high"
   | "grade-low"
   | "grade-mid"
   | "muted-foreground"
-  | "primary";
+  | "primary"
+  | "success"
+  | "warning";
 
 export function useChartTokens<T extends ChartToken>(tokens: readonly T[]) {
   const colorMode = useColorMode();
@@ -38,6 +41,11 @@ export function useChartTokens<T extends ChartToken>(tokens: readonly T[]) {
       tokens.map((t) => [t, styles.getPropertyValue(`--${t}`).trim()]),
     ) as Record<T, string>;
   }
+
+  // Synchronously on the client, not in `onMounted`: a chart that only learns
+  // its colours after mounting paints one frame with the placeholder, and a
+  // mark that resolves to nothing falls back to the browser's default black.
+  if (import.meta.client) resolve();
 
   onMounted(resolve);
 
