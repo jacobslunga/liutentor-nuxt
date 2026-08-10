@@ -66,6 +66,17 @@ export default defineNuxtConfig({
         // colour mode. Declaring it here as well would leave two competing
         // <link rel="icon"> tags in the document.
         { rel: "manifest", href: "/site.webmanifest" },
+        // Body text is Google Sans Flex, so the latin subset is on the critical
+        // path for every page. Preloading it starts the fetch alongside the
+        // stylesheet instead of after it parses. latin-ext is left out — it only
+        // covers characters this site rarely renders.
+        {
+          rel: "preload",
+          as: "font",
+          type: "font/woff2",
+          href: "/fonts/google-sans-flex-latin-wght-normal.woff2",
+          crossorigin: "anonymous",
+        },
       ],
     },
   },
