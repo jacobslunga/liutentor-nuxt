@@ -52,8 +52,8 @@ const pendingDeleteConversation = ref<ConversationItem | null>(null);
 const userId = computed(
   () =>
     ((user.value as any)?.id ?? (user.value as any)?.sub ?? null) as
-      | string
-      | null,
+    | string
+    | null,
 );
 
 const requiresLoginMessage = computed(
@@ -434,12 +434,9 @@ function focusSearch(event: Event) {
 
 <template>
   <Dialog :open="open" @update:open="emit('update:open', $event)">
-    <DialogContent
-      class="sm:max-w-md p-0 gap-0 overflow-hidden"
-      @open-auto-focus="focusSearch"
-    >
+    <DialogContent class="sm:max-w-md p-0 gap-0 overflow-hidden" @open-auto-focus="focusSearch">
       <DialogHeader class="px-4 pt-4 pb-0">
-        <DialogTitle class="text-sm font-medium">Chatthistorik</DialogTitle>
+        <DialogTitle>Chatthistorik</DialogTitle>
         <DialogDescription class="sr-only">
           Sök och öppna tidigare chattar
         </DialogDescription>
@@ -447,22 +444,12 @@ function focusSearch(event: Event) {
 
       <div class="flex items-center gap-2 border-b px-4 py-2.5">
         <LucideSearch class="size-4 shrink-0 text-muted-foreground" />
-        <input
-          ref="searchInputRef"
-          v-model="searchQuery"
-          type="text"
-          placeholder="Sök bland chattar..."
-          class="flex-1 min-w-0 bg-transparent text-sm outline-none placeholder:text-muted-foreground/70"
-        />
-        <Button
-          v-if="conversations.length > 0"
-          variant="ghost"
-          size="icon"
+        <input ref="searchInputRef" v-model="searchQuery" type="text" placeholder="Sök bland chattar..."
+          class="flex-1 min-w-0 bg-transparent text-sm outline-none placeholder:text-muted-foreground/70" />
+        <Button v-if="conversations.length > 0" variant="ghost" size="icon"
           class="size-7 shrink-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
-          :disabled="isDeletingAll || isDeletingConversation"
-          aria-label="Radera alla chattar"
-          @click="showDeleteAllConfirm = true"
-        >
+          :disabled="isDeletingAll || isDeletingConversation" aria-label="Radera alla chattar"
+          @click="showDeleteAllConfirm = true">
           <LucideTrash2 class="w-3.5 h-3.5" />
         </Button>
       </div>
@@ -476,17 +463,11 @@ function focusSearch(event: Event) {
           {{ loadError }}
         </div>
 
-        <div
-          v-else-if="requiresLoginMessage"
-          class="px-2 py-4 text-sm text-muted-foreground"
-        >
+        <div v-else-if="requiresLoginMessage" class="px-2 py-4 text-sm text-muted-foreground">
           Logga in för att se din chatthistorik.
         </div>
 
-        <div
-          v-else-if="groupedConversations.length === 0"
-          class="px-2 py-4 text-sm text-muted-foreground"
-        >
+        <div v-else-if="groupedConversations.length === 0" class="px-2 py-4 text-sm text-muted-foreground">
           {{
             searchQuery.trim()
               ? `Inga chattar matchar "${searchQuery.trim()}".`
@@ -496,60 +477,35 @@ function focusSearch(event: Event) {
 
         <div v-else class="space-y-4">
           <section v-for="group in groupedConversations" :key="group.label">
-            <h3
-              class="px-3 pb-1.5 text-sm font-normal text-muted-foreground/60"
-            >
+            <h3 class="px-3 pb-1.5 text-sm font-normal text-muted-foreground/60">
               {{ group.label }}
             </h3>
 
             <div class="space-y-0.5">
-              <div
-                v-for="item in group.items"
-                :key="item.id"
-                class="group flex items-center gap-1 rounded-md px-1 transition-colors"
-                :class="[
+              <div v-for="item in group.items" :key="item.id"
+                class="group flex items-center gap-1 rounded-md px-1 transition-colors" :class="[
                   item.id === chatStore.currentConversationId
                     ? 'bg-secondary'
                     : 'bg-transparent hover:bg-accent',
                   animateReveal ? 'history-item-reveal' : '',
-                ]"
-                :style="itemRevealStyle(item.id)"
-              >
-                <button
-                  type="button"
-                  class="min-w-0 flex-1 cursor-pointer text-left px-2 py-1.5"
-                  :disabled="isOpeningConversation || isDeletingConversation"
-                  @click="openConversation(item)"
-                >
-                  <p
-                    class="text-sm truncate text-foreground/90"
-                    :class="
-                      item.id === chatStore.currentConversationId
-                        ? 'font-medium'
-                        : 'font-normal'
-                    "
-                  >
+                ]" :style="itemRevealStyle(item.id)">
+                <button type="button" class="min-w-0 flex-1 cursor-pointer text-left px-2 py-1.5"
+                  :disabled="isOpeningConversation || isDeletingConversation" @click="openConversation(item)">
+                  <p class="text-sm truncate text-foreground/90" :class="item.id === chatStore.currentConversationId
+                    ? 'font-medium'
+                    : 'font-normal'
+                    ">
                     {{ item.title || "Ny chatt" }}
                   </p>
-                  <p
-                    v-if="metaLabel(item.id)"
-                    class="text-xs truncate text-muted-foreground/70"
-                  >
+                  <p v-if="metaLabel(item.id)" class="text-xs truncate text-muted-foreground/70">
                     {{ metaLabel(item.id) }}
                   </p>
                 </button>
 
-                <Button
-                  variant="ghost"
-                  size="icon"
+                <Button variant="ghost" size="icon"
                   class="size-7 shrink-0 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity hover:bg-transparent"
-                  :disabled="isDeletingConversation"
-                  aria-label="Radera chatt"
-                  @click="askDeleteConversation(item)"
-                >
-                  <LucideTrash2
-                    class="w-3.5 h-3.5 text-muted-foreground/60 hover:text-destructive"
-                  />
+                  :disabled="isDeletingConversation" aria-label="Radera chatt" @click="askDeleteConversation(item)">
+                  <LucideTrash2 class="w-3.5 h-3.5 text-muted-foreground/60 hover:text-destructive" />
                 </Button>
               </div>
             </div>
@@ -571,11 +527,8 @@ function focusSearch(event: Event) {
         <AlertDialogCancel :disabled="isDeletingConversation">
           Avbryt
         </AlertDialogCancel>
-        <AlertDialogAction
-          class="bg-destructive text-white hover:bg-destructive/90"
-          :disabled="isDeletingConversation"
-          @click="confirmDeleteConversation"
-        >
+        <AlertDialogAction class="bg-destructive text-white hover:bg-destructive/90" :disabled="isDeletingConversation"
+          @click="confirmDeleteConversation">
           {{ isDeletingConversation ? "Raderar..." : "Radera" }}
         </AlertDialogAction>
       </AlertDialogFooter>
@@ -593,11 +546,8 @@ function focusSearch(event: Event) {
       </AlertDialogHeader>
       <AlertDialogFooter>
         <AlertDialogCancel :disabled="isDeletingAll">Avbryt</AlertDialogCancel>
-        <AlertDialogAction
-          class="bg-destructive text-white hover:bg-destructive/90"
-          :disabled="isDeletingAll"
-          @click="confirmDeleteAllConversations"
-        >
+        <AlertDialogAction class="bg-destructive text-white hover:bg-destructive/90" :disabled="isDeletingAll"
+          @click="confirmDeleteAllConversations">
           {{ isDeletingAll ? "Raderar..." : `Radera alla` }}
         </AlertDialogAction>
       </AlertDialogFooter>

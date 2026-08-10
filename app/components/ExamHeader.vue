@@ -152,7 +152,7 @@ function confirmLockIn() {
         <DropdownMenuTrigger as-child>
           <Button variant="ghost" size="sm" class="gap-2">
             <div class="flex flex-row items-center gap-2 leading-none">
-              <span class="text-sm font-semibold">{{
+              <span class="text-sm font-bold">{{
                 selectedExam.exam_date
               }}</span>
             </div>

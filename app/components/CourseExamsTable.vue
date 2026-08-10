@@ -83,7 +83,8 @@ function toggleFilter(p: string) {
           @mouseenter="prefetchExamRoute(exam.id)" @focusin="prefetchExamRoute(exam.id)"
           @click="navigateTo(examRoutePath(exam.id))">
           <div class="min-w-0">
-            <div class="text-sm font-medium text-foreground group-hover:text-foreground/80 transition-colors truncate">
+            <div
+              class="text-sm font-semibold text-foreground group-hover:text-foreground/80 transition-colors truncate">
               {{ exam.exam_name }}
             </div>
             <div class="text-xs text-muted-foreground/70 mt-0.5">
