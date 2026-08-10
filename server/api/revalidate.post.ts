@@ -1,14 +1,15 @@
 import { courseTag, SITEMAP_TAG } from "../utils/cache";
 
 /**
- * Purge target for a Supabase database webhook on the `exams` table.
+ * Purge target for Supabase database webhooks on `exams` and `exam_stats`.
  *
- * Nothing in the app writes to `exams` — exams are published out of band —
- * so a database webhook is the one trigger that fires no matter how the row
- * gets inserted (dashboard, SQL, script, or the Go service).
+ * Nothing in the app writes to either table — exams and their statistics are
+ * published out of band — so a database webhook is the one trigger that fires
+ * no matter how the row gets inserted (dashboard, SQL, script, or the Go
+ * service). Both tables carry `course_code`, so one handler covers both.
  *
- * Configure in Supabase → Database → Webhooks:
- *   table:   public.exams
+ * Configure one webhook per table in Supabase → Database → Webhooks:
+ *   table:   public.exams / public.exam_stats
  *   events:  INSERT, UPDATE, DELETE
  *   type:    HTTP Request → POST https://liutentor.se/api/revalidate
  *   header:  x-revalidate-secret: <NUXT_REVALIDATE_SECRET>
@@ -75,8 +76,13 @@ export default defineEventHandler(async (event) => {
     return { purged: [], note: "no course_code in payload" };
   }
 
-  // The sitemap lists which courses have exams, so it changes too.
-  const tags = [...codes].map(courseTag).concat(SITEMAP_TAG);
+  const tags = [...codes].map(courseTag);
+
+  // The sitemap lists which courses have exams, so `exams` writes change it.
+  // `exam_stats` only adds numbers to a course that is already listed, so its
+  // webhook would purge the sitemap into an identical copy.
+  if (body?.table !== "exam_stats") tags.push(SITEMAP_TAG);
+
   await purgeTags(tags);
 
   return { purged: tags };
