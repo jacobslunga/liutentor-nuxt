@@ -31,11 +31,31 @@ const tokens = useChartTokens([
 // re-reads `color` when the prop itself changes, and a stable function never
 // does — the bars would keep the palette they were first handed when the
 // colour mode flips.
-const barColor = computed(() => (d: PassRatePoint) => {
+const thresholdColor = computed(() => (d: PassRatePoint) => {
   const rate = d.rate ?? 0;
   if (rate >= 50) return tokens.value.success;
   if (rate >= 30) return tokens.value.warning;
   return tokens.value.destructive;
+});
+
+// Unique per instance so two of these charts on one page (unlikely, but the
+// tab can remount) don't fight over the same gradient ids.
+const gradientPrefix = useId();
+const gradientIds = {
+  success: `${gradientPrefix}-pass-rate-success`,
+  warning: `${gradientPrefix}-pass-rate-warning`,
+  destructive: `${gradientPrefix}-pass-rate-destructive`,
+};
+
+// Bars keep their solid threshold colour at the crosshair dot, but fill with
+// a top-to-bottom gradient of that same colour — the "fading downward" look
+// used elsewhere for continuous charts, applied per discrete bar instead of
+// under a line.
+const barFill = computed(() => (d: PassRatePoint) => {
+  const rate = d.rate ?? 0;
+  if (rate >= 50) return `url(#${gradientIds.success})`;
+  if (rate >= 30) return `url(#${gradientIds.warning})`;
+  return `url(#${gradientIds.destructive})`;
 });
 
 // A time scale rather than an evenly-spaced category axis: exam sittings are
@@ -117,6 +137,24 @@ const averageLabel = computed(() => `Snitt ${Math.round(props.average)}%`);
 
 <template>
   <div ref="chartEl" class="vis-chart pass-rate-chart w-full">
+    <!-- Not rendered directly; referenced by id from the bar fills below. -->
+    <svg width="0" height="0" class="absolute" aria-hidden="true">
+      <defs>
+        <linearGradient :id="gradientIds.success" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="5%" :stop-color="tokens.success" stop-opacity="0.9" />
+          <stop offset="95%" :stop-color="tokens.success" stop-opacity="0.25" />
+        </linearGradient>
+        <linearGradient :id="gradientIds.warning" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="5%" :stop-color="tokens.warning" stop-opacity="0.9" />
+          <stop offset="95%" :stop-color="tokens.warning" stop-opacity="0.25" />
+        </linearGradient>
+        <linearGradient :id="gradientIds.destructive" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="5%" :stop-color="tokens.destructive" stop-opacity="0.9" />
+          <stop offset="95%" :stop-color="tokens.destructive" stop-opacity="0.25" />
+        </linearGradient>
+      </defs>
+    </svg>
+
     <VisXYContainer
       :data="points"
       :height="300"
@@ -128,7 +166,7 @@ const averageLabel = computed(() => `Snitt ${Math.round(props.average)}%`);
       <VisStackedBar
         :x="x"
         :y="y"
-        :color="barColor"
+        :color="barFill"
         :bar-width="barWidth"
         :rounded-corners="3"
       />
@@ -176,7 +214,7 @@ const averageLabel = computed(() => `Snitt ${Math.round(props.average)}%`);
       <VisCrosshair
         :x="x"
         :y="y"
-        :color="barColor"
+        :color="thresholdColor"
         :circle-radius="3"
         :stroke-color="tokens.background"
         :stroke-width="2"

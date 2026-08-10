@@ -23,12 +23,8 @@ const { isOpen, prefilledCourseCode } = useUploadModal();
         </DialogDescription>
       </DialogHeader>
 
-      <ExamUploadForm
-        :key="prefilledCourseCode"
-        :initial-course-code="prefilledCourseCode"
-        :fixed-course-code="!!prefilledCourseCode"
-        :show-heading="false"
-      />
+      <ExamUploadForm :key="prefilledCourseCode" :initial-course-code="prefilledCourseCode"
+        :fixed-course-code="!!prefilledCourseCode" :show-heading="false" />
     </DialogContent>
   </Dialog>
 </template>

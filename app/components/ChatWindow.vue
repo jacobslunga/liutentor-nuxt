@@ -461,7 +461,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
                   <span class="shimmer-text text-sm">{{ loadingPhrase }}</span>
                 </div>
                 <div
-                  class="prose max-w-full min-w-0 prose-headings:font-medium prose-h1:text-xl prose-h2:text-lg prose-h3:text-md prose-h4:text-base prose-strong:font-medium dark:prose-invert prose-p:font-normal prose-hr:border-secondary prose-th:border-secondary prose-td:border-secondary prose-blockquote:border-secondary marker:text-foreground marker:font-medium"
+                  class="prose max-w-full min-w-0 prose-headings:font-semibold prose-h1:text-xl prose-h2:text-lg prose-h3:text-md prose-h4:text-base prose-strong:font-semibold dark:prose-invert prose-p:font-normal prose-hr:border-secondary prose-th:border-secondary prose-td:border-secondary prose-blockquote:border-secondary marker:text-foreground marker:font-semibold"
                   v-html="renderedAssistantHtml[i]" />
               </div>
             </div>
@@ -472,11 +472,6 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
         </div>
 
         <div class="absolute bottom-0 left-0 right-0 pt-14 pb-4 pointer-events-none z-10">
-          <!-- The only backdrop in the input area. It stays translucent well
-               past the input's top edge so text scrolls under it and dissolves,
-               and only goes fully opaque near the bottom to cover the
-               disclaimer. Any stop that reaches --background early puts a
-               visible line across the text. -->
           <div
             class="pointer-events-none absolute inset-x-0 top-0 bottom-0 -z-10 bg-linear-to-b from-background/0 via-background/60 via-50% to-background to-88%" />
           <ChatInput ref="chatInputRef" :initial-text="chatStore.draftInput" :is-loading="isLoading"
