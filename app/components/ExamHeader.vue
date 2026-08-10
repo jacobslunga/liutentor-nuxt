@@ -197,7 +197,7 @@ function confirmLockIn() {
       <Button variant="default" size="sm" class="h-8 px-3" @click="chatStore.toggle()">
         <LucideLoader2 v-if="chatStore.isLoading" class="size-3.5 animate-spin" />
         <LucideMessageSquare v-else class="size-3.5" />
-        <span class="text-xs font-medium">{{ chatStore.isOpen ? "Stäng" : "Chatt" }}</span>
+        <span class="text-xs">{{ chatStore.isOpen ? "Stäng" : "Chatt" }}</span>
       </Button>
 
       <Tabs :model-value="layoutMode" @update:model-value="switchLayout">
