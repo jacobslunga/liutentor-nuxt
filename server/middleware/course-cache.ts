@@ -9,7 +9,7 @@ const COURSE_ROUTE = /^\/search\/([A-Za-z0-9]+)(?:\/(\d+))?\/?$/;
  * rather than through `routeRules` because it depends on the course code.
  */
 export default defineEventHandler((event) => {
-  const path = (event.path || "").split("?")[0];
+  const path = (event.path || "").split("?")[0] as string;
   const match = COURSE_ROUTE.exec(path);
   if (!match) return;
 
