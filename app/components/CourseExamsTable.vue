@@ -52,6 +52,15 @@ function prefetchExamRoute(examId: number) {
   void preloadRouteComponents(path);
 }
 
+/**
+ * Shared by the header and every row — split them and the columns drift apart.
+ * The name column takes the lion's share but the other three are `fr` rather
+ * than fixed, so they spread across the table instead of huddling at the right
+ * edge with a dead gap after the name.
+ */
+const gridCols =
+  "grid grid-cols-[minmax(0,3fr)_minmax(80px,1fr)_minmax(64px,1fr)_minmax(88px,1fr)] items-center gap-x-4 px-4";
+
 function toggleFilter(p: string) {
   const next = new Set(activeFilters.value);
   next.has(p) ? next.delete(p) : next.add(p);
@@ -70,16 +79,15 @@ function toggleFilter(p: string) {
 
     <div class="w-full overflow-x-auto rounded-xl border border-border">
       <div class="min-w-fit w-full rounded-xl overflow-hidden">
-        <div
-          class="grid grid-cols-[1fr_80px_64px_80px] gap-x-4 px-6 py-3 border-b border-border/60 bg-muted/30 items-center">
+        <div :class="gridCols" class="py-3 border-b border-border/60 bg-muted/30">
           <div class="text-xs text-muted-foreground">Tentamen</div>
           <div class="text-xs text-muted-foreground">Typ</div>
           <div class="text-xs text-muted-foreground text-center">Facit</div>
           <div class="text-xs text-muted-foreground text-right">Godkänd</div>
         </div>
 
-        <div v-for="exam in filteredExams" :key="exam.id"
-          class="grid grid-cols-[1fr_80px_64px_80px] gap-x-4 cursor-pointer px-3 py-2 border-b border-border/60 last:border-0 hover:bg-muted/20 transition-colors items-center group"
+        <div v-for="exam in filteredExams" :key="exam.id" :class="gridCols"
+          class="cursor-pointer py-2.5 border-b border-border/60 last:border-0 hover:bg-muted/20 transition-colors group"
           @mouseenter="prefetchExamRoute(exam.id)" @focusin="prefetchExamRoute(exam.id)"
           @click="navigateTo(examRoutePath(exam.id))">
           <div class="min-w-0">
