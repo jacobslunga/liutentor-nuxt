@@ -27,6 +27,11 @@ import { RotatePluginPackage, Rotate } from "@embedpdf/plugin-rotate/vue";
 const props = defineProps<{
   pdfUrl: string;
   layoutMode?: "exam-only" | "exam-with-facit" | "default";
+  /**
+   * Clearance for a bar that overlays the top of this viewer. Desktop only —
+   * the mobile view insets the viewer's box instead, so nothing scrolls under
+   * its header at all.
+   */
   topInset?: number;
   /**
    * Offer "Förklara" over a text selection. Opt-in: only a page that actually
@@ -66,6 +71,10 @@ const windowWidth = window.innerWidth;
 
 const viewportEl = ref<HTMLElement | null>(null);
 const showScrollTop = ref(false);
+
+const viewportInsetStyle = computed(() =>
+  props.topInset ? { paddingTop: `${props.topInset}px` } : undefined,
+);
 
 function handleViewportScroll(event: Event) {
   const target = event.currentTarget as HTMLElement;
@@ -135,6 +144,10 @@ const plugins = computed(() => {
         <template v-if="activeDocumentId">
           <PdfZoomController :document-id="activeDocumentId" :max-page-width="maxPageWidth" />
 
+          <!-- EmbedPDF renders a fragment, so this positions against the root
+               above — whose top edge already sits below the mobile header. -->
+          <PdfZoomControls v-if="isMobile" :document-id="activeDocumentId" class="absolute right-0 top-3 z-20" />
+
           <DocumentContent :document-id="activeDocumentId">
             <template #default="{ isLoaded }">
               <div
@@ -150,7 +163,7 @@ const plugins = computed(() => {
                 v-else
                 :document-id="activeDocumentId"
                 class="h-full w-full bg-background pdf-viewport"
-                :style="props.topInset ? { paddingTop: `${props.topInset}px` } : undefined"
+                :style="viewportInsetStyle"
                 @scroll="handleViewportScroll"
               >
                 <template v-if="isMobile">

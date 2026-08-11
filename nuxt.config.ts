@@ -19,7 +19,11 @@ export default defineNuxtConfig({
       titleTemplate: "LiU Tentor | %s",
       htmlAttrs: { lang: "sv" },
       charset: "utf-8",
-      viewport: "width=device-width, initial-scale=1",
+      // `viewport-fit=cover` is what makes env(safe-area-inset-*) resolve to
+      // anything but 0 on notched iPhones — the mobile chat sheet needs it to
+      // keep its collapsed bar off the home indicator.
+      viewport:
+        "width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content",
       meta: [
         {
           name: "description",
@@ -62,42 +66,12 @@ export default defineNuxtConfig({
         },
       ],
       link: [
-        // The tab icon is registered in app.vue so it can follow the active
-        // colour mode. Declaring it here as well would leave two competing
-        // <link rel="icon"> tags in the document.
         { rel: "manifest", href: "/site.webmanifest" },
-        // Body text is Google Sans Flex, so the latin subset is on the critical
-        // path for every page. Preloading it starts the fetch alongside the
-        // stylesheet instead of after it parses. latin-ext is left out — it only
-        // covers characters this site rarely renders.
-        {
-          rel: "preload",
-          as: "font",
-          type: "font/woff2",
-          href: "/fonts/google-sans-flex-latin-wght-normal.woff2",
-          crossorigin: "anonymous",
-        },
       ],
     },
   },
 
-  // ─── Route Rules & Caching ─────────────────────────────────────
-  //
-  // Prerendered routes are emitted as static HTML at build time, so they are
-  // served straight from the CDN and never invoke the server function. That
-  // matters more than the per-request render cost: the function bundle is
-  // ~22 MB, and a cold start costs ~4.5 s of TTFB.
-  //
-  // A route only belongs here if its rendered HTML is identical for every
-  // visitor. Anything that reads the auth cookie during SSR must not be
-  // prerendered *or* edge-cached — `layouts/auth.vue` and `layouts/profile.vue`
-  // call `navigateTo()` from an immediate watcher, so their responses can be a
-  // 302 whose target depends on who is asking. Caching one of those would pin
-  // one visitor's redirect onto everyone else.
   routeRules: {
-    // Landing page. Renders no server data: `AuthActions` and `RecentSearches`
-    // are both behind `isMounted`, so the recent-searches cookie is read on the
-    // client after hydration and never reaches the server-rendered markup.
     "/": { prerender: true },
 
     "/om-oss": { prerender: true },
@@ -106,7 +80,6 @@ export default defineNuxtConfig({
     "/copyright-policy": { prerender: true },
     "/privacy-policy": { prerender: true },
 
-    // Static content under the `info` layout, same as the policy pages above.
     "/upload-exams": { prerender: true },
     "/feedback": { prerender: true },
   },

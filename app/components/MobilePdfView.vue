@@ -1,10 +1,29 @@
 <script setup lang="ts">
+import { PEEK_CONTENT_HEIGHT } from "@/composables/useSheetDetents";
+
 const props = defineProps<{
   examPdfUrl: string;
   solutionPdfUrl: string | null;
   courseCode: string;
   examDate: string;
 }>();
+
+/** `h-14` on the header row, plus its bottom border. */
+const HEADER_HEIGHT = 56 + 1;
+
+/**
+ * The viewer is inset to sit *between* the header and the chat sheet's
+ * collapsed bar rather than under them. Padding the PDF's own scroll container
+ * instead only buys clearance at the very ends of the document — everything in
+ * between still scrolls under two opaque bars and is unreachable.
+ *
+ * Both bars stay overlays as far as the sheet is concerned: expanding it still
+ * covers the page, which is the point.
+ */
+const pdfBoxStyle = {
+  paddingTop: `calc(${HEADER_HEIGHT}px + env(safe-area-inset-top, 0px))`,
+  paddingBottom: `calc(${PEEK_CONTENT_HEIGHT}px + env(safe-area-inset-bottom, 0px))`,
+};
 
 const showSolution = ref(false);
 const isDownloadOpen = ref(false);
@@ -74,10 +93,9 @@ const downloadFile = async (url: string, filename: string) => {
 </script>
 
 <template>
-  <div class="relative h-screen w-full bg-background overflow-hidden">
-    <div class="absolute inset-x-0 top-0 z-40">
-      <div
-        class="pointer-events-none absolute inset-x-0 -top-10 h-24 -z-10 bg-linear-to-b from-background via-background to-background/0" />
+  <div class="relative h-dvh w-full bg-background overflow-hidden">
+    <div
+      class="absolute inset-x-0 top-0 z-40 bg-background border-b border-border pt-[env(safe-area-inset-top,0px)]">
       <div class="flex h-14 shrink-0 items-center gap-3 px-3">
         <NuxtLink :to="`/search/${courseCode}`">
           <Button aria-label="Gå tillbaka" variant="outline" size="icon-sm">
@@ -139,9 +157,9 @@ const downloadFile = async (url: string, filename: string) => {
       </div>
     </div>
 
-    <div class="h-full w-full overflow-hidden">
+    <div class="h-full w-full overflow-hidden" :style="pdfBoxStyle">
       <ClientOnly>
-        <LazyPdfRenderer :pdf-url="examPdfUrl" :top-inset="72" />
+        <LazyPdfRenderer :pdf-url="examPdfUrl" />
       </ClientOnly>
     </div>
 
@@ -155,13 +173,12 @@ const downloadFile = async (url: string, filename: string) => {
     >
       <section
         v-show="showSolution"
-        class="fixed inset-0 z-50 h-screen w-screen bg-background overflow-hidden"
+        class="fixed inset-0 z-50 h-dvh w-screen bg-background overflow-hidden"
         role="dialog"
         aria-modal="true"
       >
-        <div class="absolute inset-x-0 top-0 z-10">
-          <div
-            class="pointer-events-none absolute inset-x-0 -top-10 h-24 -z-10 bg-linear-to-b from-background via-background to-background/0" />
+        <div
+          class="absolute inset-x-0 top-0 z-10 bg-background border-b border-border pt-[env(safe-area-inset-top,0px)]">
           <div class="flex h-14 shrink-0 items-center gap-3 px-3">
             <div class="min-w-0 flex-1">
               <p
@@ -183,9 +200,9 @@ const downloadFile = async (url: string, filename: string) => {
             </Button>
           </div>
         </div>
-        <div class="h-full w-full overflow-hidden">
+        <div class="h-full w-full overflow-hidden" :style="pdfBoxStyle">
           <ClientOnly>
-            <LazyPdfRenderer v-if="solutionPdfUrl" :pdf-url="solutionPdfUrl" :top-inset="72" />
+            <LazyPdfRenderer v-if="solutionPdfUrl" :pdf-url="solutionPdfUrl" />
           </ClientOnly>
         </div>
       </section>

@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import {
+  VisArea,
   VisAxis,
   VisCrosshair,
+  VisLine,
   VisPlotline,
-  VisStackedBar,
+  VisScatter,
   VisTooltip,
   VisXYContainer,
 } from "@unovis/vue";
-import { PlotlineLabelPosition, Position, Scale } from "@unovis/ts";
-import { useElementSize } from "@vueuse/core";
+import { CurveType, Position, Scale } from "@unovis/ts";
 import type { PassRatePoint } from "~/composables/useCourseStats";
 
 const props = defineProps<{
@@ -16,47 +17,19 @@ const props = defineProps<{
   average: number;
 }>();
 
-const tokens = useChartTokens([
-  "background",
-  "destructive",
-  "foreground",
-  "success",
-  "warning",
-] as const);
+const tokens = useChartTokens(["background", "success"] as const);
 
-// Same thresholds as the pass rate in the course header, so a sitting that
-// reads as red there is red here too.
-//
-// A computed returning the accessor rather than a plain function: unovis only
-// re-reads `color` when the prop itself changes, and a stable function never
-// does — the bars would keep the palette they were first handed when the
-// colour mode flips.
-const thresholdColor = computed(() => (d: PassRatePoint) => {
-  const rate = d.rate ?? 0;
-  if (rate >= 50) return tokens.value.success;
-  if (rate >= 30) return tokens.value.warning;
-  return tokens.value.destructive;
-});
+// A pass rate of exactly 0 is how the scrape represents "not recorded", so
+// those sittings arrive with `rate: undefined`. Dropping them rather than
+// letting the line break: the gap is already visible on the time scale — the
+// curve simply spans it — and a broken line at this density reads as a bug.
+const measured = computed(() =>
+  props.points.filter((p) => p.rate !== undefined),
+);
 
 // Unique per instance so two of these charts on one page (unlikely, but the
-// tab can remount) don't fight over the same gradient ids.
-const gradientPrefix = useId();
-const gradientIds = {
-  success: `${gradientPrefix}-pass-rate-success`,
-  warning: `${gradientPrefix}-pass-rate-warning`,
-  destructive: `${gradientPrefix}-pass-rate-destructive`,
-};
-
-// Bars keep their solid threshold colour at the crosshair dot, but fill with
-// a top-to-bottom gradient of that same colour — the "fading downward" look
-// used elsewhere for continuous charts, applied per discrete bar instead of
-// under a line.
-const barFill = computed(() => (d: PassRatePoint) => {
-  const rate = d.rate ?? 0;
-  if (rate >= 50) return `url(#${gradientIds.success})`;
-  if (rate >= 30) return `url(#${gradientIds.warning})`;
-  return `url(#${gradientIds.destructive})`;
-});
+// tab can remount) don't fight over the same gradient id.
+const gradientId = `${useId()}-pass-rate-area`;
 
 // A time scale rather than an evenly-spaced category axis: exam sittings are
 // irregular, and a one-slot-per-exam layout quietly implies they aren't. A
@@ -68,23 +41,47 @@ const y = (d: PassRatePoint) => d.rate;
 
 const yTicks = [0, 25, 50, 75, 100];
 
-// Bars, not a line: each value is one sitting, a closed event with nothing
-// between it and the next. A line would draw a value for every day in the gap.
-// On a time scale unovis derives bar width from the smallest gap in the data,
-// which turns every bar into a hairline as soon as two retakes fall a fortnight
-// apart — so the width is set from the space each sitting actually gets.
-const chartEl = ref<HTMLElement | null>(null);
-const { width: chartWidth } = useElementSize(chartEl);
+// MonotoneX rather than a basis or natural spline: those overshoot between
+// points, which on a percentage axis invents sittings above 100% or below 0.
+const curveType = CurveType.MonotoneX;
 
-/** Roughly what the "100%" tick label reserves on the left. */
-const Y_AXIS_WIDTH = 44;
+// A single sitting draws no line and no area — a lone dot is the only honest
+// way to show it.
+const isSinglePoint = computed(() => measured.value.length === 1);
 
-const barWidth = computed(() => {
-  const count = props.points.length || 1;
-  // Falls back to a typical container on the server pass, where nothing is
-  // measured yet; the ref resolves on mount and the bars settle.
-  const plotWidth = (chartWidth.value || 640) - Y_AXIS_WIDTH;
-  return Math.round(Math.min(20, Math.max(3, (plotWidth / count) * 0.62)));
+// The average label is an HTML pill rather than the plotline's own text: an
+// SVG <text> has no background, so it disappeared wherever the curve or its
+// fill ran behind it. Positioning it needs the plot area in pixels, which the
+// container hands over after every render (including resizes).
+const plotBox = ref<{ top: number; bottom: number; left: number } | null>(null);
+
+type Spacing = { top: number; bottom: number; left: number; right: number };
+
+function onRenderComplete(
+  _svg: SVGSVGElement,
+  margin: Spacing,
+  bleed: Spacing,
+  _containerWidth: number,
+  _containerHeight: number,
+  _width: number,
+  height: number,
+) {
+  plotBox.value = {
+    top: margin.top + bleed.top,
+    bottom: margin.top + height - bleed.bottom,
+    left: margin.left + bleed.left,
+  };
+}
+
+const averageStyle = computed(() => {
+  const box = plotBox.value;
+  // Hidden rather than parked at 0,0 until the first render reports geometry.
+  if (!box) return { opacity: "0" };
+
+  const t = Math.min(Math.max(props.average, 0), 100) / 100;
+  const y = box.bottom - t * (box.bottom - box.top);
+
+  return { top: `${y}px`, left: `${box.left + 6}px` };
 });
 
 const dateFormatter = new Intl.DateTimeFormat("sv-SE", {
@@ -107,6 +104,16 @@ function escapeHtml(value: string) {
   );
 }
 
+// The threshold colours the bars used to carry survive on the tooltip's
+// number: one continuous stroke can't change colour per sitting, but the
+// reader still wants to know whether the point under the cursor was a good
+// result or a bad one.
+function passClass(rate: number) {
+  if (rate >= 50) return "text-success";
+  if (rate >= 30) return "text-warning";
+  return "text-destructive";
+}
+
 function tooltipTemplate(d: PassRatePoint) {
   if (!d || d.rate === undefined) return "";
 
@@ -121,7 +128,7 @@ function tooltipTemplate(d: PassRatePoint) {
         ${escapeHtml(dateFormatter.format(new Date(d.timestamp)))}
       </div>
       <div class="mt-1.5 flex items-baseline gap-1.5">
-        <span class="text-lg font-semibold leading-none text-foreground">${d.rate.toFixed(1)}%</span>
+        <span class="text-lg font-semibold leading-none ${passClass(d.rate)}">${d.rate.toFixed(1)}%</span>
         <span class="text-xs text-muted-foreground">godkända</span>
       </div>
       <div class="mt-1.5 text-xs text-muted-foreground">${names}</div>
@@ -136,57 +143,62 @@ const averageLabel = computed(() => `Snitt ${Math.round(props.average)}%`);
 </script>
 
 <template>
-  <div ref="chartEl" class="vis-chart pass-rate-chart w-full">
-    <!-- Not rendered directly; referenced by id from the bar fills below. -->
+  <div class="vis-chart pass-rate-chart relative w-full">
+    <!-- Not rendered directly; referenced by id from the area fill below. -->
     <svg width="0" height="0" class="absolute" aria-hidden="true">
       <defs>
-        <linearGradient :id="gradientIds.success" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="5%" :stop-color="tokens.success" stop-opacity="0.9" />
-          <stop offset="95%" :stop-color="tokens.success" stop-opacity="0.25" />
-        </linearGradient>
-        <linearGradient :id="gradientIds.warning" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="5%" :stop-color="tokens.warning" stop-opacity="0.9" />
-          <stop offset="95%" :stop-color="tokens.warning" stop-opacity="0.25" />
-        </linearGradient>
-        <linearGradient :id="gradientIds.destructive" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="5%" :stop-color="tokens.destructive" stop-opacity="0.9" />
-          <stop offset="95%" :stop-color="tokens.destructive" stop-opacity="0.25" />
+        <linearGradient :id="gradientId" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" :stop-color="tokens.success" stop-opacity="0.32" />
+          <stop offset="55%" :stop-color="tokens.success" stop-opacity="0.12" />
+          <stop offset="100%" :stop-color="tokens.success" stop-opacity="0" />
         </linearGradient>
       </defs>
     </svg>
 
     <VisXYContainer
-      :data="points"
+      :data="measured"
       :height="300"
       :x-scale="xScale"
       :y-domain="[0, 100]"
       :margin="{ top: 16, right: 12, bottom: 0, left: 0 }"
       :duration="200"
+      :on-render-complete="onRenderComplete"
     >
-      <VisStackedBar
+      <!-- Area first, line second: the stroke has to sit on top of its own
+           fill, not be washed out by it. -->
+      <VisArea
         :x="x"
         :y="y"
-        :color="barFill"
-        :bar-width="barWidth"
-        :rounded-corners="3"
+        :curve-type="curveType"
+        :color="`url(#${gradientId})`"
+        :baseline="0"
+      />
+      <VisLine
+        :x="x"
+        :y="y"
+        :curve-type="curveType"
+        :color="tokens.success"
+        :line-width="2"
+      />
+
+      <!-- One sitting: the curve components draw nothing, so mark the value. -->
+      <VisScatter
+        v-if="isSinglePoint"
+        :x="x"
+        :y="y"
+        :size="7"
+        :color="tokens.success"
       />
 
       <!-- The one reference the reader actually wants: is this sitting above or
-           below what the course usually does? Dashed and anchored at the left
-           edge — dashed because it is a reference rather than data (the grid
-           stays solid), left because a right-anchored label collides with the
-           bars wherever the last sitting happens to land. -->
+           below what the course usually does? Dashed because it is a reference
+           rather than data — the grid stays solid. Its label is the pill
+           below. -->
       <VisPlotline
         :value="average"
         axis="y"
         :line-width="1"
         :line-style="[5, 4]"
-        :label-text="averageLabel"
-        :label-position="PlotlineLabelPosition.TopLeft"
-        :label-color="tokens.foreground"
-        :label-size="11"
-        :label-offset-x="2"
-        :label-offset-y="8"
       />
 
       <VisAxis
@@ -209,12 +221,12 @@ const averageLabel = computed(() => `Snitt ${Math.round(props.average)}%`);
       />
 
       <!-- Snapping to the nearest sitting rather than requiring a hit on the
-           bar itself: at this density a bar is a few pixels wide, which is not
-           a pointer target on a phone. -->
+           curve itself: the line is a two-pixel stroke, which is not a pointer
+           target on a phone. -->
       <VisCrosshair
         :x="x"
         :y="y"
-        :color="thresholdColor"
+        :color="tokens.success"
         :circle-radius="3"
         :stroke-color="tokens.background"
         :stroke-width="2"
@@ -222,16 +234,27 @@ const averageLabel = computed(() => `Snitt ${Math.round(props.average)}%`);
       />
       <VisTooltip />
     </VisXYContainer>
+
+    <!-- Anchored to the left edge of the plot rather than the right: a
+         right-anchored label collides with the curve wherever the last sitting
+         happens to land. `pointer-events-none` keeps it from stealing hovers
+         from the crosshair underneath. -->
+    <span
+      class="pointer-events-none absolute -translate-y-1/2 rounded-full border border-border/60 bg-background/70 px-2 py-0.5 text-[11px] font-medium text-muted-foreground backdrop-blur-[2px]"
+      :style="averageStyle"
+    >
+      {{ averageLabel }}
+    </span>
   </div>
 </template>
 
 <style scoped>
 .pass-rate-chart {
-  /* Recessive enough to stay behind the bars, dark enough to survive being
-     drawn over them. */
+  /* Recessive enough to stay behind the curve, dark enough to survive being
+     drawn over it. */
   --vis-plotline-color: color-mix(in oklch, var(--foreground) 45%, transparent);
   --vis-plotline-label-font-size: 11px;
-  /* The crosshair line would otherwise sit on top of the bar it points at. */
+  /* The crosshair line would otherwise sit on top of the point it marks. */
   --vis-crosshair-line-stroke-opacity: 0.35;
 }
 </style>

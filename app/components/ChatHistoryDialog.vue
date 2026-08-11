@@ -427,8 +427,13 @@ onUnmounted(() => {
 });
 
 function focusSearch(event: Event) {
+  // Always swallow the default autofocus, but only move focus into the search
+  // field on a pointer-precise device: on touch, focusing it raises the soft
+  // keyboard over the list the dialog exists to show.
   event.preventDefault();
-  searchInputRef.value?.focus();
+  if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+    searchInputRef.value?.focus();
+  }
 }
 </script>
 
@@ -502,8 +507,10 @@ function focusSearch(event: Event) {
                   </p>
                 </button>
 
+                <!-- Always reachable on touch: there is no hover to reveal it
+                     with, and this is the only way to delete a conversation. -->
                 <Button variant="ghost" size="icon"
-                  class="size-7 shrink-0 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity hover:bg-transparent"
+                  class="size-7 shrink-0 sm:opacity-0 sm:pointer-events-none sm:group-hover:opacity-100 sm:group-hover:pointer-events-auto transition-opacity hover:bg-transparent"
                   :disabled="isDeletingConversation" aria-label="Radera chatt" @click="askDeleteConversation(item)">
                   <LucideTrash2 class="w-3.5 h-3.5 text-muted-foreground/60 hover:text-destructive" />
                 </Button>

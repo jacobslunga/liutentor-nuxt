@@ -290,8 +290,7 @@ onUnmounted(() => {
   <ClientOnly>
     <div class="relative h-screen w-full overflow-hidden bg-background">
       <div v-if="exam" class="hidden lg:block absolute inset-x-0 top-0 z-70">
-        <div
-          class="pointer-events-none absolute inset-x-0 -top-10 h-24 -z-10 bg-linear-to-b from-background via-background to-background/0" />
+        <div class="pointer-events-none absolute inset-x-0 -top-10 h-24 -z-10" />
         <ExamHeader :exams="exams" :exam-id="examId" :course-code="courseCode" :solution-pdf-url="solutionPdfUrl" />
       </div>
 
@@ -387,8 +386,7 @@ onUnmounted(() => {
             enter-from-class="translate-x-full opacity-0" enter-to-class="translate-x-0 opacity-100 blur-0"
             leave-active-class="transition-all duration-200 ease-spring"
             leave-from-class="translate-x-0 opacity-100 blur-0" leave-to-class="translate-x-full opacity-0 blur-sm">
-            <div v-if="!isMobile && isExamOnly && hasFacit"
-              v-show="isFacitVisible && !chatStore.isOpen"
+            <div v-if="!isMobile && isExamOnly && hasFacit" v-show="isFacitVisible && !chatStore.isOpen"
               class="fixed right-0 bottom-0 z-70 flex h-screen shadow-xl bg-background"
               :class="{ 'select-none': isOverlayResizing }" :style="{ width: `${overlayWidth}px` }">
               <div class="relative z-100 w-0 shrink-0">
@@ -400,6 +398,13 @@ onUnmounted(() => {
               </div>
             </div>
           </Transition>
+
+          <!-- Mobile chat. Always mounted, resting on its collapsed detent, so
+               the chat is a permanent affordance over the PDF rather than
+               something to discover. It owns its own presentation, so it is not
+               wrapped in the desktop panel's slide-in transition. -->
+          <LazyMobileChatSheet v-if="isMobile" :key="examId" :exam-id="examId" :exam-url="exam.pdf_url"
+            :course-code="courseCode" :solution-url="solutionPdfUrl" :has-solution="hasFacit" />
 
           <!-- Chat panel. Rendered outside the mode branches so it is not torn
                down and rebuilt when the layout switcher flips. -->

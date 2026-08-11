@@ -1,17 +1,20 @@
 <template>
-  <div class="shrink-0 relative flex items-center justify-between px-3 py-2 z-90 overflow-visible">
-    <div class="flex items-center gap-1 min-w-0">
-      <Button variant="ghost" size="icon-sm" @click="emit('close')">
+  <div
+    class="shrink-0 relative flex items-center justify-between gap-2 px-3 py-2 z-90 overflow-visible bg-background border-b border-border">
+    <div class="flex items-center gap-1.5 min-w-0 flex-1">
+      <Button variant="ghost" size="icon-sm" class="shrink-0" aria-label="Stäng chatten" @click="emit('close')">
         <LucideChevronRight />
       </Button>
+      <p class="min-w-0 truncate text-sm font-semibold text-foreground">
+        {{ displayTitle }}
+      </p>
     </div>
-    <div class="flex items-center gap-1">
-      <Button variant="ghost" size="icon-sm" @click="emit('newChat')">
+    <div class="flex items-center gap-1 shrink-0">
+      <Button variant="ghost" size="icon-sm" aria-label="Ny chatt" @click="emit('newChat')">
         <LucidePlus class="w-4 h-4" />
       </Button>
-      <Button variant="ghost" size="icon-sm" @click="emit('openHistory')">
-        <LucidePanelRight v-if="historyOpen" class="w-4 h-4" />
-        <LucidePanelRight v-else class="w-4 h-4" />
+      <Button variant="ghost" size="icon-sm" aria-label="Historik" @click="emit('openHistory')">
+        <LucidePanelRight class="w-4 h-4" />
       </Button>
     </div>
   </div>
