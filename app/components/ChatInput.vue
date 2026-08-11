@@ -15,21 +15,35 @@ const ANSWER_MODES = [
   },
 ] as const;
 
-const props = defineProps<{
-  /**
-   * Seed value only — read once, on mount. The draft deliberately lives here
-   * rather than in the parent or the store: routing every keystroke through
-   * either one re-rendered the whole chat panel per character.
-   */
-  initialText?: string;
-  isLoading: boolean;
-  giveDirectAnswer: boolean;
-  selectedModelId: string;
-  showScrollButton: boolean;
-  courseCode?: string;
-  hasSolution?: boolean;
-  selectionContext?: string;
-}>();
+const props = withDefaults(
+  defineProps<{
+    /**
+     * Seed value only — read once, on mount. The draft deliberately lives here
+     * rather than in the parent or the store: routing every keystroke through
+     * either one re-rendered the whole chat panel per character.
+     */
+    initialText?: string;
+    isLoading: boolean;
+    giveDirectAnswer: boolean;
+    selectedModelId: string;
+    showScrollButton: boolean;
+    courseCode?: string;
+    hasSolution?: boolean;
+    selectionContext?: string;
+    /**
+     * Off for shells that are mounted before the user asks for them — the
+     * mobile sheet lives on screen collapsed, and focusing on mount would raise
+     * the soft keyboard over the page.
+     */
+    autofocus?: boolean;
+    /**
+     * Off on touch, where Return is the only way to get a newline and sending
+     * is the button — the convention every mobile chat app follows.
+     */
+    submitOnEnter?: boolean;
+  }>(),
+  { autofocus: true, submitOnEnter: true },
+);
 
 const emit = defineEmits<{
   send: [];
@@ -133,6 +147,7 @@ const updateHeight = () => {
 };
 
 const handleKeyDown = (e: KeyboardEvent) => {
+  if (!props.submitOnEnter) return;
   if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();
     if (canSend.value && !props.isLoading) emit("send");
@@ -156,7 +171,7 @@ onMounted(() => {
     el.value = draft;
   }
   updateHeight();
-  textareaRef.value?.focus();
+  if (props.autofocus) textareaRef.value?.focus();
 });
 
 // A narrower row wraps sooner, so the one-row width has to be re-measured.

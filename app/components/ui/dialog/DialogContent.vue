@@ -20,28 +20,47 @@ const props = withDefaults(
     DialogContentProps & {
       class?: HTMLAttributes["class"];
       showCloseButton?: boolean;
+      /**
+       * "sheet" anchors the panel to the bottom edge below `sm`, where a
+       * centred card wastes the width and puts its controls out of thumb
+       * reach. From `sm` up it is the ordinary centred dialog either way.
+       */
+      variant?: "dialog" | "sheet";
     }
   >(),
   {
     showCloseButton: true,
+    variant: "dialog",
   },
 );
 const emits = defineEmits<DialogContentEmits>();
 
-const delegatedProps = reactiveOmit(props, "class");
+const delegatedProps = reactiveOmit(props, "class", "variant");
 
 const forwarded = useForwardPropsEmits(delegatedProps, emits);
+
+/** Shape, placement and entrance — everything else is shared below. */
+const VARIANT_CLASSES = {
+  dialog:
+    "fixed top-[50%] left-[50%] max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] rounded-3xl border duration-150 data-[state=closed]:slide-out-to-bottom-2 data-[state=open]:slide-in-from-bottom-2 sm:max-w-lg",
+  sheet:
+    "fixed inset-x-0 bottom-0 max-h-[92dvh] max-w-none rounded-3xl rounded-b-none border border-b-0 duration-200 data-[state=closed]:slide-out-to-bottom-[100%] data-[state=open]:slide-in-from-bottom-[100%] sm:inset-x-auto sm:bottom-auto sm:top-[50%] sm:left-[50%] sm:max-h-none sm:max-w-lg sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-b-3xl sm:border-b sm:duration-150 sm:data-[state=closed]:slide-out-to-bottom-2 sm:data-[state=open]:slide-in-from-bottom-2",
+} as const;
 </script>
 
 <template>
   <DialogPortal>
-    <DialogOverlay />
+    <!-- A sheet sits on the screen alongside what is behind it rather than
+         taking it over, so it gets no scrim in that presentation. The centred
+         dialog it becomes at `sm` still needs one to read as modal. -->
+    <DialogOverlay :class="props.variant === 'sheet' ? 'hidden sm:block' : undefined" />
     <DialogContent
       data-slot="dialog-content"
       v-bind="{ ...$attrs, ...forwarded }"
       :class="
         cn(
-          'bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:slide-out-to-bottom-2 data-[state=open]:slide-in-from-bottom-2 fixed top-[50%] left-[50%] z-100 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-4 rounded-3xl border p-6 duration-150 ease-spring sm:max-w-lg',
+          'bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 z-100 grid w-full gap-4 p-6 ease-spring',
+          VARIANT_CLASSES[props.variant],
           props.class,
         )
       "

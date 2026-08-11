@@ -17,16 +17,22 @@ const { open: openUploadModal } = useUploadModal();
       <AuthActions />
     </div>
 
-    <div class="flex flex-col items-center space-y-2 mb-10">
+    <div class="w-full max-w-150 flex flex-col items-center gap-6 mb-20">
+      <div
+        class="inline-flex items-center gap-2 rounded-full border border-border bg-secondary/40 py-1.5 pr-4 pl-1.5 text-xs text-muted-foreground">
+        <span class="rounded-full bg-primary/10 px-2 py-0.5 text-2xs font-semibold text-primary">
+          Nytt
+        </span>
+        Chatten fungerar nu på mobilen
+      </div>
+
       <div class="flex flex-row items-center justify-center space-x-2">
         <LogoIcon class="w-12 h-12 md:w-14 md:h-14 lg:w-24 lg:h-24" />
         <h1 class="text-4xl lg:text-5xl font-medium font-logo tracking-tighter">
           LiU Tentor
         </h1>
       </div>
-    </div>
 
-    <div class="w-full max-w-150 flex flex-col items-center gap-6 mb-20">
       <div class="relative w-full">
         <div
           class="w-full border border-foreground/20 bg-background flex flex-row items-center justify-center rounded-full transition-colors duration-200 ease-spring text-sm text-foreground/80 outline-none"

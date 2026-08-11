@@ -144,17 +144,17 @@ function confirmLockIn() {
 <template>
   <div class="hidden lg:flex h-12 shrink-0 z-60 w-full items-center justify-between px-4">
     <div class="flex items-center gap-1">
-      <Button size="icon-xs" variant="ghost" @click="router.push(`/search/${courseCode}`)">
+      <Button size="icon-sm" variant="secondary" @click="router.push(`/search/${courseCode}`)">
         <LucideArrowLeft />
       </Button>
 
       <DropdownMenu v-if="selectedExam" v-model:open="isDropdownOpen">
         <DropdownMenuTrigger as-child>
-          <Button variant="ghost" size="sm" class="gap-2">
+          <Button variant="secondary" size="sm" class="gap-2">
             <div class="flex flex-row items-center gap-2 leading-none">
               <span class="text-sm font-bold">{{
                 selectedExam.exam_date
-              }}</span>
+                }}</span>
             </div>
             <LucideChevronDown class="w-4 h-4 text-muted-foreground transition-transform duration-200"
               :class="{ 'rotate-180': isDropdownOpen }" />
