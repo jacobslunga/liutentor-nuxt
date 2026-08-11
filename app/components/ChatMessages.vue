@@ -229,8 +229,13 @@ defineExpose({
   <div ref="messagesContainer"
     class="h-full w-full overflow-y-auto overflow-x-hidden overscroll-contain px-4 custom-scrollbar" :class="contentClass"
     @scroll="handleScroll" @mouseup="handleMessageMouseUp" @click="handleCodeCopy">
-    <div v-if="messages.length === 0" class="h-full flex flex-col items-center justify-center px-4 text-center pb-24">
-      <ChatMascot class="w-16 h-16 mb-5" />
+    <!-- min-h-full, not h-full: the mobile sheet's partial detents leave this
+         box shorter than its content, and a fixed height there squashed the
+         mascot to a dot and clipped the heading instead of scrolling. -->
+    <div
+      class="min-h-full flex flex-col items-center justify-center px-4 py-8 text-center"
+      v-if="messages.length === 0">
+      <ChatMascot class="w-16 h-16 mb-5 shrink-0" />
       <h2 class="text-2xl font-semibold mb-3 text-foreground">
         Vad kan jag hjälpa till med?
       </h2>
@@ -311,6 +316,39 @@ defineExpose({
 .prose :deep(li) {
   overflow-wrap: break-word;
   word-wrap: break-word;
+}
+
+/* A table is the one block the pipeline emits with no scroll container of its
+   own, so a wide one just ran off the side of a phone with no way to reach the
+   rest. `display: block` + `max-content` turns the table itself into the
+   scroller; `contain` stops a swipe that hits the end from dragging the sheet. */
+.prose :deep(table) {
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.prose :deep(table)::-webkit-scrollbar {
+  height: 4px;
+}
+
+.prose :deep(table)::-webkit-scrollbar-thumb {
+  background: color-mix(in oklch, var(--muted-foreground) 30%, transparent);
+  border-radius: 2px;
+}
+
+.prose :deep(table)::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Same for the other blocks that can carry an unbreakable wide run. */
+.prose :deep(pre),
+.prose :deep(blockquote) {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
 }
 
 .prose :deep(.katex-display)::-webkit-scrollbar {

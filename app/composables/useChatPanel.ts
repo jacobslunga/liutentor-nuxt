@@ -26,6 +26,14 @@ export interface ChatPanelOptions {
   solutionUrl?: string | null;
   input: Ref<ChatInputApi | null>;
   transcript: Ref<ChatTranscriptApi | null>;
+  /**
+   * Pin the model / answer mode for a shell that offers no pickers. Set rather
+   * than written through the cookies on purpose: those are shared with the
+   * desktop panel, and a phone session should not silently rewrite what the
+   * reader chose there.
+   */
+  fixedModelId?: string;
+  fixedDirectAnswer?: boolean;
 }
 
 /**
@@ -74,9 +82,9 @@ export function useChatPanel(opts: ChatPanelOptions) {
     nextTick(() => opts.transcript.value?.scrollToBottom("smooth"));
 
     await send(text, {
-      modelId: selectedModelId.value,
+      modelId: opts.fixedModelId ?? selectedModelId.value,
       selectionContext: context,
-      giveDirectAnswer: giveDirectAnswer.value,
+      giveDirectAnswer: opts.fixedDirectAnswer ?? giveDirectAnswer.value,
     });
   }
 

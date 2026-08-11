@@ -1,6 +1,7 @@
 import { ref, computed, onMounted, onUnmounted } from "vue";
 
-export type Detent = "peek" | "medium" | "full";
+/** Open or shut, nothing in between — a half-height chat was just in the way. */
+export type Detent = "peek" | "full";
 
 /**
  * Collapsed height, above the home indicator. Exported because the surface
@@ -8,10 +9,9 @@ export type Detent = "peek" | "medium" | "full";
  * MobilePdfView.
  */
 export const PEEK_CONTENT_HEIGHT = 72;
-const MEDIUM_RATIO = 0.45;
 
 /** Detents low-to-high, so "one step in the fling direction" is just ±1. */
-const DETENT_ORDER: Detent[] = ["peek", "medium", "full"];
+const DETENT_ORDER: Detent[] = ["peek", "full"];
 
 /** How far past the release point a throw is projected, in ms of travel. */
 const VELOCITY_PROJECTION_MS = 120;
@@ -54,14 +54,10 @@ export function useSheetDetents() {
   const viewportHeight = ref(0);
   const safeAreaBottom = ref(0);
 
-  const heights = computed(() => {
-    const full = viewportHeight.value;
-    return {
-      peek: PEEK_CONTENT_HEIGHT + safeAreaBottom.value,
-      medium: Math.round(full * MEDIUM_RATIO),
-      full,
-    };
-  });
+  const heights = computed(() => ({
+    peek: PEEK_CONTENT_HEIGHT + safeAreaBottom.value,
+    full: viewportHeight.value,
+  }));
 
   function offsetFor(value: Detent) {
     return Math.max(heights.value.full - heights.value[value], 0);
@@ -258,18 +254,8 @@ export function useSheetDetents() {
     window.removeEventListener("orientationchange", handleViewportChange);
   });
 
-  /**
-   * What the sheet currently *looks* like. `detent` only updates on settle, so
-   * header content driven off it would sit on the old variant for the whole
-   * gesture and pop at the end.
-   */
-  const visualDetent = computed(() =>
-    isDragging.value ? nearestDetent(offset.value) : detent.value,
-  );
-
   return {
     detent,
-    visualDetent,
     offset,
     restOffset,
     isDragging,

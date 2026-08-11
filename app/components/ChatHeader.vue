@@ -11,7 +11,7 @@
     </div>
     <div class="flex items-center gap-1 shrink-0">
       <Button variant="ghost" size="icon-sm" aria-label="Ny chatt" @click="emit('newChat')">
-        <LucidePlus class="w-4 h-4" />
+        <LucideMessageSquareShare class="w-4 h-4" />
       </Button>
       <Button variant="ghost" size="icon-sm" aria-label="Historik" @click="emit('openHistory')">
         <LucidePanelRight class="w-4 h-4" />
