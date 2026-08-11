@@ -76,6 +76,94 @@ const viewportInsetStyle = computed(() =>
   props.topInset ? { paddingTop: `${props.topInset}px` } : undefined,
 );
 
+// EmbedPDF treats every wheel event as a pixel-precise trackpad gesture
+// (`1 - deltaY * 0.01`). A single mouse notch is normally reported as 100
+// pixels (or 3 lines in Firefox), which that formula turns into a request to
+// zoom out tenfold. Translate a notch into the small pixel delta its existing
+// gesture handler expects, and leave everything else alone.
+const WHEEL_PIXELS_PER_NOTCH = 100;
+const WHEEL_LINES_PER_NOTCH = 3;
+// Some mice report several notches in one event. Without a ceiling a flick of
+// the wheel crosses the entire zoom range at once.
+const MAX_NOTCHES_PER_EVENT = 3;
+// A physical notch is a discrete step, so it lands in full on the frame it
+// arrives — the reader gets a browser-sized zoom increment with no tail.
+const ZOOM_PER_NOTCH = 0.105;
+const normalizedWheelEvents = new WeakSet<WheelEvent>();
+
+// A trackpad pinch arrives as many small, often fractional, pixel deltas —
+// exactly what EmbedPDF's formula was written for, so it passes through
+// untouched and stays as smooth as it already is. Reading the event rather
+// than the platform also covers a Mac driving an ordinary mouse, which used to
+// hit the tenfold jump, and a Windows precision touchpad, which never should.
+const MOUSE_NOTCH_DELTA_THRESHOLD = 40;
+
+function isMouseNotch(event: WheelEvent) {
+  return (
+    event.deltaMode !== WheelEvent.DOM_DELTA_PIXEL ||
+    Math.abs(event.deltaY) >= MOUSE_NOTCH_DELTA_THRESHOLD
+  );
+}
+
+function wheelNotches(event: WheelEvent) {
+  switch (event.deltaMode) {
+    case WheelEvent.DOM_DELTA_LINE:
+      return event.deltaY / WHEEL_LINES_PER_NOTCH;
+    case WheelEvent.DOM_DELTA_PAGE:
+      return event.deltaY;
+    default:
+      return event.deltaY / WHEEL_PIXELS_PER_NOTCH;
+  }
+}
+
+function dispatchNormalizedWheel(
+  viewport: HTMLElement,
+  source: WheelEvent,
+  notches: number,
+) {
+  // EmbedPDF derives a scale factor as `1 - deltaY * 0.01`. Convert our
+  // stable exponential notch curve back into that expected delta format.
+  const zoomFactor = Math.exp(-ZOOM_PER_NOTCH * notches);
+  const normalizedDeltaY = (1 - zoomFactor) / 0.01;
+  const normalizedEvent = new WheelEvent("wheel", {
+    bubbles: true,
+    cancelable: true,
+    composed: true,
+    clientX: source.clientX,
+    clientY: source.clientY,
+    ctrlKey: source.ctrlKey,
+    metaKey: source.metaKey,
+    deltaMode: WheelEvent.DOM_DELTA_PIXEL,
+    deltaX: 0,
+    deltaY: normalizedDeltaY,
+  });
+  normalizedWheelEvents.add(normalizedEvent);
+  viewport.dispatchEvent(normalizedEvent);
+}
+
+function handleWheelCapture(event: WheelEvent) {
+  // The replacement event below is intentionally allowed through to EmbedPDF.
+  // It retains the library's transient transform, pointer anchoring, and
+  // 150 ms gesture batching instead of duplicating that sensitive logic here.
+  if (normalizedWheelEvents.has(event)) return;
+  if (!event.ctrlKey && !event.metaKey) return;
+  if (!isMouseNotch(event)) return;
+
+  const notches = Math.max(
+    -MAX_NOTCHES_PER_EVENT,
+    Math.min(MAX_NOTCHES_PER_EVENT, wheelNotches(event)),
+  );
+  if (!notches) return;
+  const viewport = event.currentTarget as HTMLElement | null;
+  if (!viewport) return;
+
+  // EmbedPDF listens on this same element, so stopping the original here is
+  // what keeps the raw notch out of its handler.
+  event.preventDefault();
+  event.stopImmediatePropagation();
+  dispatchNormalizedWheel(viewport, event, notches);
+}
+
 function handleViewportScroll(event: Event) {
   const target = event.currentTarget as HTMLElement;
   viewportEl.value = target;
@@ -165,6 +253,7 @@ const plugins = computed(() => {
                 class="h-full w-full bg-background pdf-viewport"
                 :style="viewportInsetStyle"
                 @scroll="handleViewportScroll"
+                @wheel.capture="handleWheelCapture"
               >
                 <template v-if="isMobile">
                   <Scroller :document-id="activeDocumentId">
@@ -202,6 +291,7 @@ const plugins = computed(() => {
                       :document-id="activeDocumentId"
                       :enable-pinch="false"
                       :enable-wheel="true"
+                      class="pdf-zoom-gesture"
                     >
                       <Scroller :document-id="activeDocumentId">
                         <template #default="{ page }">
@@ -284,5 +374,13 @@ const plugins = computed(() => {
   width: 0;
   height: 0;
   display: none;
+}
+
+/* EmbedPDF previews a zoom gesture by transforming this element, then clears
+   the transform when it commits. Deliberately no transition: the browser would
+   animate that reset while the pages re-render at the new scale, which reads as
+   a wobble. */
+.pdf-zoom-gesture {
+  will-change: transform;
 }
 </style>
