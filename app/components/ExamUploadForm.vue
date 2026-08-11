@@ -113,47 +113,39 @@ async function handleUpload() {
   if (!files.value.length || !kurskod.value) return;
   loading.value = true;
   errorMessage.value = "";
-  let successCount = 0;
   const normalizedCourseCode = kurskod.value.toUpperCase().trim();
 
-  for (const file of files.value) {
-    try {
+  try {
+    const formData = new FormData();
+    const metadata = files.value.map((file) => {
       const examDate = parseDateFromFilename(file.name);
       if (!examDate)
         throw new Error(`Kunde inte hitta ett datum i filnamnet: ${file.name}`);
 
       const fileType = isSolution(file.name) ? "SOLUTION" : "EXAM";
       const normalizedFilename = `${normalizedCourseCode}_${examDate}_${fileType}.pdf`;
+      formData.append("files", file);
+      return {
+        courseCode: normalizedCourseCode,
+        originalFilename: file.name,
+        normalizedFilename,
+        examDate,
+        fileType,
+      };
+    });
+    formData.append("metadata", JSON.stringify(metadata));
 
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("courseCode", normalizedCourseCode);
-      formData.append("originalFilename", file.name);
-      formData.append("normalizedFilename", normalizedFilename);
-      formData.append("examDate", examDate);
-      formData.append("fileType", fileType);
-
-      await $fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-      successCount++;
-    } catch (error) {
-      errorMessage.value = error instanceof Error ? error.message : "Okänt fel";
-      break;
-    }
-  }
-
-  loading.value = false;
-  uploadStatus.value =
-    successCount > 0 && successCount === files.value.length
-      ? "success"
-      : "error";
-  if (successCount > 0) {
+    await $fetch("/api/upload", { method: "POST", body: formData });
+    uploadStatus.value = "success";
     files.value = [];
     if (!props.fixedCourseCode) {
       kurskod.value = "";
     }
+  } catch (error) {
+    errorMessage.value = error instanceof Error ? error.message : "Okänt fel";
+    uploadStatus.value = "error";
+  } finally {
+    loading.value = false;
   }
 }
 

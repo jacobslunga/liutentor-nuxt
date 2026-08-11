@@ -89,6 +89,10 @@ export default defineNuxtConfig({
     // Set via NUXT_REVALIDATE_SECRET. Shared with the Supabase webhook that
     // purges course caches when exams are published.
     revalidateSecret: "",
+    resendApiKey: "",
+    uploadNotificationTo: "jacobslunga21@yahoo.se",
+    uploadNotificationFrom: "LiU Tentor <notifications@liutentor.se>",
+    uploadReviewUrl: "https://admin.liutentor.se/admin/review",
     public: {
       supabaseUrl: "",
       supabaseKey: "",
