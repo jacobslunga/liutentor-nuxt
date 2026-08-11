@@ -34,7 +34,9 @@ const { open: openUploadModal } = useUploadModal();
 const { overallPassRate } = useCourseStats(() => exams.value);
 
 const avgPassRate = computed(() =>
-  overallPassRate.value === undefined ? null : Math.round(overallPassRate.value),
+  overallPassRate.value === undefined
+    ? null
+    : Math.round(overallPassRate.value),
 );
 
 const examsWithSolutions = computed(
@@ -65,7 +67,10 @@ const examYears = computed(() => {
 
 /** Newest exam date — used as the page's freshness signal for crawlers. */
 const lastExamDate = computed(() => {
-  const dates = exams.value.map((e) => e.exam_date).filter(Boolean).sort();
+  const dates = exams.value
+    .map((e) => e.exam_date)
+    .filter(Boolean)
+    .sort();
   return dates.length ? dates[dates.length - 1] : null;
 });
 
@@ -203,14 +208,21 @@ function passColor(rate: number) {
       <CourseSearchDropdown size="md" class="mx-auto w-full max-w-xl" />
     </div>
 
-    <div v-if="status === 'pending'" class="flex items-center justify-center min-h-[60vh]">
+    <div
+      v-if="status === 'pending'"
+      class="flex items-center justify-center min-h-[60vh]"
+    >
       <LucideLoader2 class="w-6 h-6 animate-spin text-muted-foreground" />
     </div>
 
-    <div v-else-if="status === 'success' && !courseData"
-      class="mx-auto flex min-h-[60vh] w-full max-w-2xl flex-col items-center justify-center gap-8 py-8">
+    <div
+      v-else-if="status === 'success' && !courseData"
+      class="mx-auto flex min-h-[60vh] w-full max-w-2xl flex-col items-center justify-center gap-8 py-8"
+    >
       <div class="max-w-xl text-center">
-        <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+        <div
+          class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted"
+        >
           <LucideInbox class="h-6 w-6 text-muted-foreground" />
         </div>
         <h1 class="text-2xl font-medium text-foreground">
@@ -221,32 +233,41 @@ function passColor(rate: number) {
           nästa student som söker på {{ courseCode }} hjälpt direkt.
         </p>
       </div>
-      <ExamUploadForm :initial-course-code="courseCode" fixed-course-code :show-heading="false" />
+      <ExamUploadForm
+        :initial-course-code="courseCode"
+        fixed-course-code
+        :show-heading="false"
+      />
     </div>
 
     <template v-else-if="courseData">
       <div class="flex justify-center">
         <div class="flex flex-col items-start w-full max-w-4xl gap-8">
           <div class="w-full">
-            <h1 class="text-3xl sm:text-4xl font-semibold text-foreground leading-tight w-full wrap-break-word">
+            <h1
+              class="text-3xl sm:text-4xl font-semibold text-foreground leading-tight w-full wrap-break-word"
+            >
               {{ courseData.courseName }}
             </h1>
 
-            <p class="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
-              <span class="font-sans text-sm text-muted-foreground">{{ courseCode }}
+            <p
+              class="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground"
+            >
+              <span class="font-sans text-sm text-muted-foreground"
+                >{{ courseCode }}
               </span>
               <span aria-hidden="true">·</span>
               <span>
                 <span class="font-medium text-foreground">{{
                   exams.length
-                  }}</span>
+                }}</span>
                 tentor
               </span>
               <span aria-hidden="true">·</span>
               <span>
                 <span class="font-medium text-foreground">{{
                   examsWithSolutions
-                  }}</span>
+                }}</span>
                 med facit
               </span>
               <template v-if="avgPassRate !== null">
@@ -263,13 +284,20 @@ function passColor(rate: number) {
 
           <Tabs v-model="activeTab" class="w-full -mt-4">
             <div
-              class="sticky top-12 z-40 flex flex-col gap-3 border-b border-border/60 bg-background pt-2 pb-2.5 sm:flex-row sm:items-center sm:justify-between md:top-0 dark:border-border/60">
+              class="sticky top-12 z-40 flex flex-col gap-3 border-b border-border/60 bg-background pt-2 pb-2.5 sm:flex-row sm:items-center sm:justify-between md:top-0 dark:border-border/60"
+            >
               <TabsList>
-                <TabsTrigger value="exams" class="h-full font-medium text-xs gap-2">
+                <TabsTrigger
+                  value="exams"
+                  class="h-full font-medium text-xs gap-2"
+                >
                   <LucideScrollText class="w-4 h-4" />
                   Tentor
                 </TabsTrigger>
-                <TabsTrigger value="stats" class="h-full font-medium text-xs gap-2">
+                <TabsTrigger
+                  value="stats"
+                  class="h-full font-medium text-xs gap-2"
+                >
                   <LucideChartSpline class="w-4 h-4" />
                   Statistik
                 </TabsTrigger>
@@ -290,7 +318,12 @@ function passColor(rate: number) {
             </div>
 
             <Transition name="tab-panel" mode="out-in">
-              <TabsContent v-if="activeTab === 'exams'" key="exams" value="exams" class="mt-5">
+              <TabsContent
+                v-if="activeTab === 'exams'"
+                key="exams"
+                value="exams"
+                class="mt-5"
+              >
                 <CourseExamsTable :course-code="courseCode" :exams="exams" />
               </TabsContent>
 
