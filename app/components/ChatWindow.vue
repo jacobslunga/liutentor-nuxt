@@ -106,8 +106,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
           @reply-to-selection="handleReplyToSelection" @update:show-scroll-button="showScrollButton = $event" />
 
         <div class="absolute bottom-0 left-0 right-0 pt-14 pb-4 pointer-events-none z-10">
-          <div
-            class="pointer-events-none absolute inset-x-0 top-0 bottom-0 -z-10 bg-linear-to-b from-background/0 via-background/60 via-50% to-background to-88%" />
+          <div class="fade-to-background pointer-events-none absolute inset-x-0 top-0 bottom-0 -z-10" />
           <ChatInput ref="chatInputRef" :initial-text="chatStore.draftInput" :is-loading="isLoading"
             :give-direct-answer="giveDirectAnswer" :selected-model-id="selectedModelId"
             :show-scroll-button="showScrollButton" :course-code="courseCode" :has-solution="hasSolution"

@@ -192,6 +192,10 @@ body {
 :root {
   --radius: 0.625rem;
   --background: oklch(99.107% 0.00011 271.152);
+  /* See the note on .fade-to-background — these are --background at reduced
+     alpha, derived so they cannot drift from it. */
+  --background-0: oklch(from var(--background) l c h / 0);
+  --background-soft: oklch(from var(--background) l c h / 0.7);
   --foreground: oklch(0.245 0 0);
   /* Cards carry no border — they separate from the page by surface tone alone,
      so --card must sit clearly off --background (was 0.99, a 1% gap that read
@@ -247,6 +251,8 @@ body {
      warm/brown against a dark field — the eye compensates for the surrounding
      darkness. This tiny amount is what makes them read as *neutral*. */
   --background: oklch(0.21 0.004 265);
+  --background-0: oklch(from var(--background) l c h / 0);
+  --background-soft: oklch(from var(--background) l c h / 0.7);
   --foreground: oklch(0.94 0.002 265);
   /* See light-mode note — borderless cards need a visible tonal step. */
   --card: oklch(0.265 0.005 265);
@@ -447,4 +453,23 @@ body {
    use — the tokens above already switch. This keeps its defaults from winning. */
 .vis-chart .vis-tooltip-container {
   font-family: var(--font-sans);
+}
+
+/* Fade a scrolling surface out into the page background.
+ *
+ * Not `bg-linear-to-b from-background/0`: Tailwind compiles the `/0` modifier
+ * to `color-mix(in oklab, var(--background) 0%, transparent)`, and `transparent`
+ * is *black* at zero alpha. The ramp therefore runs from black to the background
+ * colour, which Safari paints as a visible dark smear rather than a clean fade —
+ * very obvious against a light background on iOS.
+ *
+ * Holding the hue fixed and moving only alpha removes the colour interpolation
+ * entirely, so there is nothing left to smear in any engine or interpolation
+ * space. --background-0 / --background-soft derive from --background via
+ * relative colour syntax, so they follow the theme automatically. */
+.fade-to-background {
+  background-image: linear-gradient(to bottom,
+      var(--background-0) 0%,
+      var(--background-soft) 45%,
+      var(--background) 80%);
 }

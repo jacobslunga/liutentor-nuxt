@@ -41,8 +41,14 @@ const props = withDefaults(
      * is the button — the convention every mobile chat app follows.
      */
     submitOnEnter?: boolean;
+    /**
+     * Drops the model and answer-mode pickers, leaving just the field and the
+     * send button. The shell that sets this is expected to pin both values —
+     * on a phone the row has no width to spare for two dropdowns.
+     */
+    compact?: boolean;
   }>(),
-  { autofocus: true, submitOnEnter: true },
+  { autofocus: true, submitOnEnter: true, compact: false },
 );
 
 const emit = defineEmits<{
@@ -91,9 +97,13 @@ const answerModeLabel = computed(
  */
 const oneRowWidth = () => {
   const row = rowRef.value;
-  const mode = modeRef.value;
   const controls = controlsRef.value;
-  if (!row || !mode || !controls) return 0;
+  if (!row || !controls) return 0;
+
+  // Absent in compact mode, which also removes one of the two gaps. Treating
+  // that as "not measurable yet" would leave isMultiline stuck and the field
+  // would stop growing.
+  const mode = modeRef.value;
 
   const style = getComputedStyle(row);
   const gap = parseFloat(style.columnGap) || 0;
@@ -101,7 +111,12 @@ const oneRowWidth = () => {
     row.clientWidth -
     parseFloat(style.paddingLeft) -
     parseFloat(style.paddingRight);
-  return inner - mode.offsetWidth - controls.offsetWidth - gap * 2;
+  return (
+    inner -
+    (mode?.offsetWidth ?? 0) -
+    controls.offsetWidth -
+    gap * (mode ? 2 : 1)
+  );
 };
 
 const applyHeight = () => {
@@ -222,7 +237,7 @@ defineExpose({
                textarea's own padding must stay identical across both layouts —
                it feeds the height measurement that picks between them. -->
           <div ref="rowRef" class="flex flex-wrap items-center gap-1.5 px-2.5 py-2.5">
-            <div ref="modeRef" class="shrink-0" :class="isMultiline ? 'order-2' : 'order-1'">
+            <div v-if="!compact" ref="modeRef" class="shrink-0" :class="isMultiline ? 'order-2' : 'order-1'">
               <DropdownMenu>
                 <DropdownMenuTrigger as-child>
                   <Button variant="ghost" size="icon" :aria-label="answerModeLabel"
@@ -255,7 +270,7 @@ defineExpose({
               @keydown="handleKeyDown" />
 
             <div ref="controlsRef" class="order-3 flex shrink-0 items-center gap-1.5" :class="{ 'ml-auto': isMultiline }">
-              <DropdownMenu>
+              <DropdownMenu v-if="!compact">
                 <DropdownMenuTrigger as-child>
                   <Button variant="ghost" size="sm"
                     class="gap-1.5 px-2.5 text-xs font-semibold text-muted-foreground hover:text-foreground">
