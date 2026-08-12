@@ -1,54 +1,29 @@
 import { ref, computed, onMounted, onUnmounted } from "vue";
 
-/** Open or shut, nothing in between — a half-height chat was just in the way. */
 export type Detent = "peek" | "full";
 
-/**
- * Collapsed height, above the home indicator. Exported because the surface
- * behind the sheet has to reserve exactly this much room for it — see
- * MobilePdfView.
- */
 export const PEEK_CONTENT_HEIGHT = 72;
 
-/** Detents low-to-high, so "one step in the fling direction" is just ±1. */
 const DETENT_ORDER: Detent[] = ["peek", "full"];
 
-/** How far past the release point a throw is projected, in ms of travel. */
 const VELOCITY_PROJECTION_MS = 120;
-/** px/ms above which a release reads as a fling rather than a drop. */
+
 const FLING_VELOCITY = 0.4;
 
-/** Resistance when pulling above the full detent. */
 const RUBBER_BAND_EXPONENT = 0.72;
 
-/** px of travel below which a gesture still counts as a tap. */
 const TAP_SLOP = 6;
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
 }
 
-/**
- * Drag and snap physics for an iOS-style multi-detent bottom sheet.
- *
- * Position is expressed as an *offset*: how far the sheet is pushed down from
- * fully open. The sheet box itself is always full height and moves by
- * `translateY(offset)`, so dragging is a compositor-only transform and the
- * transcript inside it never relayouts mid-gesture.
- */
 export function useSheetDetents() {
   const detent = ref<Detent>("peek");
   const isDragging = ref(false);
-  /**
-   * Whether the current (or most recent) gesture travelled far enough to be a
-   * drag. Tappable surfaces inside the drag region check this to tell a tap
-   * apart from the click that trails every drag.
-   */
+
   const hasMoved = ref(false);
 
-  // Non-null only while a finger is down. Everything else derives the offset
-  // from the settled detent, so a viewport change (keyboard, rotation, browser
-  // chrome collapsing) reflows the sheet for free.
   const dragOffset = ref<number | null>(null);
 
   const viewportHeight = ref(0);
@@ -86,19 +61,10 @@ export function useSheetDetents() {
     detent.value = value;
   }
 
-  // ─── Viewport ──────────────────────────────────────────────────
-  // The *visual* viewport, not innerHeight: iOS shrinks only the former when
-  // the keyboard opens, and the sheet has to end above it.
-
   function readViewport() {
     viewportHeight.value = window.visualViewport?.height ?? window.innerHeight;
   }
 
-  /**
-   * Measured off a throwaway element rather than read from a custom property —
-   * whether `env()` resolves inside `getComputedStyle` varies by engine, and a
-   * wrong answer here puts the peek bar under the home indicator.
-   */
   function readSafeArea() {
     const probe = document.createElement("div");
     probe.style.cssText =
@@ -113,22 +79,12 @@ export function useSheetDetents() {
     readSafeArea();
   }
 
-  // Measured during setup rather than only on mount. Starting from a zero
-  // viewport makes `full` and `peek` collapse to the same offset, so the sheet
-  // renders wide open for a frame and the correction then animates — it visibly
-  // snaps shut on load.
   if (import.meta.client) {
     readViewport();
     if (document.body) readSafeArea();
   }
 
-  /**
-   * Gates the settle transition until after the first paint, so nothing the
-   * initial measurement changes can animate.
-   */
   const isReady = ref(false);
-
-  // ─── Gesture ───────────────────────────────────────────────────
 
   let dragEl: HTMLElement | null = null;
   let activePointerId: number | null = null;
@@ -137,7 +93,7 @@ export function useSheetDetents() {
   let startDetent: Detent = "peek";
   let lastY = 0;
   let lastTime = 0;
-  /** px per ms; positive is downward, i.e. collapsing. */
+
   let velocity = 0;
 
   function onPointerMove(e: PointerEvent) {
@@ -148,10 +104,10 @@ export function useSheetDetents() {
     let next = startOffset + delta;
 
     if (next < 0) {
-      // Pulled above full: resist rather than letting the sheet leave the top.
+
       next = -Math.pow(-next, RUBBER_BAND_EXPONENT);
     } else if (next > maxOffset.value) {
-      // Hard stop at peek — the collapsed bar must never leave the screen.
+
       next = maxOffset.value;
     }
 
@@ -173,8 +129,7 @@ export function useSheetDetents() {
     let target = nearestDetent(current + velocity * VELOCITY_PROJECTION_MS);
 
     if (Math.abs(velocity) > FLING_VELOCITY) {
-      // A throw must always move at least one detent the way it pointed, even
-      // if the finger barely travelled before letting go.
+
       const direction = velocity > 0 ? -1 : 1;
       const floorIndex = clamp(
         DETENT_ORDER.indexOf(startDetent) + direction,
@@ -207,10 +162,6 @@ export function useSheetDetents() {
   function onPointerDown(e: PointerEvent) {
     if (e.pointerType === "mouse" && e.button !== 0) return;
 
-    // Opted-out controls inside the drag region keep their own gestures. Only
-    // these are excluded, not every button: the collapsed bar is both the
-    // primary drag surface and a tap target, and callers tell the two apart
-    // with `hasMoved`.
     const target = e.target as HTMLElement | null;
     if (target?.closest("[data-no-drag]")) return;
 

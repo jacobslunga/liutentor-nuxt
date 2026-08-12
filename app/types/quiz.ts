@@ -5,11 +5,11 @@ export interface QuizQuestion {
   answer: number;
 }
 
-export interface Quiz {
+interface Quiz {
   questions: QuizQuestion[];
 }
 
-export interface QuizMeta {
+interface QuizMeta {
   courseCode: string;
   sourceExamIds: number[];
   sourceCount: number;

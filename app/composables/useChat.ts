@@ -6,9 +6,6 @@ const CHAT_API_URL =
 
 const DEFAULT_MODEL_ID = "gemini-3.1-flash-lite";
 
-// USE FOR LOCAL DEVELOPMENT
-// const CHAT_API_URL_LOCAL = "http://localhost:8080/api/v1/chat/completion";
-
 function getAnonymousId(): string {
   if (typeof window === "undefined") return "unknown";
   const key = "liutentor_anonymous_id";
@@ -133,10 +130,6 @@ export function useChat(options: {
     const controller = new AbortController();
     abortController.value = controller;
 
-    // Coalesces stream updates to at most one per animation frame. A wall-clock
-    // interval keeps queueing re-renders even when the main thread is already
-    // behind; rAF cannot fire faster than the browser can paint, so this backs
-    // off on its own exactly when the message is long enough to be expensive.
     let pendingFrame = 0;
 
     const cancelPendingFlush = () => {
@@ -186,8 +179,6 @@ export function useChat(options: {
       const decoder = new TextDecoder("utf-8");
       let streamText = "";
 
-      // Mutating the last message in place is enough for reactivity (messages
-      // is a deep ref) and avoids copying the whole array on every tick.
       const writeStreamText = (text: string) => {
         const msgs = chatStore.messages;
         const last = msgs[msgs.length - 1];

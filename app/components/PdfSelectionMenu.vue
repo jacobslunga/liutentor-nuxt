@@ -1,15 +1,9 @@
 <script setup lang="ts">
 import { useSelectionCapability } from "@embedpdf/plugin-selection/vue";
 
-/**
- * The button offered over a text selection in the PDF. Must be rendered inside
- * SelectionLayer's `selection-menu` slot: the capability it reads comes from
- * the plugin registry, and the slot's wrapper is what positions it over the
- * selection at the current zoom.
- */
 const props = defineProps<{
   documentId: string;
-  /** The wrapper sits above the selection, so the button has to open upwards. */
+
   above: boolean;
 }>();
 
@@ -17,8 +11,6 @@ const emit = defineEmits<{ explain: [text: string] }>();
 
 const { provides: selection } = useSelectionCapability();
 
-// Matches ChatInput's own ceiling. A drag down a whole page is far more text
-// than the question needs, and the chat would reject it downstream anyway.
 const MAX_SELECTION_LENGTH = 4000;
 
 const isResolving = ref(false);
@@ -29,7 +21,7 @@ async function explain() {
 
   isResolving.value = true;
   try {
-    // One entry per page the selection spans.
+
     const pages = await capability.getSelectedText(props.documentId).toPromise();
     const text = pages.join("\n").trim();
     if (!text) return;
@@ -37,8 +29,7 @@ async function explain() {
     emit("explain", text.slice(0, MAX_SELECTION_LENGTH));
     capability.clear(props.documentId);
   } catch {
-    // Page geometry not resolved yet. Leaving the selection up means the
-    // button is still there to try again.
+
   } finally {
     isResolving.value = false;
   }
@@ -57,8 +48,7 @@ async function explain() {
 </template>
 
 <style scoped>
-/* Opacity only: the horizontal centring above is itself a transform, and
-   animating one would fight the other. */
+
 .menu-fade-enter-active,
 .menu-fade-leave-active {
   transition: opacity var(--duration-fast) var(--ease-spring);

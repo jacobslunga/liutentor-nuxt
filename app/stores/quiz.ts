@@ -24,9 +24,9 @@ export type QuizStatus = { step: string; message: string };
 export const useQuizStore = defineStore("quiz", () => {
   const stage = ref<Stage>("setup");
   const quizData = ref<MultipleChoiceQuizResponse | null>(null);
-  // null = freshly generated (no DB id yet), string = loaded from history
+
   const activeQuizId = ref<string | null>(null);
-  // incremented on retake/load so QuizAnswering remounts and resets its internal answers
+
   const sessionKey = ref(0);
   const currentIndex = ref(0);
   const answers = ref<Record<number, number>>({});

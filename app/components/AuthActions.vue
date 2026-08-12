@@ -21,7 +21,7 @@ const user = useSupabaseUser();
         <NuxtLink to="/logga-in">Logga in</NuxtLink>
       </Button>
       <Button size="sm" variant="default" as-child>
-        <NuxtLink to="/skapa-konto">Skapa konto</NuxtLink>
+        <NuxtLink to="/logga-in?tab=skapa-konto">Skapa konto</NuxtLink>
       </Button>
     </template>
   </div>

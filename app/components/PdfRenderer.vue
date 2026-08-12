@@ -27,16 +27,9 @@ import { RotatePluginPackage, Rotate } from "@embedpdf/plugin-rotate/vue";
 const props = defineProps<{
   pdfUrl: string;
   layoutMode?: "exam-only" | "exam-with-facit" | "default";
-  /**
-   * Clearance for a bar that overlays the top of this viewer. Desktop only —
-   * the mobile view insets the viewer's box instead, so nothing scrolls under
-   * its header at all.
-   */
+
   topInset?: number;
-  /**
-   * Offer "Förklara" over a text selection. Opt-in: only a page that actually
-   * has somewhere to send the text (the chat panel) should ask for it.
-   */
+
   explainEnabled?: boolean;
 }>();
 
@@ -53,19 +46,12 @@ const selectionColor = computed(() =>
     : "color-mix(in oklch, var(--primary) 28%, transparent)",
 );
 
-// Dark mode: fully invert the page (hue-rotate keeps coloured content roughly
-// true), which turns the white paper black. `screen` then leaves the backdrop
-// untouched wherever the page is black, so the paper renders as exactly
-// --background — no invert percentage to keep in sync with the token.
 const darkPageStyle = {
   filter: "invert(1) hue-rotate(180deg)",
   mixBlendMode: "screen",
 } as const;
 
-// Resolved once, on purpose. The parent swaps between the mobile and desktop
-// trees at the same 1024px breakpoint, so crossing it remounts this component
-// anyway — and keeping these reactive meant every resize event rebuilt the
-// plugin registry below, tearing the document down mid-drag.
+// Keep this non-reactive: rebuilding the plugin registry during resize reloads the PDF.
 const isMobile = window.innerWidth < 1024;
 const windowWidth = window.innerWidth;
 
@@ -76,26 +62,15 @@ const viewportInsetStyle = computed(() =>
   props.topInset ? { paddingTop: `${props.topInset}px` } : undefined,
 );
 
-// EmbedPDF treats every wheel event as a pixel-precise trackpad gesture
-// (`1 - deltaY * 0.01`). A single mouse notch is normally reported as 100
-// pixels (or 3 lines in Firefox), which that formula turns into a request to
-// zoom out tenfold. Translate a notch into the small pixel delta its existing
-// gesture handler expects, and leave everything else alone.
+// EmbedPDF interprets mouse-wheel notches as trackpad deltas, causing extreme zoom jumps.
 const WHEEL_PIXELS_PER_NOTCH = 100;
 const WHEEL_LINES_PER_NOTCH = 3;
-// Some mice report several notches in one event. Without a ceiling a flick of
-// the wheel crosses the entire zoom range at once.
+
 const MAX_NOTCHES_PER_EVENT = 3;
-// A physical notch is a discrete step, so it lands in full on the frame it
-// arrives — the reader gets a browser-sized zoom increment with no tail.
+
 const ZOOM_PER_NOTCH = 0.105;
 const normalizedWheelEvents = new WeakSet<WheelEvent>();
 
-// A trackpad pinch arrives as many small, often fractional, pixel deltas —
-// exactly what EmbedPDF's formula was written for, so it passes through
-// untouched and stays as smooth as it already is. Reading the event rather
-// than the platform also covers a Mac driving an ordinary mouse, which used to
-// hit the tenfold jump, and a Windows precision touchpad, which never should.
 const MOUSE_NOTCH_DELTA_THRESHOLD = 40;
 
 function isMouseNotch(event: WheelEvent) {
@@ -121,8 +96,7 @@ function dispatchNormalizedWheel(
   source: WheelEvent,
   notches: number,
 ) {
-  // EmbedPDF derives a scale factor as `1 - deltaY * 0.01`. Convert our
-  // stable exponential notch curve back into that expected delta format.
+
   const zoomFactor = Math.exp(-ZOOM_PER_NOTCH * notches);
   const normalizedDeltaY = (1 - zoomFactor) / 0.01;
   const normalizedEvent = new WheelEvent("wheel", {
@@ -142,9 +116,7 @@ function dispatchNormalizedWheel(
 }
 
 function handleWheelCapture(event: WheelEvent) {
-  // The replacement event below is intentionally allowed through to EmbedPDF.
-  // It retains the library's transient transform, pointer anchoring, and
-  // 150 ms gesture batching instead of duplicating that sensitive logic here.
+
   if (normalizedWheelEvents.has(event)) return;
   if (!event.ctrlKey && !event.metaKey) return;
   if (!isMouseNotch(event)) return;
@@ -157,8 +129,6 @@ function handleWheelCapture(event: WheelEvent) {
   const viewport = event.currentTarget as HTMLElement | null;
   if (!viewport) return;
 
-  // EmbedPDF listens on this same element, so stopping the original here is
-  // what keeps the raw notch out of its handler.
   event.preventDefault();
   event.stopImmediatePropagation();
   dispatchNormalizedWheel(viewport, event, notches);
@@ -170,27 +140,15 @@ function handleViewportScroll(event: Event) {
   showScrollTop.value = target.scrollTop > 320;
 }
 
-// Reading the exam full-bleed on a wide monitor gives an unreadably long line,
-// but the old ZoomMode.Automatic capped at 100% of the PDF's own scale, which
-// on a 1700px window left the page occupying about a third of the width. In
-// exam-only mode the page fills the viewport up to this cap instead.
 const MAX_EXAM_ONLY_PAGE_WIDTH = 980;
 
-// null means "always fill the pane" — in split view the pane is already narrow
-// enough to be the constraint.
 const maxPageWidth = computed(() =>
   props.layoutMode === "exam-only" ? MAX_EXAM_ONLY_PAGE_WIDTH : null,
 );
 
-// Only the starting point; PdfZoomController owns it from the first resolve on,
-// which is what lets the zoom follow a layout toggle without a plugin rebuild.
 const defaultZoomLevel = ZoomMode.FitWidth;
 
-// Depends on `pdfUrl` and nothing else: navigating to another exam reuses this
-// instance, so the registry genuinely has to be rebuilt for a new document.
-// Anything else in here — the old reactive windowWidth, or layoutMode once the
-// layout switcher stopped remounting this component — silently triggers a full
-// re-registration and a document reload.
+// Only a new PDF URL may invalidate this registry; other dependencies reload the document.
 const plugins = computed(() => {
   const base = [
     createPluginRegistration(DocumentManagerPluginPackage, {
@@ -232,8 +190,6 @@ const plugins = computed(() => {
         <template v-if="activeDocumentId">
           <PdfZoomController :document-id="activeDocumentId" :max-page-width="maxPageWidth" />
 
-          <!-- EmbedPDF renders a fragment, so this positions against the root
-               above — whose top edge already sits below the mobile header. -->
           <PdfZoomControls v-if="isMobile" :document-id="activeDocumentId" class="absolute right-0 top-3 z-20" />
 
           <DocumentContent :document-id="activeDocumentId">
@@ -328,11 +284,7 @@ const plugins = computed(() => {
                                     :page-index="page.pageIndex"
                                     :text-style="{ background: selectionColor }"
                                   >
-                                    <!-- The wrapper is a pointer-events: none
-                                         box over the selection's bounding rect,
-                                         counter-rotated and zoom-scaled by the
-                                         plugin, so the button only has to say
-                                         which side of it to sit on. -->
+
                                     <template
                                       v-if="props.explainEnabled"
                                       #selection-menu="{ menuWrapperProps, placement }"
@@ -376,10 +328,6 @@ const plugins = computed(() => {
   display: none;
 }
 
-/* EmbedPDF previews a zoom gesture by transforming this element, then clears
-   the transform when it commits. Deliberately no transition: the browser would
-   animate that reset while the pages re-render at the new scale, which reads as
-   a wobble. */
 .pdf-zoom-gesture {
   will-change: transform;
 }

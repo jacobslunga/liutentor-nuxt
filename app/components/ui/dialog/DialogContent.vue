@@ -20,11 +20,7 @@ const props = withDefaults(
     DialogContentProps & {
       class?: HTMLAttributes["class"];
       showCloseButton?: boolean;
-      /**
-       * "sheet" anchors the panel to the bottom edge below `sm`, where a
-       * centred card wastes the width and puts its controls out of thumb
-       * reach. From `sm` up it is the ordinary centred dialog either way.
-       */
+
       variant?: "dialog" | "sheet";
     }
   >(),
@@ -39,7 +35,6 @@ const delegatedProps = reactiveOmit(props, "class", "variant");
 
 const forwarded = useForwardPropsEmits(delegatedProps, emits);
 
-/** Shape, placement and entrance — everything else is shared below. */
 const VARIANT_CLASSES = {
   dialog:
     "fixed top-[50%] left-[50%] max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] rounded-3xl border duration-150 data-[state=closed]:slide-out-to-bottom-2 data-[state=open]:slide-in-from-bottom-2 sm:max-w-lg",
@@ -50,9 +45,7 @@ const VARIANT_CLASSES = {
 
 <template>
   <DialogPortal>
-    <!-- A sheet sits on the screen alongside what is behind it rather than
-         taking it over, so it gets no scrim in that presentation. The centred
-         dialog it becomes at `sm` still needs one to read as modal. -->
+
     <DialogOverlay :class="props.variant === 'sheet' ? 'hidden sm:block' : undefined" />
     <DialogContent
       data-slot="dialog-content"

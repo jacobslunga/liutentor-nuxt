@@ -7,7 +7,6 @@ export function useAnswerMode() {
     maxAge: 60 * 60 * 24 * 365,
   });
 
-  // Clean up legacy v1 cookie
   const legacy = useCookie(LEGACY_ANSWER_MODE_KEY);
   if (legacy.value !== null) {
     if (typeof legacy.value === "boolean") {

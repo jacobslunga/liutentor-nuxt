@@ -6,7 +6,7 @@ interface RecentSearch {
 }
 
 export function useRecentSearches() {
-  // Clear legacy cookie for all users if it exists
+
   const legacyCookie = useCookie("recentSearches");
   if (legacyCookie.value !== null && legacyCookie.value !== undefined) {
     legacyCookie.value = null;
@@ -15,7 +15,7 @@ export function useRecentSearches() {
   const cookie = useCookie<RecentSearch[] | undefined>("liu_recent_searches_v2", {
     path: "/",
     sameSite: "lax",
-    maxAge: 60 * 60 * 24 * 30, // 30 days
+    maxAge: 60 * 60 * 24 * 30,
   });
 
   function add(courseCode: string) {
@@ -35,7 +35,7 @@ export function useRecentSearches() {
           ? { courseCode: item, timestamp: Date.now() }
           : item,
       ),
-    ].slice(0, 3); // Store max 3 course codes
+    ].slice(0, 3);
 
     cookie.value = updated;
   }

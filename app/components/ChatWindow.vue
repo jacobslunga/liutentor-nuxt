@@ -93,9 +93,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
 <template>
   <div class="h-full w-full flex bg-background overflow-hidden relative">
     <div class="flex-1 min-w-0 relative overflow-hidden">
-      <!-- Solid, so the transcript scrolls cleanly under it. It still overlays
-           the scroll container rather than sitting in flow — the padding below
-           is what keeps the newest message clear of it. -->
+
       <div class="absolute inset-x-0 top-0 z-20">
         <ChatHeader :has-solution="hasSolution" :title="chatHeaderTitle" :history-open="isHistoryOpen"
           @close="emit('close')" @open-history="toggleHistory" @new-chat="startNewChat" />

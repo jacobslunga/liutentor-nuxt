@@ -3,9 +3,6 @@ import { courseTag, setCdnCache } from "../../utils/cache";
 export default defineEventHandler(async (e) => {
   const courseCode = getRouterParam(e, "courseCode");
 
-  // Cached at the edge and purged per course when exams are published, so a
-  // publish is visible within seconds without paying the Cloud Run round trip
-  // on every request.
   if (courseCode) setCdnCache(e, [courseTag(courseCode)]);
 
   try {

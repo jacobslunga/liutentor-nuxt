@@ -1,8 +1,6 @@
 <script setup lang="ts">
 const year = new Date().getFullYear();
 
-// The footer is the site's navigation for every page outside the app itself,
-// so it carries the full map rather than a token set of links.
 const groupedLinks = [
   {
     title: "Tjänsten",

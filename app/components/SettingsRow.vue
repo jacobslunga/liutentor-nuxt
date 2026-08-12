@@ -1,9 +1,5 @@
 <script setup lang="ts">
-/**
- * One labelled setting. `stacked` drops the control onto its own line for
- * controls too wide to sit beside the label (the theme picker, the segmented
- * groups) — at that width the side-by-side row wraps into a mess on mobile.
- */
+
 withDefaults(
   defineProps<{
     label: string;

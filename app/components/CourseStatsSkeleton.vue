@@ -1,10 +1,5 @@
 <script setup lang="ts">
-/**
- * Stands in for the whole statistics tab while its chunk is on the wire. The
- * section headings are placeholders rather than the real strings: this is the
- * shape of the panel, not a half-rendered copy of it that would have to be
- * kept in step with CourseStats.
- */
+
 </script>
 
 <template>

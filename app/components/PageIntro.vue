@@ -1,8 +1,5 @@
 <script setup lang="ts">
-/**
- * Editorial masthead shared by every info page: a small label, a large serif
- * headline and an optional lead paragraph, over a full-bleed hairline.
- */
+
 defineProps<{
   eyebrow: string;
   title: string;
@@ -18,8 +15,6 @@ defineProps<{
         {{ eyebrow }}
       </p>
 
-      <!-- font-serif, not font-logo: the GT Super face ships without Swedish
-           diacritics and silently renders "börja" as "borja". -->
       <h1
         class="mt-5 max-w-3xl font-serif text-[2.25rem] font-semibold leading-[1.05] text-foreground sm:text-5xl lg:text-6xl"
       >

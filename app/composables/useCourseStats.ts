@@ -1,19 +1,14 @@
-import type { ChartToken } from "./useChartTokens";
 import type { Exam } from "~/types/exam";
 
-/** Grades in the order they are displayed — strongest result first. */
 const GRADE_ORDER = ["VG", "5", "4", "3", "G", "U"] as const;
 
-/**
- * Grades are an ordered scale, so the pass grades wear a single-hue ordinal
- * ramp and the fail grade wears the reserved status red.
- *
- * The mapping is fixed per grade rather than assigned by rank at render time:
- * a course that only awards 3 and 5 must not repaint 5 just because 4 is
- * missing. `G`/`VG` and `3`/`4`/`5` belong to different grading scales and
- * never appear on the same course, so sharing the ramp steps is unambiguous.
- */
-const GRADE_TOKENS: Record<string, ChartToken> = {
+export type GradeToken =
+  | "grade-fail"
+  | "grade-high"
+  | "grade-low"
+  | "grade-mid";
+
+const GRADE_TOKENS: Record<string, GradeToken> = {
   U: "grade-fail",
   "3": "grade-low",
   G: "grade-mid",
@@ -24,7 +19,7 @@ const GRADE_TOKENS: Record<string, ChartToken> = {
 
 export interface PassRatePoint {
   timestamp: number;
-  /** `undefined` draws a gap rather than interpolating across a missing exam. */
+
   rate: number | undefined;
   date: string;
   names: string[];
@@ -35,7 +30,7 @@ export interface GradeEntry {
   key: string;
   value: number;
   pct: number;
-  token: ChartToken;
+  token: GradeToken;
 }
 
 function studentCount(exam: Exam) {
@@ -54,12 +49,6 @@ export function useCourseStats(exams: MaybeRefOrGetter<Exam[]>) {
     }),
   );
 
-  /**
-   * One point per exam date, not per exam. Two exams sharing a date would
-   * otherwise put two y-values on the same x and draw a vertical spike through
-   * the line; averaging them — weighted by cohort size where we know it — keeps
-   * the series a function of time.
-   */
   const series = computed<PassRatePoint[]>(() => {
     const byDate = new Map<string, Exam[]>();
     for (const exam of sorted.value) {
@@ -68,8 +57,8 @@ export function useCourseStats(exams: MaybeRefOrGetter<Exam[]>) {
     }
 
     return [...byDate].map(([date, group]) => {
-      // A pass rate of exactly 0 is how the scrape represents "not recorded",
-      // so those exams contribute no point rather than a floor-hugging one.
+
+      // Upstream uses a zero pass rate to represent "not recorded".
       const measured = group.filter((e) => Number(e.pass_rate ?? 0) > 0);
       const students = group.reduce((sum, e) => sum + studentCount(e), 0);
       const weight = measured.reduce((sum, e) => sum + studentCount(e), 0);
@@ -110,7 +99,7 @@ export function useCourseStats(exams: MaybeRefOrGetter<Exam[]>) {
         key,
         value: totals.get(key) ?? 0,
         pct: total ? ((totals.get(key) ?? 0) / total) * 100 : 0,
-        token: GRADE_TOKENS[key] as ChartToken,
+        token: GRADE_TOKENS[key]!,
       }),
     );
   });
@@ -127,12 +116,6 @@ export function useCourseStats(exams: MaybeRefOrGetter<Exam[]>) {
   const hasGradeData = computed(() => totalStudents.value > 0);
   const hasAnyData = computed(() => hasPassRateData.value || hasGradeData.value);
 
-  /**
-   * Counting students beats averaging the per-exam percentages: a 12-student
-   * retake would otherwise weigh as much as a 300-student main sitting. The
-   * percentage average is only the fallback for courses that have pass rates
-   * but no grade breakdown.
-   */
   const overallPassRate = computed(() => {
     if (hasGradeData.value) {
       const failed = grades.value.find((g) => g.key === "U")?.value ?? 0;

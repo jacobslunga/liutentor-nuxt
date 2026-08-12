@@ -133,8 +133,6 @@ function startOverlayResize() {
   );
 }
 
-// Drives FacitEdge, which used to run a second window mousemove listener
-// recomputing the same viewport geometry on every move.
 function handleMouseMove(e: MouseEvent) {
   if (
     !isExamOnly.value ||
@@ -162,9 +160,6 @@ function handleMouseMove(e: MouseEvent) {
   if (inSafeZone && !isFacitVisible.value) return;
   if (!isFacitVisible.value && e.clientY < 80) return;
 
-  // The overlay is `fixed right-0 bottom-0 h-screen` with an explicit width, so
-  // its box is fully known — measuring it with getBoundingClientRect forced a
-  // synchronous layout on every mousemove, over two live PDF viewports.
   if (isFacitVisible.value && e.clientX >= w - overlayWidth.value - 40) return;
 
   isFacitVisible.value = e.clientX > w * 0.92 && !inSafeZone;
@@ -173,9 +168,6 @@ function handleMouseMove(e: MouseEvent) {
 function handleDocumentMouseLeave() {
   facitProximity.value = 0;
 
-  // A hover-opened facit otherwise gets stuck when the pointer leaves this
-  // browser window, since no subsequent mousemove is delivered to close it.
-  // Keep an explicitly keyboard-pinned facit open.
   if (!isFacitManual.value) isFacitVisible.value = false;
 }
 
@@ -196,9 +188,6 @@ function handleKeyDown(e: KeyboardEvent) {
 
   if (chatStore.isOpen) return;
 
-  // The chat input keeps DOM focus after the panel is closed, so without this
-  // the single-letter shortcuts also type themselves into the draft. Escape is
-  // handled above and must keep working from inside the input.
   const target = e.target as HTMLElement | null;
   if (
     target &&
@@ -209,11 +198,6 @@ function handleKeyDown(e: KeyboardEvent) {
     return;
   }
 
-  // Nudge the divider, in the same range the drag handle uses. Exam-only has
-  // no divider to move, and the panes resizing drives the zoom through the
-  // usual viewport-resize path, so the documents rescale as they would on a
-  // drag. Repeats are deliberately not filtered: holding the key should keep
-  // moving it.
   if (!isExamOnly.value && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
     e.preventDefault();
     splitPercent.value = clampSplit(
@@ -223,9 +207,6 @@ function handleKeyDown(e: KeyboardEvent) {
     return;
   }
 
-  // Both shortcuts must preventDefault: opening the chat focuses its input
-  // within the same keystroke, so the character would otherwise be inserted
-  // into the freshly focused draft.
   if (e.key === "c") {
     e.preventDefault();
     chatStore.open();
@@ -243,9 +224,6 @@ function handleKeyDown(e: KeyboardEvent) {
   }
 }
 
-// Single teardown path. This previously ran from both onBeforeRouteUpdate and
-// a watcher on the same route param, so every exam-to-exam navigation did the
-// whole reset twice.
 function resetChatForNewExam() {
   chatStore.close();
   chatStore.clearChat();
@@ -341,8 +319,7 @@ onUnmounted(() => {
           class="h-full flex flex-row overflow-hidden bg-background"
           :class="{ 'select-none': isResizing || isOverlayResizing }"
         >
-          <!-- Exam viewer. Same vnode position in both modes on purpose: this is
-               what lets the document survive a layout switch. -->
+
           <div
             class="relative h-full overflow-hidden"
             :style="
@@ -446,7 +423,7 @@ onUnmounted(() => {
         </div>
 
         <Teleport to="body">
-          <!-- Facit overlay, exam-only mode -->
+
           <Transition
             enter-active-class="transition-all duration-200 ease-spring"
             enter-from-class="translate-x-full opacity-0"
@@ -479,10 +456,6 @@ onUnmounted(() => {
             </div>
           </Transition>
 
-          <!-- Mobile chat. Always mounted, resting on its collapsed detent, so
-               the chat is a permanent affordance over the PDF rather than
-               something to discover. It owns its own presentation, so it is not
-               wrapped in the desktop panel's slide-in transition. -->
           <LazyMobileChatSheet
             v-if="isMobile"
             :key="examId"
@@ -493,8 +466,6 @@ onUnmounted(() => {
             :has-solution="hasFacit"
           />
 
-          <!-- Chat panel. Rendered outside the mode branches so it is not torn
-               down and rebuilt when the layout switcher flips. -->
           <Transition
             enter-active-class="transition-all duration-200 ease-spring"
             enter-from-class="translate-x-full opacity-0"

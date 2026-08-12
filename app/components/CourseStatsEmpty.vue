@@ -1,8 +1,5 @@
 <script setup lang="ts">
-/**
- * Stands in for a chart that has no data behind it. Saying so beats rendering
- * an empty axis, which reads as a loading state that never resolves.
- */
+
 defineProps<{
   title: string;
   body: string;

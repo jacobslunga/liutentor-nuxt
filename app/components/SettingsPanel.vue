@@ -3,11 +3,6 @@ import { CHAT_MODELS } from "@/composables/useSelectedModel";
 import { useLayoutStore } from "~/stores/layout";
 import { toast } from "vue-sonner";
 
-/**
- * The body of the settings overlay: one section at a time, chosen by the
- * sidebar in SettingsDialog. Every control here writes straight to the cookie
- * that backs it, so there is nothing to save and nothing to discard.
- */
 defineProps<{ section: string }>();
 
 const colorMode = useColorMode();
@@ -33,8 +28,6 @@ const defaultLayout = computed({
   },
 });
 
-// The cookie is a boolean but the picker speaks strings, so the two modes are
-// mapped rather than bound directly.
 const answerMode = computed({
   get: () => (giveDirectAnswer.value ? "full" : "hints"),
   set: (value: string) => {
@@ -105,8 +98,6 @@ const SHORTCUT_GROUPS = [
   },
 ];
 
-// Limits and retention that are baked into the app. Listed rather than hidden
-// so the numbers behind "varför försvann min sökning" are findable.
 const FIXED_DEFAULTS = [
   {
     label: "Meddelanden i chatten",
@@ -142,7 +133,7 @@ function handleClearRecentSearches() {
 
 <template>
   <div class="mx-auto w-full max-w-2xl">
-    <!-- Utseende -->
+
     <section v-if="section === 'appearance'" class="space-y-6">
       <h2 class="text-xl font-medium text-foreground">Utseende</h2>
 
@@ -162,7 +153,6 @@ function handleClearRecentSearches() {
       </div>
     </section>
 
-    <!-- Läsvy -->
     <section v-else-if="section === 'reading'" class="space-y-6">
       <h2 class="text-xl font-medium text-foreground">Läsvy</h2>
 
@@ -183,7 +173,6 @@ function handleClearRecentSearches() {
       </div>
     </section>
 
-    <!-- AI -->
     <section v-else-if="section === 'ai'" class="space-y-6">
       <h2 class="text-xl font-medium text-foreground">AI-assistenten</h2>
 
@@ -204,7 +193,6 @@ function handleClearRecentSearches() {
       </p>
     </section>
 
-    <!-- Genvägar -->
     <section v-else-if="section === 'shortcuts'" class="space-y-6">
       <h2 class="text-xl font-medium text-foreground">Tangentbordsgenvägar</h2>
 
@@ -227,7 +215,6 @@ function handleClearRecentSearches() {
       </div>
     </section>
 
-    <!-- Fast -->
     <section v-else-if="section === 'fixed'" class="space-y-6">
       <h2 class="text-xl font-medium text-foreground">Fasta gränser</h2>
       <p class="text-sm leading-relaxed text-muted-foreground">

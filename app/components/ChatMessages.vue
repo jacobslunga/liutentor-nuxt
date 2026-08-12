@@ -11,13 +11,9 @@ const props = withDefaults(
   defineProps<{
     messages: Message[];
     isLoading: boolean;
-    /** Extra classes on the scroll container — each shell clears its own header. */
+
     contentClass?: string;
-    /**
-     * Offer "Svara" over a selection inside an answer. Mouse-only: it hangs off
-     * `mouseup` and a `mousedown`-triggered button, neither of which touch text
-     * selection produces, and iOS puts its own callout menu on top regardless.
-     */
+
     enableSelectionPopover?: boolean;
   }>(),
   { contentClass: "", enableSelectionPopover: true },
@@ -32,9 +28,6 @@ const chatStore = useChatStore();
 
 const mdReady = ref(false);
 
-// The pipeline itself (MarkdownIt instance, KaTeX/Shiki caches, DOMPurify
-// hook) is shared at module scope — see @/lib/chat-markdown. This component
-// only needs to know when it is ready to render.
 initChatMarkdown().then(() => {
   mdReady.value = true;
 });
@@ -154,9 +147,6 @@ function scrollToBottom(behavior: ScrollBehavior = "smooth") {
   container.scrollTo({ top: container.scrollHeight, behavior });
 }
 
-// Only read back on remount, so there is no reason to push it through the
-// store on every scroll event — it is kept in a plain local and flushed when
-// the panel goes away.
 let latestScrollTop = 0;
 
 function persistScrollPosition() {
@@ -180,7 +170,6 @@ function handleScroll() {
   }
 }
 
-/** Pick up where the last mount left off, or land at the newest message. */
 function restoreScroll() {
   const el = messagesContainer.value;
   if (!el) return;
@@ -229,9 +218,7 @@ defineExpose({
   <div ref="messagesContainer"
     class="h-full w-full overflow-y-auto overflow-x-hidden overscroll-contain px-4 custom-scrollbar" :class="contentClass"
     @scroll="handleScroll" @mouseup="handleMessageMouseUp" @click="handleCodeCopy">
-    <!-- min-h-full, not h-full: the mobile sheet's partial detents leave this
-         box shorter than its content, and a fixed height there squashed the
-         mascot to a dot and clipped the heading instead of scrolling. -->
+
     <div
       class="min-h-full flex flex-col items-center justify-center px-4 py-8 text-center"
       v-if="messages.length === 0">
@@ -318,10 +305,6 @@ defineExpose({
   word-wrap: break-word;
 }
 
-/* A table is the one block the pipeline emits with no scroll container of its
-   own, so a wide one just ran off the side of a phone with no way to reach the
-   rest. `display: block` + `max-content` turns the table itself into the
-   scroller; `contain` stops a swipe that hits the end from dragging the sheet. */
 .prose :deep(table) {
   display: block;
   width: max-content;
@@ -343,7 +326,6 @@ defineExpose({
   background: transparent;
 }
 
-/* Same for the other blocks that can carry an unbreakable wide run. */
 .prose :deep(pre),
 .prose :deep(blockquote) {
   max-width: 100%;
