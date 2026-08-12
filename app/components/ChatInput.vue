@@ -2,6 +2,10 @@
 import { useEventListener } from "@vueuse/core";
 import { CHAT_MODELS } from "@/composables/useSelectedModel";
 
+const MODEL_OPTIONS = ["OpenAI", "Google"].flatMap((provider) =>
+  CHAT_MODELS.filter((model) => model.provider === provider),
+);
+
 const ANSWER_MODES = [
   {
     value: true,
@@ -17,7 +21,6 @@ const ANSWER_MODES = [
 
 const props = withDefaults(
   defineProps<{
-
     initialText?: string;
     isLoading: boolean;
     giveDirectAnswer: boolean;
@@ -68,11 +71,10 @@ const nonReactiveCanSend = ref(
 const singleLineHeight = ref(0);
 const isMultiline = ref(false);
 
-const canSend = computed(
-  () =>
-    props.reactiveInput
-      ? !!text.value.trim() && text.value.length <= MAX_LENGTH
-      : nonReactiveCanSend.value,
+const canSend = computed(() =>
+  props.reactiveInput
+    ? !!text.value.trim() && text.value.length <= MAX_LENGTH
+    : nonReactiveCanSend.value,
 );
 
 const selectedModelLabel = computed(
@@ -217,7 +219,6 @@ function setText(value: string) {
 onMounted(() => {
   const el = textareaRef.value;
   if (el && props.autoResize) {
-
     const draft = el.value;
     el.value = "";
     el.style.height = "auto";
@@ -241,93 +242,177 @@ defineExpose({
 
 <template>
   <div class="px-4 bg-transparent relative w-full pointer-events-auto z-10">
-
     <div class="max-w-2xl mx-auto relative">
       <Transition name="fade-up">
         <div v-if="showScrollButton" class="absolute -top-12 right-3 z-20">
-          <Button variant="outline" size="icon" class="rounded-full" @click="emit('scrollToBottom')">
+          <Button
+            variant="outline"
+            size="icon"
+            class="rounded-full"
+            @click="emit('scrollToBottom')"
+          >
             <LucideArrowDown class="w-4 h-4" />
           </Button>
         </div>
       </Transition>
 
       <div class="space-y-2">
-
-        <div class="chat-shell rounded-[28px] border border-border bg-background focus-within:border-border">
-
+        <div
+          class="chat-shell rounded-[28px] border border-border bg-background focus-within:border-border"
+        >
           <Transition name="context-chip">
-            <div v-if="selectionContext" class="flex items-center gap-2 w-full border-b border-border/60 px-5 py-2.5">
-              <LucideCornerUpLeft class="w-3.5 h-3.5 shrink-0 text-muted-foreground" />
-              <span class="flex-1 min-w-0 text-sm italic text-muted-foreground truncate">"{{ selectionContext }}"</span>
-              <Button variant="ghost" size="icon-xs" class="shrink-0" @click.prevent="emit('clearSelectionContext')">
+            <div
+              v-if="selectionContext"
+              class="flex items-center gap-2 w-full border-b border-border/60 px-5 py-2.5"
+            >
+              <LucideCornerUpLeft
+                class="w-3.5 h-3.5 shrink-0 text-muted-foreground"
+              />
+              <span
+                class="flex-1 min-w-0 text-sm italic text-muted-foreground truncate"
+                >"{{ selectionContext }}"</span
+              >
+              <Button
+                variant="ghost"
+                size="icon-xs"
+                class="shrink-0"
+                @click.prevent="emit('clearSelectionContext')"
+              >
                 <LucideX class="w-3.5 h-3.5" />
               </Button>
             </div>
           </Transition>
 
-          <div ref="rowRef" class="flex flex-wrap items-center gap-1.5 px-2.5 py-2.5">
-            <div v-if="!compact" ref="modeRef" class="shrink-0" :class="isMultiline ? 'order-2' : 'order-1'">
+          <div
+            ref="rowRef"
+            class="flex flex-wrap items-center gap-1.5 px-2.5 py-2.5"
+          >
+            <div
+              v-if="!compact"
+              ref="modeRef"
+              class="shrink-0"
+              :class="isMultiline ? 'order-2' : 'order-1'"
+            >
               <DropdownMenu>
                 <DropdownMenuTrigger as-child>
-                  <Button variant="ghost" size="icon" :aria-label="answerModeLabel"
-                    class="size-8 rounded-full text-muted-foreground hover:text-foreground">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    :aria-label="answerModeLabel"
+                    class="size-8 rounded-full text-muted-foreground hover:text-foreground"
+                  >
                     <LucideZap v-if="giveDirectAnswer" class="w-4 h-4" />
                     <LucideLightbulb v-else class="w-4 h-4" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" class="w-60">
-                  <DropdownMenuItem v-for="mode in ANSWER_MODES" :key="String(mode.value)"
+                  <DropdownMenuItem
+                    v-for="mode in ANSWER_MODES"
+                    :key="String(mode.value)"
                     class="cursor-pointer items-start justify-between gap-2"
-                    @click="emit('update:giveDirectAnswer', mode.value)">
+                    @click="emit('update:giveDirectAnswer', mode.value)"
+                  >
                     <div class="flex items-start gap-2">
-                      <LucideZap v-if="mode.value" class="w-4 h-4 shrink-0 mt-0.5 text-muted-foreground" />
-                      <LucideLightbulb v-else class="w-4 h-4 shrink-0 mt-0.5 text-muted-foreground" />
+                      <LucideZap
+                        v-if="mode.value"
+                        class="w-4 h-4 shrink-0 mt-0.5 text-muted-foreground"
+                      />
+                      <LucideLightbulb
+                        v-else
+                        class="w-4 h-4 shrink-0 mt-0.5 text-muted-foreground"
+                      />
                       <div class="flex flex-col gap-0.5">
-                        <span class="text-sm font-medium">{{ mode.label }}</span>
-                        <span class="text-2xs text-muted-foreground">{{ mode.description }}</span>
+                        <span class="text-sm font-medium">{{
+                          mode.label
+                        }}</span>
+                        <span class="text-2xs text-muted-foreground">{{
+                          mode.description
+                        }}</span>
                       </div>
                     </div>
-                    <LucideCheck v-if="mode.value === giveDirectAnswer" class="w-4 h-4 shrink-0 text-primary" />
+                    <LucideCheck
+                      v-if="mode.value === giveDirectAnswer"
+                      class="w-4 h-4 shrink-0 text-primary"
+                    />
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
 
-            <textarea ref="textareaRef" :value="text" rows="1" placeholder="Fråga vad som helst"
+            <textarea
+              ref="textareaRef"
+              :value="text"
+              rows="1"
+              placeholder="Fråga vad som helst"
               class="chat-textarea min-w-0 resize-none border-0 bg-transparent px-2 py-1 text-base leading-relaxed outline-none placeholder:text-muted-foreground/70 focus:ring-0 max-h-45"
-              :class="isMultiline ? 'order-1 basis-full' : 'order-2 flex-1'" @input="handleInput"
-              @keydown="handleKeyDown" />
+              :class="isMultiline ? 'order-1 basis-full' : 'order-2 flex-1'"
+              @input="handleInput"
+              @keydown="handleKeyDown"
+            />
 
-            <div ref="controlsRef" class="order-3 flex shrink-0 items-center gap-1.5" :class="{ 'ml-auto': isMultiline }">
+            <div
+              ref="controlsRef"
+              class="order-3 flex shrink-0 items-center gap-1.5"
+              :class="{ 'ml-auto': isMultiline }"
+            >
               <DropdownMenu v-if="!compact">
                 <DropdownMenuTrigger as-child>
-                  <Button variant="ghost" size="sm"
-                    class="gap-1.5 px-2.5 text-xs font-semibold text-muted-foreground hover:text-foreground">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    class="h-8 gap-1.5 rounded-full border border-border bg-secondary/40 px-3 text-xs font-semibold text-muted-foreground hover:bg-secondary hover:text-foreground"
+                  >
                     {{ selectedModelLabel }}
-                    <LucideChevronDown class="w-3.5 h-3.5 text-muted-foreground/70" />
+                    <LucideChevronDown
+                      class="w-3.5 h-3.5 text-muted-foreground/70"
+                    />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" class="w-56">
-                  <DropdownMenuLabel
-                    class="flex items-center gap-1.5 text-2xs font-semibold text-muted-foreground/70 px-2 py-1">
-                    Gemini
-                  </DropdownMenuLabel>
-                  <DropdownMenuItem v-for="model in CHAT_MODELS" :key="model.id"
-                    class="cursor-pointer items-center justify-between gap-2"
-                    @click="emit('update:selectedModelId', model.id)">
-                    <span class="text-sm font-medium">{{ model.label }}</span>
-                    <LucideCheck v-if="model.id === selectedModelId" class="w-4 h-4 shrink-0 text-primary" />
+                <DropdownMenuContent align="end" class="w-56 p-1.5">
+                  <DropdownMenuItem
+                    v-for="model in MODEL_OPTIONS"
+                    :key="model.id"
+                    class="cursor-pointer items-center justify-between gap-2 rounded-md px-2.5 py-1.5 focus:bg-accent/70"
+                    @click="emit('update:selectedModelId', model.id)"
+                  >
+                    <div
+                      class="flex min-w-0 flex-col items-start leading-tight"
+                    >
+                      <span class="text-xs font-medium text-foreground">{{
+                        model.label
+                      }}</span>
+                      <span
+                        class="font-mono text-[10px] font-normal text-muted-foreground/75"
+                        >{{ model.id }}</span
+                      >
+                    </div>
+                    <LucideCheck
+                      v-if="model.id === selectedModelId"
+                      class="size-3.5 shrink-0 text-primary"
+                    />
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
 
               <Transition name="scale" mode="out-in">
-                <Button v-if="isLoading" key="stop" size="icon" variant="secondary" class="size-8 rounded-full"
-                  @click="emit('cancel')">
+                <Button
+                  v-if="isLoading"
+                  key="stop"
+                  size="icon"
+                  variant="secondary"
+                  class="size-8 rounded-full"
+                  @click="emit('cancel')"
+                >
                   <LucideSquare class="size-3.5 fill-current" />
                 </Button>
-                <Button v-else key="send" size="icon" class="size-8 rounded-full" :disabled="!canSend"
-                  @click="emit('send')">
+                <Button
+                  v-else
+                  key="send"
+                  size="icon"
+                  class="size-8 rounded-full"
+                  :disabled="!canSend"
+                  @click="emit('send')"
+                >
                   <LucideArrowUp class="size-4" />
                 </Button>
               </Transition>
@@ -337,12 +422,17 @@ defineExpose({
 
         <div class="flex items-center justify-center gap-2 px-4 text-center">
           <p class="text-2xs text-muted-foreground/60">
-            AI kan göra misstag. Kontrollera viktig information.
+            AI kan göra misstag. Kontrollera svaren.
           </p>
-          <p v-if="reactiveInput && text.length > MAX_LENGTH * 0.8" class="text-xs" :class="text.length > MAX_LENGTH
-            ? 'text-destructive font-bold'
-            : 'text-muted-foreground'
-            ">
+          <p
+            v-if="reactiveInput && text.length > MAX_LENGTH * 0.8"
+            class="text-xs"
+            :class="
+              text.length > MAX_LENGTH
+                ? 'text-destructive font-bold'
+                : 'text-muted-foreground'
+            "
+          >
             {{ text.length }} / {{ MAX_LENGTH }}
           </p>
         </div>

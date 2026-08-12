@@ -268,7 +268,7 @@ defineExpose({
             <span class="shimmer-text text-sm">{{ loadingPhrase }}</span>
           </div>
           <div
-            class="prose max-w-full min-w-0 prose-headings:font-semibold prose-h1:text-xl prose-h2:text-lg prose-h3:text-md prose-h4:text-base prose-strong:font-semibold dark:prose-invert prose-p:font-normal prose-hr:border-secondary prose-th:border-secondary prose-td:border-secondary prose-blockquote:border-secondary marker:text-foreground marker:font-semibold"
+            class="prose max-w-full min-w-0 prose-headings:font-semibold prose-h1:text-xl prose-h2:text-lg prose-h3:text-md prose-h4:text-base prose-strong:font-semibold dark:prose-invert prose-p:font-normal marker:text-foreground marker:font-semibold"
             v-html="renderedAssistantHtml[i]" />
         </div>
       </div>
@@ -287,6 +287,17 @@ defineExpose({
 </style>
 
 <style scoped>
+.prose {
+  --tw-prose-hr: var(--border);
+  --tw-prose-quote-borders: var(--border);
+  --tw-prose-th-borders: var(--border);
+  --tw-prose-td-borders: var(--border);
+  --tw-prose-invert-hr: var(--border);
+  --tw-prose-invert-quote-borders: var(--border);
+  --tw-prose-invert-th-borders: var(--border);
+  --tw-prose-invert-td-borders: var(--border);
+}
+
 .prose :deep(.katex-display) {
   overflow-x: auto;
   overflow-y: hidden;
@@ -310,24 +321,31 @@ defineExpose({
   word-wrap: break-word;
 }
 
-.prose :deep(table) {
-  display: block;
-  width: max-content;
+.prose :deep(.table-scroll) {
+  width: 100%;
   max-width: 100%;
   overflow-x: auto;
   overscroll-behavior-x: contain;
+  margin: 2em 0;
 }
 
-.prose :deep(table)::-webkit-scrollbar {
+.prose :deep(.table-scroll table) {
+  width: 100%;
+  min-width: max-content;
+  margin: 0;
+  table-layout: auto;
+}
+
+.prose :deep(.table-scroll)::-webkit-scrollbar {
   height: 4px;
 }
 
-.prose :deep(table)::-webkit-scrollbar-thumb {
+.prose :deep(.table-scroll)::-webkit-scrollbar-thumb {
   background: color-mix(in oklch, var(--muted-foreground) 30%, transparent);
   border-radius: 2px;
 }
 
-.prose :deep(table)::-webkit-scrollbar-track {
+.prose :deep(.table-scroll)::-webkit-scrollbar-track {
   background: transparent;
 }
 
