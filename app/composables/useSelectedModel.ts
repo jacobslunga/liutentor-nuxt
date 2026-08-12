@@ -9,14 +9,25 @@ export const CHAT_MODELS = [
     label: "3.6 Flash",
     provider: "Google",
   },
+  {
+    id: "gpt-5.6-terra",
+    label: "5.6 Terra",
+    provider: "OpenAI",
+  },
+  {
+    id: "gpt-5.6-luna",
+    label: "5.6 Luna",
+    provider: "OpenAI",
+  },
 ] as const;
 
 const VALID_MODEL_IDS = CHAT_MODELS.map((m) => m.id);
-const DEFAULT_MODEL_ID = "gemini-3.1-flash-lite";
+const DEFAULT_MODEL_ID = "gpt-5.6-luna";
 const VALID_MODEL_ID_SET = new Set<string>(VALID_MODEL_IDS);
-const MODEL_COOKIE_KEY = "liutentor_selected_model";
+const MODEL_COOKIE_KEY = "liutentor_selected_model_v9";
 
 const LEGACY_MODEL_COOKIE_KEYS = [
+  "liutentor_selected_model",
   "liutentor_selected_model_v8",
   "liutentor_selected_model_v7",
   "liutentor_selected_model_v6",
