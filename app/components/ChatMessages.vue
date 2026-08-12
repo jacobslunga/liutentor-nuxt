@@ -116,6 +116,7 @@ function handleMessageMouseUp(e: MouseEvent) {
 }
 
 function handleSelectionChange() {
+  if (!props.enableSelectionPopover) return;
   if (!window.getSelection()?.toString().trim()) {
     selectionPopover.value.visible = false;
   }
@@ -198,11 +199,15 @@ watch(
 );
 
 onMounted(() => {
-  document.addEventListener("selectionchange", handleSelectionChange);
+  if (props.enableSelectionPopover) {
+    document.addEventListener("selectionchange", handleSelectionChange);
+  }
 });
 
 onUnmounted(() => {
-  document.removeEventListener("selectionchange", handleSelectionChange);
+  if (props.enableSelectionPopover) {
+    document.removeEventListener("selectionchange", handleSelectionChange);
+  }
   persistScrollPosition();
 });
 

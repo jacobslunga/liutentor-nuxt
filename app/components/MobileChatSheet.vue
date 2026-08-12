@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch, nextTick } from "vue";
+import { ref, watch, nextTick } from "vue";
 import { storeToRefs } from "pinia";
 import { useChatStore } from "@/stores/chat";
 import {
@@ -7,7 +7,6 @@ import {
   type ChatInputApi,
   type ChatTranscriptApi,
 } from "@/composables/useChatPanel";
-import { useSheetDetents } from "@/composables/useSheetDetents";
 
 const props = defineProps<{
   examId: string;
@@ -18,25 +17,11 @@ const props = defineProps<{
 }>();
 
 const chatStore = useChatStore();
-const { isHistoryOpen } = storeToRefs(chatStore);
+const { isOpen, isHistoryOpen } = storeToRefs(chatStore);
 
 const chatInputRef = ref<ChatInputApi | null>(null);
 const transcriptRef = ref<ChatTranscriptApi | null>(null);
-const inputBlockRef = ref<HTMLElement | null>(null);
 const showScrollButton = ref(false);
-
-const {
-  detent,
-  offset,
-  restOffset,
-  maxOffset,
-  viewportHeight,
-  isDragging,
-  isReady,
-  hasMoved,
-  snapTo,
-  onPointerDown,
-} = useSheetDetents();
 
 const MOBILE_MODEL_ID = "gemini-3.1-flash-lite";
 const MOBILE_DIRECT_ANSWER = true;
@@ -62,86 +47,26 @@ const {
   fixedDirectAnswer: MOBILE_DIRECT_ANSWER,
 });
 
-const hasExpanded = ref(false);
-
-const SHEET_EASING = "cubic-bezier(0.32, 0.72, 0, 1)";
-const SHEET_DURATION = 320;
-
-const duration = computed(() =>
-  isDragging.value || !isReady.value ? 0 : SHEET_DURATION,
-);
-
-const motion = computed(
-  () =>
-    `transform ${duration.value}ms ${SHEET_EASING}, opacity ${duration.value}ms ${SHEET_EASING}`,
-);
-
-const sheetStyle = computed(() => ({
-  height: viewportHeight.value ? `${viewportHeight.value}px` : "100dvh",
-  transform: `translate3d(0, ${offset.value}px, 0)`,
-  transition: motion.value,
-}));
-
-const inputStyle = computed(() => ({
-  transform: `translate3d(0, ${-offset.value}px, 0)`,
-  opacity: expandedOpacity.value,
-  transition: motion.value,
-
-  // Hidden composer children must not intercept collapsed-sheet gestures.
-  visibility: expandedOpacity.value === 0 ? "hidden" : "visible",
-}) as const);
-
-const transcriptStyle = computed(() => ({
-  paddingBottom: `${restOffset.value}px`,
-}));
-
-const expandedOpacity = computed(() => {
-  if (maxOffset.value <= 0) return 1;
-  return Math.min(Math.max((maxOffset.value - offset.value) / 120, 0), 1);
-});
-
-const peekOpacity = computed(() => 1 - expandedOpacity.value);
-
-const isExpanded = computed(() => detent.value !== "peek");
-
-function expand() {
-  hasExpanded.value = true;
-  snapTo("full");
+function openChat() {
+  chatStore.open();
 }
 
-watch(offset, (value) => {
-  if (!hasExpanded.value && value < maxOffset.value - 4) {
-    hasExpanded.value = true;
+function closeChat() {
+  chatStore.draftInput = chatInputRef.value?.getText() ?? "";
+  chatStore.close();
+  isHistoryOpen.value = false;
+}
+
+watch(isOpen, (open) => {
+  if (!open) {
+    isHistoryOpen.value = false;
+    return;
   }
+
+  nextTick(() => {
+    transcriptRef.value?.restoreScroll();
+  });
 });
-
-function collapse() {
-  snapTo("peek");
-}
-
-function handleHeaderTap(e: MouseEvent) {
-
-  if ((e.target as HTMLElement | null)?.closest("[data-no-drag]")) return;
-  if (hasMoved.value || detent.value !== "peek") return;
-  expand();
-  nextTick(() => chatInputRef.value?.focus());
-}
-
-watch(isExpanded, (expanded) => {
-  if (chatStore.isOpen !== expanded) chatStore.isOpen = expanded;
-});
-
-watch(
-  () => chatStore.isOpen,
-  (open) => {
-    if (open) {
-      if (!isExpanded.value) expand();
-    } else {
-      if (isExpanded.value) collapse();
-      isHistoryOpen.value = false;
-    }
-  },
-);
 
 watch(transcriptRef, (transcript) => {
   if (transcript) nextTick(() => transcript.restoreScroll());
@@ -150,64 +75,125 @@ watch(transcriptRef, (transcript) => {
 
 <template>
   <Teleport to="body">
+    <Transition name="mobile-chat-launcher">
+      <button
+        v-if="!isOpen"
+        type="button"
+        class="fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom,0px))] z-80 flex h-14 items-center gap-2.5 rounded-full border border-border bg-background px-3 shadow-lg"
+        aria-label="Öppna chatten"
+        @click="openChat"
+      >
+        <ChatMascot class="size-7 shrink-0" />
+        <span
+          class="flex h-10 min-w-0 flex-1 items-center rounded-full bg-secondary/40 px-4 text-left text-base text-muted-foreground/80"
+        >
+          Fråga vad som helst
+        </span>
+      </button>
+    </Transition>
 
-    <div
-      class="fixed inset-x-0 bottom-0 z-80 flex flex-col overflow-hidden rounded-t-[22px] border-t border-border bg-background shadow-[0_-8px_40px_rgba(0,0,0,0.16)] will-change-transform"
-      :style="sheetStyle">
+    <Transition name="mobile-chat-dialog">
+      <div
+        v-if="isOpen"
+        class="fixed inset-0 z-80 flex h-dvh w-screen flex-col overflow-hidden bg-background"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Chatt"
+      >
+        <header
+          class="shrink-0 border-b border-border bg-background pt-[env(safe-area-inset-top,0px)]"
+        >
+          <div class="flex h-14 items-center gap-1 px-2">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              class="shrink-0"
+              aria-label="Stäng chatten"
+              @click="closeChat"
+            >
+              <LucideX class="size-4" />
+            </Button>
 
-      <div class="relative h-16 shrink-0 touch-none select-none" @pointerdown="onPointerDown"
-        @click="handleHeaderTap">
-        <div class="absolute inset-x-0 top-2 flex justify-center">
-          <div class="h-1 w-9 rounded-full bg-muted-foreground/30" />
-        </div>
+            <p
+              class="min-w-0 flex-1 truncate text-sm font-semibold text-foreground"
+            >
+              {{ chatHeaderTitle }}
+            </p>
 
-        <div class="absolute inset-0 flex items-center gap-2.5 px-3 pt-3" role="button" tabindex="0"
-          aria-label="Öppna chatten" :style="{ opacity: peekOpacity, transition: motion }"
-          :class="peekOpacity === 0 ? 'pointer-events-none' : ''" @keydown.enter.space.prevent="expand()">
-          <ChatMascot class="size-7 shrink-0" />
-          <div
-            class="flex h-10 flex-1 items-center rounded-full border border-border bg-secondary/40 px-4 text-base text-muted-foreground/80">
-            Fråga vad som helst
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              aria-label="Ny chatt"
+              @click="startNewChat"
+            >
+              <LucideMessageSquareShare class="size-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              aria-label="Historik"
+              @click="toggleHistory"
+            >
+              <LucidePanelRight class="size-4" />
+            </Button>
           </div>
+        </header>
+
+        <div class="min-h-0 flex-1">
+          <LazyChatMessages
+            ref="transcriptRef"
+            :messages="messages"
+            :is-loading="isLoading"
+            content-class="pt-4"
+            :enable-selection-popover="false"
+            @reply-to-selection="handleReplyToSelection"
+            @update:show-scroll-button="showScrollButton = $event"
+          />
         </div>
 
-        <div class="absolute inset-0 flex items-center gap-1 px-2 pt-3"
-          :style="{ opacity: expandedOpacity, transition: motion }"
-          :class="expandedOpacity === 0 ? 'pointer-events-none' : ''">
-          <Button variant="ghost" size="icon-sm" aria-label="Fäll ihop" data-no-drag @click="collapse">
-            <LucideChevronDown class="size-4" />
-          </Button>
-          <p class="min-w-0 flex-1 truncate text-sm font-semibold text-foreground">
-            {{ chatHeaderTitle }}
-          </p>
-          <Button variant="ghost" size="icon-sm" aria-label="Ny chatt" data-no-drag @click="startNewChat">
-            <LucidePlus class="size-4" />
-          </Button>
-          <Button variant="ghost" size="icon-sm" aria-label="Historik" data-no-drag @click="toggleHistory">
-            <LucidePanelRight class="size-4" />
-          </Button>
+        <div
+          class="shrink-0 bg-background pt-2 pb-[env(safe-area-inset-bottom,0px)]"
+        >
+          <ChatInput
+            ref="chatInputRef"
+            :initial-text="chatStore.draftInput"
+            :is-loading="isLoading"
+            :give-direct-answer="MOBILE_DIRECT_ANSWER"
+            :selected-model-id="MOBILE_MODEL_ID"
+            :show-scroll-button="showScrollButton"
+            :course-code="courseCode"
+            :has-solution="hasSolution"
+            :selection-context="selectionContext"
+            :autofocus="false"
+            :auto-resize="false"
+            :reactive-input="false"
+            :submit-on-enter="false"
+            compact
+            @send="handleSend"
+            @cancel="handleCancel"
+            @scroll-to-bottom="transcriptRef?.scrollToBottom('smooth')"
+            @clear-selection-context="selectionContext = ''"
+          />
         </div>
       </div>
-
-      <div class="relative min-h-0 flex-1">
-        <LazyChatMessages v-if="hasExpanded" ref="transcriptRef" :messages="messages" :is-loading="isLoading"
-          :enable-selection-popover="false" :style="transcriptStyle"
-          @reply-to-selection="handleReplyToSelection" @update:show-scroll-button="showScrollButton = $event" />
-      </div>
-
-      <div ref="inputBlockRef"
-        class="pointer-events-none absolute inset-x-0 bottom-0 z-10 pt-10 pb-[env(safe-area-inset-bottom,0px)]"
-        :style="inputStyle">
-        <div class="fade-to-background pointer-events-none absolute inset-x-0 top-0 bottom-0 -z-10" />
-        <ChatInput ref="chatInputRef" :initial-text="chatStore.draftInput" :is-loading="isLoading"
-          :give-direct-answer="MOBILE_DIRECT_ANSWER" :selected-model-id="MOBILE_MODEL_ID"
-          :show-scroll-button="showScrollButton" :course-code="courseCode" :has-solution="hasSolution"
-          :selection-context="selectionContext" :autofocus="false" :submit-on-enter="false" compact @send="handleSend"
-          @cancel="handleCancel" @scroll-to-bottom="transcriptRef?.scrollToBottom('smooth')"
-          @clear-selection-context="selectionContext = ''" />
-      </div>
-    </div>
+    </Transition>
 
     <ChatHistoryDialog v-model:open="isHistoryOpen" />
   </Teleport>
 </template>
+
+<style scoped>
+.mobile-chat-dialog-enter-active,
+.mobile-chat-dialog-leave-active,
+.mobile-chat-launcher-enter-active,
+.mobile-chat-launcher-leave-active {
+  transition: opacity 180ms ease;
+}
+
+.mobile-chat-dialog-enter-from,
+.mobile-chat-dialog-leave-to,
+.mobile-chat-launcher-enter-from,
+.mobile-chat-launcher-leave-to {
+  opacity: 0;
+}
+</style>

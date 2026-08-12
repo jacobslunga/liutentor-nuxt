@@ -92,26 +92,52 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
 
 <template>
   <div class="h-full w-full flex bg-background overflow-hidden relative">
-    <div class="flex-1 min-w-0 relative overflow-hidden">
-
-      <div class="absolute inset-x-0 top-0 z-20">
-        <ChatHeader :has-solution="hasSolution" :title="chatHeaderTitle" :history-open="isHistoryOpen"
-          @close="emit('close')" @open-history="toggleHistory" @new-chat="startNewChat" />
+    <div class="flex min-w-0 flex-1 flex-col overflow-hidden">
+      <div class="relative z-20 shrink-0">
+        <ChatHeader
+          :has-solution="hasSolution"
+          :title="chatHeaderTitle"
+          :history-open="isHistoryOpen"
+          @close="emit('close')"
+          @open-history="toggleHistory"
+          @new-chat="startNewChat"
+        />
       </div>
 
-      <div class="h-full w-full">
-        <ChatMessages ref="transcriptRef" :messages="messages" :is-loading="isLoading" content-class="pt-14"
-          @reply-to-selection="handleReplyToSelection" @update:show-scroll-button="showScrollButton = $event" />
+      <div class="relative min-h-0 w-full flex-1">
+        <ChatMessages
+          ref="transcriptRef"
+          :messages="messages"
+          :is-loading="isLoading"
+          content-class="pt-4"
+          @reply-to-selection="handleReplyToSelection"
+          @update:show-scroll-button="showScrollButton = $event"
+        />
 
-        <div class="absolute bottom-0 left-0 right-0 pt-14 pb-4 pointer-events-none z-10">
-          <div class="fade-to-background pointer-events-none absolute inset-x-0 top-0 bottom-0 -z-10" />
-          <ChatInput ref="chatInputRef" :initial-text="chatStore.draftInput" :is-loading="isLoading"
-            :give-direct-answer="giveDirectAnswer" :selected-model-id="selectedModelId"
-            :show-scroll-button="showScrollButton" :course-code="courseCode" :has-solution="hasSolution"
-            :selection-context="selectionContext" class="pointer-events-auto" @send="handleSend" @cancel="handleCancel"
+        <div
+          class="absolute bottom-0 left-0 right-0 pt-14 pb-4 pointer-events-none z-10"
+        >
+          <div
+            class="fade-to-background pointer-events-none absolute inset-x-0 top-0 bottom-0 -z-10"
+          />
+          <ChatInput
+            ref="chatInputRef"
+            :initial-text="chatStore.draftInput"
+            :is-loading="isLoading"
+            :give-direct-answer="giveDirectAnswer"
+            :selected-model-id="selectedModelId"
+            :show-scroll-button="showScrollButton"
+            :course-code="courseCode"
+            :has-solution="hasSolution"
+            :selection-context="selectionContext"
+            class="pointer-events-auto"
+            @send="handleSend"
+            @cancel="handleCancel"
             @scroll-to-bottom="transcriptRef?.scrollToBottom('smooth')"
-            @update:give-direct-answer="giveDirectAnswer = $event" @update:selected-model-id="selectedModelId = $event"
-            @clear-selection-context="selectionContext = ''" />
+            @update:give-direct-answer="giveDirectAnswer = $event"
+            @update:selected-model-id="selectedModelId = $event"
+            @clear-selection-context="selectionContext = ''"
+          />
         </div>
       </div>
     </div>
