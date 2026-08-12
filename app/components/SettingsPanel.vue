@@ -133,18 +133,31 @@ function handleClearRecentSearches() {
 
 <template>
   <div class="mx-auto w-full max-w-2xl">
-
     <section v-if="section === 'appearance'" class="space-y-6">
       <h2 class="text-xl font-medium text-foreground">Utseende</h2>
 
       <div>
-        <SettingsRow label="Tema" description="System följer inställningen i din enhet." stacked>
+        <SettingsRow
+          label="Tema"
+          description="System följer inställningen i din enhet."
+          stacked
+        >
           <div class="grid grid-cols-3 gap-2">
-            <Button v-for="option in THEME_OPTIONS" :key="option.id" variant="outline"
+            <Button
+              v-for="option in THEME_OPTIONS"
+              :key="option.id"
+              variant="outline"
               class="h-auto flex-col gap-2 rounded-2xl py-4 hover:border-primary hover:bg-primary/5"
-              :class="theme === option.id ? 'border-primary bg-primary/5' : 'bg-card'" @click="theme = option.id">
+              :class="
+                theme === option.id ? 'border-primary bg-primary/5' : 'bg-card'
+              "
+              @click="theme = option.id"
+            >
               <LucideSun v-if="option.id === 'light'" class="size-4.5" />
-              <LucideMoonStar v-else-if="option.id === 'dark'" class="size-4.5" />
+              <LucideMoonStar
+                v-else-if="option.id === 'dark'"
+                class="size-4.5"
+              />
               <LucideMonitor v-else class="size-4.5" />
               <span class="text-sm font-medium">{{ option.label }}</span>
             </Button>
@@ -157,17 +170,28 @@ function handleClearRecentSearches() {
       <h2 class="text-xl font-medium text-foreground">Läsvy</h2>
 
       <div>
-        <SettingsRow label="Standardvy" description="Hur en tenta öppnas. Du kan alltid byta i tentavyn." stacked>
-          <SettingsSegmented v-model="defaultLayout" :options="LAYOUT_OPTIONS" />
+        <SettingsRow
+          label="Standardvy"
+          description="Hur en tenta öppnas. Du kan alltid byta i tentavyn."
+          stacked
+        >
+          <SettingsSegmented
+            v-model="defaultLayout"
+            :options="LAYOUT_OPTIONS"
+          />
         </SettingsRow>
 
-        <SettingsRow label="Dölj facit tills du pekar på det"
-          description="Gäller delad vy. Med detta av ligger facit framme direkt.">
+        <SettingsRow
+          label="Dölj facit tills du pekar på det"
+          description="Gäller delad vy. Med detta av ligger facit framme direkt."
+        >
           <Switch v-model="blurFacitUntilHover" />
         </SettingsRow>
 
-        <SettingsRow label="Visa &quot;Förklara&quot; vid markering"
-          description="Knappen som dyker upp när du markerar text i en tenta och skickar den vidare till AI-chatten.">
+        <SettingsRow
+          label='Visa "Förklara" vid markering'
+          description="Knappen som dyker upp när du markerar text i en tenta och skickar den vidare till AI-chatten."
+        >
           <Switch v-model="showExplainPopover" />
         </SettingsRow>
       </div>
@@ -177,19 +201,34 @@ function handleClearRecentSearches() {
       <h2 class="text-xl font-medium text-foreground">AI-assistenten</h2>
 
       <div>
-        <SettingsRow label="Standardläge för svar" description="Kan bytas när som helst nere i chattrutan." stacked>
+        <SettingsRow
+          label="Standardläge för svar"
+          description="Kan bytas när som helst nere i chattrutan."
+          stacked
+        >
           <SettingsSegmented v-model="answerMode" :options="ANSWER_OPTIONS" />
         </SettingsRow>
 
-        <SettingsRow label="Modell" description="Vilken modell chatten och förklaringarna använder." stacked>
-          <SettingsSegmented v-model="selectedModelId" :options="MODEL_OPTIONS" />
+        <SettingsRow
+          label="Modell"
+          description="Vilken modell chatten och förklaringarna använder."
+          stacked
+        >
+          <SettingsSegmented
+            v-model="selectedModelId"
+            :options="MODEL_OPTIONS"
+          />
         </SettingsRow>
       </div>
 
       <p class="text-sm leading-relaxed text-muted-foreground">
         AI kan göra misstag – se svaren som pedagogiska förslag, inte som facit.
         Läs mer i vår
-        <NuxtLink to="/ai-policy" class="text-foreground underline underline-offset-4">AI-policy</NuxtLink>.
+        <NuxtLink
+          to="/ai-policy"
+          class="text-foreground underline underline-offset-4"
+          >AI-policy</NuxtLink
+        >.
       </p>
     </section>
 
@@ -197,15 +236,25 @@ function handleClearRecentSearches() {
       <h2 class="text-xl font-medium text-foreground">Tangentbordsgenvägar</h2>
 
       <div class="space-y-6">
-        <div v-for="group in SHORTCUT_GROUPS" :key="group.label" class="space-y-2">
+        <div
+          v-for="group in SHORTCUT_GROUPS"
+          :key="group.label"
+          class="space-y-2"
+        >
           <h3 class="text-sm text-muted-foreground">{{ group.label }}</h3>
           <div class="overflow-hidden rounded-2xl border bg-card">
-            <div v-for="shortcut in group.shortcuts" :key="shortcut.action"
-              class="flex items-center justify-between gap-4 border-b border-border px-4 py-3 last:border-b-0">
+            <div
+              v-for="shortcut in group.shortcuts"
+              :key="shortcut.action"
+              class="flex items-center justify-between gap-4 border-b border-border px-4 py-3 last:border-b-0"
+            >
               <span class="text-sm text-foreground">{{ shortcut.action }}</span>
               <span class="flex shrink-0 items-center gap-1">
-                <kbd v-for="key in shortcut.keys" :key="key"
-                  class="inline-flex h-7 min-w-7 items-center justify-center rounded-sm border bg-muted px-2 text-sm text-muted-foreground">
+                <kbd
+                  v-for="key in shortcut.keys"
+                  :key="key"
+                  class="inline-flex h-7 min-w-7 items-center justify-center rounded-sm border bg-muted px-2 text-sm text-muted-foreground"
+                >
                   {{ key }}
                 </kbd>
               </span>
@@ -222,19 +271,33 @@ function handleClearRecentSearches() {
       </p>
 
       <dl class="overflow-hidden rounded-2xl border bg-card">
-        <div v-for="item in FIXED_DEFAULTS" :key="item.label"
-          class="flex flex-col gap-1 border-b border-border px-4 py-3.5 last:border-b-0 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+        <div
+          v-for="item in FIXED_DEFAULTS"
+          :key="item.label"
+          class="flex flex-col gap-1 border-b border-border px-4 py-3.5 last:border-b-0 sm:flex-row sm:items-center sm:justify-between sm:gap-6"
+        >
           <dt class="text-sm text-foreground">{{ item.label }}</dt>
-          <dd class="text-sm text-muted-foreground sm:text-right">{{ item.value }}</dd>
+          <dd class="text-sm text-muted-foreground sm:text-right">
+            {{ item.value }}
+          </dd>
         </div>
       </dl>
 
       <div>
-        <SettingsRow label="Senaste sökningar" :description="recentSearches.length
-            ? `Sparat på den här enheten: ${recentSearches.map((s) => s.courseCode).join(', ')}.`
-            : 'Inga sparade sökningar på den här enheten.'
-          ">
-          <Button size="sm" variant="outline" :disabled="!recentSearches.length" @click="handleClearRecentSearches">
+        <SettingsRow
+          label="Senaste sökningar"
+          :description="
+            recentSearches.length
+              ? `Sparat på den här enheten: ${recentSearches.map((s) => s.courseCode).join(', ')}.`
+              : 'Inga sparade sökningar på den här enheten.'
+          "
+        >
+          <Button
+            size="sm"
+            variant="outline"
+            :disabled="!recentSearches.length"
+            @click="handleClearRecentSearches"
+          >
             Rensa
           </Button>
         </SettingsRow>
