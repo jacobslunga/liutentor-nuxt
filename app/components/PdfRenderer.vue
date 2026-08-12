@@ -51,9 +51,14 @@ const darkPageStyle = {
   mixBlendMode: "screen",
 } as const;
 
+const lightPageStyle = {
+  // PDF pages render with an opaque white canvas. Multiplying it over the app
+  // background makes that white resolve to the exact --background token.
+  mixBlendMode: "multiply",
+} as const;
+
 // Keep this non-reactive: rebuilding the plugin registry during resize reloads the PDF.
 const isMobile = window.innerWidth < 1024;
-const windowWidth = window.innerWidth;
 
 const viewportEl = ref<HTMLElement | null>(null);
 const showScrollTop = ref(false);
@@ -96,7 +101,6 @@ function dispatchNormalizedWheel(
   source: WheelEvent,
   notches: number,
 ) {
-
   const zoomFactor = Math.exp(-ZOOM_PER_NOTCH * notches);
   const normalizedDeltaY = (1 - zoomFactor) / 0.01;
   const normalizedEvent = new WheelEvent("wheel", {
@@ -116,7 +120,6 @@ function dispatchNormalizedWheel(
 }
 
 function handleWheelCapture(event: WheelEvent) {
-
   if (normalizedWheelEvents.has(event)) return;
   if (!event.ctrlKey && !event.metaKey) return;
   if (!isMouseNotch(event)) return;
@@ -188,9 +191,16 @@ const plugins = computed(() => {
     <EmbedPDF v-else :engine="engine" :plugins="plugins">
       <template #default="{ activeDocumentId }">
         <template v-if="activeDocumentId">
-          <PdfZoomController :document-id="activeDocumentId" :max-page-width="maxPageWidth" />
+          <PdfZoomController
+            :document-id="activeDocumentId"
+            :max-page-width="maxPageWidth"
+          />
 
-          <PdfZoomControls v-if="isMobile" :document-id="activeDocumentId" class="absolute right-0 top-3 z-20" />
+          <PdfZoomControls
+            v-if="isMobile"
+            :document-id="activeDocumentId"
+            class="absolute right-0 top-3 z-20"
+          />
 
           <DocumentContent :document-id="activeDocumentId">
             <template #default="{ isLoaded }">
@@ -224,11 +234,11 @@ const plugins = computed(() => {
                         <Rotate
                           :document-id="activeDocumentId"
                           :page-index="page.pageIndex"
-                          class="relative h-full w-full dark:bg-background"
+                          class="relative h-full w-full bg-background"
                         >
                           <div
                             class="absolute inset-0 z-0 pdf-render-surface"
-                            :style="isDark ? darkPageStyle : {}"
+                            :style="isDark ? darkPageStyle : lightPageStyle"
                           >
                             <RenderLayer
                               :document-id="activeDocumentId"
@@ -265,11 +275,11 @@ const plugins = computed(() => {
                               <Rotate
                                 :document-id="activeDocumentId"
                                 :page-index="page.pageIndex"
-                                class="relative h-full w-full dark:bg-background"
+                                class="relative h-full w-full bg-background"
                               >
                                 <div
                                   class="absolute inset-0 z-0 pdf-render-surface"
-                                  :style="isDark ? darkPageStyle : {}"
+                                  :style="isDark ? darkPageStyle : lightPageStyle"
                                 >
                                   <RenderLayer
                                     :document-id="activeDocumentId"
@@ -284,10 +294,12 @@ const plugins = computed(() => {
                                     :page-index="page.pageIndex"
                                     :text-style="{ background: selectionColor }"
                                   >
-
                                     <template
                                       v-if="props.explainEnabled"
-                                      #selection-menu="{ menuWrapperProps, placement }"
+                                      #selection-menu="{
+                                        menuWrapperProps,
+                                        placement,
+                                      }"
                                     >
                                       <div v-bind="menuWrapperProps">
                                         <PdfSelectionMenu

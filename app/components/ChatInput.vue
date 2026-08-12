@@ -32,8 +32,18 @@ const props = withDefaults(
     submitOnEnter?: boolean;
 
     compact?: boolean;
+
+    autoResize?: boolean;
+
+    reactiveInput?: boolean;
   }>(),
-  { autofocus: true, submitOnEnter: true, compact: false },
+  {
+    autofocus: true,
+    submitOnEnter: true,
+    compact: false,
+    autoResize: true,
+    reactiveInput: true,
+  },
 );
 
 const emit = defineEmits<{
@@ -51,12 +61,18 @@ const modeRef = ref<HTMLElement | null>(null);
 const controlsRef = ref<HTMLElement | null>(null);
 const text = ref(props.initialText ?? "");
 const MAX_LENGTH = 4000;
+const nonReactiveCanSend = ref(
+  !!props.initialText?.trim() && props.initialText.length <= MAX_LENGTH,
+);
 
 const singleLineHeight = ref(0);
 const isMultiline = ref(false);
 
 const canSend = computed(
-  () => !!text.value.trim() && text.value.length <= MAX_LENGTH,
+  () =>
+    props.reactiveInput
+      ? !!text.value.trim() && text.value.length <= MAX_LENGTH
+      : nonReactiveCanSend.value,
 );
 
 const selectedModelLabel = computed(
@@ -92,22 +108,28 @@ const oneRowWidth = () => {
   );
 };
 
-const applyHeight = () => {
+const applyHeight = (allowShrink = false) => {
   const el = textareaRef.value;
   if (!el) return;
-  el.style.height = "auto";
-  el.style.height = `${Math.min(el.scrollHeight, 180)}px`;
-  el.style.overflowY = el.scrollHeight > 180 ? "auto" : "hidden";
+
+  if (allowShrink) el.style.height = "auto";
+
+  const scrollHeight = el.scrollHeight;
+  const nextHeight = Math.min(scrollHeight, 180);
+  const height = `${nextHeight}px`;
+  const overflowY = scrollHeight > 180 ? "auto" : "hidden";
+
+  if (el.style.height !== height) el.style.height = height;
+  if (el.style.overflowY !== overflowY) el.style.overflowY = overflowY;
 };
 
-const updateHeight = () => {
+const recalculateLayout = () => {
   const el = textareaRef.value;
   if (!el) return;
 
   const was = isMultiline.value;
   const width = oneRowWidth();
   if (width > 0) {
-
     el.style.flex = `0 0 ${width}px`;
     el.style.height = "auto";
     isMultiline.value = el.scrollHeight > singleLineHeight.value + 4;
@@ -115,18 +137,66 @@ const updateHeight = () => {
   }
 
   if (isMultiline.value === was) {
-    applyHeight();
+    applyHeight(true);
     return;
   }
 
   nextTick(() => {
     const previous = el.style.transition;
     el.style.transition = "none";
-    applyHeight();
+    applyHeight(true);
     // Force reflow so restoring the transition cannot animate this resize.
     void el.offsetHeight;
     el.style.transition = previous;
   });
+};
+
+const updateHeight = (event?: Event) => {
+  if (!props.autoResize) return;
+
+  const el = textareaRef.value;
+  if (!el) return;
+
+  const inputType = event instanceof InputEvent ? event.inputType : "";
+
+  // Deletion can make a multiline textarea fit on one row again, so it needs
+  // the more expensive width probe. Insertions only need a single scrollHeight
+  // read and should not force the surrounding mobile sheet to reflow.
+  if (!event) {
+    recalculateLayout();
+    return;
+  }
+
+  if (inputType.startsWith("delete")) {
+    if (isMultiline.value) recalculateLayout();
+    return;
+  }
+
+  if (!isMultiline.value) {
+    if (el.scrollHeight <= singleLineHeight.value + 4) return;
+    isMultiline.value = true;
+    nextTick(() => applyHeight(true));
+    return;
+  }
+
+  applyHeight();
+};
+
+const handleInput = (event: Event) => {
+  const value = (event.target as HTMLTextAreaElement).value;
+
+  if (props.reactiveInput) {
+    text.value = value;
+    updateHeight(event);
+    return;
+  }
+
+  // Keep rapid mobile typing out of Vue's render cycle. In this mode the DOM
+  // owns the textarea value; reactive state only changes when sendability does.
+  const nextCanSend = !!value.trim() && value.length <= MAX_LENGTH;
+  if (nonReactiveCanSend.value !== nextCanSend) {
+    nonReactiveCanSend.value = nextCanSend;
+  }
 };
 
 const handleKeyDown = (e: KeyboardEvent) => {
@@ -138,13 +208,15 @@ const handleKeyDown = (e: KeyboardEvent) => {
 };
 
 function setText(value: string) {
-  text.value = value;
-  nextTick(updateHeight);
+  if (props.reactiveInput) text.value = value;
+  if (textareaRef.value) textareaRef.value.value = value;
+  nonReactiveCanSend.value = !!value.trim() && value.length <= MAX_LENGTH;
+  if (props.autoResize) nextTick(recalculateLayout);
 }
 
 onMounted(() => {
   const el = textareaRef.value;
-  if (el) {
+  if (el && props.autoResize) {
 
     const draft = el.value;
     el.value = "";
@@ -152,15 +224,17 @@ onMounted(() => {
     singleLineHeight.value = el.scrollHeight;
     el.value = draft;
   }
-  updateHeight();
+  if (props.autoResize) recalculateLayout();
   if (props.autofocus) textareaRef.value?.focus();
 });
 
-useEventListener("resize", updateHeight);
+useEventListener("resize", () => {
+  if (props.autoResize) recalculateLayout();
+});
 
 defineExpose({
   focus: () => textareaRef.value?.focus(),
-  getText: () => text.value,
+  getText: () => textareaRef.value?.value ?? text.value,
   setText,
 });
 </script>
@@ -219,9 +293,9 @@ defineExpose({
               </DropdownMenu>
             </div>
 
-            <textarea ref="textareaRef" v-model="text" rows="1" placeholder="Fråga vad som helst"
+            <textarea ref="textareaRef" :value="text" rows="1" placeholder="Fråga vad som helst"
               class="chat-textarea min-w-0 resize-none border-0 bg-transparent px-2 py-1 text-base leading-relaxed outline-none placeholder:text-muted-foreground/70 focus:ring-0 max-h-45"
-              :class="isMultiline ? 'order-1 basis-full' : 'order-2 flex-1'" @input="updateHeight"
+              :class="isMultiline ? 'order-1 basis-full' : 'order-2 flex-1'" @input="handleInput"
               @keydown="handleKeyDown" />
 
             <div ref="controlsRef" class="order-3 flex shrink-0 items-center gap-1.5" :class="{ 'ml-auto': isMultiline }">
@@ -265,7 +339,7 @@ defineExpose({
           <p class="text-2xs text-muted-foreground/60">
             AI kan göra misstag. Kontrollera viktig information.
           </p>
-          <p v-if="text.length > MAX_LENGTH * 0.8" class="text-xs" :class="text.length > MAX_LENGTH
+          <p v-if="reactiveInput && text.length > MAX_LENGTH * 0.8" class="text-xs" :class="text.length > MAX_LENGTH
             ? 'text-destructive font-bold'
             : 'text-muted-foreground'
             ">

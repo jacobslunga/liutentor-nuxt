@@ -307,6 +307,7 @@ onUnmounted(() => {
       <template v-else-if="exam">
         <MobilePdfView
           v-if="isMobile"
+          v-show="!chatStore.isOpen"
           class="bg-background"
           :exam-pdf-url="exam.pdf_url"
           :solution-pdf-url="solutionPdfUrl"
