@@ -5,7 +5,6 @@ const eyeX = ref(0);
 const eyeY = ref(0);
 const blinking = ref(false);
 
-// Ögonens maximala utslag, i viewBox-enheter.
 const MAX_X = 8;
 const MAX_Y = 6;
 
@@ -22,15 +21,10 @@ function step() {
     return;
   }
 
-  // Rect:en läses en gång per frame (inte per pointer-event) så utslaget följer
-  // maskoten även när chatt-panelen dragits om — ResizeHandle utlöser aldrig
-  // något window-resize.
   const rect = el.getBoundingClientRect();
   const dx = pointerX - (rect.left + rect.width / 2);
   const dy = pointerY - (rect.top + rect.height / 2);
 
-  // Mjuk avtagning: nära markören ger litet utslag, långt bort närmar sig
-  // blicken fullt utslag utan att någonsin slå i kanten.
   const denom = Math.hypot(dx, dy) + 120;
   const targetX = hasPointer ? (dx / denom) * MAX_X : 0;
   const targetY = hasPointer ? (dy / denom) * MAX_Y : 0;
@@ -101,7 +95,7 @@ onUnmounted(() => {
 
 <style scoped>
 .mascot {
-  /* A deepened primary, so the eyes track the brand hue in both modes. */
+
   --mascot-eye: color-mix(in oklch, var(--primary) 45%, #000);
 }
 

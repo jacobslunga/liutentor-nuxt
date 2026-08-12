@@ -82,8 +82,6 @@ const groups = [
           {{ group.label }}
         </p>
 
-        <!-- Answers stay open rather than sitting behind an accordion: eight
-             short entries scan faster in full, and the text stays crawlable. -->
         <dl class="max-w-2xl">
           <div v-for="faq in group.faqs" :key="faq.q" class="border-b py-6 last:border-b-0">
             <dt class="text-base font-medium text-foreground">

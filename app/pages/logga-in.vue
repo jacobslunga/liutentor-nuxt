@@ -24,7 +24,6 @@ watch(activeTab, (tab) => {
   router.replace({ query: { ...route.query, tab } });
 });
 
-// Login form
 const loginForm = reactive({
   email: "",
   password: "",
@@ -40,7 +39,6 @@ const loginSuccess = ref(false);
 const loginGeneralError = ref("");
 const showLoginPassword = ref(false);
 
-// Signup form
 const signupForm = reactive({
   email: "",
   password: "",
@@ -191,7 +189,6 @@ async function handleSignup() {
         <TabsTrigger value="skapa-konto" class="flex-1">Skapa konto</TabsTrigger>
       </TabsList>
 
-      <!-- Login tab -->
       <TabsContent value="logga-in" class="mt-6">
         <div v-if="loginSuccess" class="flex flex-col items-center space-y-3 py-6 text-center">
           <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
@@ -250,7 +247,6 @@ async function handleSignup() {
         </form>
       </TabsContent>
 
-      <!-- Signup tab -->
       <TabsContent value="skapa-konto" class="mt-6">
         <div v-if="signupSuccess" class="flex flex-col items-center space-y-3 py-6 text-center">
           <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">

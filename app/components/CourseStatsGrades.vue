@@ -15,11 +15,6 @@ const tokens = useChartTokens([
   "grade-mid",
 ] as const);
 
-// A computed returning the accessor, not a plain function: unovis only re-reads
-// `color` when the prop identity changes, and a stable function never does — the
-// donut would keep whichever palette it was first handed while the swatches
-// beside it, which read `var(--grade-*)` straight from the cascade, follow the
-// colour mode.
 const color = computed(() => (d: GradeEntry) => tokens.value[d.token]);
 const value = (d: GradeEntry) => d.value;
 
@@ -41,8 +36,7 @@ const triggers = {
 
 <template>
   <div class="grid gap-8 md:grid-cols-2 md:items-center md:gap-12">
-    <!-- The list is the table view, not decoration: a donut can't be read for
-         close values, so every number it encodes is also here in full. -->
+
     <ol class="divide-y divide-border/60 rounded-xl border border-border/60">
       <li
         v-for="grade in grades"

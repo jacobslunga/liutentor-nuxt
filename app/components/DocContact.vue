@@ -1,5 +1,5 @@
 <script setup lang="ts">
-/** Closing note on a long-form page — a rule, a short paragraph, one action. */
+
 defineProps<{
   title: string;
   body: string;

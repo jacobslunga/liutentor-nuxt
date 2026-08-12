@@ -27,7 +27,6 @@ const user = useSupabaseUser();
 const supabase = useSupabaseClient();
 const chatStore = useChatStore();
 
-// Global cache — kept i minne mellan öppningar och över komponent-remounts.
 const conversations = useState<ConversationItem[]>(
   "chat-history-conversations",
   () => [],
@@ -142,7 +141,6 @@ async function loadConversations() {
     return;
   }
 
-  // Med cachad data: uppdatera tyst i bakgrunden istället för att blanka listan.
   const isInitialLoad = conversations.value.length === 0;
   if (isInitialLoad) isLoading.value = true;
   loadError.value = null;
@@ -168,7 +166,7 @@ async function loadConversations() {
     loadConversationMeta(conversations.value.map((c) => c.id));
     if (isInitialLoad) startReveal();
   } catch {
-    // En misslyckad bakgrundsuppdatering behåller den cachade listan tyst.
+
     if (isInitialLoad) {
       loadError.value = "Kunde inte hämta konversationshistorik.";
       conversations.value = [];
@@ -231,7 +229,7 @@ async function loadConversationMeta(ids: string[]) {
 
     conversationMeta.value = meta;
   } catch {
-    // Behåll ev. tidigare metadata vid fel.
+
   }
 }
 
@@ -417,7 +415,6 @@ watch(
   { immediate: true },
 );
 
-// Ingen replay av intro-animationen medan användaren filtrerar.
 watch(searchQuery, () => {
   animateReveal.value = false;
 });
@@ -427,9 +424,7 @@ onUnmounted(() => {
 });
 
 function focusSearch(event: Event) {
-  // Always swallow the default autofocus, but only move focus into the search
-  // field on a pointer-precise device: on touch, focusing it raises the soft
-  // keyboard over the list the dialog exists to show.
+
   event.preventDefault();
   if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
     searchInputRef.value?.focus();
@@ -507,8 +502,6 @@ function focusSearch(event: Event) {
                   </p>
                 </button>
 
-                <!-- Always reachable on touch: there is no hover to reveal it
-                     with, and this is the only way to delete a conversation. -->
                 <Button variant="ghost" size="icon"
                   class="size-7 shrink-0 sm:opacity-0 sm:pointer-events-none sm:group-hover:opacity-100 sm:group-hover:pointer-events-auto transition-opacity hover:bg-transparent"
                   :disabled="isDeletingConversation" aria-label="Radera chatt" @click="askDeleteConversation(item)">

@@ -52,18 +52,6 @@ function prefetchExamRoute(examId: number) {
   void preloadRouteComponents(path);
 }
 
-/**
- * Shared by the header and every row — split them and the columns drift apart.
- *
- * Below `sm` every column is sized to its content, so nothing is truncated to
- * fit a phone; the table simply grows past the viewport and the wrapper scrolls
- * it. The name column is `minmax(max-content, 1fr)` rather than plain
- * `max-content` so a short table still fills the width instead of leaving a gap
- * down the right.
- *
- * From `sm` the width is no longer scarce, so it goes back to `fr` columns that
- * spread across the table instead of huddling at the right edge.
- */
 const gridCols =
   "grid grid-cols-[minmax(max-content,1fr)_max-content_max-content_max-content] sm:grid-cols-[minmax(0,3fr)_minmax(80px,1fr)_minmax(64px,1fr)_minmax(88px,1fr)] items-center gap-x-4 px-4";
 
@@ -84,8 +72,7 @@ function toggleFilter(p: string) {
     </div>
 
     <div class="w-full overflow-x-auto rounded-xl border border-border">
-      <!-- w-max lets the grid grow past the viewport on a phone so the wrapper
-           above can scroll it; min-w-full keeps a narrow table filling the card. -->
+
       <div class="w-max min-w-full sm:w-full rounded-xl overflow-hidden">
         <div :class="gridCols" class="py-3 border-b border-border/60 bg-muted/30">
           <div class="text-xs text-muted-foreground">Tentamen</div>
@@ -98,8 +85,7 @@ function toggleFilter(p: string) {
           class="cursor-pointer py-2.5 border-b border-border/60 last:border-0 hover:bg-muted/20 transition-colors group"
           @mouseenter="prefetchExamRoute(exam.id)" @focusin="prefetchExamRoute(exam.id)"
           @click="navigateTo(examRoutePath(exam.id))">
-          <!-- Truncation is a desktop-only concession: on a phone the column is
-               sized to this text, so it stays whole and the table scrolls. -->
+
           <div class="sm:min-w-0">
             <div
               class="text-sm font-semibold text-foreground group-hover:text-foreground/80 transition-colors whitespace-nowrap sm:truncate">

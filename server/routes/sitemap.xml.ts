@@ -1,14 +1,13 @@
 import { serverSupabaseClient } from "#supabase/server";
 import { SITEMAP_TAG, setCdnCache } from "../utils/cache";
 
-/** PostgREST caps a single response at 1000 rows, so page through explicitly. */
 const PAGE_SIZE = 1000;
 
 type ExamRow = { course_code: string | null; exam_date: string | null };
 
 async function fetchCourseLastmods(event: any) {
   const supabase = await serverSupabaseClient(event);
-  /** course code -> most recent exam date */
+
   const lastmods = new Map<string, string>();
 
   for (let offset = 0; ; offset += PAGE_SIZE) {
@@ -48,15 +47,11 @@ export default defineEventHandler(async (event) => {
     "https://liutentor.se/upload-exams",
   ];
 
-  // Only advertise course pages that actually have exams. Course codes without
-  // exams render a thin "vi saknar tentor" page and are noindexed, so listing
-  // them here would burn crawl budget for nothing.
   let lastmods = new Map<string, string>();
   try {
     lastmods = await fetchCourseLastmods(event);
   } catch {
-    // Prefer a sitemap with only the static pages over one full of URLs we
-    // cannot verify have content.
+
     lastmods = new Map();
   }
 
@@ -83,8 +78,7 @@ ${entries}
 </urlset>`;
 
   setHeader(event, "Content-Type", "application/xml");
-  // Purged alongside course pages when exams are published, since publishing
-  // can add a course code that was not previously listed.
+
   setCdnCache(event, [SITEMAP_TAG]);
 
   return sitemapXml;

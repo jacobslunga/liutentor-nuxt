@@ -1,32 +1,16 @@
 import { courseTag, SITEMAP_TAG } from "../utils/cache";
 
-/**
- * Purge target for Supabase database webhooks on `exams` and `exam_stats`.
- *
- * Nothing in the app writes to either table — exams and their statistics are
- * published out of band — so a database webhook is the one trigger that fires
- * no matter how the row gets inserted (dashboard, SQL, script, or the Go
- * service). Both tables carry `course_code`, so one handler covers both.
- *
- * Configure one webhook per table in Supabase → Database → Webhooks:
- *   table:   public.exams / public.exam_stats
- *   events:  INSERT, UPDATE, DELETE
- *   type:    HTTP Request → POST https://liutentor.se/api/revalidate
- *   header:  x-revalidate-secret: <NUXT_REVALIDATE_SECRET>
- */
-
 type WebhookBody = {
   type?: string;
   table?: string;
   record?: Record<string, any> | null;
   old_record?: Record<string, any> | null;
-  /** Allows manual purges: { "courseCodes": ["TATA91"] } */
+
   courseCodes?: string[];
 };
 
 async function purgeTags(tags: string[]) {
-  // Netlify injects both of these into the function runtime, so no token
-  // needs to be created or stored manually.
+
   const token = process.env.NETLIFY_PURGE_API_TOKEN;
   const siteId = process.env.SITE_ID;
 
@@ -66,7 +50,7 @@ export default defineEventHandler(async (event) => {
   for (const code of body?.courseCodes ?? []) {
     if (code) codes.add(String(code).trim().toUpperCase());
   }
-  // On UPDATE the course code could have moved, so purge both sides.
+
   for (const row of [body?.record, body?.old_record]) {
     const code = row?.course_code;
     if (code) codes.add(String(code).trim().toUpperCase());
@@ -78,9 +62,6 @@ export default defineEventHandler(async (event) => {
 
   const tags = [...codes].map(courseTag);
 
-  // The sitemap lists which courses have exams, so `exams` writes change it.
-  // `exam_stats` only adds numbers to a course that is already listed, so its
-  // webhook would purge the sitemap into an identical copy.
   if (body?.table !== "exam_stats") tags.push(SITEMAP_TAG);
 
   await purgeTags(tags);

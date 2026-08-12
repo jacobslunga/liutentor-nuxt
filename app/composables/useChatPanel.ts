@@ -4,14 +4,12 @@ import { storeToRefs } from "pinia";
 import { useChatStore, type PendingSelection } from "@/stores/chat";
 import { useChat } from "@/composables/useChat";
 
-/** The slice of ChatInput's exposed API this composable drives. */
 export interface ChatInputApi {
   focus: () => void;
   getText: () => string;
   setText: (value: string) => void;
 }
 
-/** The slice of ChatMessages' exposed API this composable drives. */
 export interface ChatTranscriptApi {
   scrollToBottom: (behavior?: ScrollBehavior) => void;
   restoreScroll: () => void;
@@ -26,24 +24,11 @@ export interface ChatPanelOptions {
   solutionUrl?: string | null;
   input: Ref<ChatInputApi | null>;
   transcript: Ref<ChatTranscriptApi | null>;
-  /**
-   * Pin the model / answer mode for a shell that offers no pickers. Set rather
-   * than written through the cookies on purpose: those are shared with the
-   * desktop panel, and a phone session should not silently rewrite what the
-   * reader chose there.
-   */
+
   fixedModelId?: string;
   fixedDirectAnswer?: boolean;
 }
 
-/**
- * Everything a chat shell does that is not layout: sending, cancelling,
- * starting over, and picking up questions asked from outside the panel.
- *
- * Shared by the desktop side panel (ChatWindow) and the mobile bottom sheet
- * (MobileChatSheet), which differ only in how they present the same three
- * parts — header, transcript, input.
- */
 export function useChatPanel(opts: ChatPanelOptions) {
   const chatStore = useChatStore();
   const user = useSupabaseUser();
@@ -106,20 +91,13 @@ export function useChatPanel(opts: ChatPanelOptions) {
     }
   }
 
-  /** A selection made inside an answer, quoted back into the next question. */
   function handleReplyToSelection(text: string) {
     selectionContext.value = text;
     nextTick(() => opts.input.value?.focus());
   }
 
-  /**
-   * A question asked from outside the panel — today the PDF's "Förklara" button.
-   * The quote goes over as selection context, exactly as a reply typed in here
-   * would.
-   */
   function startPendingSelection(pending: PendingSelection) {
-    // Mid-generation the send would be dropped on the floor. Park the quote in
-    // the input instead and let the reader fire it when the answer lands.
+
     if (isLoading.value) {
       selectionContext.value = pending.context;
       nextTick(() => {
@@ -167,9 +145,7 @@ export function useChatPanel(opts: ChatPanelOptions) {
   });
 
   onMounted(() => {
-    // Read before the reset below, which clears the pending ask along with the
-    // rest of the chat state. On the first ask this panel is mounted *by* that
-    // ask, so the payload has to survive the mount.
+
     const pending = chatStore.takePendingSelection();
 
     if (chatStore.currentExamId !== opts.examId) {
@@ -179,12 +155,9 @@ export function useChatPanel(opts: ChatPanelOptions) {
 
     nextTick(() => opts.transcript.value?.restoreScroll());
 
-    // After the scroll restore is queued, so its "auto" jump does not land on
-    // top of the smooth scroll this send starts.
     if (pending) startPendingSelection(pending);
   });
 
-  // Asks that arrive while the panel is already mounted, open or not.
   watch(
     () => chatStore.pendingSelection,
     (pending) => {
@@ -194,8 +167,6 @@ export function useChatPanel(opts: ChatPanelOptions) {
     },
   );
 
-  // Children are still mounted during onBeforeUnmount, so the draft can still
-  // be read off the input. It is the only point the store needs to hear about it.
   onBeforeUnmount(() => {
     chatStore.draftInput = opts.input.value?.getText() ?? "";
   });

@@ -1,10 +1,6 @@
 <script setup lang="ts">
 import type { DocSection } from "~/types/doc";
 
-/**
- * Long-form legal document: a numbered index followed by sections laid out as
- * a two-column editorial grid — heading rail on the left, prose on the right.
- */
 const props = defineProps<{
   sections: DocSection[];
 }>();
@@ -25,7 +21,7 @@ function jumpTo(id: string) {
 
 <template>
   <div class="mx-auto max-w-6xl px-5 sm:px-8">
-    <!-- Index -->
+
     <nav aria-label="Innehåll" class="pt-12 sm:pt-16">
       <p class="text-sm font-medium text-muted-foreground">
         Innehåll
@@ -46,7 +42,6 @@ function jumpTo(id: string) {
       </ol>
     </nav>
 
-    <!-- Sections -->
     <div class="mt-16 sm:mt-24">
       <section
         v-for="entry in entries"

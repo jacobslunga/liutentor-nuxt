@@ -19,21 +19,12 @@ const props = defineProps<{
 
 const tokens = useChartTokens(["background", "success"] as const);
 
-// A pass rate of exactly 0 is how the scrape represents "not recorded", so
-// those sittings arrive with `rate: undefined`. Dropping them rather than
-// letting the line break: the gap is already visible on the time scale — the
-// curve simply spans it — and a broken line at this density reads as a bug.
 const measured = computed(() =>
   props.points.filter((p) => p.rate !== undefined),
 );
 
-// Unique per instance so two of these charts on one page (unlikely, but the
-// tab can remount) don't fight over the same gradient id.
 const gradientId = `${useId()}-pass-rate-area`;
 
-// A time scale rather than an evenly-spaced category axis: exam sittings are
-// irregular, and a one-slot-per-exam layout quietly implies they aren't. A
-// four-year gap looks like a four-year gap.
 const xScale = Scale.scaleTime();
 
 const x = (d: PassRatePoint) => d.timestamp;
@@ -41,18 +32,10 @@ const y = (d: PassRatePoint) => d.rate;
 
 const yTicks = [0, 25, 50, 75, 100];
 
-// MonotoneX rather than a basis or natural spline: those overshoot between
-// points, which on a percentage axis invents sittings above 100% or below 0.
 const curveType = CurveType.MonotoneX;
 
-// A single sitting draws no line and no area — a lone dot is the only honest
-// way to show it.
 const isSinglePoint = computed(() => measured.value.length === 1);
 
-// The average label is an HTML pill rather than the plotline's own text: an
-// SVG <text> has no background, so it disappeared wherever the curve or its
-// fill ran behind it. Positioning it needs the plot area in pixels, which the
-// container hands over after every render (including resizes).
 const plotBox = ref<{ top: number; bottom: number; left: number } | null>(null);
 
 type Spacing = { top: number; bottom: number; left: number; right: number };
@@ -75,7 +58,7 @@ function onRenderComplete(
 
 const averageStyle = computed(() => {
   const box = plotBox.value;
-  // Hidden rather than parked at 0,0 until the first render reports geometry.
+
   if (!box) return { opacity: "0" };
 
   const t = Math.min(Math.max(props.average, 0), 100) / 100;
@@ -104,10 +87,6 @@ function escapeHtml(value: string) {
   );
 }
 
-// The threshold colours the bars used to carry survive on the tooltip's
-// number: one continuous stroke can't change colour per sitting, but the
-// reader still wants to know whether the point under the cursor was a good
-// result or a bad one.
 function passClass(rate: number) {
   if (rate >= 50) return "text-success";
   if (rate >= 30) return "text-warning";
@@ -137,14 +116,12 @@ function tooltipTemplate(d: PassRatePoint) {
   `;
 }
 
-// Math.round, matching the header on the course page: the two numbers are the
-// same figure and must not round apart at a .5.
 const averageLabel = computed(() => `Snitt ${Math.round(props.average)}%`);
 </script>
 
 <template>
   <div class="vis-chart pass-rate-chart relative w-full">
-    <!-- Not rendered directly; referenced by id from the area fill below. -->
+
     <svg width="0" height="0" class="absolute" aria-hidden="true">
       <defs>
         <linearGradient :id="gradientId" x1="0" y1="0" x2="0" y2="1">
@@ -164,8 +141,7 @@ const averageLabel = computed(() => `Snitt ${Math.round(props.average)}%`);
       :duration="200"
       :on-render-complete="onRenderComplete"
     >
-      <!-- Area first, line second: the stroke has to sit on top of its own
-           fill, not be washed out by it. -->
+
       <VisArea
         :x="x"
         :y="y"
@@ -181,7 +157,6 @@ const averageLabel = computed(() => `Snitt ${Math.round(props.average)}%`);
         :line-width="2"
       />
 
-      <!-- One sitting: the curve components draw nothing, so mark the value. -->
       <VisScatter
         v-if="isSinglePoint"
         :x="x"
@@ -190,10 +165,6 @@ const averageLabel = computed(() => `Snitt ${Math.round(props.average)}%`);
         :color="tokens.success"
       />
 
-      <!-- The one reference the reader actually wants: is this sitting above or
-           below what the course usually does? Dashed because it is a reference
-           rather than data — the grid stays solid. Its label is the pill
-           below. -->
       <VisPlotline
         :value="average"
         axis="y"
@@ -220,9 +191,6 @@ const averageLabel = computed(() => `Snitt ${Math.round(props.average)}%`);
         :tick-format="(v: number | Date) => `${v}%`"
       />
 
-      <!-- Snapping to the nearest sitting rather than requiring a hit on the
-           curve itself: the line is a two-pixel stroke, which is not a pointer
-           target on a phone. -->
       <VisCrosshair
         :x="x"
         :y="y"
@@ -235,10 +203,6 @@ const averageLabel = computed(() => `Snitt ${Math.round(props.average)}%`);
       <VisTooltip />
     </VisXYContainer>
 
-    <!-- Anchored to the left edge of the plot rather than the right: a
-         right-anchored label collides with the curve wherever the last sitting
-         happens to land. `pointer-events-none` keeps it from stealing hovers
-         from the crosshair underneath. -->
     <span
       class="pointer-events-none absolute -translate-y-1/2 rounded-full border border-border/60 bg-background/70 px-2 py-0.5 text-[11px] font-medium text-muted-foreground backdrop-blur-[2px]"
       :style="averageStyle"
@@ -250,11 +214,10 @@ const averageLabel = computed(() => `Snitt ${Math.round(props.average)}%`);
 
 <style scoped>
 .pass-rate-chart {
-  /* Recessive enough to stay behind the curve, dark enough to survive being
-     drawn over it. */
+
   --vis-plotline-color: color-mix(in oklch, var(--foreground) 45%, transparent);
   --vis-plotline-label-font-size: 11px;
-  /* The crosshair line would otherwise sit on top of the point it marks. */
+
   --vis-crosshair-line-stroke-opacity: 0.35;
 }
 </style>

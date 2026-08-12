@@ -1,8 +1,5 @@
 <script setup lang="ts">
-/**
- * The picker used for the small either/or settings. Generic over the value so
- * a caller can bind it straight to a cookie ref holding a union of strings.
- */
+
 defineProps<{
   options: readonly { value: string; label: string; hint?: string }[];
 }>();
@@ -12,8 +9,7 @@ const model = defineModel<string>({ required: true });
 
 <template>
   <div class="grid gap-2" :style="{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }">
-    <!-- The variant's fixed height and nowrap are dropped: these are two-line
-         cards, not label-sized buttons. -->
+
     <Button
       v-for="option in options"
       :key="option.value"

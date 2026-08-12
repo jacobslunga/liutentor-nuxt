@@ -8,18 +8,8 @@ const props = defineProps<{
   examDate: string;
 }>();
 
-/** `h-14` on the header row, plus its bottom border. */
 const HEADER_HEIGHT = 56 + 1;
 
-/**
- * The viewer is inset to sit *between* the header and the chat sheet's
- * collapsed bar rather than under them. Padding the PDF's own scroll container
- * instead only buys clearance at the very ends of the document — everything in
- * between still scrolls under two opaque bars and is unreachable.
- *
- * Both bars stay overlays as far as the sheet is concerned: expanding it still
- * covers the page, which is the point.
- */
 const pdfBoxStyle = {
   paddingTop: `calc(${HEADER_HEIGHT}px + env(safe-area-inset-top, 0px))`,
   paddingBottom: `calc(${PEEK_CONTENT_HEIGHT}px + env(safe-area-inset-bottom, 0px))`,

@@ -78,7 +78,6 @@ const principles = [
         </div>
       </section>
 
-      <!-- Principles -->
       <section class="border-t py-14 lg:py-20">
         <p class="text-sm font-medium text-muted-foreground">
           Tre saker vi står för
@@ -98,7 +97,6 @@ const principles = [
         </div>
       </section>
 
-      <!-- Closing -->
       <section class="grid gap-x-12 gap-y-6 border-t py-14 lg:grid-cols-[13rem_minmax(0,1fr)] lg:py-20">
         <h2 class="text-lg font-medium text-foreground">Hjälp till</h2>
         <div class="max-w-2xl">

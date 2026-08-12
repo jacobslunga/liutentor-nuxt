@@ -1,14 +1,11 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
-import { useRouter } from "vue-router";
 import courseCodes from "~/data/courseCodes.json";
 import Button from "./ui/button/Button.vue";
 
 const upperCourseCodes = computed(() =>
   courseCodes.map((c: string) => c.toUpperCase()),
 );
-
-const isLoading = ref(false);
 
 const props = defineProps<{
   focusInput: boolean;
@@ -216,10 +213,6 @@ function handleClickOutside(event: MouseEvent) {
       v-if="showSuggestions && suggestions.length > 0"
       class="absolute w-full left-0 mt-2 bg-background rounded-2xl border z-40 max-h-72 overflow-hidden text-sm"
     >
-      <div v-if="isLoading" class="p-3 text-sm text-muted-foreground">
-        Laddar...
-      </div>
-
       <div class="px-3 pt-3 pb-1 text-muted-foreground font-medium">
         Alla kurser
       </div>

@@ -1,19 +1,7 @@
 <script setup lang="ts">
-/**
- * The affordance for the facit panel, on the right edge of the exam reader.
- *
- * At rest it is a hairline — the edge of a sheet tucked just off-screen. As the
- * pointer approaches, that sheet slides out and the label surfaces on it. The
- * gesture is the same one that actually opens the facit, so the indicator is a
- * preview of the motion rather than a separate piece of decoration.
- */
 const props = defineProps<{
   facitPdfUrl: string | null;
   label?: string;
-  /**
-   * Pointer proximity, 0..1, supplied by the parent. Deriving it there keeps a
-   * second window-level mousemove listener off the page.
-   */
   intensity: number;
 }>();
 
@@ -37,51 +25,34 @@ function animateTo(target: number) {
   rafId = requestAnimationFrame(step);
 }
 
-const REST_WIDTH = 3;
-const OPEN_WIDTH = 84;
-
-// Every mix here is `in oklab`, not oklch. --border and --foreground are
-// achromatic, so their hue is recorded as 0deg; oklch interpolates hue as an
-// angle, which drags an 18% mix of a 172deg teal all the way down to ~31deg and
-// renders the border orange. oklab is rectangular and blends through the true
-// neutral axis instead.
-const surface = (percent: number) =>
-  `color-mix(in oklab, var(--foreground) ${percent.toFixed(2)}%, var(--background))`;
-
-const sheetStyle = computed(() => {
+const glowStyle = computed(() => {
   const v = spring.value;
+  const mix = (percent: number) =>
+    `color-mix(in oklab, var(--primary) ${percent.toFixed(1)}%, transparent)`;
+
   return {
-    width: `${REST_WIDTH + v * (OPEN_WIDTH - REST_WIDTH)}px`,
-    // A plain --background sheet would be invisible here: in exam-only mode the
-    // margin beside the page is already --background. A few percent of
-    // --foreground reads as a distinct surface in both themes without
-    // introducing a colour of its own.
-    backgroundColor: surface(3 + v * 3),
-    borderLeftColor: `color-mix(in oklab, var(--primary) ${(18 + v * 52).toFixed(0)}%, var(--border))`,
-    boxShadow: `-14px 0 30px -14px color-mix(in oklab, var(--foreground) ${(v * 22).toFixed(0)}%, transparent)`,
+    width: `${150 + v * 90}px`,
+    opacity: 0.48 + v * 0.52,
+    transform: `translateY(-50%) scaleY(${(0.82 + v * 0.18).toFixed(3)})`,
+    backgroundImage: `radial-gradient(ellipse at 100% 50%, ${mix(20 + v * 32)} 0%, ${mix(12 + v * 22)} 22%, ${mix(4 + v * 12)} 48%, transparent 74%)`,
   };
 });
 
-// The permanent affordance. Without something visible at rest there is nothing
-// telling you the right edge is worth approaching at all. It shares the sheet's
-// fill, so as the sheet widens past it the nub stops reading as a separate
-// object and simply becomes the sheet's edge.
-const nubStyle = computed(() => {
+const tabStyle = computed(() => {
   const v = spring.value;
   return {
-    opacity: 1 - Math.min(v / 0.45, 1),
-    backgroundColor: surface(5),
-    borderColor: `color-mix(in oklab, var(--primary) 22%, var(--border))`,
+    opacity: 0.68 + v * 0.32,
+    transform: `translate(${(10 - v * 27).toFixed(1)}px, -50%)`,
+    backgroundColor: `color-mix(in oklab, var(--background) ${(88 - v * 8).toFixed(0)}%, var(--primary))`,
+    borderColor: `color-mix(in oklab, var(--primary) ${(28 + v * 42).toFixed(0)}%, var(--border))`,
+    boxShadow: `-10px 0 28px -14px color-mix(in oklab, var(--primary) ${(18 + v * 42).toFixed(0)}%, transparent)`,
   };
 });
 
-// Held back until the sheet is wide enough to seat it, so the text never
-// appears to spill past the edge it belongs to.
-const labelStyle = computed(() => {
-  const revealed = Math.min(Math.max((spring.value - 0.28) / 0.42, 0), 1);
+const iconStyle = computed(() => {
+  const v = spring.value;
   return {
-    opacity: revealed,
-    transform: `translate(${((1 - revealed) * 10).toFixed(1)}px, -50%)`,
+    transform: `translateX(${(-v * 3).toFixed(1)}px)`,
   };
 });
 
@@ -93,19 +64,26 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="pointer-events-none absolute inset-y-0 right-0 w-32">
-    <div class="absolute inset-y-0 right-0 border-l" :style="sheetStyle" />
+  <div
+    class="pointer-events-none absolute inset-y-0 right-0 w-64 overflow-hidden"
+  >
+    <div
+      class="absolute right-0 top-1/2 h-[min(34rem,62vh)] origin-right will-change-[width,transform,opacity]"
+      :style="glowStyle"
+    />
 
     <div
-      class="absolute right-0 top-1/2 flex h-12 w-6 -translate-y-1/2 items-center justify-center rounded-l-lg border-y border-l"
-      :style="nubStyle">
-      <LucideChevronLeft class="size-4 text-muted-foreground" />
-    </div>
-
-    <div class="absolute right-0 top-1/2 flex items-center gap-2 whitespace-nowrap pr-4" :style="labelStyle">
+      class="absolute right-0 top-1/2 flex h-10 items-center gap-2 whitespace-nowrap rounded-l-full border border-r-0 py-2 pl-3 pr-4 backdrop-blur-sm will-change-[transform,opacity]"
+      :style="tabStyle"
+    >
       <template v-if="facitPdfUrl">
-        <LucideArrowLeftToLine class="size-4 shrink-0 text-primary" />
-        <span class="text-xs font-medium text-primary">{{ label ?? "Facit" }}</span>
+        <LucideChevronLeft
+          class="size-4 shrink-0 text-primary will-change-transform"
+          :style="iconStyle"
+        />
+        <span class="text-xs font-semibold text-primary">
+          {{ label ?? "Facit" }}
+        </span>
       </template>
       <span v-else class="text-xs text-muted-foreground">Ej tillgängligt</span>
     </div>

@@ -4,8 +4,6 @@ import { useWindowScroll } from "@vueuse/core";
 const { open: openUploadModal } = useUploadModal();
 const { y } = useWindowScroll();
 
-// The header is borderless at rest so the page opens on uninterrupted white,
-// and only picks up a hairline once content slides under it.
 const scrolled = computed(() => y.value > 8);
 </script>
 

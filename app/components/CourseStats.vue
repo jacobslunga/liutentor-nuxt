@@ -15,9 +15,6 @@ const {
   hasAnyData,
 } = useCourseStats(() => props.exams);
 
-// The average the plotline marks. Counting students rather than averaging the
-// per-exam percentages, so a 12-student retake doesn't weigh as much as a
-// 300-student main sitting.
 const average = computed(() => overallPassRate.value ?? 0);
 </script>
 

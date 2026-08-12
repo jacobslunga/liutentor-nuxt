@@ -33,7 +33,6 @@ export function useSelectedModel() {
     maxAge: 60 * 60 * 24 * 365,
   });
 
-  // Clean up legacy versioned cookies
   for (const key of LEGACY_MODEL_COOKIE_KEYS) {
     const legacy = useCookie(key);
     if (legacy.value !== null) {
@@ -41,9 +40,6 @@ export function useSelectedModel() {
     }
   }
 
-  // Anything not on the list above falls back to the default. This is also
-  // what migrates the users still holding a retired `claude-*` id in their
-  // cookie — no separate cleanup pass needed.
   if (!VALID_MODEL_ID_SET.has(selectedModelId.value)) {
     selectedModelId.value = DEFAULT_MODEL_ID;
   }

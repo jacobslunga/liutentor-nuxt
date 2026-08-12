@@ -42,8 +42,7 @@ function passColor(rate: number) {
 </script>
 
 <template>
-  <!-- Nothing to open a dialog onto, so the cell reads as empty rather than as
-       a 0.0% result — same dash the facit column uses. -->
+
   <LucideMinus v-if="total === 0" class="w-4 h-4 text-muted-foreground/30" />
 
   <Dialog v-else>

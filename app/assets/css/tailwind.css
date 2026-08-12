@@ -9,45 +9,12 @@
   font-display: swap;
 }
 
-/* platypi-latin-wght-normal */
-@font-face {
-  font-family: 'Platypi Variable';
-  font-style: normal;
-  font-display: swap;
-  font-weight: 300 800;
-  src: url(https://cdn.jsdelivr.net/fontsource/fonts/platypi:vf@5.3.0/latin-wght-normal.woff2) format(woff2) tech(variations);
-  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
-}
-
 @theme {
-  /* Motion: one easing, two durations. --duration-fast for hover/color/opacity/
-     press, --duration-base for enter/exit/transform/layout. Nothing else. */
+
   --ease-spring: cubic-bezier(0.25, 0.1, 0.25, 1);
   --duration-fast: 150ms;
   --duration-base: 200ms;
 
-  --animate-accordion-down: accordion-down 150ms cubic-bezier(0.25, 0.1, 0.25, 1);
-  --animate-accordion-up: accordion-up 150ms cubic-bezier(0.25, 0.1, 0.25, 1);
-}
-
-@keyframes accordion-down {
-  from {
-    height: 0;
-  }
-
-  to {
-    height: var(--reka-accordion-content-height);
-  }
-}
-
-@keyframes accordion-up {
-  from {
-    height: var(--reka-accordion-content-height);
-  }
-
-  to {
-    height: 0;
-  }
 }
 
 ::-webkit-scrollbar {
@@ -132,15 +99,7 @@ body {
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  /* Radius ladder — every rounded-* derives from --radius so the whole app
-     scales from one number. Radius scales with the element: the bigger the
-     surface, the rounder it gets.
-       sm  6px  kbd, micro-chips, nested inner corners
-       md  8px  menu items, list rows, tab triggers
-       lg 10px  buttons, inputs, textareas
-       xl 12px  tab lists, segmented controls, small popovers
-      2xl 16px  dropdown panels, suggestion lists, chat bubbles
-      3xl 24px  cards, dialogs, sheets, tables, chat composer */
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -192,14 +151,11 @@ body {
 :root {
   --radius: 0.625rem;
   --background: oklch(99.107% 0.00011 271.152);
-  /* See the note on .fade-to-background — these are --background at reduced
-     alpha, derived so they cannot drift from it. */
+
   --background-0: oklch(from var(--background) l c h / 0);
   --background-soft: oklch(from var(--background) l c h / 0.7);
   --foreground: oklch(0.245 0 0);
-  /* Cards carry no border — they separate from the page by surface tone alone,
-     so --card must sit clearly off --background (was 0.99, a 1% gap that read
-     as invisible). */
+
   --card: oklch(0.972 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(0.99 0 0);
@@ -217,8 +173,7 @@ body {
   --success-foreground: oklch(0.985 0 0);
   --warning: oklch(81.007% 0.16264 90.418);
   --warning-foreground: oklch(0.2 0 0);
-  /* Borders are structural, not decorative — kept low-contrast so they read as
-     hairlines rather than outlines. */
+
   --border: oklch(0.95 0 0);
   --input: oklch(0.9 0 0);
   --ring: oklch(0.7 0 0);
@@ -227,11 +182,7 @@ body {
   --chart-3: oklch(0.7521 0.1557 160.22);
   --chart-4: oklch(0.6506 0.138 159.72);
   --chart-5: oklch(0.5382 0.1159 159.4);
-  /* Grades are an *ordered* scale, so the pass grades get a single-hue ordinal
-     ramp (higher grade = darker here, lighter in dark mode) rather than
-     arbitrary categorical hues. Validated for monotone lightness, adjacent ΔL
-     >= 0.06 and contrast against the surface. --grade-fail is the status red
-     and is never reused as a series color. */
+
   --grade-low: oklch(0.755 0.155 160);
   --grade-mid: oklch(0.6 0.145 160);
   --grade-high: oklch(0.46 0.11 160);
@@ -247,14 +198,12 @@ body {
 }
 
 .dark {
-  /* Dark neutrals carry a trace of cool chroma (hue 265). At chroma 0 they read
-     warm/brown against a dark field — the eye compensates for the surrounding
-     darkness. This tiny amount is what makes them read as *neutral*. */
+
   --background: oklch(0.21 0.004 265);
   --background-0: oklch(from var(--background) l c h / 0);
   --background-soft: oklch(from var(--background) l c h / 0.7);
   --foreground: oklch(0.94 0.002 265);
-  /* See light-mode note — borderless cards need a visible tonal step. */
+
   --card: oklch(0.265 0.005 265);
   --card-foreground: oklch(0.94 0.002 265);
   --popover: oklch(0.265 0.005 265);
@@ -265,18 +214,16 @@ body {
   --secondary-foreground: oklch(0.94 0.002 265);
   --muted: oklch(0.29 0.006 265);
   --muted-foreground: oklch(0.65 0.008 265);
-  /* --accent is the hover/active surface. It has to clear *--popover* (0.265),
-     not just --background, or hover states inside menus are invisible. */
+
   --accent: oklch(0.34 0.007 265);
   --accent-foreground: oklch(0.94 0.002 265);
   --destructive: oklch(0.704 0.191 22.216);
-  /* Higher chroma than --primary (0.088) so success stays distinguishable from
-     the green primary in dark mode. */
+
   --success: oklch(0.78 0.13 150);
   --success-foreground: oklch(0.2 0 0);
   --warning: oklch(0.82 0.14 80);
   --warning-foreground: oklch(0.2 0 0);
-  /* Softened to a hairline — see the light-mode note. */
+
   --border: oklch(0.285 0.005 265);
   --input: oklch(0.3 0.005 265);
   --ring: oklch(0.42 0.008 265);
@@ -285,9 +232,7 @@ body {
   --chart-3: oklch(0.7521 0.1557 160.22);
   --chart-4: oklch(0.6506 0.138 159.72);
   --chart-5: oklch(0.5382 0.1159 159.4);
-  /* The dark ramp is re-stepped against the dark surface, not flipped: it runs
-     the other direction (higher grade = lighter) so the strongest grade stays
-     the most prominent segment. */
+
   --grade-low: oklch(0.55 0.12 160);
   --grade-mid: oklch(0.68 0.145 160);
   --grade-high: oklch(0.83 0.13 160);
@@ -311,8 +256,6 @@ body {
     @apply bg-background text-foreground;
   }
 
-  /* Inline prose links keep a persistent underline (editorial convention),
-     not one that only appears on hover. */
   .prose :where(a):not(:where(.not-prose *)) {
     text-decoration-thickness: 1px;
     text-underline-offset: 0.2em;
@@ -381,7 +324,6 @@ body {
   }
 }
 
-/* Custom Thin Scrollbar */
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -405,12 +347,6 @@ body {
   scrollbar-color: color-mix(in oklch, var(--muted-foreground) 30%, transparent) transparent;
 }
 
-/* ─── Unovis chart theming ─────────────────────────────────────────────────
-   Unovis ships its own CSS custom properties for chrome (axes, grid,
-   crosshair, tooltip). Mapping them onto the design tokens here — rather than
-   passing colors through component props — is what keeps the charts following
-   the colour mode without a re-render, since the tokens themselves swap under
-   `.dark`. Only chrome lives here; series colours stay data-driven. */
 .vis-chart {
   --vis-font-family: var(--font-sans);
 
@@ -438,9 +374,6 @@ body {
   --vis-tooltip-shadow-color: oklch(0 0 0 / 0.1);
   --vis-tooltip-backdrop-filter: none;
 
-  /* The 2px "surface gap" that separates touching marks. Drawing it in the
-     surface colour is what lets neighbouring donut segments read as distinct
-     without a stroke outlining each one. */
   --vis-donut-segment-stroke-color: var(--background);
   --vis-donut-segment-stroke-width: 2;
   --vis-donut-central-label-font-family: var(--font-sans);
@@ -449,24 +382,10 @@ body {
   --vis-donut-central-sub-label-text-color: var(--muted-foreground);
 }
 
-/* Unovis renders its dark-mode overrides behind `--vis-dark`, which we don't
-   use — the tokens above already switch. This keeps its defaults from winning. */
 .vis-chart .vis-tooltip-container {
   font-family: var(--font-sans);
 }
 
-/* Fade a scrolling surface out into the page background.
- *
- * Not `bg-linear-to-b from-background/0`: Tailwind compiles the `/0` modifier
- * to `color-mix(in oklab, var(--background) 0%, transparent)`, and `transparent`
- * is *black* at zero alpha. The ramp therefore runs from black to the background
- * colour, which Safari paints as a visible dark smear rather than a clean fade —
- * very obvious against a light background on iOS.
- *
- * Holding the hue fixed and moving only alpha removes the colour interpolation
- * entirely, so there is nothing left to smear in any engine or interpolation
- * space. --background-0 / --background-soft derive from --background via
- * relative colour syntax, so they follow the theme automatically. */
 .fade-to-background {
   background-image: linear-gradient(to bottom,
       var(--background-0) 0%,

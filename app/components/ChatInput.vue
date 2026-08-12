@@ -17,11 +17,7 @@ const ANSWER_MODES = [
 
 const props = withDefaults(
   defineProps<{
-    /**
-     * Seed value only — read once, on mount. The draft deliberately lives here
-     * rather than in the parent or the store: routing every keystroke through
-     * either one re-rendered the whole chat panel per character.
-     */
+
     initialText?: string;
     isLoading: boolean;
     giveDirectAnswer: boolean;
@@ -30,22 +26,11 @@ const props = withDefaults(
     courseCode?: string;
     hasSolution?: boolean;
     selectionContext?: string;
-    /**
-     * Off for shells that are mounted before the user asks for them — the
-     * mobile sheet lives on screen collapsed, and focusing on mount would raise
-     * the soft keyboard over the page.
-     */
+
     autofocus?: boolean;
-    /**
-     * Off on touch, where Return is the only way to get a newline and sending
-     * is the button — the convention every mobile chat app follows.
-     */
+
     submitOnEnter?: boolean;
-    /**
-     * Drops the model and answer-mode pickers, leaving just the field and the
-     * send button. The shell that sets this is expected to pin both values —
-     * on a phone the row has no width to spare for two dropdowns.
-     */
+
     compact?: boolean;
   }>(),
   { autofocus: true, submitOnEnter: true, compact: false },
@@ -67,9 +52,6 @@ const controlsRef = ref<HTMLElement | null>(null);
 const text = ref(props.initialText ?? "");
 const MAX_LENGTH = 4000;
 
-// Captured from the empty textarea's natural scrollHeight on mount, so we can
-// tell "still one line" apart from "has wrapped" without hardcoding a px value
-// that would drift if the font or padding changes.
 const singleLineHeight = ref(0);
 const isMultiline = ref(false);
 
@@ -89,20 +71,11 @@ const answerModeLabel = computed(
     ANSWER_MODES[0].label,
 );
 
-/**
- * Width the textarea has when it shares the row with the buttons — the width
- * the wrap decision must always be taken at. Measuring at the two-row width
- * instead would let a line that just wrapped fit again the moment the layout
- * changed, and the two layouts would flip-flop on every keystroke.
- */
 const oneRowWidth = () => {
   const row = rowRef.value;
   const controls = controlsRef.value;
   if (!row || !controls) return 0;
 
-  // Absent in compact mode, which also removes one of the two gaps. Treating
-  // that as "not measurable yet" would leave isMultiline stuck and the field
-  // would stop growing.
   const mode = modeRef.value;
 
   const style = getComputedStyle(row);
@@ -134,8 +107,7 @@ const updateHeight = () => {
   const was = isMultiline.value;
   const width = oneRowWidth();
   if (width > 0) {
-    // Pin the one-row width just long enough to read the wrapped height back.
-    // Nothing paints in between — the reflow is synchronous.
+
     el.style.flex = `0 0 ${width}px`;
     el.style.height = "auto";
     isMultiline.value = el.scrollHeight > singleLineHeight.value + 4;
@@ -147,16 +119,12 @@ const updateHeight = () => {
     return;
   }
 
-  // The layout is switching. Measuring now would size the textarea against the
-  // outgoing width for one frame, and the height transition would then animate
-  // it while the box is also changing width — that pair is what flickers. Wait
-  // for the new row (the classes land on the next tick, still before paint) and
-  // resize without transitioning, so the switch lands in a single frame.
   nextTick(() => {
     const previous = el.style.transition;
     el.style.transition = "none";
     applyHeight();
-    void el.offsetHeight; // flush, so restoring below can't animate this step
+    // Force reflow so restoring the transition cannot animate this resize.
+    void el.offsetHeight;
     el.style.transition = previous;
   });
 };
@@ -177,8 +145,7 @@ function setText(value: string) {
 onMounted(() => {
   const el = textareaRef.value;
   if (el) {
-    // Measure a guaranteed-empty textarea so a multi-line initial draft
-    // doesn't get mistaken for the single-line baseline.
+
     const draft = el.value;
     el.value = "";
     el.style.height = "auto";
@@ -189,7 +156,6 @@ onMounted(() => {
   if (props.autofocus) textareaRef.value?.focus();
 });
 
-// A narrower row wraps sooner, so the one-row width has to be re-measured.
 useEventListener("resize", updateHeight);
 
 defineExpose({
@@ -201,9 +167,7 @@ defineExpose({
 
 <template>
   <div class="px-4 bg-transparent relative w-full pointer-events-auto z-10">
-    <!-- No backdrop of its own: the input container is already opaque, and any
-         solid block here would put a hard top edge across the scrolling text.
-         The single fade lives on the parent's backdrop layer in ChatWindow. -->
+
     <div class="max-w-2xl mx-auto relative">
       <Transition name="fade-up">
         <div v-if="showScrollButton" class="absolute -top-12 right-3 z-20">
@@ -214,13 +178,9 @@ defineExpose({
       </Transition>
 
       <div class="space-y-2">
-        <!-- Fixed radius, exactly half the one-row height (56px): it reads as a
-             full pill while collapsed and as a rounded box once it grows, with
-             nothing to animate. Transitioning to `rounded-full` instead snaps —
-             9999px clamps to half the height, so most of the sweep looks
-             identical and the change all lands in the last few frames. -->
+
         <div class="chat-shell rounded-[28px] border border-border bg-background focus-within:border-border">
-          <!-- Selection context chip -->
+
           <Transition name="context-chip">
             <div v-if="selectionContext" class="flex items-center gap-2 w-full border-b border-border/60 px-5 py-2.5">
               <LucideCornerUpLeft class="w-3.5 h-3.5 shrink-0 text-muted-foreground" />
@@ -231,11 +191,6 @@ defineExpose({
             </div>
           </Transition>
 
-          <!-- One wrapping row: on a single line of text everything sits side by
-               side; once the text wraps the textarea takes the full basis and
-               pushes the two control groups onto a row of their own. The
-               textarea's own padding must stay identical across both layouts —
-               it feeds the height measurement that picks between them. -->
           <div ref="rowRef" class="flex flex-wrap items-center gap-1.5 px-2.5 py-2.5">
             <div v-if="!compact" ref="modeRef" class="shrink-0" :class="isMultiline ? 'order-2' : 'order-1'">
               <DropdownMenu>

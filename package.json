@@ -2,10 +2,10 @@
   "name": "liutentor-nuxt",
   "version": "1.0.0",
   "description": "Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.",
-  "main": "index.js",
   "scripts": {
     "dev": "nuxt dev",
     "build": "nuxt build",
+    "typecheck": "nuxt typecheck",
     "preview": "nuxt preview",
     "generate": "nuxt generate",
     "postinstall": "nuxt prepare"
@@ -25,7 +25,7 @@
     "@embedpdf/plugin-selection": "^2.14.0",
     "@embedpdf/plugin-viewport": "^2.14.0",
     "@embedpdf/plugin-zoom": "^2.14.0",
-    "@nuxt/scripts": "^0.13.4",
+    "@fontsource-variable/platypi": "^5.3.0",
     "@nuxtjs/color-mode": "^4.0.0",
     "@nuxtjs/supabase": "^2.0.5",
     "@pinia/nuxt": "^0.11.3",
@@ -34,9 +34,10 @@
     "@unovis/ts": "^1.6.7",
     "@unovis/vue": "^1.6.7",
     "@vueuse/core": "^14.2.1",
-    "@vueuse/integrations": "^14.2.1",
     "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "dompurify": "^3.3.3",
+    "h3": "^1.15.11",
     "katex": "^0.16.45",
     "lucide-vue-next": "^1.0.0",
     "markdown-it": "^14.1.1",
@@ -48,15 +49,15 @@
     "pinia": "^3.0.4",
     "reka-ui": "^2.9.6",
     "shadcn-nuxt": "^2.5.3",
-    "shiki": "^4.0.2",
     "tailwind-merge": "^3.5.0",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "^5.8.3",
-    "vue-sonner": "^2.0.9",
-    "zod": "^4.4.3"
+    "vue-sonner": "^2.0.9"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.19",
-    "@types/markdown-it": "^14.1.2"
+    "@types/markdown-it": "^14.1.2",
+    "@types/node": "^24.0.0",
+    "vue-tsc": "^3.3.8"
   }
 }

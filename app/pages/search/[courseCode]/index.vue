@@ -15,8 +15,6 @@ watch(
   { immediate: true },
 );
 
-// Resolved during SSR so the course content and its metadata end up in the
-// server-rendered HTML rather than only after client-side hydration.
 const { data, status } = useFetch(() => `/api/exams/${courseCode.value}`, {
   key: () => `course-exams-${courseCode.value}`,
 });
@@ -26,11 +24,6 @@ const exams = computed<Exam[]>(() => courseData.value?.exams ?? []);
 const activeTab = ref("exams");
 const { open: openUploadModal } = useUploadModal();
 
-// Same source as the statistics tab rather than a second average computed
-// here: the header used to take a plain mean of every `pass_rate` — counting
-// the zeros the scrape writes for "not recorded" as real sittings, and letting
-// a 12-student retake weigh as much as a 300-student main sitting — so it
-// disagreed with the average line drawn on the chart.
 const { overallPassRate } = useCourseStats(() => exams.value);
 
 const avgPassRate = computed(() =>
@@ -43,18 +36,12 @@ const examsWithSolutions = computed(
   () => exams.value.filter((e) => e.has_solution).length,
 );
 
-// ─── SEO ──────────────────────────────────────────────────────
-// Called unconditionally at setup (never inside a watcher) so unhead resolves
-// them during SSR. Reactive getters keep them correct across client-side
-// navigation between course codes.
-
 const courseName = computed<string>(() => courseData.value?.courseName ?? "");
 const canonicalUrl = computed(
   () => `https://liutentor.se/search/${courseCode.value}`,
 );
 const hasExams = computed(() => exams.value.length > 0);
 
-/** Range of years the archive covers, e.g. "2013–2026". */
 const examYears = computed(() => {
   const years = exams.value
     .map((e) => Number(e.exam_date?.slice(0, 4)))
@@ -65,7 +52,6 @@ const examYears = computed(() => {
   return min === max ? `${min}` : `${min}–${max}`;
 });
 
-/** Newest exam date — used as the page's freshness signal for crawlers. */
 const lastExamDate = computed(() => {
   const dates = exams.value
     .map((e) => e.exam_date)
@@ -74,7 +60,6 @@ const lastExamDate = computed(() => {
   return dates.length ? dates[dates.length - 1] : null;
 });
 
-// Course code first: that is the query users actually type.
 const seoTitle = computed(() => {
   const code = courseCode.value;
   if (!hasExams.value) return `${code} – gamla tentor`;
@@ -148,7 +133,6 @@ const jsonLd = computed(() => {
       },
     });
 
-    // Surfaces the individual exam pages to crawlers from the course page.
     graph.push({
       "@type": "ItemList",
       name: `Gamla tentor för ${code}`,
@@ -178,13 +162,12 @@ useSeoMeta({
   twitterCard: "summary",
   twitterTitle: () => seoTitle.value,
   twitterDescription: () => seoDescription.value,
-  // Courses with no exams are thin content — keep them out of the index but
-  // let crawlers follow the upload links.
+
   robots: () => (hasExams.value ? "index, follow" : "noindex, follow"),
 });
 
 useHead(() => ({
-  // Override the global "LiU Tentor | %s" so the course code leads the title.
+
   titleTemplate: "%s | LiU Tentor",
   link: [{ rel: "canonical", href: canonicalUrl.value }],
   script: [
@@ -328,9 +311,7 @@ function passColor(rate: number) {
               </TabsContent>
 
               <TabsContent v-else key="stats" value="stats" class="mt-5">
-                <!-- The charts are a separate chunk, fetched the first time the
-                     tab is opened. Without a fallback the panel is blank for as
-                     long as that request takes. -->
+
                 <Suspense>
                   <LazyCourseStats :exams="exams" />
                   <template #fallback>

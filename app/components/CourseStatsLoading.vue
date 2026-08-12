@@ -1,19 +1,13 @@
 <script setup lang="ts">
-/**
- * Holds a chart's slot while its client-only bundle loads. Shaped like the
- * chart that replaces it rather than a spinner: the section keeps its height,
- * so nothing below it jumps when the module lands.
- */
+
 withDefaults(
   defineProps<{
-    /** `bars` stands in for the pass-rate chart, `distribution` for the grades. */
+
     variant?: "bars" | "distribution";
   }>(),
   { variant: "bars" },
 );
 
-// Fixed rather than random: the placeholder has to render identically on the
-// server pass and the client one.
 const BAR_HEIGHTS = [46, 28, 62, 40, 71, 35, 55, 44, 78, 33, 58, 66, 39, 50];
 const ROWS = [0, 1, 2, 3, 4];
 </script>
@@ -45,7 +39,7 @@ const ROWS = [0, 1, 2, 3, 4];
       </div>
 
       <div class="mx-auto flex w-full max-w-xs items-center justify-center py-4">
-        <!-- A ring, not a disc: the donut it stands in for is hollow. -->
+
         <div class="skeleton-block relative size-40 rounded-full">
           <div class="absolute inset-[26px] rounded-full bg-background" />
         </div>

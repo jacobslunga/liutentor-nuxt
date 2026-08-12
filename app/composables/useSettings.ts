@@ -1,8 +1,5 @@
-/**
- * Reading-view preferences. Cookies rather than localStorage on purpose: both
- * of these decide what the very first paint of an exam page looks like, and a
- * client-only store would render the default and then correct itself.
- */
+
+
 const EXPLAIN_POPOVER_KEY = "liutentor_show_explain_popover";
 const BLUR_FACIT_KEY = "liutentor_blur_facit";
 

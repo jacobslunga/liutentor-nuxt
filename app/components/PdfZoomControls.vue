@@ -2,21 +2,10 @@
 import { computed } from "vue";
 import { useZoom } from "@embedpdf/plugin-zoom/vue";
 
-/**
- * Must live inside <EmbedPDF> — the zoom capability comes from the plugin
- * registry. Unlike PdfZoomController, which is renderless and keeps the zoom in
- * step with the layout, this is the reader's own handle on it.
- *
- * On mobile it is the *only* one: the pinch/wheel gesture wrapper is desktop-
- * only, and pinch is disabled even there.
- */
 const props = defineProps<{ documentId: string }>();
 
 const { state, provides: zoom } = useZoom(() => props.documentId);
 
-// The plugin clamps to these (ZoomPlugin's own defaults, which we do not
-// override at registration), so matching them here is what lets a button go
-// disabled exactly when another step would be a no-op.
 const MIN_ZOOM = 0.25;
 const MAX_ZOOM = 10;
 const EPSILON = 0.001;

@@ -13,15 +13,13 @@ export default defineNuxtConfig({
     "nuxt-shiki",
   ],
 
-  // ─── App & Meta ───────────────────────────────────────────────
   app: {
     head: {
       titleTemplate: "LiU Tentor | %s",
       htmlAttrs: { lang: "sv" },
       charset: "utf-8",
-      // `viewport-fit=cover` is what makes env(safe-area-inset-*) resolve to
-      // anything but 0 on notched iPhones — the mobile chat sheet needs it to
-      // keep its collapsed bar off the home indicator.
+
+      // Required for safe-area insets on notched iPhones.
       viewport:
         "width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content",
       meta: [
@@ -84,10 +82,8 @@ export default defineNuxtConfig({
     "/feedback": { prerender: true },
   },
 
-  // ─── Runtime Config ───────────────────────────────────────────
   runtimeConfig: {
-    // Set via NUXT_REVALIDATE_SECRET. Shared with the Supabase webhook that
-    // purges course caches when exams are published.
+
     revalidateSecret: "",
     resendApiKey: "",
     uploadNotificationTo: "jacobslunga21@yahoo.se",
@@ -100,7 +96,6 @@ export default defineNuxtConfig({
     },
   },
 
-  // ─── Module Config ────────────────────────────────────────────
   supabase: {
     redirect: false,
   },
@@ -138,16 +133,12 @@ export default defineNuxtConfig({
     enabled: process.env.NODE_ENV === "production",
   },
 
-  // ─── Build & Infra ────────────────────────────────────────────
   nitro: {
     preset: "netlify",
     compressPublicAssets: true,
 
     prerender: {
-      // Emit `om-oss.html` rather than `om-oss/index.html`. With the subfolder
-      // form, `/om-oss` 301s to `/om-oss/` before serving — an extra round trip
-      // on every internal link, and on the sitemap entries, which list the
-      // unslashed form. Netlify resolves the flat file for `/om-oss` directly.
+
       autoSubfolderIndex: false,
     },
   },
