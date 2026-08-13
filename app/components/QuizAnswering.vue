@@ -4,16 +4,20 @@ import type { MultipleChoiceQuizResponse } from "@/types/quiz";
 const props = defineProps<{
   quizData: MultipleChoiceQuizResponse;
   currentIndex: number;
+  answers: Record<number, number>;
 }>();
 
 const emit = defineEmits<{
-  complete: [answers: Record<number, number>];
+  answer: [questionId: number, optionIndex: number];
+  complete: [];
   next: [hasAnsweredCurrent: boolean];
   previous: [];
+  exit: [];
 }>();
 
-const answers = ref<Record<number, number>>({});
+const isExitDialogOpen = ref(false);
 
+const answers = computed(() => props.answers);
 const questions = computed(() => props.quizData.quiz.questions);
 const currentIndex = computed(() => props.currentIndex);
 
@@ -41,17 +45,42 @@ const progress = computed(() =>
 
 function onAnswer(optionIndex: number) {
   if (!currentQuestion.value) return;
-  answers.value[currentQuestion.value.id] = optionIndex;
+  emit("answer", currentQuestion.value.id, optionIndex);
 }
 
 function submit() {
   if (!canSubmit.value) return;
-  emit("complete", { ...answers.value });
+  emit("complete");
+}
+
+function requestExit() {
+  if (answeredCount.value > 0) {
+    isExitDialogOpen.value = true;
+    return;
+  }
+  emit("exit");
+}
+
+function confirmExit() {
+  isExitDialogOpen.value = false;
+  emit("exit");
 }
 </script>
 
 <template>
-  <div class="mx-auto w-full max-w-4xl py-8 lg:py-12">
+  <div class="w-full">
+    <div class="mb-6 flex items-center justify-start gap-3">
+      <Button
+        variant="ghost"
+        size="sm"
+        class="shrink-0 gap-1.5 text-muted-foreground"
+        @click="requestExit"
+      >
+        <LucideArrowLeft class="h-3.5 w-3.5" />
+        Avsluta
+      </Button>
+    </div>
+
     <div class="mb-8">
       <div class="mb-2 flex items-center justify-between">
         <span class="text-xs text-muted-foreground">
@@ -126,5 +155,21 @@ function submit() {
         </ButtonGroup>
       </div>
     </div>
+
+    <AlertDialog v-model:open="isExitDialogOpen">
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Avsluta quizet?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Du har svarat på {{ answeredCount }} av {{ questionCount }} frågor.
+            Dina svar försvinner.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Fortsätt quizet</AlertDialogCancel>
+          <AlertDialogAction @click="confirmExit">Avsluta</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   </div>
 </template>

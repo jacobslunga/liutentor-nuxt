@@ -9,10 +9,6 @@ function isExamRoute(path: string) {
   return /^\/search\/[A-Z0-9]+\/[0-9]+$/.test(path);
 }
 
-function isQuizRoute(path: string) {
-  return /^\/quiz\/[^/]+$/.test(path);
-}
-
 function isLockInRoute(path: string) {
   return /^\/lock-in\/[^/]+$/.test(path);
 }
@@ -24,9 +20,7 @@ export function useDefaultAppShell(): AppShellState {
   const { initializeExamMode, updateActivity, cleanupHistory } =
     useLockInMode();
 
-  const hideFooter = computed(
-    () => isExamRoute(route.path) || isQuizRoute(route.path),
-  );
+  const hideFooter = computed(() => isExamRoute(route.path));
   const isExamMode = ref(false);
 
   watch(

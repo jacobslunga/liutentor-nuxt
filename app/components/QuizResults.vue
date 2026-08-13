@@ -9,7 +9,6 @@ const props = defineProps<{
 const emit = defineEmits<{
   retake: [];
   newQuiz: [];
-  adjustSetup: [];
 }>();
 
 const questions = computed(() => props.quizData.quiz.questions);
@@ -40,7 +39,7 @@ const courseCodeLabel = computed(() => {
 </script>
 
 <template>
-  <div class="mx-auto max-w-xl px-4 py-8">
+  <div class="w-full">
     <div class="mb-6 flex items-end justify-between">
       <div>
         <p class="mb-1 text-2xs font-medium text-muted-foreground/60">
@@ -49,7 +48,8 @@ const courseCodeLabel = computed(() => {
         <p class="text-4xl font-medium leading-none">
           {{ score }}
           <span class="text-2xl text-muted-foreground font-medium">
-            / {{ questions.length }}</span>
+            / {{ questions.length }}</span
+          >
         </p>
         <p class="mt-1.5 text-xs text-muted-foreground">
           {{ sourceCountLabel }} ·
@@ -65,32 +65,43 @@ const courseCodeLabel = computed(() => {
         Gör om quizet eller skapa ett nytt med nya tentor.
       </p>
       <div class="flex items-center gap-2">
-        <Button size="sm" variant="outline" class="gap-1.5 border-border" @click="emit('retake')">
+        <Button
+          size="sm"
+          variant="outline"
+          class="gap-1.5 border-border"
+          @click="emit('retake')"
+        >
           <LucideRefreshCw class="h-3.5 w-3.5" />
           Gör om
         </Button>
         <Button size="sm" class="gap-1.5 ml-auto" @click="emit('newQuiz')">
-          <LucideZap class="h-3.5 w-3.5" />
           Nytt quiz
         </Button>
       </div>
     </div>
 
-    <p class="mb-3 text-2xs font-medium text-muted-foreground/60">
-      Genomgång
-    </p>
+    <p class="mb-3 text-2xs font-medium text-muted-foreground/60">Genomgång</p>
 
     <div class="flex flex-col gap-3">
-      <div v-for="(question, qi) in questions" :key="question.id" class="rounded-md border border-border p-4">
+      <div
+        v-for="(question, qi) in questions"
+        :key="question.id"
+        class="rounded-md border border-border p-4"
+      >
         <div class="mb-3 flex items-center gap-2">
           <span
-            class="inline-flex items-center rounded-full border border-border bg-muted/40 px-2 py-0.5 text-2xs">
+            class="inline-flex items-center rounded-full border border-border bg-muted/40 px-2 py-0.5 text-2xs"
+          >
             Fråga {{ qi + 1 }}
           </span>
-          <span class="inline-flex items-center rounded-full px-2 py-0.5 text-2xs font-medium border" :class="answers[question.id] === question.answer
-            ? 'bg-success/10 text-success border-success/30'
-            : 'bg-destructive/10 text-destructive border-destructive/30'
-            ">
+          <span
+            class="inline-flex items-center rounded-full px-2 py-0.5 text-2xs font-medium border"
+            :class="
+              answers[question.id] === question.answer
+                ? 'bg-success/10 text-success border-success/30'
+                : 'bg-destructive/10 text-destructive border-destructive/30'
+            "
+          >
             {{ answers[question.id] === question.answer ? "Rätt" : "Fel" }}
           </span>
         </div>
@@ -100,8 +111,11 @@ const courseCodeLabel = computed(() => {
         </div>
 
         <div class="flex flex-col gap-1.5">
-          <div v-for="(option, oi) in question.options" :key="`${question.id}-${oi}`"
-            class="rounded-md border px-3 py-2 text-xs" :class="[
+          <div
+            v-for="(option, oi) in question.options"
+            :key="`${question.id}-${oi}`"
+            class="rounded-md border px-3 py-2 text-xs"
+            :class="[
               oi === question.answer
                 ? 'border-success/30 bg-success/10 font-medium'
                 : '',
@@ -111,7 +125,8 @@ const courseCodeLabel = computed(() => {
               oi !== question.answer && oi !== answers[question.id]
                 ? 'border-transparent bg-muted/30'
                 : '',
-            ]">
+            ]"
+          >
             <QuizMarkdown :content="option" />
           </div>
         </div>

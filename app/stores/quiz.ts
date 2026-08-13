@@ -134,8 +134,11 @@ export const useQuizStore = defineStore("quiz", () => {
     stage.value = "answering";
   }
 
-  function complete(submittedAnswers: Record<number, number>) {
-    answers.value = submittedAnswers;
+  function setAnswer(questionId: number, optionIndex: number) {
+    answers.value = { ...answers.value, [questionId]: optionIndex };
+  }
+
+  function complete() {
     stage.value = "results";
   }
 
@@ -191,6 +194,7 @@ export const useQuizStore = defineStore("quiz", () => {
     questionCount,
     generate,
     loadFromHistory,
+    setAnswer,
     complete,
     retake,
     reset,

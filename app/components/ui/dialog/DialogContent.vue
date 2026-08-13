@@ -45,8 +45,9 @@ const VARIANT_CLASSES = {
 
 <template>
   <DialogPortal>
-
-    <DialogOverlay :class="props.variant === 'sheet' ? 'hidden sm:block' : undefined" />
+    <DialogOverlay
+      :class="props.variant === 'sheet' ? 'hidden sm:block' : undefined"
+    />
     <DialogContent
       data-slot="dialog-content"
       v-bind="{ ...$attrs, ...forwarded }"
