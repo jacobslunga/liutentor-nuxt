@@ -38,5 +38,4 @@ export interface Exam {
 
 export interface GenerateQuizPayload {
   examIds: number[];
-  customPrompt?: string;
 }

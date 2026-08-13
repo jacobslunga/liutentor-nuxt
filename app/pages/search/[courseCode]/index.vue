@@ -21,7 +21,32 @@ const { data, status } = useFetch(() => `/api/exams/${courseCode.value}`, {
 
 const courseData = computed(() => (data.value as any)?.data);
 const exams = computed<Exam[]>(() => courseData.value?.exams ?? []);
-const activeTab = ref("exams");
+const router = useRouter();
+const COURSE_TABS = ["exams", "stats", "quiz"];
+
+function tabFromQuery(value: unknown) {
+  return typeof value === "string" && COURSE_TABS.includes(value)
+    ? value
+    : "exams";
+}
+
+const activeTab = ref(tabFromQuery(route.query.tab));
+
+watch(
+  () => route.query.tab,
+  (tab) => {
+    activeTab.value = tabFromQuery(tab);
+  },
+);
+
+// Keep the tab in the URL so it can be linked/refreshed, without a navigation.
+watch(activeTab, (tab) => {
+  if (tabFromQuery(route.query.tab) === tab) return;
+  const query = { ...route.query };
+  if (tab === "exams") delete query.tab;
+  else query.tab = tab;
+  router.replace({ query });
+});
 const { open: openUploadModal } = useUploadModal();
 
 const { overallPassRate } = useCourseStats(() => exams.value);
@@ -266,39 +291,14 @@ function passColor(rate: number) {
           </div>
 
           <Tabs v-model="activeTab" class="w-full -mt-4">
-            <div
-              class="sticky top-12 z-40 flex flex-col gap-3 border-b border-border/60 bg-background pt-2 pb-2.5 sm:flex-row sm:items-center sm:justify-between md:top-0 dark:border-border/60"
-            >
-              <TabsList>
-                <TabsTrigger
-                  value="exams"
-                  class="h-full font-medium text-xs gap-2"
-                >
-                  <LucideScrollText class="w-4 h-4" />
-                  Tentor
-                </TabsTrigger>
-                <TabsTrigger
-                  value="stats"
-                  class="h-full font-medium text-xs gap-2"
-                >
-                  <LucideChartSpline class="w-4 h-4" />
-                  Statistik
-                </TabsTrigger>
-              </TabsList>
-
-              <div class="flex items-center gap-2">
+            <CourseTabsBar>
+              <template #actions>
                 <Button variant="default" @click="openUploadModal(courseCode)">
                   <LucideUpload class="w-4 h-4" />
                   Ladda upp
                 </Button>
-                <Button variant="outline" as-child>
-                  <NuxtLink :to="`/quiz/${courseCode}`">
-                    <LucideLayers class="w-4 h-4" />
-                    Quiz
-                  </NuxtLink>
-                </Button>
-              </div>
-            </div>
+              </template>
+            </CourseTabsBar>
 
             <Transition name="tab-panel" mode="out-in">
               <TabsContent
@@ -310,14 +310,22 @@ function passColor(rate: number) {
                 <CourseExamsTable :course-code="courseCode" :exams="exams" />
               </TabsContent>
 
-              <TabsContent v-else key="stats" value="stats" class="mt-5">
-
+              <TabsContent
+                v-else-if="activeTab === 'stats'"
+                key="stats"
+                value="stats"
+                class="mt-5"
+              >
                 <Suspense>
                   <LazyCourseStats :exams="exams" />
                   <template #fallback>
                     <CourseStatsSkeleton />
                   </template>
                 </Suspense>
+              </TabsContent>
+
+              <TabsContent v-else key="quiz" value="quiz" class="mt-5">
+                <CourseQuizPanel :course-code="courseCode" :exams="exams" />
               </TabsContent>
             </Transition>
           </Tabs>

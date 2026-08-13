@@ -7,6 +7,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   retry: [];
+  cancel: [];
 }>();
 
 const STEP_ORDER = [
@@ -20,10 +21,6 @@ const currentStepIndex = computed(() =>
   props.statusStep ? STEP_ORDER.indexOf(props.statusStep) : -1,
 );
 
-const t = {
-  failed: "Kunde inte generera quizet.",
-  retry: "Försök igen",
-};
 </script>
 
 <template>
@@ -46,6 +43,17 @@ const t = {
         {{ statusMessage }}
       </p>
 
+      <Button
+        v-if="!error"
+        variant="ghost"
+        size="sm"
+        class="gap-1.5 text-muted-foreground"
+        @click="emit('cancel')"
+      >
+        <LucideX class="h-3.5 w-3.5" />
+        Avbryt
+      </Button>
+
       <Transition
         enter-active-class="transition-all duration-200 ease-spring"
         enter-from-class="opacity-0 translate-y-1"
@@ -53,7 +61,7 @@ const t = {
         leave-to-class="opacity-0"
       >
         <div v-if="error" class="text-center">
-          <p class="text-sm text-destructive">{{ t.failed }}</p>
+          <p class="text-sm text-destructive">Kunde inte generera quizet.</p>
           <Button
             variant="outline"
             size="sm"
@@ -61,7 +69,7 @@ const t = {
             @click="emit('retry')"
           >
             <LucideRefreshCw class="h-3.5 w-3.5" />
-            {{ t.retry }}
+            Försök igen
           </Button>
         </div>
       </Transition>

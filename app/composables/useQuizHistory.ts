@@ -77,6 +77,31 @@ export function useQuizHistory(courseCode: Ref<string>) {
     return allHistory.value.find((item) => item.id === id) ?? null;
   }
 
+  async function remove(id: string) {
+    const userId = (user.value as any)?.id ?? (user.value as any)?.sub;
+    if (!userId) return false;
+
+    const previous = allHistory.value;
+    allHistory.value = previous.filter((item) => item.id !== id);
+
+    // `.select()` matters: when RLS filters a delete, PostgREST reports no
+    // error and simply affects no rows, so the returned rows are the only
+    // way to tell a real delete from a silent no-op.
+    const { data, error } = await (supabase as any)
+      .from("ai_quiz_logs")
+      .delete()
+      .eq("id", id)
+      .eq("user_id", userId)
+      .select("id");
+
+    if (error || !Array.isArray(data) || data.length === 0) {
+      allHistory.value = previous;
+      return false;
+    }
+
+    return true;
+  }
+
   watch(
     [courseCode, user],
     () => {
@@ -89,5 +114,5 @@ export function useQuizHistory(courseCode: Ref<string>) {
     cleanupLegacyQuizHistoryStorage();
   });
 
-  return { courseHistory, findById, refresh };
+  return { courseHistory, findById, refresh, remove };
 }
