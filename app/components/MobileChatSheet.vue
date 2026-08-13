@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, nextTick } from "vue";
+import { computed, ref, watch, nextTick } from "vue";
 import { storeToRefs } from "pinia";
 import { useChatStore } from "@/stores/chat";
 import {
@@ -22,9 +22,13 @@ const { isOpen, isHistoryOpen } = storeToRefs(chatStore);
 const chatInputRef = ref<ChatInputApi | null>(null);
 const transcriptRef = ref<ChatTranscriptApi | null>(null);
 const showScrollButton = ref(false);
+const attachmentSurfaceEnabled = computed(() => isOpen.value);
+const { dropZoneRef, isOverDropZone } = useChatAttachmentSurface(
+  chatInputRef,
+  attachmentSurfaceEnabled,
+);
 
 const MOBILE_MODEL_ID = "gemini-3.1-flash-lite";
-const MOBILE_DIRECT_ANSWER = true;
 
 const {
   messages,
@@ -44,7 +48,6 @@ const {
   input: chatInputRef,
   transcript: transcriptRef,
   fixedModelId: MOBILE_MODEL_ID,
-  fixedDirectAnswer: MOBILE_DIRECT_ANSWER,
 });
 
 function openChat() {
@@ -53,6 +56,7 @@ function openChat() {
 
 function closeChat() {
   chatStore.draftInput = chatInputRef.value?.getText() ?? "";
+  chatStore.draftAttachments = chatInputRef.value?.getAttachments() ?? [];
   chatStore.close();
   isHistoryOpen.value = false;
 }
@@ -95,11 +99,16 @@ watch(transcriptRef, (transcript) => {
     <Transition name="mobile-chat-dialog">
       <div
         v-if="isOpen"
+        ref="dropZoneRef"
         class="fixed inset-0 z-80 flex h-dvh w-screen flex-col overflow-hidden bg-background"
         role="dialog"
         aria-modal="true"
         aria-label="Chatt"
       >
+        <Transition name="drop-overlay">
+          <ChatDropOverlay v-if="isOverDropZone && !isLoading" />
+        </Transition>
+
         <header
           class="shrink-0 border-b border-border bg-background pt-[env(safe-area-inset-top,0px)]"
         >
@@ -157,8 +166,8 @@ watch(transcriptRef, (transcript) => {
           <ChatInput
             ref="chatInputRef"
             :initial-text="chatStore.draftInput"
+            :initial-attachments="chatStore.draftAttachments"
             :is-loading="isLoading"
-            :give-direct-answer="MOBILE_DIRECT_ANSWER"
             :selected-model-id="MOBILE_MODEL_ID"
             :show-scroll-button="showScrollButton"
             :course-code="courseCode"

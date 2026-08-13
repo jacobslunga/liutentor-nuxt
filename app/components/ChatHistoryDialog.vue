@@ -275,6 +275,7 @@ async function openConversation(item: ConversationItem) {
       return;
     }
 
+    chatStore.releaseMessageAttachmentPreviews();
     chatStore.messages = [...loadedMessages];
     chatStore.currentConversationId = item.id;
     chatStore.currentConversationTitle = item.title;
@@ -318,6 +319,7 @@ async function confirmDeleteConversation() {
     conversations.value = conversations.value.filter((c) => c.id !== item.id);
 
     if (chatStore.currentConversationId === item.id) {
+      chatStore.releaseMessageAttachmentPreviews();
       chatStore.messages = [];
       chatStore.currentConversationId = null;
       chatStore.currentConversationTitle = null;
@@ -363,6 +365,7 @@ async function confirmDeleteAllConversations() {
 
     conversations.value = [];
     conversationMeta.value = {};
+    chatStore.releaseMessageAttachmentPreviews();
     chatStore.messages = [];
     chatStore.currentConversationId = null;
     chatStore.currentConversationTitle = null;

@@ -6,6 +6,18 @@ export interface Message {
   content: string;
   context?: string;
   selectionContext?: string;
+  attachments?: ChatAttachment[];
+}
+
+export interface ChatAttachment {
+  id: string;
+  name: string;
+  mediaType: string;
+  size: number;
+  lastModified: number;
+  active: boolean;
+  file?: File;
+  previewUrl?: string;
 }
 
 export interface PendingSelection {
@@ -21,6 +33,7 @@ export const useChatStore = defineStore("chat", () => {
   const savedScrollPosition = ref(0);
   const messages = ref<Message[]>([]);
   const draftInput = ref("");
+  const draftAttachments = ref<ChatAttachment[]>([]);
   const currentExamId = ref<string | null>(null);
   const currentConversationId = ref<string | null>(null);
   const currentConversationTitle = ref<string | null>(null);
@@ -54,11 +67,49 @@ export const useChatStore = defineStore("chat", () => {
     isLoading.value = val;
   }
 
+  function getActiveAttachments(): ChatAttachment[] {
+    return messages.value.flatMap((message) =>
+      (message.attachments ?? []).filter(
+        (attachment) => attachment.active && attachment.file,
+      ),
+    );
+  }
+
+  function deactivateAttachment(id: string) {
+    for (const message of messages.value) {
+      const attachment = message.attachments?.find((item) => item.id === id);
+      if (!attachment) continue;
+      if (attachment.previewUrl) URL.revokeObjectURL(attachment.previewUrl);
+      attachment.active = false;
+      attachment.file = undefined;
+      attachment.previewUrl = undefined;
+      return;
+    }
+  }
+
+  function releaseMessageAttachmentPreviews() {
+    const previewUrls = new Set(
+      messages.value
+        .flatMap((message) => message.attachments ?? [])
+        .map((attachment) => attachment.previewUrl)
+        .filter((url): url is string => !!url),
+    );
+    for (const url of previewUrls) URL.revokeObjectURL(url);
+  }
+
   function clearChat() {
+    releaseMessageAttachmentPreviews();
+    const previewUrls = new Set(
+      draftAttachments.value
+        .map((attachment) => attachment.previewUrl)
+        .filter((url): url is string => !!url),
+    );
+    for (const url of previewUrls) URL.revokeObjectURL(url);
     messages.value = [];
     isLoading.value = false;
     savedScrollPosition.value = 0;
     draftInput.value = "";
+    draftAttachments.value = [];
     currentExamId.value = null;
     currentConversationId.value = null;
     currentConversationTitle.value = null;
@@ -77,6 +128,7 @@ export const useChatStore = defineStore("chat", () => {
     messages,
     savedScrollPosition,
     draftInput,
+    draftAttachments,
     currentExamId,
     currentConversationId,
     currentConversationTitle,
@@ -88,6 +140,9 @@ export const useChatStore = defineStore("chat", () => {
     open,
     close,
     setLoading,
+    getActiveAttachments,
+    deactivateAttachment,
+    releaseMessageAttachmentPreviews,
     clearChat,
     resetOnLogout,
   };

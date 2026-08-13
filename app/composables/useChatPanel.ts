@@ -1,13 +1,22 @@
 import { ref, computed, watch, nextTick, onMounted, onBeforeUnmount } from "vue";
 import type { Ref } from "vue";
 import { storeToRefs } from "pinia";
-import { useChatStore, type PendingSelection } from "@/stores/chat";
+import {
+  useChatStore,
+  type ChatAttachment,
+  type PendingSelection,
+} from "@/stores/chat";
 import { useChat } from "@/composables/useChat";
 
 export interface ChatInputApi {
   focus: () => void;
   getText: () => string;
   setText: (value: string) => void;
+  getAttachments: () => ChatAttachment[];
+  setAttachments: (value: ChatAttachment[]) => void;
+  clearAttachments: () => void;
+  discardAttachments: () => void;
+  addFiles: (files: File[]) => void;
 }
 
 export interface ChatTranscriptApi {
@@ -26,7 +35,6 @@ export interface ChatPanelOptions {
   transcript: Ref<ChatTranscriptApi | null>;
 
   fixedModelId?: string;
-  fixedDirectAnswer?: boolean;
 }
 
 export function useChatPanel(opts: ChatPanelOptions) {
@@ -35,7 +43,6 @@ export function useChatPanel(opts: ChatPanelOptions) {
   const { messages, isLoading, currentConversationTitle, isHistoryOpen } =
     storeToRefs(chatStore);
 
-  const { giveDirectAnswer } = useAnswerMode();
   const { selectedModelId } = useSelectedModel();
 
   const { send, cancelGeneration } = useChat({
@@ -63,30 +70,36 @@ export function useChatPanel(opts: ChatPanelOptions) {
     return "Ny chatt";
   });
 
-  async function submit(text: string, context?: string) {
+  async function submit(
+    text: string,
+    context?: string,
+    attachments: ChatAttachment[] = [],
+  ) {
     nextTick(() => opts.transcript.value?.scrollToBottom("smooth"));
 
-    await send(text, {
+    await send(text, attachments, {
       modelId: opts.fixedModelId ?? selectedModelId.value,
       selectionContext: context,
-      giveDirectAnswer: opts.fixedDirectAnswer ?? giveDirectAnswer.value,
     });
   }
 
   async function handleSend() {
     const text = opts.input.value?.getText() ?? "";
-    if (!text.trim() || isLoading.value) return;
+    const attachments = opts.input.value?.getAttachments() ?? [];
+    if ((!text.trim() && attachments.length === 0) || isLoading.value) return;
     const context = selectionContext.value || undefined;
     opts.input.value?.setText("");
+    opts.input.value?.clearAttachments();
     selectionContext.value = "";
 
-    await submit(text, context);
+    await submit(text, context, attachments);
   }
 
   function handleCancel() {
     const cancelled = cancelGeneration();
     if (cancelled) {
-      opts.input.value?.setText(cancelled);
+      opts.input.value?.setText(cancelled.content);
+      opts.input.value?.setAttachments(cancelled.attachments);
       opts.input.value?.focus();
     }
   }
@@ -118,9 +131,12 @@ export function useChatPanel(opts: ChatPanelOptions) {
   }
 
   function startNewChat() {
+    chatStore.releaseMessageAttachmentPreviews();
     chatStore.messages = [];
     chatStore.draftInput = "";
+    chatStore.draftAttachments = [];
     opts.input.value?.setText("");
+    opts.input.value?.discardAttachments();
     chatStore.currentConversationId = null;
     chatStore.currentConversationTitle = null;
     chatStore.savedScrollPosition = 0;
@@ -134,6 +150,8 @@ export function useChatPanel(opts: ChatPanelOptions) {
   watch(
     () => chatStore.currentConversationId,
     () => {
+      chatStore.draftAttachments = [];
+      opts.input.value?.discardAttachments();
       nextTick(() => opts.transcript.value?.scrollToBottom("auto"));
     },
   );
@@ -141,6 +159,7 @@ export function useChatPanel(opts: ChatPanelOptions) {
   watch(currentUserId, (nextId, prevId) => {
     if (prevId && !nextId) {
       chatStore.resetOnLogout();
+      opts.input.value?.discardAttachments();
     }
   });
 
@@ -151,6 +170,7 @@ export function useChatPanel(opts: ChatPanelOptions) {
     if (chatStore.currentExamId !== opts.examId) {
       chatStore.clearChat();
       chatStore.currentExamId = opts.examId;
+      opts.input.value?.discardAttachments();
     }
 
     nextTick(() => opts.transcript.value?.restoreScroll());
@@ -169,6 +189,7 @@ export function useChatPanel(opts: ChatPanelOptions) {
 
   onBeforeUnmount(() => {
     chatStore.draftInput = opts.input.value?.getText() ?? "";
+    chatStore.draftAttachments = opts.input.value?.getAttachments() ?? [];
   });
 
   return {
@@ -177,7 +198,6 @@ export function useChatPanel(opts: ChatPanelOptions) {
     isHistoryOpen,
     selectionContext,
     chatHeaderTitle,
-    giveDirectAnswer,
     selectedModelId,
     submit,
     handleSend,
