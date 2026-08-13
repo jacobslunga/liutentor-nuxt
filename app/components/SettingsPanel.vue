@@ -8,7 +8,6 @@ defineProps<{ section: string }>();
 const colorMode = useColorMode();
 const layoutStore = useLayoutStore();
 const { layoutMode } = storeToRefs(layoutStore);
-const { giveDirectAnswer } = useAnswerMode();
 const { selectedModelId } = useSelectedModel();
 const { showExplainPopover, blurFacitUntilHover } = useSettings();
 const { latest: recentSearches, clear: clearRecentSearches } =
@@ -28,13 +27,6 @@ const defaultLayout = computed({
   },
 });
 
-const answerMode = computed({
-  get: () => (giveDirectAnswer.value ? "full" : "hints"),
-  set: (value: string) => {
-    giveDirectAnswer.value = value === "full";
-  },
-});
-
 const THEME_OPTIONS = [
   { id: "light", label: "Ljust" },
   { id: "dark", label: "Mörkt" },
@@ -51,19 +43,6 @@ const LAYOUT_OPTIONS = [
     value: "exam-only",
     label: "Endast tenta",
     hint: "Facit glider in från kanten.",
-  },
-] as const;
-
-const ANSWER_OPTIONS = [
-  {
-    value: "full",
-    label: "Fullständigt svar",
-    hint: "Ger hela lösningen direkt.",
-  },
-  {
-    value: "hints",
-    label: "Ledtrådar",
-    hint: "Guidar med frågor och tips.",
   },
 ] as const;
 
@@ -102,6 +81,10 @@ const FIXED_DEFAULTS = [
   {
     label: "Meddelanden i chatten",
     value: "Max 4 000 tecken",
+  },
+  {
+    label: "Bilagor i en aktiv chatt",
+    value: "5 filer, 5 MB per fil och 20 MB totalt",
   },
   {
     label: "Markerad text som skickas till chatten",
@@ -201,14 +184,6 @@ function handleClearRecentSearches() {
       <h2 class="text-xl font-medium text-foreground">AI-assistenten</h2>
 
       <div>
-        <SettingsRow
-          label="Standardläge för svar"
-          description="Kan bytas när som helst nere i chattrutan."
-          stacked
-        >
-          <SettingsSegmented v-model="answerMode" :options="ANSWER_OPTIONS" />
-        </SettingsRow>
-
         <SettingsRow
           label="Modell"
           description="Vilken modell chatten och förklaringarna använder."

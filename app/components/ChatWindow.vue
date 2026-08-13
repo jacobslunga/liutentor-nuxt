@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, nextTick, onMounted, onUnmounted } from "vue";
+import { computed, ref, watch, nextTick, onMounted, onUnmounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useChatStore } from "@/stores/chat";
 import {
@@ -24,13 +24,17 @@ const { isOpen, isHistoryOpen } = storeToRefs(chatStore);
 const chatInputRef = ref<ChatInputApi | null>(null);
 const transcriptRef = ref<ChatTranscriptApi | null>(null);
 const showScrollButton = ref(false);
+const attachmentSurfaceEnabled = computed(() => isOpen.value);
+const { dropZoneRef, isOverDropZone } = useChatAttachmentSurface(
+  chatInputRef,
+  attachmentSurfaceEnabled,
+);
 
 const {
   messages,
   isLoading,
   selectionContext,
   chatHeaderTitle,
-  giveDirectAnswer,
   selectedModelId,
   handleSend,
   handleCancel,
@@ -91,7 +95,14 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
 </script>
 
 <template>
-  <div class="h-full w-full flex bg-background overflow-hidden relative">
+  <div
+    ref="dropZoneRef"
+    class="h-full w-full flex bg-background overflow-hidden relative"
+  >
+    <Transition name="drop-overlay">
+      <ChatDropOverlay v-if="isOverDropZone && !isLoading" />
+    </Transition>
+
     <div class="flex min-w-0 flex-1 flex-col overflow-hidden">
       <div class="relative z-20 shrink-0">
         <ChatHeader
@@ -123,8 +134,8 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
           <ChatInput
             ref="chatInputRef"
             :initial-text="chatStore.draftInput"
+            :initial-attachments="chatStore.draftAttachments"
             :is-loading="isLoading"
-            :give-direct-answer="giveDirectAnswer"
             :selected-model-id="selectedModelId"
             :show-scroll-button="showScrollButton"
             :course-code="courseCode"
@@ -134,7 +145,6 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
             @send="handleSend"
             @cancel="handleCancel"
             @scroll-to-bottom="transcriptRef?.scrollToBottom('smooth')"
-            @update:give-direct-answer="giveDirectAnswer = $event"
             @update:selected-model-id="selectedModelId = $event"
             @clear-selection-context="selectionContext = ''"
           />

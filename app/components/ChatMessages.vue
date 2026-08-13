@@ -130,6 +130,12 @@ function handleReplyToSelection() {
   emit("replyToSelection", text);
 }
 
+function formatFileSize(bytes: number): string {
+  return bytes >= 1024 * 1024
+    ? `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+    : `${Math.max(1, Math.round(bytes / 1024))} kB`;
+}
+
 const renderedAssistantHtml = computed(() => {
   if (!mdReady.value) return props.messages.map(() => "");
   const lastIndex = props.messages.length - 1;
@@ -232,8 +238,7 @@ defineExpose({
         Vad kan jag hjälpa till med?
       </h2>
       <p class="text-muted-foreground text-sm max-w-70 sm:max-w-md mb-8 leading-relaxed">
-        Ställ frågor om tentan, be om ledtrådar eller få hjälp att förstå
-        lösningarna.
+        Ställ frågor om tentan eller få hjälp att förstå lösningarna.
       </p>
       <NuxtLink to="/ai-policy" target="_blank"
         class="text-2xs text-muted-foreground/60 hover:text-foreground transition-colors duration-200 border-b border-transparent hover:border-foreground/30 pb-0.5">
@@ -246,6 +251,7 @@ defineExpose({
         msg.role,
         msg.content,
         msg.selectionContext,
+        msg.attachments?.map((attachment) => `${attachment.id}:${attachment.active}`).join(','),
         isLoading && i === messages.length - 1,
         mdReady,
       ]">
@@ -254,7 +260,37 @@ defineExpose({
             class="border-l-2 border-muted-foreground/30 pl-3 text-sm text-muted-foreground italic line-clamp-3 text-right">
             "{{ msg.selectionContext }}"
           </div>
-          <div class="bg-primary/10 text-foreground px-4 py-2 rounded-2xl w-fit">
+          <div
+            v-if="msg.attachments?.length"
+            class="flex flex-wrap justify-end gap-1.5"
+          >
+            <div
+              v-for="attachment in msg.attachments"
+              :key="attachment.id"
+              class="attachment-context-item flex min-w-0 max-w-full items-center gap-1.5 rounded-xl border px-2.5 py-1.5 text-xs"
+              :class="attachment.active ? 'bg-background' : 'bg-muted/40 text-muted-foreground opacity-70'"
+            >
+              <LucideFileText
+                v-if="attachment.mediaType === 'application/pdf'"
+                class="size-3.5 shrink-0"
+              />
+              <img
+                v-else-if="attachment.previewUrl"
+                :src="attachment.previewUrl"
+                alt=""
+                class="size-16 shrink-0 rounded-lg object-cover"
+              />
+              <LucideImage v-else class="size-3.5 shrink-0" />
+              <span class="max-w-20 truncate" :title="attachment.name">{{
+                attachment.name
+              }}</span>
+              <span class="shrink-0 text-muted-foreground">{{
+                formatFileSize(attachment.size)
+              }}</span>
+              <span v-else class="sr-only">Inte längre i kontext</span>
+            </div>
+          </div>
+          <div v-if="msg.content" class="bg-primary/10 text-foreground px-4 py-2 rounded-2xl w-fit">
             <p class="text-base leading-relaxed whitespace-pre-wrap">
               {{ msg.content }}
             </p>
@@ -327,6 +363,27 @@ defineExpose({
   overflow-x: auto;
   overscroll-behavior-x: contain;
   margin: 2em 0;
+}
+
+.attachment-context-item {
+  animation: attachment-context-in 180ms var(--ease-spring) both;
+}
+
+@keyframes attachment-context-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .attachment-context-item {
+    animation: none;
+  }
 }
 
 .prose :deep(.table-scroll table) {

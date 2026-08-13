@@ -1,10 +1,10 @@
 import { ref } from "vue";
-import { useChatStore } from "@/stores/chat";
+import { useChatStore, type ChatAttachment } from "@/stores/chat";
 
 const CHAT_API_URL =
   "https://liutentor-hono-687405545415.europe-north2.run.app/api/v1/chat/completion";
 
-// const CHAT_API_URL_LOCAL = "http://localhost:8080/api/v1/chat/completion";
+const CHAT_API_URL_LOCAL = "http://localhost:8080/api/v1/chat/completion";
 
 const DEFAULT_MODEL_ID = "gpt-5.6-luna";
 
@@ -36,24 +36,36 @@ export function useChat(options: {
       | null;
   }
 
-  function cancelGeneration(): string | null {
+  function cancelGeneration(): {
+    content: string;
+    attachments: ChatAttachment[];
+  } | null {
     abortController.value?.abort();
     abortController.value = null;
 
-    let cancelledUserMessage: string | null = null;
+    let cancelledUserMessage: {
+      content: string;
+      attachments: ChatAttachment[];
+    } | null = null;
     const msgs = chatStore.messages;
     const last = msgs[msgs.length - 1];
 
     if (last?.role === "assistant") {
       if (!last.content.trim()) {
         const userMsg = msgs[msgs.length - 2];
-        if (userMsg?.role === "user") cancelledUserMessage = userMsg.content;
+        if (userMsg?.role === "user") {
+          cancelledUserMessage = {
+            content: userMsg.content,
+            attachments: userMsg.attachments ?? [],
+          };
+        }
 
         if (msgs.length === 2) {
           chatStore.messages = [
             ...msgs.slice(0, -1),
             { role: "assistant", content: "> *Avbruten av användaren*" },
           ];
+          cancelledUserMessage = null;
         } else {
           chatStore.messages = msgs.slice(0, -2);
         }
@@ -74,25 +86,31 @@ export function useChat(options: {
 
   async function send(
     content: string,
+    attachments: ChatAttachment[] = [],
     opts: {
       modelId?: string;
       context?: string;
       selectionContext?: string;
-      giveDirectAnswer?: boolean;
     } = {},
   ) {
-    if (!content.trim() || chatStore.isLoading) return;
+    if ((!content.trim() && attachments.length === 0) || chatStore.isLoading) {
+      return;
+    }
 
     const trimmedContent = content.trim();
     const userId = getUserId();
 
     if (!chatStore.currentConversationTitle) {
-      chatStore.currentConversationTitle = trimmedContent.substring(0, 80);
+      chatStore.currentConversationTitle =
+        trimmedContent.substring(0, 80) || attachments[0]?.name || "Ny chatt";
     }
 
     if (userId && !chatStore.currentConversationId) {
       try {
-        const title = trimmedContent.substring(0, 50);
+        const title =
+          trimmedContent.substring(0, 50) ||
+          attachments[0]?.name.substring(0, 50) ||
+          "Ny chatt";
         const { data, error } = await (supabase as any)
           .from("conversations")
           .insert({
@@ -110,12 +128,7 @@ export function useChat(options: {
       }
     }
 
-    const {
-      modelId = DEFAULT_MODEL_ID,
-      context,
-      selectionContext,
-      giveDirectAnswer,
-    } = opts;
+    const { modelId = DEFAULT_MODEL_ID, context, selectionContext } = opts;
     const resolvedModelId = modelId || DEFAULT_MODEL_ID;
 
     const userMessage = {
@@ -123,6 +136,7 @@ export function useChat(options: {
       content,
       ...(context ? { context } : {}),
       ...(selectionContext ? { selectionContext } : {}),
+      ...(attachments.length ? { attachments } : {}),
     };
 
     chatStore.messages.push(userMessage);
@@ -147,20 +161,19 @@ export function useChat(options: {
         .slice(-20)
         .map((m) => ({
           role: m.role,
-          content: m.content,
+          content:
+            m.role === "user" && !m.content.trim() && m.attachments?.length
+              ? "Jag bifogade material till den här frågan."
+              : m.content,
           ...(m.context ? { context: m.context } : {}),
         }));
 
       const authHeaders = await getAuthHeaders();
 
-      const response = await fetch(`${CHAT_API_URL}/${options.examId}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-anonymous-user-id": getAnonymousId(),
-          ...authHeaders,
-        },
-        body: JSON.stringify({
+      const formData = new FormData();
+      formData.append(
+        "payload",
+        JSON.stringify({
           messages: recentMessages,
           examUrl: options.examUrl,
           courseCode: options.courseCode,
@@ -168,8 +181,21 @@ export function useChat(options: {
           modelId: resolvedModelId,
           conversationId: chatStore.currentConversationId,
           selectionContext: selectionContext || undefined,
-          giveDirectAnswer,
         }),
+      );
+      for (const attachment of chatStore.getActiveAttachments()) {
+        if (attachment.file) {
+          formData.append("files", attachment.file, attachment.name);
+        }
+      }
+
+      const response = await fetch(`${CHAT_API_URL_LOCAL}/${options.examId}`, {
+        method: "POST",
+        headers: {
+          "x-anonymous-user-id": getAnonymousId(),
+          ...authHeaders,
+        },
+        body: formData,
         signal: controller.signal,
       });
 
