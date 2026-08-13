@@ -287,7 +287,6 @@ defineExpose({
               <span class="shrink-0 text-muted-foreground">{{
                 formatFileSize(attachment.size)
               }}</span>
-              <span v-else class="sr-only">Inte längre i kontext</span>
             </div>
           </div>
           <div v-if="msg.content" class="bg-primary/10 text-foreground px-4 py-2 rounded-2xl w-fit">
