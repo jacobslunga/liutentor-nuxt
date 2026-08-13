@@ -525,7 +525,7 @@ defineExpose({
                   <Button
                     variant="ghost"
                     size="sm"
-                    class="h-8 gap-1.5 rounded-full border border-border bg-secondary/40 px-3 text-xs font-semibold text-muted-foreground hover:bg-secondary hover:text-foreground"
+                    class="h-8 gap-1.5 rounded-full px-3 text-xs font-normal text-muted-foreground hover:bg-transparent hover:text-foreground"
                   >
                     {{ selectedModelLabel }}
                     <LucideChevronDown
