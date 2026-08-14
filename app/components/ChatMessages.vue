@@ -65,7 +65,7 @@ function handleCodeCopy(e: MouseEvent) {
   const code = pre?.textContent ?? "";
   if (!code) return;
 
-  navigator.clipboard.writeText(code).catch(() => { });
+  navigator.clipboard.writeText(code).catch(() => {});
 
   const label = btn.querySelector(".code-copy-label");
   if (label) label.textContent = "Kopierad";
@@ -226,38 +226,60 @@ defineExpose({
 </script>
 
 <template>
-  <div ref="messagesContainer"
-    class="h-full w-full overflow-y-auto overflow-x-hidden overscroll-contain px-4 custom-scrollbar" :class="contentClass"
-    @scroll="handleScroll" @mouseup="handleMessageMouseUp" @click="handleCodeCopy">
-
+  <div
+    ref="messagesContainer"
+    class="h-full w-full overflow-y-auto overflow-x-hidden overscroll-contain px-4 custom-scrollbar"
+    :class="contentClass"
+    @scroll="handleScroll"
+    @mouseup="handleMessageMouseUp"
+    @click="handleCodeCopy"
+  >
     <div
       class="min-h-full flex flex-col items-center justify-center px-4 py-8 text-center"
-      v-if="messages.length === 0">
+      v-if="messages.length === 0"
+    >
       <ChatMascot class="w-16 h-16 mb-5 shrink-0" />
       <h2 class="text-2xl font-semibold mb-3 text-foreground">
         Vad kan jag hjälpa till med?
       </h2>
-      <p class="text-muted-foreground text-sm max-w-70 sm:max-w-md mb-8 leading-relaxed">
+      <p
+        class="text-muted-foreground text-sm max-w-70 sm:max-w-md mb-8 leading-relaxed"
+      >
         Ställ frågor om tentan eller få hjälp att förstå lösningarna.
       </p>
-      <NuxtLink to="/ai-policy" target="_blank"
-        class="text-2xs text-muted-foreground/60 hover:text-foreground transition-colors duration-200 border-b border-transparent hover:border-foreground/30 pb-0.5">
+      <NuxtLink
+        to="/ai-policy"
+        target="_blank"
+        class="text-2xs text-muted-foreground/60 hover:text-foreground transition-colors duration-200 border-b border-transparent hover:border-foreground/30 pb-0.5"
+      >
         Läs vår AI-policy
       </NuxtLink>
     </div>
 
     <div v-else class="space-y-6 max-w-2xl mx-auto w-full">
-      <div v-for="(msg, i) in messages" :key="i" :class="msg.role === 'user' ? 'flex justify-end' : ''" v-memo="[
-        msg.role,
-        msg.content,
-        msg.selectionContext,
-        msg.attachments?.map((attachment) => `${attachment.id}:${attachment.active}`).join(','),
-        isLoading && i === messages.length - 1,
-        mdReady,
-      ]">
-        <div v-if="msg.role === 'user'" class="flex flex-col items-end gap-1.5 max-w-[85%]">
-          <div v-if="msg.selectionContext"
-            class="border-l-2 border-muted-foreground/30 pl-3 text-sm text-muted-foreground italic line-clamp-3 text-right">
+      <div
+        v-for="(msg, i) in messages"
+        :key="i"
+        :class="msg.role === 'user' ? 'flex justify-end' : ''"
+        v-memo="[
+          msg.role,
+          msg.content,
+          msg.selectionContext,
+          msg.attachments
+            ?.map((attachment) => `${attachment.id}:${attachment.active}`)
+            .join(','),
+          isLoading && i === messages.length - 1,
+          mdReady,
+        ]"
+      >
+        <div
+          v-if="msg.role === 'user'"
+          class="flex flex-col items-end gap-1.5 max-w-[85%]"
+        >
+          <div
+            v-if="msg.selectionContext"
+            class="border-l-2 border-muted-foreground/30 pl-3 text-sm text-muted-foreground italic line-clamp-3 text-right"
+          >
             "{{ msg.selectionContext }}"
           </div>
           <div
@@ -268,7 +290,11 @@ defineExpose({
               v-for="attachment in msg.attachments"
               :key="attachment.id"
               class="attachment-context-item flex min-w-0 max-w-full items-center gap-1.5 rounded-xl border px-2.5 py-1.5 text-xs"
-              :class="attachment.active ? 'bg-background' : 'bg-muted/40 text-muted-foreground opacity-70'"
+              :class="
+                attachment.active
+                  ? 'bg-background'
+                  : 'bg-muted/40 text-muted-foreground opacity-70'
+              "
             >
               <LucideFileText
                 v-if="attachment.mediaType === 'application/pdf'"
@@ -289,22 +315,35 @@ defineExpose({
               }}</span>
             </div>
           </div>
-          <div v-if="msg.content" class="bg-primary/10 text-foreground px-4 py-2 rounded-2xl w-fit">
+          <div
+            v-if="msg.content"
+            class="bg-primary/10 text-foreground px-4 py-2 rounded-2xl w-fit"
+          >
             <p class="text-base leading-relaxed whitespace-pre-wrap">
               {{ msg.content }}
             </p>
           </div>
         </div>
 
-        <div v-else class="w-full min-w-0 px-1 py-2 overflow-hidden" data-role="assistant" :data-streaming="isLoading && i === messages.length - 1 ? 'true' : undefined
-          ">
-          <div v-if="!msg.content && isLoading && i === messages.length - 1" class="flex items-center gap-2 h-6">
+        <div
+          v-else
+          class="w-full min-w-0 px-1 py-2 overflow-hidden"
+          data-role="assistant"
+          :data-streaming="
+            isLoading && i === messages.length - 1 ? 'true' : undefined
+          "
+        >
+          <div
+            v-if="!msg.content && isLoading && i === messages.length - 1"
+            class="flex items-center gap-2 h-6"
+          >
             <LucideLoader class="variable-spin w-4 h-4 text-muted-foreground" />
             <span class="shimmer-text text-sm">{{ loadingPhrase }}</span>
           </div>
           <div
-            class="prose max-w-full min-w-0 prose-headings:font-semibold prose-h1:text-xl prose-h2:text-lg prose-h3:text-md prose-h4:text-base prose-strong:font-semibold dark:prose-invert prose-p:font-normal marker:text-foreground marker:font-semibold"
-            v-html="renderedAssistantHtml[i]" />
+            class="prose max-w-full min-w-0 prose-headings:font-medium prose-h1:text-xl prose-h2:text-lg prose-h3:text-md prose-h4:text-base prose-strong:font-medium dark:prose-invert prose-p:font-normal marker:text-foreground marker:font-medium"
+            v-html="renderedAssistantHtml[i]"
+          />
         </div>
       </div>
 
@@ -312,8 +351,13 @@ defineExpose({
       <div class="h-32 w-full shrink-0" />
     </div>
 
-    <SelectionPopover v-if="enableSelectionPopover" :visible="selectionPopover.visible" :x="selectionPopover.x"
-      :y="selectionPopover.y" @reply="handleReplyToSelection" />
+    <SelectionPopover
+      v-if="enableSelectionPopover"
+      :visible="selectionPopover.visible"
+      :x="selectionPopover.x"
+      :y="selectionPopover.y"
+      @reply="handleReplyToSelection"
+    />
   </div>
 </template>
 
@@ -334,15 +378,19 @@ defineExpose({
 }
 
 .prose :deep(.katex-display) {
+  width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
+  overscroll-behavior-x: contain;
   max-width: 100%;
   padding: 0.5rem 0;
   margin: 0.75rem 0;
 }
 
-.prose :deep(.katex-display)>.katex {
-  max-width: 100%;
+.prose :deep(.katex-display) > .katex {
+  width: max-content;
+  min-width: 100%;
+  max-width: none;
 }
 
 .prose :deep(.katex) {
@@ -438,7 +486,8 @@ defineExpose({
   justify-content: space-between;
   padding: 0.4rem 0.75rem 0.4rem 1rem;
   background-color: color-mix(in oklch, var(--secondary) 60%, transparent);
-  border-bottom: 1px solid color-mix(in oklch, var(--foreground) 8%, transparent);
+  border-bottom: 1px solid
+    color-mix(in oklch, var(--foreground) 8%, transparent);
 }
 
 .prose :deep(.code-lang) {
@@ -537,12 +586,14 @@ defineExpose({
   display: block;
   padding: 1rem 1.25rem;
   font-size: 0.875rem;
-  background: linear-gradient(90deg,
-      color-mix(in srgb, var(--muted-foreground), transparent 40%) 0%,
-      color-mix(in srgb, var(--muted-foreground), transparent 40%) 35%,
-      var(--foreground) 50%,
-      color-mix(in srgb, var(--muted-foreground), transparent 40%) 65%,
-      color-mix(in srgb, var(--muted-foreground), transparent 40%) 100%);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--muted-foreground), transparent 40%) 0%,
+    color-mix(in srgb, var(--muted-foreground), transparent 40%) 35%,
+    var(--foreground) 50%,
+    color-mix(in srgb, var(--muted-foreground), transparent 40%) 65%,
+    color-mix(in srgb, var(--muted-foreground), transparent 40%) 100%
+  );
   background-size: 200% 100%;
   background-clip: text;
   -webkit-background-clip: text;
@@ -631,7 +682,8 @@ defineExpose({
   color: var(--muted-foreground);
   padding: 0.4rem 1rem;
   background-color: color-mix(in oklch, var(--secondary) 60%, transparent);
-  border-bottom: 1px solid color-mix(in oklch, var(--foreground) 8%, transparent);
+  border-bottom: 1px solid
+    color-mix(in oklch, var(--foreground) 8%, transparent);
 }
 
 .prose :deep(.plot-host) {
