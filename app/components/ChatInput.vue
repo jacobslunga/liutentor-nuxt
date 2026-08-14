@@ -4,9 +4,10 @@ import { CHAT_MODELS } from "@/composables/useSelectedModel";
 import { useChatStore, type ChatAttachment } from "@/stores/chat";
 import { toast } from "vue-sonner";
 
-const MODEL_OPTIONS = ["OpenAI", "Google"].flatMap((provider) =>
-  CHAT_MODELS.filter((model) => model.provider === provider),
-);
+const MODEL_GROUPS = ["OpenAI", "Google"].map((provider) => ({
+  provider,
+  models: CHAT_MODELS.filter((model) => model.provider === provider),
+}));
 
 const MAX_ATTACHMENTS = 5;
 const MAX_ATTACHMENT_SIZE = 5 * 1024 * 1024;
@@ -534,28 +535,28 @@ defineExpose({
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" class="w-56 p-1.5">
-                  <DropdownMenuItem
-                    v-for="model in MODEL_OPTIONS"
-                    :key="model.id"
-                    class="cursor-pointer items-center justify-between gap-2 rounded-md px-2.5 py-1.5 focus:bg-accent/70"
-                    @click="emit('update:selectedModelId', model.id)"
-                  >
-                    <div
-                      class="flex min-w-0 flex-col items-start leading-tight"
+                  <template v-for="(group, groupIndex) in MODEL_GROUPS" :key="group.provider">
+                    <DropdownMenuSeparator v-if="groupIndex > 0" class="my-1.5" />
+                    <DropdownMenuLabel
+                      class="px-2.5 pb-1 pt-1.5 text-xs font-normal text-muted-foreground"
                     >
-                      <span class="text-xs font-medium text-foreground">{{
-                        model.label
-                      }}</span>
-                      <span
-                        class="font-mono text-[10px] font-normal text-muted-foreground/75"
-                        >{{ model.id }}</span
-                      >
-                    </div>
-                    <LucideCheck
-                      v-if="model.id === selectedModelId"
-                      class="size-3.5 shrink-0 text-primary"
-                    />
-                  </DropdownMenuItem>
+                      {{ group.provider }}
+                    </DropdownMenuLabel>
+                    <DropdownMenuItem
+                      v-for="model in group.models"
+                      :key="model.id"
+                      class="cursor-pointer items-center justify-between gap-2 rounded-md px-2.5 py-1.5 focus:bg-accent/70"
+                      @click="emit('update:selectedModelId', model.id)"
+                    >
+                      <span class="text-xs font-medium text-foreground">
+                        {{ model.label }}
+                      </span>
+                      <LucideCheck
+                        v-if="model.id === selectedModelId"
+                        class="size-3.5 shrink-0 text-primary"
+                      />
+                    </DropdownMenuItem>
+                  </template>
                 </DropdownMenuContent>
               </DropdownMenu>
 
