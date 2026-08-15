@@ -162,20 +162,14 @@ const plugins = computed(() => {
     createPluginRegistration(RenderPluginPackage),
     createPluginRegistration(RotatePluginPackage),
     createPluginRegistration(ZoomPluginPackage, { defaultZoomLevel }),
-  ];
-
-  if (isMobile) {
-    return base;
-  }
-
-  return [
-    ...base,
     createPluginRegistration(InteractionManagerPluginPackage),
     createPluginRegistration(SelectionPluginPackage, {
       toleranceFactor: 2.0,
       minSelectionDragDistance: 5,
     }),
   ];
+
+  return base;
 });
 </script>
 
@@ -231,21 +225,52 @@ const plugins = computed(() => {
                         }"
                         class="relative mx-auto my-4 pdf-page-shell"
                       >
-                        <Rotate
+                        <PagePointerProvider
                           :document-id="activeDocumentId"
                           :page-index="page.pageIndex"
-                          class="relative h-full w-full bg-background"
+                          class="pdf-mobile-pointer"
                         >
-                          <div
-                            class="absolute inset-0 z-0 pdf-render-surface"
-                            :style="isDark ? darkPageStyle : lightPageStyle"
+                          <Rotate
+                            :document-id="activeDocumentId"
+                            :page-index="page.pageIndex"
+                            class="relative h-full w-full bg-background"
                           >
-                            <RenderLayer
-                              :document-id="activeDocumentId"
-                              :page-index="page.pageIndex"
-                            />
-                          </div>
-                        </Rotate>
+                            <div
+                              class="absolute inset-0 z-0 pdf-render-surface"
+                              :style="isDark ? darkPageStyle : lightPageStyle"
+                            >
+                              <RenderLayer
+                                :document-id="activeDocumentId"
+                                :page-index="page.pageIndex"
+                              />
+                            </div>
+                            <div
+                              class="absolute inset-0 z-10 pdf-selection-surface"
+                            >
+                              <SelectionLayer
+                                :document-id="activeDocumentId"
+                                :page-index="page.pageIndex"
+                                :text-style="{ background: selectionColor }"
+                              >
+                                <template
+                                  v-if="props.explainEnabled"
+                                  #selection-menu="{
+                                    menuWrapperProps,
+                                    placement,
+                                  }"
+                                >
+                                  <div v-bind="menuWrapperProps">
+                                    <PdfSelectionMenu
+                                      :document-id="activeDocumentId"
+                                      :above="placement.suggestTop"
+                                      @explain="emit('explain', $event)"
+                                    />
+                                  </div>
+                                </template>
+                              </SelectionLayer>
+                            </div>
+                          </Rotate>
+                        </PagePointerProvider>
                       </div>
                     </template>
                   </Scroller>
@@ -342,5 +367,11 @@ const plugins = computed(() => {
 
 .pdf-zoom-gesture {
   will-change: transform;
+}
+
+/* EmbedPDF defaults pointer surfaces to touch-action: none. Keep vertical page
+   scrolling on touch devices while allowing horizontal drags to select text. */
+:deep(.pdf-mobile-pointer) {
+  touch-action: pan-y pinch-zoom !important;
 }
 </style>

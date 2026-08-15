@@ -6,7 +6,10 @@ const props = defineProps<{
   solutionPdfUrl: string | null;
   courseCode: string;
   examDate: string;
+  explainEnabled?: boolean;
 }>();
+
+const emit = defineEmits<{ explain: [text: string] }>();
 
 const HEADER_HEIGHT = 56 + 1;
 
@@ -149,7 +152,11 @@ const downloadFile = async (url: string, filename: string) => {
 
     <div class="h-full w-full overflow-hidden" :style="pdfBoxStyle">
       <ClientOnly>
-        <LazyPdfRenderer :pdf-url="examPdfUrl" />
+        <LazyPdfRenderer
+          :pdf-url="examPdfUrl"
+          :explain-enabled="explainEnabled"
+          @explain="emit('explain', $event)"
+        />
       </ClientOnly>
     </div>
 
@@ -192,7 +199,12 @@ const downloadFile = async (url: string, filename: string) => {
         </div>
         <div class="h-full w-full overflow-hidden" :style="pdfBoxStyle">
           <ClientOnly>
-            <LazyPdfRenderer v-if="solutionPdfUrl" :pdf-url="solutionPdfUrl" />
+            <LazyPdfRenderer
+              v-if="solutionPdfUrl"
+              :pdf-url="solutionPdfUrl"
+              :explain-enabled="explainEnabled"
+              @explain="emit('explain', $event)"
+            />
           </ClientOnly>
         </div>
       </section>
