@@ -1,6 +1,6 @@
 <template>
   <div
-    class="shrink-0 relative flex items-center justify-between gap-2 px-3 py-2 z-90 overflow-visible bg-background"
+    class="shrink-0 relative flex items-center justify-between gap-2 px-3 py-1 z-90 overflow-visible bg-background"
   >
     <div class="flex items-center gap-1.5 min-w-0 flex-1">
       <Button
@@ -12,7 +12,7 @@
       >
         <LucideChevronRight />
       </Button>
-      <p class="min-w-0 truncate text-sm font-semibold text-foreground">
+      <p class="min-w-0 truncate text-sm font-normal text-muted-foreground">
         {{ displayTitle }}
       </p>
     </div>
