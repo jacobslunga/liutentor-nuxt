@@ -22,7 +22,7 @@ useHead({
       rel: "icon",
       type: "image/svg+xml",
       href: () =>
-        colorMode.value === "dark"
+        ["dark", "dim"].includes(colorMode.value)
           ? "/favicon-dark.svg"
           : "/favicon-light.svg",
     },

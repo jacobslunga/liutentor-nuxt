@@ -38,16 +38,15 @@ const emit = defineEmits<{ explain: [text: string] }>();
 const colorMode = useColorMode();
 const { engine, isLoading } = usePdfiumEngine();
 
-const isDark = computed(() => colorMode.value === "dark");
-
-const selectionColor = computed(() =>
-  isDark.value
-    ? "color-mix(in oklch, var(--primary) 35%, transparent)"
-    : "color-mix(in oklch, var(--primary) 28%, transparent)",
-);
+const selectionColor = "color-mix(in oklch, var(--primary) 10%, transparent)";
 
 const darkPageStyle = {
   filter: "invert(1) hue-rotate(180deg)",
+  mixBlendMode: "screen",
+} as const;
+
+const dimPageStyle = {
+  filter: "invert(1) hue-rotate(180deg) brightness(0.92)",
   mixBlendMode: "screen",
 } as const;
 
@@ -56,6 +55,12 @@ const lightPageStyle = {
   // background makes that white resolve to the exact --background token.
   mixBlendMode: "multiply",
 } as const;
+
+const pageStyle = computed(() => {
+  if (colorMode.value === "dark") return darkPageStyle;
+  if (colorMode.value === "dim") return dimPageStyle;
+  return lightPageStyle;
+});
 
 // Keep this non-reactive: rebuilding the plugin registry during resize reloads the PDF.
 const isMobile = window.innerWidth < 1024;
@@ -237,7 +242,7 @@ const plugins = computed(() => {
                           >
                             <div
                               class="absolute inset-0 z-0 pdf-render-surface"
-                              :style="isDark ? darkPageStyle : lightPageStyle"
+                              :style="pageStyle"
                             >
                               <RenderLayer
                                 :document-id="activeDocumentId"
@@ -304,7 +309,7 @@ const plugins = computed(() => {
                               >
                                 <div
                                   class="absolute inset-0 z-0 pdf-render-surface"
-                                  :style="isDark ? darkPageStyle : lightPageStyle"
+                                  :style="pageStyle"
                                 >
                                   <RenderLayer
                                     :document-id="activeDocumentId"

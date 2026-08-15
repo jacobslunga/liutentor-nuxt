@@ -29,7 +29,8 @@ const defaultLayout = computed({
 
 const THEME_OPTIONS = [
   { id: "light", label: "Ljust" },
-  { id: "dark", label: "Mörkt" },
+  { id: "dim", label: "Dämpat" },
+  { id: "dark", label: "Svart" },
   { id: "system", label: "System" },
 ];
 
@@ -125,7 +126,7 @@ function handleClearRecentSearches() {
           description="System följer inställningen i din enhet."
           stacked
         >
-          <div class="grid grid-cols-3 gap-2">
+          <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
             <Button
               v-for="option in THEME_OPTIONS"
               :key="option.id"
@@ -138,9 +139,10 @@ function handleClearRecentSearches() {
             >
               <LucideSun v-if="option.id === 'light'" class="size-4.5" />
               <LucideMoonStar
-                v-else-if="option.id === 'dark'"
+                v-else-if="option.id === 'dim'"
                 class="size-4.5"
               />
+              <LucideMoon v-else-if="option.id === 'dark'" class="size-4.5" />
               <LucideMonitor v-else class="size-4.5" />
               <span class="text-sm font-medium">{{ option.label }}</span>
             </Button>

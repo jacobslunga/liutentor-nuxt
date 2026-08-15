@@ -322,7 +322,6 @@ onUnmounted(() => {
           class="h-full flex flex-row overflow-hidden bg-background"
           :class="{ 'select-none': isResizing || isOverlayResizing }"
         >
-
           <div
             class="relative h-full overflow-hidden"
             :style="
@@ -426,7 +425,6 @@ onUnmounted(() => {
         </div>
 
         <Teleport to="body">
-
           <Transition
             enter-active-class="transition-all duration-200 ease-spring"
             enter-from-class="translate-x-full opacity-0"
@@ -438,7 +436,7 @@ onUnmounted(() => {
             <div
               v-if="!isMobile && isExamOnly && hasFacit"
               v-show="isFacitVisible && !chatStore.isOpen"
-              class="fixed right-0 bottom-0 z-70 flex h-screen shadow-xl bg-background"
+              class="fixed right-0 bottom-0 z-70 flex h-screen shadow-2xl border-l bg-background"
               :class="{ 'select-none': isOverlayResizing }"
               :style="{ width: `${overlayWidth}px` }"
             >
@@ -480,7 +478,7 @@ onUnmounted(() => {
             <div
               v-if="!isMobile && chatHasBeenOpened"
               v-show="chatStore.isOpen"
-              class="fixed right-0 bottom-0 z-80 flex h-screen shadow-xl bg-background"
+              class="fixed right-0 bottom-0 z-80 flex h-screen shadow-2xl bg-background"
               :class="{ 'select-none': isOverlayResizing }"
               :style="{ width: `${overlayWidth}px` }"
             >
