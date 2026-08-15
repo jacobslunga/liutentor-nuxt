@@ -207,7 +207,7 @@ function handleKeyDown(e: KeyboardEvent) {
     return;
   }
 
-  if (e.key === "c") {
+  if (!e.metaKey && !e.ctrlKey && e.key.toLowerCase() === "c") {
     e.preventDefault();
     chatStore.open();
     return;
