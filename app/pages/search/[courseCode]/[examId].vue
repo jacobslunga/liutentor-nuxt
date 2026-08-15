@@ -313,6 +313,8 @@ onUnmounted(() => {
           :solution-pdf-url="solutionPdfUrl"
           :course-code="courseCode"
           :exam-date="exam.exam_date"
+          :explain-enabled="showExplainPopover"
+          @explain="explainSelection"
         />
 
         <div
