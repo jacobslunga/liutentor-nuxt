@@ -16,9 +16,22 @@ const { data: examData, status } = useFetch(
   () => `/api/exams/detail/${examId.value}`,
   {
     key: () => `exam-detail-${examId.value}`,
-    lazy: true,
   },
 );
+
+const loadingIndicator = useLoadingIndicator();
+watch(
+  status,
+  (fetchStatus) => {
+    if (fetchStatus === "pending") {
+      loadingIndicator.start({ force: true });
+    } else if (loadingIndicator.isLoading.value) {
+      loadingIndicator.finish({ error: fetchStatus === "error" });
+    }
+  },
+  { immediate: true },
+);
+
 const { data: courseData } = useFetch(() => `/api/exams/${courseCode.value}`, {
   key: () => `course-exams-${courseCode.value}`,
   lazy: true,

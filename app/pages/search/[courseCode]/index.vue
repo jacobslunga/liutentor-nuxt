@@ -19,6 +19,19 @@ const { data, status } = useFetch(() => `/api/exams/${courseCode.value}`, {
   key: () => `course-exams-${courseCode.value}`,
 });
 
+const loadingIndicator = useLoadingIndicator();
+watch(
+  status,
+  (fetchStatus) => {
+    if (fetchStatus === "pending") {
+      loadingIndicator.start({ force: true });
+    } else if (loadingIndicator.isLoading.value) {
+      loadingIndicator.finish({ error: fetchStatus === "error" });
+    }
+  },
+  { immediate: true },
+);
+
 const courseData = computed(() => (data.value as any)?.data);
 const exams = computed<Exam[]>(() => courseData.value?.exams ?? []);
 const router = useRouter();
