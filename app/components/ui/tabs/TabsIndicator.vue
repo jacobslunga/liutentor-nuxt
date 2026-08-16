@@ -14,8 +14,11 @@ const forwardedProps = useForwardProps(delegatedProps);
 </script>
 
 <template>
-  <TabsIndicator data-slot="tabs-indicator" v-bind="forwardedProps" :class="cn(
-    'absolute inset-y-0 left-0 -z-10 bg-primary/10 transition-all duration-200 ease-spring dark:bg-primary/15 w-[var(--reka-tabs-indicator-size)] translate-x-[var(--reka-tabs-indicator-position)] pointer-events-none',
+  <TabsIndicator data-slot="tabs-indicator" v-bind="forwardedProps" :style="{
+    width: 'var(--reka-tabs-indicator-size)',
+    transform: 'translateX(var(--reka-tabs-indicator-position))',
+  }" :class="cn(
+    'pointer-events-none absolute inset-y-[3px] left-0 z-0 rounded-lg border border-border/50 bg-background shadow-sm transition-transform duration-200 ease-out dark:border-white/10 dark:bg-white/10 dark:shadow-black/40',
     props.class,
   )
     ">
