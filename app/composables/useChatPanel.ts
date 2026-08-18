@@ -10,6 +10,7 @@ import { useChat } from "@/composables/useChat";
 
 export interface ChatInputApi {
   focus: () => void;
+  getShellTop: () => number | null;
   getText: () => string;
   setText: (value: string) => void;
   getAttachments: () => ChatAttachment[];

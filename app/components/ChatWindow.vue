@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch, nextTick, onMounted, onUnmounted } from "vue";
+import { useResizeObserver } from "@vueuse/core";
 import { storeToRefs } from "pinia";
 import { useChatStore } from "@/stores/chat";
 import {
@@ -23,7 +24,23 @@ const { isOpen, isHistoryOpen } = storeToRefs(chatStore);
 
 const chatInputRef = ref<ChatInputApi | null>(null);
 const transcriptRef = ref<ChatTranscriptApi | null>(null);
+const inputRegionRef = ref<HTMLDivElement | null>(null);
 const showScrollButton = ref(false);
+const contentBottom = ref(Number.NEGATIVE_INFINITY);
+const showDisclaimer = ref(true);
+
+function updateDisclaimerVisibility() {
+  const shellTop = chatInputRef.value?.getShellTop();
+  if (shellTop === null || shellTop === undefined) return;
+  showDisclaimer.value = contentBottom.value <= shellTop - 32;
+}
+
+function handleContentBottom(value: number) {
+  contentBottom.value = value;
+  nextTick(updateDisclaimerVisibility);
+}
+
+useResizeObserver(inputRegionRef, () => nextTick(updateDisclaimerVisibility));
 const attachmentSurfaceEnabled = computed(() => isOpen.value);
 const { dropZoneRef, isOverDropZone } = useChatAttachmentSurface(
   chatInputRef,
@@ -123,10 +140,12 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
           content-class="pt-4"
           @reply-to-selection="handleReplyToSelection"
           @update:show-scroll-button="showScrollButton = $event"
+          @update:content-bottom="handleContentBottom"
         />
 
         <div
-          class="absolute bottom-0 left-0 right-0 pt-14 pb-4 pointer-events-none z-10"
+          ref="inputRegionRef"
+          class="absolute bottom-0 left-0 right-0 pt-8 pb-4 pointer-events-none z-10"
         >
           <div
             class="fade-to-background pointer-events-none absolute inset-x-0 top-0 bottom-0 -z-10"
@@ -141,6 +160,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
             :course-code="courseCode"
             :has-solution="hasSolution"
             :selection-context="selectionContext"
+            :show-disclaimer="showDisclaimer"
             class="pointer-events-auto"
             @send="handleSend"
             @cancel="handleCancel"

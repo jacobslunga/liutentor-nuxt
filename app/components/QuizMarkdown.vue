@@ -11,13 +11,24 @@ defineOptions({
 });
 
 function normalizeMathDelimiters(content: string): string {
-  return content
+  const normalized = content
     .replace(/\\\[([\s\S]*?)\\\]/g, (_m, inner) => `$$${inner.trim()}$$`)
     .replace(/\\\(([\s\S]*?)\\\)/g, (_m, inner) => `$${inner.trim()}$`)
     .replace(
-      /\$\s+([^$\n][\s\S]*?[^$\n])\s+\$/g,
+      /\$(?!\$)\s*([^$\n]*?\S)\s*\$/g,
       (_m, inner) => `$${inner.trim()}$`,
     );
+
+  return normalized.replace(
+    /\$(?!\$)[^$\n]+?\$/gu,
+    (math, offset: number, source: string) => {
+      const before = source[offset - 1] ?? "";
+      const after = source[offset + math.length] ?? "";
+      const leadingSpace = /\p{L}/u.test(before) ? " " : "";
+      const trailingSpace = /\p{L}/u.test(after) ? " " : "";
+      return `${leadingSpace}${math}${trailingSpace}`;
+    },
+  );
 }
 
 const md = new MarkdownIt({ html: true, linkify: true, typographer: true });

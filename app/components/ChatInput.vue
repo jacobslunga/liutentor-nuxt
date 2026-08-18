@@ -39,6 +39,7 @@ const props = withDefaults(
     courseCode?: string;
     hasSolution?: boolean;
     selectionContext?: string;
+    showDisclaimer?: boolean;
 
     autofocus?: boolean;
 
@@ -57,6 +58,7 @@ const props = withDefaults(
     compact: false,
     autoResize: true,
     reactiveInput: true,
+    showDisclaimer: false,
   },
 );
 
@@ -69,6 +71,7 @@ const emit = defineEmits<{
 }>();
 
 const textareaRef = ref<HTMLTextAreaElement | null>(null);
+const chatShellRef = ref<HTMLDivElement | null>(null);
 const fileInputRef = ref<HTMLInputElement | null>(null);
 const rowRef = ref<HTMLElement | null>(null);
 const attachmentButtonRef = ref<HTMLElement | null>(null);
@@ -84,6 +87,8 @@ const nonReactiveTooLong = ref((props.initialText?.length ?? 0) > MAX_LENGTH);
 
 const singleLineHeight = ref(0);
 const isMultiline = ref(false);
+let heightExpansionAnimation: Animation | null = null;
+let heightExpansionRequest = 0;
 
 const canSend = computed(() => {
   const hasContent = props.reactiveInput
@@ -153,9 +158,58 @@ const applyHeight = (allowShrink = false) => {
   if (el.style.overflowY !== overflowY) el.style.overflowY = overflowY;
 };
 
+const cancelHeightExpansion = () => {
+  heightExpansionRequest += 1;
+  heightExpansionAnimation?.cancel();
+  heightExpansionAnimation = null;
+};
+
+const animateFirstMultilineHeight = (startHeight: number) => {
+  cancelHeightExpansion();
+  const request = heightExpansionRequest;
+
+  nextTick(() => {
+    const el = textareaRef.value;
+    if (
+      !el ||
+      !isMultiline.value ||
+      request !== heightExpansionRequest
+    ) {
+      return;
+    }
+
+    applyHeight(true);
+    const endHeight = el.getBoundingClientRect().height;
+    if (endHeight <= startHeight) return;
+
+    const animation = el.animate(
+      [
+        { height: `${startHeight}px` },
+        { height: `${endHeight}px` },
+      ],
+      {
+        duration: 160,
+        easing: "cubic-bezier(0.22, 1, 0.36, 1)",
+      },
+    );
+    heightExpansionAnimation = animation;
+    animation.addEventListener(
+      "finish",
+      () => {
+        if (heightExpansionAnimation === animation) {
+          heightExpansionAnimation = null;
+        }
+      },
+      { once: true },
+    );
+  });
+};
+
 const recalculateLayout = () => {
   const el = textareaRef.value;
   if (!el) return;
+
+  cancelHeightExpansion();
 
   const was = isMultiline.value;
   const width = oneRowWidth();
@@ -171,14 +225,7 @@ const recalculateLayout = () => {
     return;
   }
 
-  nextTick(() => {
-    const previous = el.style.transition;
-    el.style.transition = "none";
-    applyHeight(true);
-    // Force reflow so restoring the transition cannot animate this resize.
-    void el.offsetHeight;
-    el.style.transition = previous;
-  });
+  nextTick(() => applyHeight(true));
 };
 
 const updateHeight = (event?: Event) => {
@@ -204,11 +251,15 @@ const updateHeight = (event?: Event) => {
 
   if (!isMultiline.value) {
     if (el.scrollHeight <= singleLineHeight.value + 4) return;
+    const startHeight = el.getBoundingClientRect().height;
     isMultiline.value = true;
-    nextTick(() => applyHeight(true));
+    animateFirstMultilineHeight(startHeight);
     return;
   }
 
+  // Once multiline, additional rows should resize immediately. If another
+  // newline arrives during the first expansion, stop that animation first.
+  cancelHeightExpansion();
   applyHeight();
 };
 
@@ -363,12 +414,15 @@ onMounted(() => {
   if (props.autofocus) textareaRef.value?.focus();
 });
 
+onUnmounted(cancelHeightExpansion);
+
 useEventListener("resize", () => {
   if (props.autoResize) recalculateLayout();
 });
 
 defineExpose({
   focus: () => textareaRef.value?.focus(),
+  getShellTop: () => chatShellRef.value?.getBoundingClientRect().top ?? null,
   getText: () => textareaRef.value?.value ?? text.value,
   setText,
   getAttachments: () => [...pendingAttachments.value],
@@ -393,23 +447,36 @@ defineExpose({
 <template>
   <div class="px-4 bg-transparent relative w-full pointer-events-auto z-10">
     <div class="max-w-2xl mx-auto relative">
-      <Transition name="fade-up">
-        <div v-if="showScrollButton" class="absolute -top-12 right-3 z-20">
-          <Button
-            variant="outline"
-            size="icon"
-            class="rounded-full"
-            @click="emit('scrollToBottom')"
-          >
-            <LucideArrowDown class="w-4 h-4" />
-          </Button>
-        </div>
-      </Transition>
-
       <div class="space-y-2">
+        <Transition name="disclaimer-fade">
+          <p
+            v-if="showDisclaimer"
+            class="px-4 text-center text-2xs text-muted-foreground/60"
+          >
+            AI kan göra misstag. Kontrollera svaren.
+          </p>
+        </Transition>
+
         <div
-          class="chat-shell rounded-[28px] border border-border bg-background focus-within:border-border"
+          ref="chatShellRef"
+          class="chat-shell relative rounded-[28px] border border-border bg-background shadow-[0_16px_45px_-18px_rgba(0,0,0,0.22)] focus-within:border-border dark:shadow-[0_16px_45px_-18px_rgba(0,0,0,0.55)]"
         >
+          <Transition name="fade-up">
+            <div
+              v-if="showScrollButton"
+              class="pointer-events-none absolute -top-12 right-3 z-20"
+            >
+              <Button
+                variant="outline"
+                size="icon"
+                class="pointer-events-auto rounded-full"
+                @click="emit('scrollToBottom')"
+              >
+                <LucideArrowDown class="w-4 h-4" />
+              </Button>
+            </div>
+          </Transition>
+
           <Transition name="context-chip">
             <div
               v-if="selectionContext"
@@ -586,12 +653,11 @@ defineExpose({
           </div>
         </div>
 
-        <div class="flex items-center justify-center gap-2 px-4 text-center">
-          <p class="text-2xs text-muted-foreground/60">
-            AI kan göra misstag. Kontrollera svaren.
-          </p>
+        <div
+          v-if="reactiveInput && text.length > MAX_LENGTH * 0.8"
+          class="flex items-center justify-center gap-2 px-4 text-center"
+        >
           <p
-            v-if="reactiveInput && text.length > MAX_LENGTH * 0.8"
             class="text-xs"
             :class="
               text.length > MAX_LENGTH
@@ -608,10 +674,6 @@ defineExpose({
 </template>
 
 <style scoped>
-textarea {
-  transition: height var(--duration-fast) var(--ease-spring);
-}
-
 .chat-shell {
   transition: border-color var(--duration-fast) ease;
 }
@@ -627,13 +689,25 @@ textarea {
 
 .fade-up-enter-active,
 .fade-up-leave-active {
-  transition: all var(--duration-base) var(--ease-spring);
+  transition:
+    opacity var(--duration-base) var(--ease-spring),
+    transform var(--duration-base) var(--ease-spring);
 }
 
 .fade-up-enter-from,
 .fade-up-leave-to {
   opacity: 0;
   transform: translateY(4px);
+}
+
+.disclaimer-fade-enter-active,
+.disclaimer-fade-leave-active {
+  transition: opacity var(--duration-base) ease;
+}
+
+.disclaimer-fade-enter-from,
+.disclaimer-fade-leave-to {
+  opacity: 0;
 }
 
 .scale-enter-active,

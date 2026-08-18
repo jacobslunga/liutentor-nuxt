@@ -173,6 +173,7 @@ watch(transcriptRef, (transcript) => {
             :course-code="courseCode"
             :has-solution="hasSolution"
             :selection-context="selectionContext"
+            show-disclaimer
             :autofocus="false"
             :auto-resize="false"
             :reactive-input="false"

@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted } from "vue";
+import { ref, computed, watch, nextTick, onMounted, onUnmounted } from "vue";
+import { useResizeObserver } from "@vueuse/core";
 import type { Message } from "@/stores/chat";
 import {
   initChatMarkdown,
@@ -22,6 +23,7 @@ const props = withDefaults(
 const emit = defineEmits<{
   replyToSelection: [text: string];
   "update:showScrollButton": [value: boolean];
+  "update:contentBottom": [value: number];
 }>();
 
 const chatStore = useChatStore();
@@ -33,6 +35,19 @@ initChatMarkdown().then(() => {
 });
 
 const messagesContainer = ref<HTMLDivElement | null>(null);
+const messagesList = ref<HTMLDivElement | null>(null);
+const contentEndMarker = ref<HTMLDivElement | null>(null);
+
+function reportContentBottom() {
+  emit(
+    "update:contentBottom",
+    contentEndMarker.value?.getBoundingClientRect().top ??
+      Number.NEGATIVE_INFINITY,
+  );
+}
+
+useResizeObserver(messagesContainer, reportContentBottom);
+useResizeObserver(messagesList, reportContentBottom);
 
 const selectionPopover = ref({ visible: false, x: 0, y: 0 });
 const selectionPopoverScrollAnchor = ref(0);
@@ -168,6 +183,7 @@ function handleScroll() {
   );
   emit("update:showScrollButton", distFromBottom > 200);
   latestScrollTop = el.scrollTop;
+  reportContentBottom();
 
   if (selectionPopover.value.visible) {
     const delta = Math.abs(el.scrollTop - selectionPopoverScrollAnchor.value);
@@ -204,7 +220,18 @@ watch(
   { immediate: true },
 );
 
+watch(
+  [
+    () => props.messages.length,
+    () => props.messages.at(-1)?.content,
+    mdReady,
+  ],
+  () => nextTick(reportContentBottom),
+  { flush: "post" },
+);
+
 onMounted(() => {
+  nextTick(reportContentBottom);
   if (props.enableSelectionPopover) {
     document.addEventListener("selectionchange", handleSelectionChange);
   }
@@ -256,7 +283,7 @@ defineExpose({
       </NuxtLink>
     </div>
 
-    <div v-else class="space-y-6 max-w-2xl mx-auto w-full">
+    <div ref="messagesList" v-else class="space-y-6 max-w-2xl mx-auto w-full">
       <div
         v-for="(msg, i) in messages"
         :key="i"
@@ -347,7 +374,7 @@ defineExpose({
         </div>
       </div>
 
-      <div class="h-px w-full" />
+      <div ref="contentEndMarker" class="h-px w-full" />
       <div class="h-32 w-full shrink-0" />
     </div>
 
