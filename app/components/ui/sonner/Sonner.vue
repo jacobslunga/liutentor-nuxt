@@ -3,7 +3,9 @@ import type { ToasterProps } from "vue-sonner";
 import { Toaster as Sonner } from "vue-sonner";
 import { cn } from "@/lib/utils";
 
-const props = defineProps<ToasterProps>();
+const props = withDefaults(defineProps<ToasterProps>(), {
+  richColors: true,
+});
 </script>
 
 <template>
