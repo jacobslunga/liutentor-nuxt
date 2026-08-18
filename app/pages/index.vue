@@ -23,7 +23,7 @@ const { open: openUploadModal } = useUploadModal();
         <span class="rounded-full bg-primary/10 px-2 py-0.5 text-2xs font-semibold text-primary">
           Nytt
         </span>
-        Chatten fungerar nu på mobilen
+        Chatten kan nu rita interaktiva grafer
       </div>
 
       <div class="flex flex-row items-center justify-center space-x-2">
