@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "nuxt dev",
     "build": "nuxt build",
+    "test": "bun test",
     "typecheck": "nuxt typecheck",
     "preview": "nuxt preview",
     "generate": "nuxt generate",
@@ -37,7 +38,9 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dompurify": "^3.3.3",
+    "expr-eval": "^2.0.2",
     "h3": "^1.15.11",
+    "jsxgraph": "^1.13.2",
     "katex": "^0.16.45",
     "lucide-vue-next": "^1.0.0",
     "markdown-it": "^14.1.1",
