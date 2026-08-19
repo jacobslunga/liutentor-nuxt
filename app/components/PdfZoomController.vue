@@ -2,6 +2,7 @@
 import { useZoom, ZoomMode } from "@embedpdf/plugin-zoom/vue";
 import { useViewportCapability } from "@embedpdf/plugin-viewport/vue";
 import { useScrollCapability } from "@embedpdf/plugin-scroll/vue";
+import { pdfResetZoomKey } from "@/lib/pdf-zoom";
 
 const props = defineProps<{
   documentId: string;
@@ -88,6 +89,11 @@ function rescaleManualZoom(previousWidth: number, nextWidth: number) {
 function scrollToTop() {
   viewport.value?.forDocument(props.documentId).scrollTo({ x: 0, y: 0 });
 }
+
+provide(pdfResetZoomKey, () => {
+  apply();
+  nextTick(scrollToTop);
+});
 
 function isOurs(): boolean {
   const level = zoom.value?.getState().zoomLevel;

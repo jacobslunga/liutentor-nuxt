@@ -179,7 +179,7 @@ const plugins = computed(() => {
 </script>
 
 <template>
-  <div class="relative h-full w-full overflow-hidden bg-background">
+  <div class="group/pdf relative h-full w-full overflow-hidden bg-background">
     <div
       v-if="isLoading || !engine"
       class="flex h-full w-full items-center justify-center"
@@ -193,7 +193,13 @@ const plugins = computed(() => {
           <PdfZoomController
             :document-id="activeDocumentId"
             :max-page-width="maxPageWidth"
-          />
+          >
+            <PdfPageControls
+              v-if="!isMobile"
+              :document-id="activeDocumentId"
+              class="absolute bottom-4 left-1/2 z-30 -translate-x-1/2"
+            />
+          </PdfZoomController>
 
           <PdfZoomControls
             v-if="isMobile"
@@ -225,8 +231,8 @@ const plugins = computed(() => {
                     <template #default="{ page }">
                       <div
                         :style="{
-                          width: `${page.width}px`,
-                          height: `${page.height}px`,
+                          width: `${page.rotatedWidth}px`,
+                          height: `${page.rotatedHeight}px`,
                         }"
                         class="relative mx-auto my-4 pdf-page-shell"
                       >
@@ -238,7 +244,11 @@ const plugins = computed(() => {
                           <Rotate
                             :document-id="activeDocumentId"
                             :page-index="page.pageIndex"
-                            class="relative h-full w-full bg-background"
+                            class="bg-background"
+                            :style="{
+                              width: `${page.width}px`,
+                              height: `${page.height}px`,
+                            }"
                           >
                             <div
                               class="absolute inset-0 z-0 pdf-render-surface"
@@ -293,8 +303,8 @@ const plugins = computed(() => {
                         <template #default="{ page }">
                           <div
                             :style="{
-                              width: `${page.width}px`,
-                              height: `${page.height}px`,
+                              width: `${page.rotatedWidth}px`,
+                              height: `${page.rotatedHeight}px`,
                             }"
                             class="relative mx-auto my-4 pdf-page-shell"
                           >
@@ -305,7 +315,11 @@ const plugins = computed(() => {
                               <Rotate
                                 :document-id="activeDocumentId"
                                 :page-index="page.pageIndex"
-                                class="relative h-full w-full bg-background"
+                                class="bg-background"
+                                :style="{
+                                  width: `${page.width}px`,
+                                  height: `${page.height}px`,
+                                }"
                               >
                                 <div
                                   class="absolute inset-0 z-0 pdf-render-surface"
