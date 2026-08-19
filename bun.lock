@@ -16,7 +16,6 @@
         "@embedpdf/plugin-viewport": "^2.14.0",
         "@embedpdf/plugin-zoom": "^2.14.0",
         "@fontsource-variable/platypi": "^5.3.0",
-        "@fontsource/radio-canada-big": "^5.3.0",
         "@nuxtjs/color-mode": "^4.0.0",
         "@nuxtjs/supabase": "^2.0.5",
         "@pinia/nuxt": "^0.11.3",
@@ -253,8 +252,6 @@
     "@floating-ui/vue": ["@floating-ui/vue@1.1.11", "", { "dependencies": { "@floating-ui/dom": "^1.7.6", "@floating-ui/utils": "^0.2.11", "vue-demi": ">=0.13.0" } }, "sha512-HzHKCNVxnGS35r9fCHBc3+uCnjw9IWIlCPL683cGgM9Kgj2BiAl8x1mS7vtvP6F9S/e/q4O6MApwSHj8hNLGfw=="],
 
     "@fontsource-variable/platypi": ["@fontsource-variable/platypi@5.3.0", "", {}, "sha512-p56deVYAVgU4199Se1emLyQkccZM6z5GNzp2p8u23Qsh3GNyRJqNhFfG7HySKKnTM+JWt5+nYIAKApSfQnSR6Q=="],
-
-    "@fontsource/radio-canada-big": ["@fontsource/radio-canada-big@5.3.0", "", {}, "sha512-430NJzaW63rCaAbjQPRNG5z19PehjlKk+UyEzSfFjsw6HgzzkCBzlyPW9R0+gjwwY3Puo5uazRuM4P+BY9b6FA=="],
 
     "@internationalized/date": ["@internationalized/date@3.12.2", "", { "dependencies": { "@swc/helpers": "^0.5.0" } }, "sha512-FY1Y+H64NDs+HAF6omlnWxm3mEpfgaCSWtL5l551ZZfImA+kGjPFgrnJrGjH6lfmLL0g8Z/mBu1R3kufeCp6Jw=="],
 
