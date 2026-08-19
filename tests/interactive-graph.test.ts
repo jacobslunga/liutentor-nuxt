@@ -74,6 +74,45 @@ describe("interactive graph parsing", () => {
     ).toThrow();
   });
 
+  it("accepts uppercase parameter ids and rejects reserved names", () => {
+    const parsed = parseInteractiveGraphSpec({
+      ...graph,
+      parameters: [
+        { id: "A", label: "Amplitude", min: 0, max: 4, step: 0.1, initial: 2 },
+        { id: "D", label: "Offset", min: -3, max: 3, step: 0.1, initial: 0 },
+      ],
+      series: [{ ...graph.series[0], expression: "A*sin(x)+D" }],
+    });
+
+    expect(parsed.parameters.map((parameter) => parameter.id)).toEqual(["A", "D"]);
+    expect(
+      evaluateGraphExpression(
+        compileGraphExpression(parsed.series[0].expression, ["A", "D"]),
+        Math.PI / 2,
+        { A: 2, D: 1 },
+      ),
+    ).toBeCloseTo(3, 5);
+
+    expect(() =>
+      parseInteractiveGraphSpec({
+        ...graph,
+        parameters: [
+          { id: "E", label: "E", min: 0, max: 1, step: 0.1, initial: 0 },
+        ],
+        series: [{ ...graph.series[0], expression: "E*x" }],
+      }),
+    ).toThrow();
+    expect(() =>
+      parseInteractiveGraphSpec({
+        ...graph,
+        parameters: [
+          { id: "sin", label: "sin", min: 0, max: 1, step: 0.1, initial: 0 },
+        ],
+        series: [{ ...graph.series[0], expression: "sin*x" }],
+      }),
+    ).toThrow();
+  });
+
   it("truncates oversized display labels without rejecting the graph", () => {
     const parsed = parseInteractiveGraphSpec({
       ...graph,
