@@ -16,6 +16,9 @@
 
 <script setup lang="ts">
 import "@fontsource-variable/platypi/wght.css";
+import "@fontsource/radio-canada-big/400.css";
+import "@fontsource/radio-canada-big/500.css";
+import "@fontsource/radio-canada-big/600.css";
 import "vue-sonner/style.css";
 import { Toaster } from "@/components/ui/sonner";
 

@@ -142,8 +142,15 @@ function confirmLockIn() {
 </script>
 
 <template>
-  <div class="hidden lg:flex h-12 shrink-0 z-60 w-full items-center justify-between px-4">
-    <div class="flex items-center gap-1">
+  <div
+    class="pointer-events-none relative isolate hidden h-14 w-full shrink-0 items-start justify-between px-3 pt-2 lg:flex"
+  >
+    <div
+      aria-hidden="true"
+      class="absolute inset-0 -z-10 bg-background/95 backdrop-blur-md mask-[linear-gradient(to_bottom,black_65%,transparent)]"
+    />
+
+    <div class="pointer-events-auto flex items-center gap-1">
       <Button size="icon-sm" variant="ghost" @click="router.push(`/search/${courseCode}`)">
         <LucideArrowLeft />
       </Button>
@@ -161,7 +168,7 @@ function confirmLockIn() {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" :side-offset="8" class="p-0 overflow-hidden border-border/60">
-          <div class="px-4 py-2.5 flex items-center justify-between border-b border-border/60 bg-muted/30">
+          <div class="px-4 py-2.5 flex items-center justify-between border-b border-border/60 bg-background">
             <span class="text-xs font-semibold text-foreground">Alla tentor</span>
             <span class="text-xs font-mono px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
               {{ sortedExams.length }} st
@@ -193,7 +200,7 @@ function confirmLockIn() {
       </DropdownMenu>
     </div>
 
-    <div class="flex items-center gap-2">
+    <div class="pointer-events-auto flex items-center gap-2">
       <Button variant="default" size="sm" class="h-8 px-3" @click="chatStore.toggle()">
         <LucideLoader2 v-if="chatStore.isLoading" class="size-3.5 animate-spin" />
         <LucideMessageSquare v-else class="size-3.5" />

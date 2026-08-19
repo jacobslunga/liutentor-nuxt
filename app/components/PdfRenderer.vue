@@ -388,6 +388,12 @@ const plugins = computed(() => {
   will-change: transform;
 }
 
+/* EmbedPDF multiplies selection highlights into the rendered page. That works
+   on white pages, but makes the tint disappear against dark-mode PDF pages. */
+:deep(.pdf-selection-surface > div[style*="mix-blend-mode"]) {
+  mix-blend-mode: normal !important;
+}
+
 /* EmbedPDF defaults pointer surfaces to touch-action: none. Keep vertical page
    scrolling on touch devices while allowing horizontal drags to select text. */
 :deep(.pdf-mobile-pointer) {

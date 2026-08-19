@@ -1,8 +1,13 @@
 <template>
   <div
-    class="shrink-0 relative flex items-center justify-between gap-2 px-3 py-1 z-90 overflow-visible bg-background"
+    class="pointer-events-none relative isolate flex h-12 items-start justify-between gap-2 overflow-visible px-3 pt-1"
   >
-    <div class="flex items-center gap-1.5 min-w-0 flex-1">
+    <div
+      aria-hidden="true"
+      class="absolute inset-0 -z-10 bg-background/95 backdrop-blur-md mask-[linear-gradient(to_bottom,black_65%,transparent)]"
+    />
+
+    <div class="pointer-events-auto flex min-w-0 flex-1 items-center gap-1.5">
       <Button
         variant="ghost"
         size="icon-sm"
@@ -16,7 +21,7 @@
         {{ displayTitle }}
       </p>
     </div>
-    <div class="flex items-center gap-1 shrink-0">
+    <div class="pointer-events-auto flex shrink-0 items-center gap-1">
       <Button
         variant="ghost"
         size="icon-sm"
