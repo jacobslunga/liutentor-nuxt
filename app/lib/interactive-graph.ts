@@ -46,8 +46,37 @@ export type AssistantContentSegment =
 const GRAPH_FENCE_OPEN = /```interactive-graph[^\S\r\n]*\r?\n/g;
 const GRAPH_FENCE_CLOSE = /^[\t ]*```[\t ]*(?:\r?\n|$)/gm;
 const EXPRESSION_PATTERN = /^[0-9A-Za-z_+\-*/^().,\s]+$/;
-const PARAMETER_ID_PATTERN = /^[a-z][a-z0-9_]{0,23}$/;
-const RESERVED_PARAMETER_IDS = new Set(["x", "PI", "E"]);
+const PARAMETER_ID_PATTERN = /^[A-Za-z][A-Za-z0-9_]{0,23}$/;
+const RESERVED_PARAMETER_IDS = new Set([
+  "x",
+  "PI",
+  "E",
+  "sin",
+  "cos",
+  "tan",
+  "asin",
+  "acos",
+  "atan",
+  "sinh",
+  "cosh",
+  "tanh",
+  "sqrt",
+  "log",
+  "ln",
+  "lg",
+  "log10",
+  "abs",
+  "ceil",
+  "floor",
+  "round",
+  "trunc",
+  "exp",
+  "cbrt",
+  "expm1",
+  "log1p",
+  "sign",
+  "log2",
+]);
 const MAX_COORDINATE = 1_000_000;
 const MAX_DISPLAY_TEXT_INPUT = 2_000;
 
@@ -191,7 +220,7 @@ export function parseInteractiveGraphSpec(value: unknown): InteractiveGraphSpec 
   const ids = new Set<string>();
   for (const parameter of parameters) {
     if (RESERVED_PARAMETER_IDS.has(parameter.id) || ids.has(parameter.id)) {
-      throw new Error("Grafens parameter-ID:n är inte unika");
+      throw new Error("Grafens parameter-ID:n är reserverade eller inte unika");
     }
     ids.add(parameter.id);
   }
