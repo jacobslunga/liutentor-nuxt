@@ -287,9 +287,6 @@ onUnmounted(() => {
   <ClientOnly>
     <div class="relative h-screen w-full overflow-hidden bg-background">
       <div v-if="exam" class="hidden lg:block absolute inset-x-0 top-0 z-70">
-        <div
-          class="pointer-events-none absolute inset-x-0 -top-10 h-24 -z-10"
-        />
         <ExamHeader
           :exams="exams"
           :exam-id="examId"

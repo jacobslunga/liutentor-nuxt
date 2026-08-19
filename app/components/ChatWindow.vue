@@ -121,7 +121,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
     </Transition>
 
     <div class="flex min-w-0 flex-1 flex-col overflow-hidden">
-      <div class="relative z-20 shrink-0">
+      <div class="pointer-events-none absolute inset-x-0 top-0 z-20">
         <ChatHeader
           :has-solution="hasSolution"
           :title="chatHeaderTitle"
@@ -137,7 +137,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
           ref="transcriptRef"
           :messages="messages"
           :is-loading="isLoading"
-          content-class="pt-4"
+          content-class="pt-12"
           @reply-to-selection="handleReplyToSelection"
           @update:show-scroll-button="showScrollButton = $event"
           @update:content-bottom="handleContentBottom"

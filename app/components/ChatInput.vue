@@ -448,14 +448,12 @@ defineExpose({
   <div class="px-4 bg-transparent relative w-full pointer-events-auto z-10">
     <div class="max-w-2xl mx-auto relative">
       <div class="space-y-2">
-        <Transition name="disclaimer-fade">
-          <p
-            v-if="showDisclaimer"
-            class="px-4 text-center text-2xs text-muted-foreground/60"
-          >
-            AI kan göra misstag. Kontrollera svaren.
-          </p>
-        </Transition>
+        <p
+          v-if="showDisclaimer"
+          class="px-4 text-center text-2xs text-muted-foreground/60"
+        >
+          AI kan göra misstag. Kontrollera svaren.
+        </p>
 
         <div
           ref="chatShellRef"
@@ -593,7 +591,7 @@ defineExpose({
                   <Button
                     variant="ghost"
                     size="sm"
-                    class="h-8 gap-1.5 rounded-full px-3 text-xs font-normal text-muted-foreground hover:bg-transparent hover:text-foreground"
+                    class="h-8 gap-1.5 rounded-full px-3 text-xs font-normal text-muted-foreground hover:bg-accent/70 hover:text-foreground data-[state=open]:bg-accent/70"
                   >
                     {{ selectedModelLabel }}
                     <LucideChevronDown
@@ -698,16 +696,6 @@ defineExpose({
 .fade-up-leave-to {
   opacity: 0;
   transform: translateY(4px);
-}
-
-.disclaimer-fade-enter-active,
-.disclaimer-fade-leave-active {
-  transition: opacity var(--duration-base) ease;
-}
-
-.disclaimer-fade-enter-from,
-.disclaimer-fade-leave-to {
-  opacity: 0;
 }
 
 .scale-enter-active,
