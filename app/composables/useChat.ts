@@ -8,6 +8,12 @@ const CHAT_API_URL =
 
 const DEFAULT_MODEL_ID = "gpt-5.6-luna";
 
+function truncateTitle(title: string, maxLength: number): string {
+  if (title.length <= maxLength) return title;
+
+  return `${title.slice(0, maxLength - 1).trimEnd()}…`;
+}
+
 function getAnonymousId(): string {
   if (typeof window === "undefined") return "unknown";
   const key = "liutentor_anonymous_id";
@@ -102,15 +108,19 @@ export function useChat(options: {
 
     if (!chatStore.currentConversationTitle) {
       chatStore.currentConversationTitle =
-        trimmedContent.substring(0, 80) || attachments[0]?.name || "Ny chatt";
+        truncateTitle(trimmedContent, 80) ||
+        (attachments[0]?.name
+          ? truncateTitle(attachments[0].name, 80)
+          : "Ny chatt");
     }
 
     if (userId && !chatStore.currentConversationId) {
       try {
         const title =
-          trimmedContent.substring(0, 50) ||
-          attachments[0]?.name.substring(0, 50) ||
-          "Ny chatt";
+          truncateTitle(trimmedContent, 50) ||
+          (attachments[0]?.name
+            ? truncateTitle(attachments[0].name, 50)
+            : "Ny chatt");
         const { data, error } = await (supabase as any)
           .from("conversations")
           .insert({
