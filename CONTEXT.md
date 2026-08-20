@@ -77,7 +77,7 @@ liutentor-nuxt/
 │   ├── stores/                 # Pinia stores (chat, layout, quiz)
 │   └── types/                  # TypeScript interface definitions
 ├── public/                     # Static assets (fonts, logo, manifest)
-│   └── fonts/                  # Custom webfonts (GitLabSansVF.woff2, GT-Super-Text-Bold.otf)
+│   └── fonts/                  # Custom logo webfont (GT-Super-Text-Bold.otf)
 ├── server/                     # Nitro server engine
 │   ├── api/                    # Server API endpoints & Go backend proxies
 │   └── routes/                 # Dynamic server routes (sitemap.xml)
@@ -101,4 +101,4 @@ liutentor-nuxt/
    - Static pages (`/om-oss`, `/faq`, `/ai-policy`, `/copyright-policy`, `/privacy-policy`) use `prerender: true`.
    - Course pages (`/search/**`), home (`/`), and API endpoints (`/api/exams/**`) use Stale-While-Revalidate (`swr: 3600`).
 6. **Fonts**:
-   - Main sans font `/fonts/GitLabSansVF.woff2` is preloaded in `nuxt.config.ts` and configured with `font-display: swap;` in `tailwind.css`.
+   - The interface uses the system sans-serif stack. The custom `GT-Super-Text-Bold.otf` font is reserved for the logo.
