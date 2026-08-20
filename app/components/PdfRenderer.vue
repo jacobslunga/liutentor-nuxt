@@ -38,7 +38,8 @@ const emit = defineEmits<{ explain: [text: string] }>();
 const colorMode = useColorMode();
 const { engine, isLoading } = usePdfiumEngine();
 
-const selectionColor = "color-mix(in oklch, var(--primary) 10%, transparent)";
+const selectionColor =
+  "color-mix(in oklch, var(--primary) 35%, transparent)";
 
 const darkPageStyle = {
   filter: "invert(1) hue-rotate(180deg) brightness(0.92)",
@@ -382,8 +383,8 @@ const plugins = computed(() => {
   will-change: transform;
 }
 
-/* EmbedPDF multiplies selection highlights into the rendered page. That works
-   on white pages, but makes the tint disappear against dark-mode PDF pages. */
+/* PDF text is rendered into a canvas rather than selectable DOM glyphs. A
+   translucent highlight keeps that canvas text crisp in either color mode. */
 :deep(.pdf-selection-surface > div[style*="mix-blend-mode"]) {
   mix-blend-mode: normal !important;
 }

@@ -45,12 +45,23 @@
 <script setup lang="ts">
 import { computed } from "vue";
 
+const LEGACY_TITLE_LIMITS = new Set([50, 80]);
+
 const props = defineProps<{
   hasSolution: boolean;
   title: string;
   historyOpen: boolean;
 }>();
-const displayTitle = computed(() => props.title?.trim() || "Ny chatt");
+const displayTitle = computed(() => {
+  const title = props.title?.trim() || "Ny chatt";
+
+  // Older conversation titles were cut at these lengths without an ellipsis.
+  if (LEGACY_TITLE_LIMITS.has(title.length) && !title.endsWith("…")) {
+    return `${title}…`;
+  }
+
+  return title;
+});
 const emit = defineEmits<{
   close: [];
   openHistory: [];
