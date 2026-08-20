@@ -1,15 +1,7 @@
 <script setup lang="ts">
 import { useChatStore } from "@/stores/chat";
+import type { Exam } from "~/types/exam";
 import { useLayoutStore } from "~/stores/layout";
-
-interface Exam {
-  id: number;
-  exam_name: string;
-  exam_date: string;
-  has_solution: boolean;
-  course_code: string;
-  pdf_url: string;
-}
 
 const props = defineProps<{
   exams: Exam[];
@@ -29,8 +21,22 @@ const isSettingsOpen = ref(false);
 const lockInDuration = ref<string | null>(null);
 const showLockInConfirm = ref(false);
 const scrollRef = ref<HTMLDivElement | null>(null);
+const { sortBy, sortDirection } = useExamSortPreference("exam-picker");
+const isSortMenuOpen = ref(false);
+
+function toggleSortMenu() {
+  isSortMenuOpen.value = !isSortMenuOpen.value;
+}
+
+function dismissSortMenu(event: MouseEvent) {
+  if (!isSortMenuOpen.value) return;
+  event.preventDefault();
+  event.stopPropagation();
+  isSortMenuOpen.value = false;
+}
 
 watch(isDropdownOpen, (open) => {
+  if (!open) isSortMenuOpen.value = false;
   if (open) {
     nextTick(() => {
       const activeEl = scrollRef.value?.querySelector('[data-current="true"]');
@@ -50,11 +56,61 @@ const TIME_OPTIONS = [
   { value: "300", label: "5 timmar" },
 ];
 
+function hasPassRate(exam: Exam) {
+  return Number.isFinite(Number(exam.pass_rate)) && Number(exam.pass_rate) > 0;
+}
+
+function formatPassRate(exam: Exam) {
+  return hasPassRate(exam) ? `${Number(exam.pass_rate).toFixed(1)}%` : "–";
+}
+
+function passColor(exam: Exam) {
+  if (!hasPassRate(exam)) return "text-muted-foreground/50";
+  if (exam.pass_rate >= 50) return "text-success";
+  if (exam.pass_rate >= 30) return "text-warning";
+  return "text-destructive";
+}
+
+const sortLabel = computed(() =>
+  sortBy.value === "date" ? "Datum" : "Godkänd",
+);
+
+function setSortBy(value: unknown) {
+  if (value === "date" || value === "pass-rate") {
+    sortBy.value = value;
+    isSortMenuOpen.value = false;
+  }
+}
+
+function setSortDirection(value: unknown) {
+  if (value === "asc" || value === "desc") {
+    sortDirection.value = value;
+    isSortMenuOpen.value = false;
+  }
+}
+
 const sortedExams = computed(() =>
   [...props.exams].sort((a, b) => {
-    const diff =
-      new Date(b.exam_date).getTime() - new Date(a.exam_date).getTime();
-    if (diff !== 0) return diff;
+    if (sortBy.value === "pass-rate") {
+      const aHasRate = hasPassRate(a);
+      const bHasRate = hasPassRate(b);
+      if (aHasRate !== bHasRate) return aHasRate ? -1 : 1;
+
+      if (aHasRate && bHasRate) {
+        const rateDiff = Number(a.pass_rate) - Number(b.pass_rate);
+        if (rateDiff !== 0) {
+          return sortDirection.value === "asc" ? rateDiff : -rateDiff;
+        }
+      }
+    } else {
+      const dateDiff = a.exam_date.localeCompare(b.exam_date);
+      if (dateDiff !== 0) {
+        return sortDirection.value === "asc" ? dateDiff : -dateDiff;
+      }
+    }
+
+    const dateDiff = b.exam_date.localeCompare(a.exam_date);
+    if (dateDiff !== 0) return dateDiff;
     return a.exam_name.localeCompare(b.exam_name);
   }),
 );
@@ -167,33 +223,62 @@ function confirmLockIn() {
               :class="{ 'rotate-180': isDropdownOpen }" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" :side-offset="8" class="p-0 overflow-hidden border-border/60">
-          <div class="px-4 py-2.5 flex items-center justify-between border-b border-border/60 bg-background">
+        <DropdownMenuContent align="start" :side-offset="8" class="p-0 overflow-hidden border-border/60"
+          @click.capture="dismissSortMenu">
+          <div class="px-3 py-2 flex items-center justify-between gap-3 border-b border-border/60 bg-background">
             <span class="text-xs font-semibold text-foreground">Alla tentor</span>
-            <span class="text-xs font-mono px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
-              {{ sortedExams.length }} st
-            </span>
+            <div class="flex items-center gap-1.5">
+              <DropdownMenuSub :open="isSortMenuOpen">
+                <DropdownMenuSubTrigger
+                  class="h-7 cursor-pointer border border-border/60 bg-background px-2 py-1 text-xs"
+                  aria-label="Sortera tentor" @click.prevent="toggleSortMenu"
+                >
+                  <LucideArrowDown v-if="sortDirection === 'desc'" class="size-3.5" />
+                  <LucideArrowUp v-else class="size-3.5" />
+                  {{ sortLabel }}
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent class="w-44">
+                  <DropdownMenuLabel>Sortera efter</DropdownMenuLabel>
+                  <DropdownMenuRadioGroup :model-value="sortBy" @update:model-value="setSortBy">
+                    <DropdownMenuRadioItem value="date" @select.prevent>Datum</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="pass-rate" @select.prevent>Godkänd</DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuLabel>Ordning</DropdownMenuLabel>
+                  <DropdownMenuRadioGroup :model-value="sortDirection"
+                    @update:model-value="setSortDirection">
+                    <DropdownMenuRadioItem value="desc" @select.prevent>Fallande</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="asc" @select.prevent>Stigande</DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+              <span class="text-xs font-mono px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
+                {{ sortedExams.length }} st
+              </span>
+            </div>
           </div>
           <div ref="scrollRef" class="max-h-80 overflow-y-auto p-1.5 space-y-0.5 custom-scrollbar">
             <button v-for="e in sortedExams" :key="e.id" :data-current="e.id.toString() === examId"
-              class="w-full flex items-center justify-between gap-2.5 text-left rounded-md px-3 py-2 transition-colors duration-150 cursor-pointer group"
+              class="grid w-full grid-cols-[3.25rem_6.75rem_3.75rem_3.5rem_1rem] items-center gap-x-2 rounded-md px-3 py-2 text-left transition-colors duration-150 cursor-pointer group"
               :class="e.id.toString() === examId
                 ? 'bg-accent font-semibold text-accent-foreground'
                 : 'hover:bg-muted/70 text-foreground/90 hover:text-foreground'
                 " @click="changeExam(e)">
-              <div class="flex items-center gap-1.5 min-w-0">
-                <span v-if="getExamPrefix(e)" class="text-sm font-normal text-foreground shrink-0">
-                  {{ getExamPrefix(e) }}
-                </span>
-                <span class="text-sm font-semibold shrink-0">
-                  {{ e.exam_date }}
-                </span>
-                <Badge v-if="e.has_solution" variant="outline"
-                  class="text-2xs px-1.5 py-0.5 rounded-md font-medium border-success/30 bg-success/10 text-success shrink-0 ml-0.5">
-                  Facit
-                </Badge>
-              </div>
-              <LucideCheck v-if="e.id.toString() === examId" class="size-4 text-primary shrink-0 ml-auto" />
+              <span class="truncate text-sm font-normal text-foreground">
+                {{ getExamPrefix(e) }}
+              </span>
+              <span class="text-sm font-semibold tabular-nums">
+                {{ e.exam_date }}
+              </span>
+              <Badge v-if="e.has_solution" variant="outline"
+                class="col-start-3 justify-self-start text-2xs px-1.5 py-0.5 rounded-md font-medium border-success/30 bg-success/10 text-success">
+                Facit
+              </Badge>
+              <span class="col-start-4 justify-self-end font-mono text-xs tabular-nums" :class="passColor(e)">
+                {{ formatPassRate(e) }}
+              </span>
+              <LucideCheck v-if="e.id.toString() === examId" class="col-start-5 size-4 text-primary" />
+              <span v-else class="col-start-5 size-4" aria-hidden="true" />
             </button>
           </div>
         </DropdownMenuContent>

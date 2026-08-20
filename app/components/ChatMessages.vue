@@ -19,9 +19,11 @@ const props = withDefaults(
 
     contentClass?: string;
 
+    assistantClass?: string;
+
     enableSelectionPopover?: boolean;
   }>(),
-  { contentClass: "", enableSelectionPopover: true },
+  { assistantClass: "", contentClass: "", enableSelectionPopover: true },
 );
 
 const emit = defineEmits<{
@@ -363,9 +365,9 @@ defineExpose({
           </div>
           <div
             v-if="msg.content"
-            class="bg-primary/10 text-foreground px-4 py-2 rounded-2xl w-fit"
+            class="w-fit rounded-2xl bg-secondary px-4 py-3 text-secondary-foreground"
           >
-            <p class="text-base leading-relaxed whitespace-pre-wrap">
+            <p class="text-[15px] leading-relaxed whitespace-pre-wrap">
               {{ msg.content }}
             </p>
           </div>
@@ -374,6 +376,7 @@ defineExpose({
         <div
           v-else
           class="w-full min-w-0 px-1 py-2 overflow-hidden"
+          :class="assistantClass"
           data-role="assistant"
           :data-streaming="
             isLoading && i === messages.length - 1 ? 'true' : undefined
@@ -615,11 +618,13 @@ defineExpose({
   color: var(--shiki-light);
 }
 
-.dark .prose :deep(.code-block pre.shiki) {
+.dark .prose :deep(.code-block pre.shiki),
+.dim .prose :deep(.code-block pre.shiki) {
   background-color: var(--shiki-dark-bg);
 }
 
-.dark .prose :deep(.code-block pre.shiki span) {
+.dark .prose :deep(.code-block pre.shiki span),
+.dim .prose :deep(.code-block pre.shiki span) {
   color: var(--shiki-dark);
 }
 

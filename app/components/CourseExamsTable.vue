@@ -4,6 +4,8 @@ import type { Exam } from "~/types/exam";
 const props = defineProps<{
   courseCode: string;
   exams: Exam[];
+  sortBy?: "date" | "pass-rate";
+  sortDirection?: "asc" | "desc";
 }>();
 
 const activeFilters = ref<Set<string>>(new Set());
@@ -23,11 +25,28 @@ const prefixes = computed(() => {
 
 const sortedExams = computed<Exam[]>(() => {
   return [...props.exams].sort((a, b) => {
-    const diff =
-      new Date(b.exam_date).getTime() - new Date(a.exam_date).getTime();
-    if (diff !== 0) {
-      return diff;
+    if (props.sortBy === "pass-rate") {
+      const aHasRate =
+        Number.isFinite(Number(a.pass_rate)) && Number(a.pass_rate) > 0;
+      const bHasRate =
+        Number.isFinite(Number(b.pass_rate)) && Number(b.pass_rate) > 0;
+      if (aHasRate !== bHasRate) return aHasRate ? -1 : 1;
+
+      if (aHasRate && bHasRate) {
+        const rateDiff = Number(a.pass_rate) - Number(b.pass_rate);
+        if (rateDiff !== 0) {
+          return props.sortDirection === "asc" ? rateDiff : -rateDiff;
+        }
+      }
+    } else {
+      const dateDiff = a.exam_date.localeCompare(b.exam_date);
+      if (dateDiff !== 0) {
+        return props.sortDirection === "asc" ? dateDiff : -dateDiff;
+      }
     }
+
+    const dateDiff = b.exam_date.localeCompare(a.exam_date);
+    if (dateDiff !== 0) return dateDiff;
     return (a.exam_name ?? "").localeCompare(b.exam_name ?? "");
   });
 });
