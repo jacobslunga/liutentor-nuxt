@@ -36,8 +36,6 @@ const conversationMeta = useState<Record<string, ConversationMeta>>(
   () => ({}),
 );
 const searchQuery = ref("");
-const animateReveal = ref(false);
-let revealTimer: ReturnType<typeof setTimeout> | null = null;
 const searchInputRef = ref<HTMLInputElement | null>(null);
 const isLoading = ref(false);
 const isOpeningConversation = ref(false);
@@ -164,7 +162,6 @@ async function loadConversations() {
       }));
 
     loadConversationMeta(conversations.value.map((c) => c.id));
-    if (isInitialLoad) startReveal();
   } catch {
 
     if (isInitialLoad) {
@@ -381,53 +378,17 @@ async function confirmDeleteAllConversations() {
   }
 }
 
-function startReveal() {
-  animateReveal.value = true;
-  if (revealTimer) clearTimeout(revealTimer);
-  revealTimer = setTimeout(() => {
-    animateReveal.value = false;
-  }, 700);
-}
-
-const itemDelayIndex = computed(() => {
-  const map: Record<string, number> = {};
-  let index = 0;
-  for (const group of groupedConversations.value) {
-    for (const item of group.items) {
-      map[item.id] = index;
-      index += 1;
-    }
-  }
-  return map;
-});
-
-function itemRevealStyle(id: string) {
-  if (!animateReveal.value) return undefined;
-  const index = itemDelayIndex.value[id] ?? 0;
-  return { animationDelay: `${Math.min(index * 22, 260)}ms` };
-}
-
 watch(
   [() => props.open, userId],
   ([open]) => {
     if (!open) return;
     searchQuery.value = "";
-    if (conversations.value.length > 0) startReveal();
     loadConversations();
   },
   { immediate: true },
 );
 
-watch(searchQuery, () => {
-  animateReveal.value = false;
-});
-
-onUnmounted(() => {
-  if (revealTimer) clearTimeout(revealTimer);
-});
-
 function focusSearch(event: Event) {
-
   event.preventDefault();
   if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
     searchInputRef.value?.focus();
@@ -437,7 +398,10 @@ function focusSearch(event: Event) {
 
 <template>
   <Dialog :open="open" @update:open="emit('update:open', $event)">
-    <DialogContent class="sm:max-w-md p-0 gap-0 overflow-hidden" @open-auto-focus="focusSearch">
+    <DialogContent
+      class="flex h-[min(32rem,calc(100dvh-2rem))] flex-col gap-0 overflow-hidden p-0 duration-0 data-[state=closed]:!animate-none data-[state=open]:!animate-none sm:h-[32rem] sm:max-w-md"
+      @open-auto-focus="focusSearch"
+    >
       <DialogHeader class="px-4 pt-4 pb-0">
         <DialogTitle>Chatthistorik</DialogTitle>
         <DialogDescription class="sr-only">
@@ -457,7 +421,7 @@ function focusSearch(event: Event) {
         </Button>
       </div>
 
-      <div class="max-h-[55vh] min-h-40 overflow-y-auto px-2 py-2 custom-scrollbar">
+      <div class="min-h-0 flex-1 overflow-y-auto px-2 py-2 custom-scrollbar">
         <div v-if="isLoading" class="px-2 py-4 text-sm text-muted-foreground">
           Hämtar historik...
         </div>
@@ -486,12 +450,11 @@ function focusSearch(event: Event) {
 
             <div class="space-y-0.5">
               <div v-for="item in group.items" :key="item.id"
-                class="group flex items-center gap-1 rounded-md px-1 transition-colors" :class="[
+                class="group flex items-center gap-1 rounded-md px-1 transition-colors" :class="
                   item.id === chatStore.currentConversationId
                     ? 'bg-secondary'
-                    : 'bg-transparent hover:bg-accent',
-                  animateReveal ? 'history-item-reveal' : '',
-                ]" :style="itemRevealStyle(item.id)">
+                    : 'bg-transparent hover:bg-accent'
+                ">
                 <button type="button" class="min-w-0 flex-1 cursor-pointer text-left px-2 py-1.5"
                   :disabled="isOpeningConversation || isDeletingConversation" @click="openConversation(item)">
                   <p class="text-sm truncate text-foreground/90" :class="item.id === chatStore.currentConversationId
@@ -557,24 +520,3 @@ function focusSearch(event: Event) {
     </AlertDialogContent>
   </AlertDialog>
 </template>
-
-<style scoped>
-.history-item-reveal {
-  opacity: 0;
-  animation: history-item-in 240ms var(--ease-spring) forwards;
-}
-
-@keyframes history-item-in {
-  from {
-    opacity: 0;
-    filter: blur(4px);
-    transform: translateY(4px);
-  }
-
-  to {
-    opacity: 1;
-    filter: blur(0);
-    transform: translateY(0);
-  }
-}
-</style>

@@ -41,11 +41,6 @@ const { engine, isLoading } = usePdfiumEngine();
 const selectionColor = "color-mix(in oklch, var(--primary) 10%, transparent)";
 
 const darkPageStyle = {
-  filter: "invert(1) hue-rotate(180deg)",
-  mixBlendMode: "screen",
-} as const;
-
-const dimPageStyle = {
   filter: "invert(1) hue-rotate(180deg) brightness(0.92)",
   mixBlendMode: "screen",
 } as const;
@@ -57,8 +52,7 @@ const lightPageStyle = {
 } as const;
 
 const pageStyle = computed(() => {
-  if (colorMode.value === "dark") return darkPageStyle;
-  if (colorMode.value === "dim") return dimPageStyle;
+  if (["dark", "dim"].includes(colorMode.value)) return darkPageStyle;
   return lightPageStyle;
 });
 

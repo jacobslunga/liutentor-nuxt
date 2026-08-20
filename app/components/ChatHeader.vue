@@ -28,7 +28,7 @@
         aria-label="Ny chatt"
         @click="emit('newChat')"
       >
-        <LucideMessageSquareShare class="w-4 h-4" />
+        <LucidePlus class="size-4" />
       </Button>
       <Button
         variant="ghost"
@@ -36,7 +36,7 @@
         aria-label="Historik"
         @click="emit('openHistory')"
       >
-        <LucidePanelRight class="w-4 h-4" />
+        <LucidePanelRight class="size-4" />
       </Button>
     </div>
   </div>

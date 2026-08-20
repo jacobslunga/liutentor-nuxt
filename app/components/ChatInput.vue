@@ -575,7 +575,7 @@ defineExpose({
               :value="text"
               rows="1"
               placeholder="Fråga vad som helst"
-              class="chat-textarea min-w-0 resize-none border-0 bg-transparent px-2 py-1 text-base leading-relaxed outline-none placeholder:text-muted-foreground/70 focus:ring-0 max-h-45"
+              class="chat-textarea min-w-0 resize-none border-0 bg-transparent px-2 py-1 text-base leading-relaxed outline-none placeholder:text-muted-foreground/70 focus:ring-0 max-h-45 sm:text-[15px]"
               :class="isMultiline ? 'order-1 basis-full' : 'order-2 flex-1'"
               @input="handleInput"
               @keydown="handleKeyDown"

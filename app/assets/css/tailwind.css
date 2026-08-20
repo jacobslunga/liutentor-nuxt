@@ -62,8 +62,8 @@
 @theme {
   --font-logo: "Logo", serif;
   --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
-  --font-serif: "Platypi Variable", Georgia, Cambria, "Times New Roman", Times, serif;
-  --font-sans: system-ui, -apple-system, BlinkMacSystemFont,
+  --font-serif: "Source Serif 4 Variable", Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-sans: "Inter Variable", system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue",
     sans-serif;
 
@@ -185,7 +185,9 @@ body {
   --sidebar-ring: oklch(0.7 0 0);
 }
 
+.dark,
 .dim {
+  color-scheme: dark;
 
   --background: oklch(0.21 0.004 265);
   --background-0: oklch(from var(--background) l c h / 0);
@@ -233,61 +235,6 @@ body {
   --sidebar-accent-foreground: oklch(0.94 0.002 265);
   --sidebar-border: oklch(0.285 0.005 265);
   --sidebar-ring: oklch(0.42 0.008 265);
-}
-
-.dark {
-  color-scheme: dark;
-
-  --background: oklch(0 0 0);
-  --background-0: oklch(from var(--background) l c h / 0);
-  --background-soft: oklch(from var(--background) l c h / 0.7);
-  --foreground: oklch(0.94 0.002 265);
-
-  --card: oklch(0.12 0.003 265);
-  --card-foreground: oklch(0.94 0.002 265);
-  --popover: oklch(0.15 0.004 265);
-  --popover-foreground: oklch(0.94 0.002 265);
-  --primary: oklch(0.8332 0.088 144.73);
-  --primary-foreground: #1a1a19;
-  --secondary: oklch(0.12 0.003 265);
-  --secondary-foreground: oklch(0.94 0.002 265);
-  --muted: oklch(0.15 0.004 265);
-  --muted-foreground: oklch(0.65 0.008 265);
-
-  --accent: oklch(0.18 0.005 265);
-  --accent-foreground: oklch(0.94 0.002 265);
-  --destructive: oklch(0.704 0.191 22.216);
-
-  --success: oklch(0.78 0.13 150);
-  --success-foreground: oklch(0.2 0 0);
-  --warning: oklch(0.82 0.14 80);
-  --warning-foreground: oklch(0.2 0 0);
-
-  --border: oklch(0.2 0.004 265);
-  --input: oklch(0.22 0.004 265);
-  --ring: oklch(0.38 0.007 265);
-  --chart-1: oklch(0.911 0.0453 168.18);
-  --chart-2: oklch(0.8072 0.1109 164.79);
-  --chart-3: oklch(0.7521 0.1557 160.22);
-  --chart-4: oklch(0.6506 0.138 159.72);
-  --chart-5: oklch(0.5382 0.1159 159.4);
-
-  --grade-low: oklch(0.55 0.12 160);
-  --grade-mid: oklch(0.68 0.145 160);
-  --grade-high: oklch(0.83 0.13 160);
-  --grade-fail: var(--destructive);
-  --sidebar: oklch(0 0 0);
-  --sidebar-foreground: oklch(0.94 0.002 265);
-  --sidebar-primary: oklch(78% 0.055 168);
-  --sidebar-primary-foreground: oklch(0.14 0 0);
-  --sidebar-accent: oklch(0.14 0.004 265);
-  --sidebar-accent-foreground: oklch(0.94 0.002 265);
-  --sidebar-border: oklch(0.2 0.004 265);
-  --sidebar-ring: oklch(0.38 0.007 265);
-}
-
-.dim {
-  color-scheme: dark;
 }
 
 @layer base {

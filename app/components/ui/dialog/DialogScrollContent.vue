@@ -56,7 +56,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits);
         <slot />
 
         <DialogClose v-if="showCloseButton"
-          class="absolute top-4 right-4 p-0.5 transition-colors duration-150 ease-spring rounded-md hover:bg-accent">
+          class="absolute top-4 right-4 cursor-pointer p-0.5 transition-colors duration-150 ease-spring rounded-md hover:bg-accent">
           <LucideX class="w-4 h-4" />
           <span class="sr-only">Close</span>
         </DialogClose>

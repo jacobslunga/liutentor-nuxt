@@ -135,7 +135,7 @@ watch(transcriptRef, (transcript) => {
               aria-label="Ny chatt"
               @click="startNewChat"
             >
-              <LucideMessageSquareShare class="size-4" />
+              <LucidePlus class="size-4" />
             </Button>
             <Button
               variant="ghost"

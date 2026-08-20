@@ -15,11 +15,22 @@
 </template>
 
 <script setup lang="ts">
-import "@fontsource-variable/platypi/wght.css";
+import "@fontsource-variable/inter/wght.css";
+import "@fontsource-variable/inter/wght-italic.css";
+import "@fontsource-variable/source-serif-4/wght.css";
+import "@fontsource-variable/source-serif-4/wght-italic.css";
 import "vue-sonner/style.css";
 import { Toaster } from "@/components/ui/sonner";
 
 const colorMode = useColorMode();
+
+onMounted(() => {
+  // "dim" was the old name for the softer dark palette. Keep the CSS alias
+  // during migration, but persist the single canonical dark preference.
+  if (colorMode.preference === "dim") {
+    colorMode.preference = "dark";
+  }
+});
 
 useHead({
   link: [

@@ -36,6 +36,21 @@ const courseData = computed(() => (data.value as any)?.data);
 const exams = computed<Exam[]>(() => courseData.value?.exams ?? []);
 const router = useRouter();
 const COURSE_TABS = ["exams", "stats", "quiz"];
+const {
+  sortBy: examSortBy,
+  sortDirection: examSortDirection,
+} = useExamSortPreference("course-page");
+const examSortLabel = computed(() =>
+  examSortBy.value === "date" ? "Datum" : "Godkänd",
+);
+
+function setExamSortBy(value: unknown) {
+  if (value === "date" || value === "pass-rate") examSortBy.value = value;
+}
+
+function setExamSortDirection(value: unknown) {
+  if (value === "asc" || value === "desc") examSortDirection.value = value;
+}
 
 function tabFromQuery(value: unknown) {
   return typeof value === "string" && COURSE_TABS.includes(value)
@@ -305,6 +320,33 @@ function passColor(rate: number) {
 
           <Tabs v-model="activeTab" class="w-full -mt-4">
             <CourseTabsBar>
+              <template #controls>
+                <DropdownMenu v-if="activeTab === 'exams'">
+                  <DropdownMenuTrigger as-child>
+                    <Button variant="outline" size="sm" aria-label="Sortera tentor">
+                      <LucideArrowUpDown class="size-4" />
+                      {{ examSortLabel }}
+                      <LucideArrowDown v-if="examSortDirection === 'desc'" class="size-3.5 text-muted-foreground" />
+                      <LucideArrowUp v-else class="size-3.5 text-muted-foreground" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" class="w-44">
+                    <DropdownMenuLabel>Sortera efter</DropdownMenuLabel>
+                    <DropdownMenuRadioGroup :model-value="examSortBy"
+                      @update:model-value="setExamSortBy">
+                      <DropdownMenuRadioItem value="date">Datum</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="pass-rate">Godkänd</DropdownMenuRadioItem>
+                    </DropdownMenuRadioGroup>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuLabel>Ordning</DropdownMenuLabel>
+                    <DropdownMenuRadioGroup :model-value="examSortDirection"
+                      @update:model-value="setExamSortDirection">
+                      <DropdownMenuRadioItem value="desc">Fallande</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value="asc">Stigande</DropdownMenuRadioItem>
+                    </DropdownMenuRadioGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </template>
               <template #actions>
                 <Button variant="default" @click="openUploadModal(courseCode)">
                   <LucideUpload class="w-4 h-4" />
@@ -320,7 +362,12 @@ function passColor(rate: number) {
                 value="exams"
                 class="mt-5"
               >
-                <CourseExamsTable :course-code="courseCode" :exams="exams" />
+                <CourseExamsTable
+                  :course-code="courseCode"
+                  :exams="exams"
+                  :sort-by="examSortBy"
+                  :sort-direction="examSortDirection"
+                />
               </TabsContent>
 
               <TabsContent
