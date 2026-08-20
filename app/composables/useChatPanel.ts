@@ -1,4 +1,11 @@
-import { ref, computed, watch, nextTick, onMounted, onBeforeUnmount } from "vue";
+import {
+  ref,
+  computed,
+  watch,
+  nextTick,
+  onMounted,
+  onBeforeUnmount,
+} from "vue";
 import type { Ref } from "vue";
 import { storeToRefs } from "pinia";
 import {
@@ -58,8 +65,8 @@ export function useChatPanel(opts: ChatPanelOptions) {
   const currentUserId = computed(
     () =>
       ((user.value as any)?.id ?? (user.value as any)?.sub ?? null) as
-      | string
-      | null,
+        | string
+        | null,
   );
 
   const chatHeaderTitle = computed(() => {
@@ -111,7 +118,6 @@ export function useChatPanel(opts: ChatPanelOptions) {
   }
 
   function startPendingSelection(pending: PendingSelection) {
-
     if (isLoading.value) {
       selectionContext.value = pending.context;
       nextTick(() => {
@@ -165,7 +171,6 @@ export function useChatPanel(opts: ChatPanelOptions) {
   });
 
   onMounted(() => {
-
     const pending = chatStore.takePendingSelection();
 
     if (chatStore.currentExamId !== opts.examId) {

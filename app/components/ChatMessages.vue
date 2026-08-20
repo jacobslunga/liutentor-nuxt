@@ -16,11 +16,7 @@ const props = withDefaults(
   defineProps<{
     messages: Message[];
     isLoading: boolean;
-
     contentClass?: string;
-
-    assistantClass?: string;
-
     enableSelectionPopover?: boolean;
   }>(),
   { assistantClass: "", contentClass: "", enableSelectionPopover: true },
@@ -169,18 +165,20 @@ const renderedAssistantSegments = computed<RenderedAssistantSegment[][]>(() => {
   return props.messages.map((msg, i) => {
     if (msg.role !== "assistant" || !msg.content) return [];
     const isStreamingLast = props.isLoading && i === lastIndex;
-    return parseAssistantContent(msg.content).map((segment): RenderedAssistantSegment => {
-      if (segment.type === "graph" && isStreamingLast) {
-        return { type: "graph-pending" };
-      }
-      if (segment.type !== "markdown") return segment;
-      return {
-        type: "markdown",
-        html: isStreamingLast
-          ? renderChatMarkdown(segment.content)
-          : renderCachedChatMarkdown(segment.content),
-      };
-    });
+    return parseAssistantContent(msg.content).map(
+      (segment): RenderedAssistantSegment => {
+        if (segment.type === "graph" && isStreamingLast) {
+          return { type: "graph-pending" };
+        }
+        if (segment.type !== "markdown") return segment;
+        return {
+          type: "markdown",
+          html: isStreamingLast
+            ? renderChatMarkdown(segment.content)
+            : renderCachedChatMarkdown(segment.content),
+        };
+      },
+    );
   });
 });
 
@@ -242,11 +240,7 @@ watch(
 );
 
 watch(
-  [
-    () => props.messages.length,
-    () => props.messages.at(-1)?.content,
-    mdReady,
-  ],
+  [() => props.messages.length, () => props.messages.at(-1)?.content, mdReady],
   () => nextTick(reportContentBottom),
   { flush: "post" },
 );
@@ -365,7 +359,7 @@ defineExpose({
           </div>
           <div
             v-if="msg.content"
-            class="w-fit rounded-2xl bg-secondary px-4 py-3 text-secondary-foreground"
+            class="w-fit rounded-2xl bg-secondary px-4 py-2 text-secondary-foreground"
           >
             <p class="text-[15px] leading-relaxed whitespace-pre-wrap">
               {{ msg.content }}
@@ -376,7 +370,6 @@ defineExpose({
         <div
           v-else
           class="w-full min-w-0 px-1 py-2 overflow-hidden"
-          :class="assistantClass"
           data-role="assistant"
           :data-streaming="
             isLoading && i === messages.length - 1 ? 'true' : undefined
@@ -396,13 +389,15 @@ defineExpose({
             >
               <div
                 v-if="segment.type === 'markdown'"
-                class="prose max-w-full min-w-0 prose-headings:font-medium prose-h1:text-xl prose-h2:text-lg prose-h3:text-md prose-h4:text-base prose-strong:font-medium dark:prose-invert prose-p:font-normal marker:text-foreground marker:font-medium"
+                class="prose max-w-full min-w-0 prose-headings:font-semibold prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-h4:text-base dark:prose-invert marker:text-foreground marker:font-medium"
                 v-html="segment.html"
               />
               <ClientOnly v-else-if="segment.type === 'graph'">
                 <LazyChatInteractiveGraph :spec="segment.spec" />
                 <template #fallback>
-                  <div class="graph-artifact-status shimmer-text">Förbereder graf...</div>
+                  <div class="graph-artifact-status shimmer-text">
+                    Förbereder graf...
+                  </div>
                 </template>
               </ClientOnly>
               <div
