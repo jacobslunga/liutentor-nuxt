@@ -1,12 +1,7 @@
 <template>
   <div
-    class="pointer-events-none relative isolate flex h-12 items-start justify-between gap-2 overflow-visible px-3 pt-1"
+    class="pointer-events-none relative isolate flex h-12 items-start justify-between gap-2 overflow-visible px-3 pt-1 bg-linear-to-b from-background via-background/80 to-transparent"
   >
-    <div
-      aria-hidden="true"
-      class="absolute inset-0 -z-10 bg-background/95 backdrop-blur-md mask-[linear-gradient(to_bottom,black_65%,transparent)]"
-    />
-
     <div class="pointer-events-auto flex min-w-0 flex-1 items-center gap-1.5">
       <Button
         variant="ghost"
@@ -17,7 +12,9 @@
       >
         <LucideChevronRight />
       </Button>
-      <p class="min-w-0 truncate text-sm font-normal text-muted-foreground">
+      <p
+        class="min-w-0 truncate overflow-hidden text-sm font-normal text-muted-foreground"
+      >
         {{ displayTitle }}
       </p>
     </div>

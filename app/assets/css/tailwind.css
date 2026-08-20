@@ -18,11 +18,9 @@
 }
 
 @theme {
-
   --ease-spring: cubic-bezier(0.25, 0.1, 0.25, 1);
   --duration-fast: 150ms;
   --duration-base: 200ms;
-
 }
 
 ::-webkit-scrollbar {
@@ -69,12 +67,14 @@
 
 @theme {
   --font-logo: "Logo", serif;
-  --font-mono: "JetBrains Mono Variable", ui-monospace, "SF Mono", SFMono-Regular,
-    Menlo, Consolas, monospace;
-  --font-serif: "Source Serif 4 Variable", Georgia, Cambria, "Times New Roman", Times, serif;
-  --font-sans: "GitLab Sans", system-ui, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue",
-    sans-serif;
+  --font-mono:
+    "JetBrains Mono Variable", ui-monospace, "SF Mono", SFMono-Regular, Menlo,
+    Consolas, monospace;
+  --font-serif:
+    "Source Serif 4 Variable", Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-sans:
+    "GitLab Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 
   --text-2xs: 0.6875rem;
 }
@@ -94,7 +94,6 @@ body {
 @custom-variant dark (&:where(.dark, .dark *, .dim, .dim *));
 
 @theme inline {
-
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -341,7 +340,8 @@ body {
 
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: color-mix(in oklch, var(--muted-foreground) 30%, transparent) transparent;
+  scrollbar-color: color-mix(in oklch, var(--muted-foreground) 30%, transparent)
+    transparent;
 }
 
 .vis-chart {
@@ -384,9 +384,11 @@ body {
 }
 
 .fade-to-background {
-  background-image: linear-gradient(to bottom,
-      var(--background-0) 0%,
-      var(--background-0) 30%,
-      var(--background-soft) 72%,
-      var(--background) 100%);
+  background-image: linear-gradient(
+    to bottom,
+    var(--background-0) 0%,
+    var(--background-0) 30%,
+    var(--background-soft) 72%,
+    var(--background) 100%
+  );
 }
