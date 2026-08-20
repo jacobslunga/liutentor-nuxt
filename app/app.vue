@@ -17,8 +17,6 @@
 <script setup lang="ts">
 import "@fontsource-variable/jetbrains-mono/wght.css";
 import "@fontsource-variable/jetbrains-mono/wght-italic.css";
-import "@fontsource-variable/source-serif-4/wght.css";
-import "@fontsource-variable/source-serif-4/wght-italic.css";
 import "vue-sonner/style.css";
 import { Toaster } from "@/components/ui/sonner";
 
