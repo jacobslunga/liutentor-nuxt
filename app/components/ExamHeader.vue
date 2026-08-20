@@ -24,17 +24,6 @@ const scrollRef = ref<HTMLDivElement | null>(null);
 const { sortBy, sortDirection } = useExamSortPreference("exam-picker");
 const isSortMenuOpen = ref(false);
 
-function toggleSortMenu() {
-  isSortMenuOpen.value = !isSortMenuOpen.value;
-}
-
-function dismissSortMenu(event: MouseEvent) {
-  if (!isSortMenuOpen.value) return;
-  event.preventDefault();
-  event.stopPropagation();
-  isSortMenuOpen.value = false;
-}
-
 watch(isDropdownOpen, (open) => {
   if (!open) isSortMenuOpen.value = false;
   if (open) {
@@ -223,15 +212,14 @@ function confirmLockIn() {
               :class="{ 'rotate-180': isDropdownOpen }" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" :side-offset="8" class="p-0 overflow-hidden border-border/60"
-          @click.capture="dismissSortMenu">
+        <DropdownMenuContent align="start" :side-offset="8" class="p-0 overflow-hidden border-border/60">
           <div class="px-3 py-2 flex items-center justify-between gap-3 border-b border-border/60 bg-background">
             <span class="text-xs font-semibold text-foreground">Alla tentor</span>
             <div class="flex items-center gap-1.5">
-              <DropdownMenuSub :open="isSortMenuOpen">
+              <DropdownMenuSub v-model:open="isSortMenuOpen">
                 <DropdownMenuSubTrigger
                   class="h-7 cursor-pointer border border-border/60 bg-background px-2 py-1 text-xs"
-                  aria-label="Sortera tentor" @click.prevent="toggleSortMenu"
+                  aria-label="Sortera tentor"
                 >
                   <LucideArrowDown v-if="sortDirection === 'desc'" class="size-3.5" />
                   <LucideArrowUp v-else class="size-3.5" />
