@@ -18,7 +18,7 @@ const forwardedProps = useForwardProps(delegatedProps);
     width: 'var(--reka-tabs-indicator-size)',
     transform: 'translateX(var(--reka-tabs-indicator-position))',
   }" :class="cn(
-    'pointer-events-none absolute inset-y-[3px] left-0 z-0 rounded-lg border border-border/50 bg-background shadow-sm transition-transform duration-200 ease-out dark:border-white/10 dark:bg-white/10 dark:shadow-black/40',
+    'pointer-events-none absolute inset-y-[3px] left-0 z-0 rounded-lg border border-border/50 bg-background shadow-sm transition-[transform,width] duration-200 ease-spring will-change-[transform,width] dark:border-white/10 dark:bg-white/10 dark:shadow-black/40',
     props.class,
   )
     ">
