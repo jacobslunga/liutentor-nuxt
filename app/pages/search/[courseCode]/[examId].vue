@@ -68,6 +68,7 @@ const SPLIT_MIN = 20;
 const SPLIT_MAX = 80;
 const SPLIT_KEY_STEP = 2;
 
+const splitRow = ref<HTMLElement | null>(null);
 const splitPercent = ref(55);
 const isResizing = ref(false);
 const solutionBlurred = ref(blurFacitUntilHover.value);
@@ -121,9 +122,13 @@ function beginDrag(onMove: (e: MouseEvent) => void, onDone: () => void) {
 
 function startSplitResize() {
   isResizing.value = true;
+  // The row can't change size mid-drag, so measure it once.
+  const rect = splitRow.value?.getBoundingClientRect();
+  const left = rect?.left ?? 0;
+  const width = rect?.width || window.innerWidth;
   beginDrag(
     (e) => {
-      splitPercent.value = clampSplit((e.clientX / window.innerWidth) * 100);
+      splitPercent.value = clampSplit(((e.clientX - left) / width) * 100);
     },
     () => {
       isResizing.value = false;
@@ -285,8 +290,10 @@ onUnmounted(() => {
 
 <template>
   <ClientOnly>
-    <div class="relative h-screen w-full overflow-hidden bg-background">
-      <div v-if="exam" class="hidden lg:block absolute inset-x-0 top-0 z-70">
+    <div
+      class="relative flex h-screen w-full flex-col overflow-hidden bg-canvas"
+    >
+      <div v-if="exam" class="relative z-70 hidden shrink-0 lg:block">
         <ExamHeader
           :exams="exams"
           :exam-id="examId"
@@ -295,225 +302,226 @@ onUnmounted(() => {
         />
       </div>
 
-      <div
-        v-if="isLoading"
-        class="flex h-full items-center justify-center flex-col gap-2 bg-background"
-      >
-        <LucideLoader2 class="w-8 h-8 animate-spin text-muted-foreground" />
-        <p class="text-sm text-muted-foreground">Laddar tenta...</p>
-      </div>
-
-      <div
-        v-else-if="isError"
-        class="flex h-full items-center justify-center flex-col gap-2 bg-background"
-      >
-        <p class="text-2xl text-foreground/80">Något gick fel!</p>
-        <p class="text-sm text-muted-foreground">
-          Ibland fungerar det att bara ladda om sidan :)
-        </p>
-        <Button variant="secondary" @click="refreshNuxtData()">Ladda om</Button>
-      </div>
-
-      <template v-else-if="exam">
-        <MobilePdfView
-          v-if="isMobile"
-          v-show="!chatStore.isOpen"
-          class="bg-background"
-          :exam-pdf-url="exam.pdf_url"
-          :solution-pdf-url="solutionPdfUrl"
-          :course-code="courseCode"
-          :exam-date="exam.exam_date"
-          :explain-enabled="showExplainPopover"
-          @explain="explainSelection"
-        />
+      <div class="relative min-h-0 flex-1">
+        <div
+          v-if="isLoading"
+          class="flex h-full items-center justify-center flex-col gap-2"
+        >
+          <LucideLoader2 class="w-8 h-8 animate-spin text-muted-foreground" />
+          <p class="text-sm text-muted-foreground">Laddar tenta...</p>
+        </div>
 
         <div
-          v-else
-          class="h-full flex flex-row overflow-hidden bg-background"
-          :class="{ 'select-none': isResizing || isOverlayResizing }"
+          v-else-if="isError"
+          class="flex h-full items-center justify-center flex-col gap-2"
         >
+          <p class="text-2xl text-foreground/80">Något gick fel!</p>
+          <p class="text-sm text-muted-foreground">
+            Ibland fungerar det att bara ladda om sidan :)
+          </p>
+          <Button variant="secondary" @click="refreshNuxtData()">Ladda om</Button>
+        </div>
+
+        <template v-else-if="exam">
+          <MobilePdfView
+            v-if="isMobile"
+            v-show="!chatStore.isOpen"
+            class="bg-background"
+            :exam-pdf-url="exam.pdf_url"
+            :solution-pdf-url="solutionPdfUrl"
+            :course-code="courseCode"
+            :exam-date="exam.exam_date"
+            :explain-enabled="showExplainPopover"
+            @explain="explainSelection"
+          />
+
           <div
-            class="relative h-full overflow-hidden"
-            :style="
-              isExamOnly ? { width: '100%' } : { width: `${splitPercent}%` }
-            "
+            v-else
+            ref="splitRow"
+            class="h-full flex flex-row gap-1.5 overflow-hidden px-2 pb-2"
+            :class="{ 'select-none': isResizing || isOverlayResizing }"
           >
-            <LazyPdfRenderer
-              :pdf-url="exam.pdf_url"
-              :layout-mode="layoutMode"
-              :top-inset="64"
-              :explain-enabled="showExplainPopover"
-              @explain="explainSelection"
-            />
-
-            <FacitEdge
-              v-if="
-                isExamOnly && hasFacit && !isFacitVisible && !chatStore.isOpen
+            <div
+              class="relative h-full overflow-hidden rounded-xl border border-canvas-border bg-background"
+              :style="
+                isExamOnly ? { width: '100%' } : { width: `${splitPercent}%` }
               "
-              :facit-pdf-url="solutionPdfUrl"
-              :intensity="facitProximity"
-            />
-          </div>
+            >
+              <LazyPdfRenderer
+                :pdf-url="exam.pdf_url"
+                :layout-mode="layoutMode"
+                :explain-enabled="showExplainPopover"
+                @explain="explainSelection"
+              />
 
-          <template v-if="!isExamOnly">
-            <div class="relative z-60 w-0 shrink-0">
-              <ResizeHandle
-                :is-resizing="isResizing"
-                @start-resize="startSplitResize"
+              <FacitEdge
+                v-if="
+                  isExamOnly && hasFacit && !isFacitVisible && !chatStore.isOpen
+                "
+                :facit-pdf-url="solutionPdfUrl"
+                :intensity="facitProximity"
               />
             </div>
 
-            <div
-              class="relative h-full flex-1 min-w-0 overflow-hidden bg-background"
-            >
-              <div class="absolute inset-0 h-full w-full flex flex-col">
-                <div
-                  v-if="solution"
-                  class="h-full relative"
-                  @mouseenter="solutionBlurred = false"
-                  @mouseleave="solutionBlurred = blurFacitUntilHover"
-                >
-                  <LazyPdfRenderer
-                    :pdf-url="solution.pdf_url"
-                    layout-mode="exam-with-facit"
-                    :top-inset="64"
-                    :explain-enabled="showExplainPopover"
-                    @explain="explainSelection"
-                  />
-                  <Transition name="fade">
-                    <div
-                      v-if="solutionBlurred"
-                      class="absolute inset-0 z-50 backdrop-blur-sm bg-background/30 flex flex-col gap-2 items-center justify-center pointer-events-none"
-                    >
-                      <p class="text-sm font-normal text-muted-foreground">
-                        Håll muspekaren för att visa facit
-                      </p>
-                      <LucideMousePointerClick
-                        class="text-muted-foreground animate-in"
-                      />
-                    </div>
-                  </Transition>
-                </div>
+            <template v-if="!isExamOnly">
+              <div class="relative z-60 w-0 shrink-0">
+                <ResizeHandle
+                  :is-resizing="isResizing"
+                  @start-resize="startSplitResize"
+                />
+              </div>
 
-                <div v-else class="flex h-full items-center justify-center p-6">
-                  <div class="group relative w-full max-w-sm">
-                    <div
-                      class="rounded-md border-2 border-dashed border-border/60 px-8 py-10 transition-colors group-hover:border-primary/30"
-                    >
-                      <div class="flex flex-col items-center text-center gap-4">
-                        <div
-                          class="flex size-12 items-center justify-center rounded-md bg-muted/60 group-hover:bg-primary/10 transition-colors"
-                        >
-                          <LucideUpload
-                            class="size-6 text-muted-foreground group-hover:text-primary transition-colors"
-                          />
-                        </div>
-                        <div>
-                          <p class="font-medium text-foreground/80">
-                            Inget facit tillgängligt
-                          </p>
-                          <p
-                            class="mt-1 text-xs text-muted-foreground/70 max-w-55 leading-relaxed"
+              <div
+                class="relative h-full flex-1 min-w-0 overflow-hidden rounded-xl border border-canvas-border bg-background"
+              >
+                <div class="absolute inset-0 h-full w-full flex flex-col">
+                  <div
+                    v-if="solution"
+                    class="h-full relative"
+                    @mouseenter="solutionBlurred = false"
+                    @mouseleave="solutionBlurred = blurFacitUntilHover"
+                  >
+                    <LazyPdfRenderer
+                      :pdf-url="solution.pdf_url"
+                      layout-mode="exam-with-facit"
+                      :explain-enabled="showExplainPopover"
+                      @explain="explainSelection"
+                    />
+                    <Transition name="fade">
+                      <div
+                        v-if="solutionBlurred"
+                        class="absolute inset-0 z-50 backdrop-blur-sm bg-background/30 flex flex-col gap-2 items-center justify-center pointer-events-none"
+                      >
+                        <p class="text-sm font-normal text-muted-foreground">
+                          Håll muspekaren för att visa facit
+                        </p>
+                        <LucideMousePointerClick
+                          class="text-muted-foreground animate-in"
+                        />
+                      </div>
+                    </Transition>
+                  </div>
+
+                  <div v-else class="flex h-full items-center justify-center p-6">
+                    <div class="group relative w-full max-w-sm">
+                      <div
+                        class="rounded-md border-2 border-dashed border-border/60 px-8 py-10 transition-colors group-hover:border-primary/30"
+                      >
+                        <div class="flex flex-col items-center text-center gap-4">
+                          <div
+                            class="flex size-12 items-center justify-center rounded-md bg-muted/60 group-hover:bg-primary/10 transition-colors"
                           >
-                            Hjälp andra studenter genom att ladda upp facit till
-                            denna tenta.
-                          </p>
+                            <LucideUpload
+                              class="size-6 text-muted-foreground group-hover:text-primary transition-colors"
+                            />
+                          </div>
+                          <div>
+                            <p class="font-medium text-foreground/80">
+                              Inget facit tillgängligt
+                            </p>
+                            <p
+                              class="mt-1 text-xs text-muted-foreground/70 max-w-55 leading-relaxed"
+                            >
+                              Hjälp andra studenter genom att ladda upp facit till
+                              denna tenta.
+                            </p>
+                          </div>
+                          <NuxtLink to="/upload-exams">
+                            <Button size="sm" variant="outline">
+                              <LucideUpload class="size-3.5" />
+                              Ladda upp
+                            </Button>
+                          </NuxtLink>
                         </div>
-                        <NuxtLink to="/upload-exams">
-                          <Button size="sm" variant="outline">
-                            <LucideUpload class="size-3.5" />
-                            Ladda upp
-                          </Button>
-                        </NuxtLink>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          </template>
-        </div>
+            </template>
+          </div>
 
-        <Teleport to="body">
-          <Transition
-            enter-active-class="transition-all duration-200 ease-spring"
-            enter-from-class="translate-x-full opacity-0"
-            enter-to-class="translate-x-0 opacity-100 blur-0"
-            leave-active-class="transition-all duration-200 ease-spring"
-            leave-from-class="translate-x-0 opacity-100 blur-0"
-            leave-to-class="translate-x-full opacity-0 blur-sm"
-          >
-            <div
-              v-if="!isMobile && isExamOnly && hasFacit"
-              v-show="isFacitVisible && !chatStore.isOpen"
-              class="fixed right-0 bottom-0 z-70 flex h-screen shadow-2xl border-l bg-background"
-              :class="{ 'select-none': isOverlayResizing }"
-              :style="{ width: `${overlayWidth}px` }"
+          <Teleport to="body">
+            <Transition
+              enter-active-class="transition-all duration-200 ease-spring"
+              enter-from-class="translate-x-full opacity-0"
+              enter-to-class="translate-x-0 opacity-100 blur-0"
+              leave-active-class="transition-all duration-200 ease-spring"
+              leave-from-class="translate-x-0 opacity-100 blur-0"
+              leave-to-class="translate-x-full opacity-0 blur-sm"
             >
-              <div class="relative z-100 w-0 shrink-0">
-                <ResizeHandle
-                  :is-resizing="isOverlayResizing"
-                  @start-resize="startOverlayResize"
-                />
+              <div
+                v-if="!isMobile && isExamOnly && hasFacit"
+                v-show="isFacitVisible && !chatStore.isOpen"
+                class="fixed right-0 bottom-0 z-70 flex h-screen border-l border-canvas-border bg-background shadow-xl dark:shadow-none"
+                :class="{ 'select-none': isOverlayResizing }"
+                :style="{ width: `${overlayWidth}px` }"
+              >
+                <div class="relative z-100 w-0 shrink-0">
+                  <ResizeHandle
+                    :is-resizing="isOverlayResizing"
+                    @start-resize="startOverlayResize"
+                  />
+                </div>
+                <div class="flex-1 overflow-hidden">
+                  <LazyPdfRenderer
+                    :pdf-url="solutionPdfUrl!"
+                    layout-mode="exam-only"
+                    :explain-enabled="showExplainPopover"
+                    @explain="explainSelection"
+                  />
+                </div>
               </div>
-              <div class="flex-1 overflow-hidden">
-                <LazyPdfRenderer
-                  :pdf-url="solutionPdfUrl!"
-                  layout-mode="exam-only"
-                  :explain-enabled="showExplainPopover"
-                  @explain="explainSelection"
-                />
-              </div>
-            </div>
-          </Transition>
+            </Transition>
 
-          <LazyMobileChatSheet
-            v-if="isMobile"
-            :key="examId"
-            :exam-id="examId"
-            :exam-url="exam.pdf_url"
-            :course-code="courseCode"
-            :solution-url="solutionPdfUrl"
-            :has-solution="hasFacit"
-          />
+            <LazyMobileChatSheet
+              v-if="isMobile"
+              :key="examId"
+              :exam-id="examId"
+              :exam-url="exam.pdf_url"
+              :course-code="courseCode"
+              :solution-url="solutionPdfUrl"
+              :has-solution="hasFacit"
+            />
 
-          <Transition
-            enter-active-class="transition-all duration-200 ease-spring"
-            enter-from-class="translate-x-full opacity-0"
-            enter-to-class="translate-x-0 opacity-100 blur-0"
-            leave-active-class="transition-all duration-200 ease-spring"
-            leave-from-class="translate-x-0 opacity-100 blur-0"
-            leave-to-class="translate-x-full opacity-0 blur-sm"
-          >
-            <div
-              v-if="!isMobile && chatHasBeenOpened"
-              v-show="chatStore.isOpen"
-              class="fixed right-0 bottom-0 z-80 flex h-screen shadow-2xl bg-background"
-              :class="{ 'select-none': isOverlayResizing }"
-              :style="{ width: `${overlayWidth}px` }"
+            <Transition
+              enter-active-class="transition-all duration-200 ease-spring"
+              enter-from-class="translate-x-full opacity-0"
+              enter-to-class="translate-x-0 opacity-100 blur-0"
+              leave-active-class="transition-all duration-200 ease-spring"
+              leave-from-class="translate-x-0 opacity-100 blur-0"
+              leave-to-class="translate-x-full opacity-0 blur-sm"
             >
-              <div class="relative z-100 w-0 shrink-0">
-                <ResizeHandle
-                  :is-resizing="isOverlayResizing"
-                  @start-resize="startOverlayResize"
-                />
+              <div
+                v-if="!isMobile && chatHasBeenOpened"
+                v-show="chatStore.isOpen"
+                class="fixed right-0 bottom-0 z-80 flex h-screen border-l border-canvas-border bg-background shadow-xl dark:shadow-none"
+                :class="{ 'select-none': isOverlayResizing }"
+                :style="{ width: `${overlayWidth}px` }"
+              >
+                <div class="relative z-100 w-0 shrink-0">
+                  <ResizeHandle
+                    :is-resizing="isOverlayResizing"
+                    @start-resize="startOverlayResize"
+                  />
+                </div>
+                <div class="flex-1 overflow-hidden">
+                  <LazyChatWindow
+                    :key="examId"
+                    :exam-id="examId"
+                    :exam-url="exam.pdf_url"
+                    :course-code="courseCode"
+                    :solution-url="solutionPdfUrl"
+                    :has-solution="hasFacit"
+                    class="h-full w-full"
+                    @close="chatStore.close()"
+                  />
+                </div>
               </div>
-              <div class="flex-1 overflow-hidden">
-                <LazyChatWindow
-                  :key="examId"
-                  :exam-id="examId"
-                  :exam-url="exam.pdf_url"
-                  :course-code="courseCode"
-                  :solution-url="solutionPdfUrl"
-                  :has-solution="hasFacit"
-                  class="h-full w-full"
-                  @close="chatStore.close()"
-                />
-              </div>
-            </div>
-          </Transition>
-        </Teleport>
-      </template>
+            </Transition>
+          </Teleport>
+        </template>
+      </div>
     </div>
   </ClientOnly>
 </template>

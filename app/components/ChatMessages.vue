@@ -16,6 +16,7 @@ const props = withDefaults(
   defineProps<{
     messages: Message[];
     isLoading: boolean;
+    assistantClass?: string;
     contentClass?: string;
     enableSelectionPopover?: boolean;
   }>(),
@@ -370,6 +371,7 @@ defineExpose({
         <div
           v-else
           class="w-full min-w-0 px-1 py-2 overflow-hidden"
+          :class="assistantClass"
           data-role="assistant"
           :data-streaming="
             isLoading && i === messages.length - 1 ? 'true' : undefined
