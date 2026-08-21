@@ -334,7 +334,10 @@ function confirmLockIn() {
       </Button>
 
       <Tabs :model-value="layoutMode" @update:model-value="switchLayout">
-        <TabsList class="h-8 bg-transparent">
+        <TabsList
+          class="h-8 border border-canvas-border bg-background"
+          indicator-class="border-transparent bg-accent shadow-none dark:border-transparent dark:bg-accent"
+        >
           <TabsTrigger value="exam-with-facit" class="px-2.5 h-full">
             <LucideColumns2 class="size-4" />
           </TabsTrigger>

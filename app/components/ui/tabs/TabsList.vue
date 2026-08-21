@@ -11,6 +11,7 @@ const props = withDefaults(
     TabsListProps & {
       class?: HTMLAttributes["class"];
       showIndicator?: boolean;
+      indicatorClass?: HTMLAttributes["class"];
     }
   >(),
   {
@@ -18,7 +19,12 @@ const props = withDefaults(
   },
 );
 
-const delegatedProps = reactiveOmit(props, "class", "showIndicator");
+const delegatedProps = reactiveOmit(
+  props,
+  "class",
+  "showIndicator",
+  "indicatorClass",
+);
 </script>
 
 <template>
@@ -28,6 +34,6 @@ const delegatedProps = reactiveOmit(props, "class", "showIndicator");
   )
     ">
     <slot />
-    <TabsIndicator v-if="showIndicator" />
+    <TabsIndicator v-if="showIndicator" :class="indicatorClass" />
   </TabsList>
 </template>
