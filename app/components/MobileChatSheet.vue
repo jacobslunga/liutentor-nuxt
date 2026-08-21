@@ -28,8 +28,6 @@ const { dropZoneRef, isOverDropZone } = useChatAttachmentSurface(
   attachmentSurfaceEnabled,
 );
 
-const MOBILE_MODEL_ID = "gemini-3.1-flash-lite";
-
 const {
   messages,
   isLoading,
@@ -40,6 +38,7 @@ const {
   handleReplyToSelection,
   toggleHistory,
   startNewChat,
+  selectedModelId,
 } = useChatPanel({
   examId: props.examId,
   examUrl: props.examUrl,
@@ -47,7 +46,6 @@ const {
   solutionUrl: props.solutionUrl,
   input: chatInputRef,
   transcript: transcriptRef,
-  fixedModelId: MOBILE_MODEL_ID,
 });
 
 function openChat() {
@@ -168,7 +166,7 @@ watch(transcriptRef, (transcript) => {
             :initial-text="chatStore.draftInput"
             :initial-attachments="chatStore.draftAttachments"
             :is-loading="isLoading"
-            :selected-model-id="MOBILE_MODEL_ID"
+            :selected-model-id="selectedModelId"
             :show-scroll-button="showScrollButton"
             :course-code="courseCode"
             :has-solution="hasSolution"
@@ -178,11 +176,11 @@ watch(transcriptRef, (transcript) => {
             :auto-resize="false"
             :reactive-input="false"
             :submit-on-enter="false"
-            compact
             @send="handleSend"
             @cancel="handleCancel"
             @scroll-to-bottom="transcriptRef?.scrollToBottom('smooth')"
             @clear-selection-context="selectionContext = ''"
+            @update:selected-model-id="selectedModelId = $event"
           />
         </div>
       </div>

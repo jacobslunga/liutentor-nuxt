@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { CHAT_MODELS } from "@/composables/useSelectedModel";
 import { useLayoutStore } from "~/stores/layout";
 import { toast } from "vue-sonner";
 
@@ -8,7 +7,7 @@ defineProps<{ section: string }>();
 const colorMode = useColorMode();
 const layoutStore = useLayoutStore();
 const { layoutMode } = storeToRefs(layoutStore);
-const { selectedModelId } = useSelectedModel();
+const { selectedModelId, availableModels } = useSelectedModel();
 const { showExplainPopover, blurFacitUntilHover } = useSettings();
 const { latest: recentSearches, clear: clearRecentSearches } =
   useRecentSearches();
@@ -46,11 +45,13 @@ const LAYOUT_OPTIONS = [
   },
 ] as const;
 
-const MODEL_OPTIONS = CHAT_MODELS.map((model) => ({
-  value: model.id,
-  label: model.label,
-  hint: model.id === "gemini-3.1-flash-lite" ? "Snabbast." : "Mer utförlig.",
-}));
+const MODEL_OPTIONS = computed(() =>
+  availableModels.value.map((model) => ({
+    value: model.id,
+    label: model.label,
+    hint: model.hint,
+  })),
+);
 
 const SHORTCUT_GROUPS = [
   {
@@ -185,8 +186,8 @@ function handleClearRecentSearches() {
 
       <div>
         <SettingsRow
-          label="Modell"
-          description="Vilken modell chatten och förklaringarna använder."
+          label="Tankenivå"
+          description="Hur mycket chatten och förklaringarna tänker innan de svarar."
           stacked
         >
           <SettingsSegmented

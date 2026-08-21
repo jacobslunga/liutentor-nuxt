@@ -382,12 +382,12 @@ defineExpose({
             class="flex items-center gap-2 h-6"
           >
             <LucideLoader class="variable-spin w-4 h-4 text-muted-foreground" />
-            <span class="shimmer-text text-sm">{{ loadingPhrase }}</span>
+            <span class="shimmer-text font-sans text-sm">{{ loadingPhrase }}</span>
           </div>
           <div class="assistant-segments">
             <template
               v-for="(segment, segmentIndex) in renderedAssistantSegments[i]"
-              :key="segmentIndex"
+              :key="`${segment.type}:${segmentIndex}`"
             >
               <div
                 v-if="segment.type === 'markdown'"
@@ -397,14 +397,14 @@ defineExpose({
               <ClientOnly v-else-if="segment.type === 'graph'">
                 <LazyChatInteractiveGraph :spec="segment.spec" />
                 <template #fallback>
-                  <div class="graph-artifact-status shimmer-text">
+                  <div class="graph-artifact-status shimmer-text font-sans">
                     Förbereder graf...
                   </div>
                 </template>
               </ClientOnly>
               <div
                 v-else-if="segment.type === 'graph-pending'"
-                class="graph-artifact-status shimmer-text"
+                class="graph-artifact-status shimmer-text font-sans"
               >
                 Förbereder graf...
               </div>
