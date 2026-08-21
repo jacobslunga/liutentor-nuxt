@@ -19,7 +19,7 @@
 
 @font-face {
   font-family: "Tiempos Text";
-  src: url("/fonts/tiempos-text-medium.ttf") format("truetype");
+  src: url("/fonts/tiempos-text-medium.woff2") format("woff2");
   font-style: normal;
   font-weight: 500;
   font-display: swap;
