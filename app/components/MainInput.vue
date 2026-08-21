@@ -1,11 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
-import courseCodes from "~/data/courseCodes.json";
 import Button from "./ui/button/Button.vue";
 
-const upperCourseCodes = computed(() =>
-  courseCodes.map((c: string) => c.toUpperCase()),
-);
+const { codes: courseCodes } = useCourseCodes();
 
 const props = defineProps<{
   focusInput: boolean;
@@ -33,7 +30,7 @@ watch([courseCode, () => props.focusInput], () => {
     return;
   }
   if (props.focusInput) showSuggestions.value = true;
-  suggestions.value = upperCourseCodes.value
+  suggestions.value = courseCodes.value
     .filter((code) => code.includes(q))
     .slice(0, 60);
   selectedIndex.value = -1;
@@ -119,17 +116,20 @@ function handleKeyDown(e: KeyboardEvent) {
 }
 
 const typed = ref("");
-const exIndex = ref(Math.floor(Math.random() * courseCodes.length));
+const exIndex = ref(0);
 const charIndex = ref(0);
 const deleting = ref(false);
 let typingTimer: ReturnType<typeof setTimeout> | null = null;
 
-const shuffledExamples = [...courseCodes].sort(() => Math.random() - 0.5);
+// The codes arrive from /api/courses after mount, so the placeholder animation
+// starts empty and kicks off once the list lands.
+const shuffledExamples = ref<string[]>([]);
 
 function runTyping() {
   if (courseCode.value) return;
   const current =
-    shuffledExamples[exIndex.value % shuffledExamples.length] ?? "";
+    shuffledExamples.value[exIndex.value % shuffledExamples.value.length] ?? "";
+  if (!current) return;
   const doneTyping = charIndex.value === current.length && !deleting.value;
   const doneDeleting = charIndex.value === 0 && deleting.value;
   const speed = deleting.value ? 30 : 55;
@@ -140,7 +140,7 @@ function runTyping() {
       deleting.value = true;
     } else if (doneDeleting) {
       deleting.value = false;
-      exIndex.value = (exIndex.value + 1) % shuffledExamples.length;
+      exIndex.value = (exIndex.value + 1) % shuffledExamples.value.length;
     } else {
       charIndex.value += deleting.value ? -1 : 1;
       typed.value = current.slice(0, charIndex.value);
@@ -148,6 +148,17 @@ function runTyping() {
     runTyping();
   }, pause || speed);
 }
+
+watch(
+  courseCodes,
+  (list) => {
+    if (!list.length || shuffledExamples.value.length) return;
+    shuffledExamples.value = [...list].sort(() => Math.random() - 0.5);
+    exIndex.value = Math.floor(Math.random() * shuffledExamples.value.length);
+    if (!typingTimer) runTyping();
+  },
+  { immediate: true },
+);
 
 onMounted(() => {
   runTyping();

@@ -1,4 +1,5 @@
-import { courseTag, SITEMAP_TAG } from "../utils/cache";
+import { GO_API_URL } from "../utils/api";
+import { COURSES_TAG, courseTag, SITEMAP_TAG } from "../utils/cache";
 
 type WebhookBody = {
   type?: string;
@@ -14,8 +15,7 @@ type ExamDetailResponse = {
   };
 };
 
-const EXAM_API_URL =
-  "https://liutentor-go-687405545415.europe-west1.run.app/v1/exams";
+const EXAM_API_URL = `${GO_API_URL}/v1/exams`;
 
 async function resolveCourseCode(examId: number) {
   const data = await $fetch<ExamDetailResponse>(
@@ -96,7 +96,9 @@ export default defineEventHandler(async (event) => {
   const tags = [...codes].map(courseTag);
 
   if (body?.table !== "exam_stats" && body?.table !== "solutions") {
-    tags.push(SITEMAP_TAG);
+    // A new exam can add a course code, or push one over the daily-puzzle
+    // popularity threshold, so the course index has to be refreshed too.
+    tags.push(SITEMAP_TAG, COURSES_TAG);
   }
 
   await purgeTags(tags);

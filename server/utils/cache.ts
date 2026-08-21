@@ -15,3 +15,6 @@ export function setCdnCache(event: H3Event, tags: string[]) {
   );
   setHeader(event, "Netlify-Cache-Tag", tags.join(","));
 }
+
+/** The course index behind search autocomplete and the daily puzzle. */
+export const COURSES_TAG = "courses";
