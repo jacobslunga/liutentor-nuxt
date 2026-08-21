@@ -1,33 +1,42 @@
+/**
+ * The picker is presented as a thinking level rather than a model name: students
+ * pick how much effort they want spent, not a vendor. Each level maps to exactly
+ * one model, so the mapping stays swappable without touching the UI copy.
+ */
 export const CHAT_MODELS = [
   {
     id: "gemini-3.1-flash-lite",
-    label: "3.1 Flash Lite",
+    label: "Låg",
+    hint: "Snabbast. Bra för korta frågor.",
     provider: "Google",
-  },
-  {
-    id: "gemini-3.6-flash",
-    label: "3.6 Flash",
-    provider: "Google",
-  },
-  {
-    id: "gpt-5.6-terra",
-    label: "5.6 Terra",
-    provider: "OpenAI",
+    requiresAuth: false,
   },
   {
     id: "gpt-5.6-luna",
-    label: "5.6 Luna",
+    label: "Balanserad",
+    hint: "Standard för de flesta uppgifter.",
     provider: "OpenAI",
+    requiresAuth: false,
+  },
+  {
+    id: "gpt-5.6-terra",
+    label: "Djup",
+    hint: "Tänker längre. Bäst på svåra uppgifter.",
+    provider: "OpenAI",
+    requiresAuth: true,
   },
 ] as const;
 
-const VALID_MODEL_IDS = CHAT_MODELS.map((m) => m.id);
 const DEFAULT_MODEL_ID = "gpt-5.6-luna";
-const VALID_MODEL_ID_SET = new Set<string>(VALID_MODEL_IDS);
-const MODEL_COOKIE_KEY = "liutentor_selected_model_v9";
+const VALID_MODEL_ID_SET = new Set<string>(CHAT_MODELS.map((m) => m.id));
+const AUTHED_ONLY_MODEL_IDS = new Set<string>(
+  CHAT_MODELS.filter((m) => m.requiresAuth).map((m) => m.id),
+);
+const MODEL_COOKIE_KEY = "liutentor_selected_model_v10";
 
 const LEGACY_MODEL_COOKIE_KEYS = [
   "liutentor_selected_model",
+  "liutentor_selected_model_v9",
   "liutentor_selected_model_v8",
   "liutentor_selected_model_v7",
   "liutentor_selected_model_v6",
@@ -39,6 +48,7 @@ const LEGACY_MODEL_COOKIE_KEYS = [
 ];
 
 export function useSelectedModel() {
+  const user = useSupabaseUser();
   const selectedModelId = useCookie<string>(MODEL_COOKIE_KEY, {
     default: () => DEFAULT_MODEL_ID,
     maxAge: 60 * 60 * 24 * 365,
@@ -51,9 +61,21 @@ export function useSelectedModel() {
     }
   }
 
-  if (!VALID_MODEL_ID_SET.has(selectedModelId.value)) {
-    selectedModelId.value = DEFAULT_MODEL_ID;
-  }
+  const availableModels = computed(() =>
+    CHAT_MODELS.filter((model) => !model.requiresAuth || !!user.value),
+  );
 
-  return { selectedModelId };
+  const isSelectable = (id: string) =>
+    VALID_MODEL_ID_SET.has(id) &&
+    (!AUTHED_ONLY_MODEL_IDS.has(id) || !!user.value);
+
+  // Signing out has to drop a gated tier, or the picker keeps showing a level
+  // the backend will reject. Runs immediately so SSR never emits a stale label.
+  watchEffect(() => {
+    if (!isSelectable(selectedModelId.value)) {
+      selectedModelId.value = DEFAULT_MODEL_ID;
+    }
+  });
+
+  return { selectedModelId, availableModels };
 }

@@ -1,13 +1,9 @@
 <script setup lang="ts">
 import { useEventListener } from "@vueuse/core";
-import { CHAT_MODELS } from "@/composables/useSelectedModel";
 import { useChatStore, type ChatAttachment } from "@/stores/chat";
 import { toast } from "vue-sonner";
 
-const MODEL_GROUPS = ["OpenAI", "Google"].map((provider) => ({
-  provider,
-  models: CHAT_MODELS.filter((model) => model.provider === provider),
-}));
+const { availableModels } = useSelectedModel();
 
 const MAX_ATTACHMENTS = 5;
 const MAX_ATTACHMENT_SIZE = 5 * 1024 * 1024;
@@ -45,8 +41,6 @@ const props = withDefaults(
 
     submitOnEnter?: boolean;
 
-    compact?: boolean;
-
     autoResize?: boolean;
 
     reactiveInput?: boolean;
@@ -55,7 +49,6 @@ const props = withDefaults(
     autofocus: true,
     initialAttachments: () => [],
     submitOnEnter: true,
-    compact: false,
     autoResize: true,
     reactiveInput: true,
     showDisclaimer: false,
@@ -118,8 +111,8 @@ const attachmentCapacityReached = computed(
 
 const selectedModelLabel = computed(
   () =>
-    CHAT_MODELS.find((m) => m.id === props.selectedModelId)?.label ??
-    CHAT_MODELS[0].label,
+    availableModels.value.find((m) => m.id === props.selectedModelId)?.label ??
+    availableModels.value[0]!.label,
 );
 
 const oneRowWidth = () => {
@@ -586,7 +579,7 @@ defineExpose({
               class="order-3 flex shrink-0 items-center gap-1.5"
               :class="{ 'ml-auto': isMultiline }"
             >
-              <DropdownMenu v-if="!compact">
+              <DropdownMenu>
                 <DropdownMenuTrigger as-child>
                   <Button
                     variant="ghost"
@@ -599,29 +592,31 @@ defineExpose({
                     />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" class="w-56 p-1.5">
-                  <template v-for="(group, groupIndex) in MODEL_GROUPS" :key="group.provider">
-                    <DropdownMenuSeparator v-if="groupIndex > 0" class="my-1.5" />
-                    <DropdownMenuLabel
-                      class="px-2.5 pb-1 pt-1.5 text-xs font-normal text-muted-foreground"
-                    >
-                      {{ group.provider }}
-                    </DropdownMenuLabel>
-                    <DropdownMenuItem
-                      v-for="model in group.models"
-                      :key="model.id"
-                      class="cursor-pointer items-center justify-between gap-2 rounded-md px-2.5 py-1.5 focus:bg-accent/70"
-                      @click="emit('update:selectedModelId', model.id)"
-                    >
+                <DropdownMenuContent align="end" class="w-60 p-1.5">
+                  <DropdownMenuLabel
+                    class="px-2.5 pb-1 pt-1.5 text-xs font-normal text-muted-foreground"
+                  >
+                    Tankenivå
+                  </DropdownMenuLabel>
+                  <DropdownMenuItem
+                    v-for="model in availableModels"
+                    :key="model.id"
+                    class="cursor-pointer items-start justify-between gap-2 rounded-md px-2.5 py-1.5 focus:bg-accent/70"
+                    @click="emit('update:selectedModelId', model.id)"
+                  >
+                    <span class="flex min-w-0 flex-col gap-0.5">
                       <span class="text-xs font-medium text-foreground">
                         {{ model.label }}
                       </span>
-                      <LucideCheck
-                        v-if="model.id === selectedModelId"
-                        class="size-3.5 shrink-0 text-primary"
-                      />
-                    </DropdownMenuItem>
-                  </template>
+                      <span class="text-2xs leading-snug text-muted-foreground">
+                        {{ model.hint }}
+                      </span>
+                    </span>
+                    <LucideCheck
+                      v-if="model.id === selectedModelId"
+                      class="mt-0.5 size-3.5 shrink-0 text-primary"
+                    />
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
 

@@ -15,6 +15,9 @@ const parameterValues = reactive<Record<string, number>>({});
 
 let board: JXG.Board | null = null;
 let JSXGraphApi: typeof JXG | null = null;
+// renderBoard awaits a dynamic import, so the component can unmount mid-flight.
+// Anything after that await has to re-check both the host element and this flag.
+let disposed = false;
 const controlPrefix = `graph-${crypto.randomUUID()}`;
 
 const SERIES_COLORS = ["#2563eb", "#ea580c", "#7c3aed", "#059669"];
@@ -40,6 +43,8 @@ async function renderBoard() {
   try {
     renderError.value = null;
     const module = await import("jsxgraph");
+    if (disposed || !boardHost.value) return;
+
     const JXGraph = (module.default ?? module) as typeof JXG;
     JSXGraphApi = JXGraph;
     const foreground = getComputedStyle(document.documentElement)
@@ -110,6 +115,13 @@ async function renderBoard() {
       });
     });
     board.unsuspendUpdate();
+
+    // Unmounting during any of the above leaves onBeforeUnmount nothing to free,
+    // so the board would outlive its host. Free it here instead.
+    if (disposed) {
+      JXGraph.JSXGraph.freeBoard(board);
+      board = null;
+    }
   } catch (error) {
     renderError.value =
       error instanceof Error ? error.message : "Grafen kunde inte ritas.";
@@ -146,6 +158,7 @@ function formatValue(value: number, step: number): string {
 onMounted(renderBoard);
 
 onBeforeUnmount(() => {
+  disposed = true;
   if (!board || !JSXGraphApi) return;
   JSXGraphApi.JSXGraph.freeBoard(board);
   board = null;
