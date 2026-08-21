@@ -2,7 +2,7 @@
 import { computed, nextTick, ref } from "vue";
 import { useZoom, ZoomMode } from "@embedpdf/plugin-zoom/vue";
 import { useRotate } from "@embedpdf/plugin-rotate/vue";
-import { pdfResetZoomKey } from "@/lib/pdf-zoom";
+import { pdfLiveZoomScaleKey, pdfResetZoomKey } from "@/lib/pdf-zoom";
 
 const props = defineProps<{ documentId: string }>();
 
@@ -10,6 +10,7 @@ const { state, provides: zoom } = useZoom(() => props.documentId);
 const { provides: rotate } = useRotate(() => props.documentId);
 
 const resetZoom = inject(pdfResetZoomKey, null);
+const liveZoomScale = inject(pdfLiveZoomScaleKey, null);
 
 const MIN_ZOOM = 0.25;
 const MAX_ZOOM = 10;
@@ -19,13 +20,19 @@ const currentZoom = computed(() => state.value?.currentZoomLevel ?? 1);
 const canZoomIn = computed(() => currentZoom.value < MAX_ZOOM - EPSILON);
 const canZoomOut = computed(() => currentZoom.value > MIN_ZOOM + EPSILON);
 
+// A pinch only commits its zoom level once the gesture settles, so fold in the
+// in-flight scale to keep the readout in step with what is on screen.
+const displayZoom = computed(
+  () => currentZoom.value * (liveZoomScale?.value ?? 1),
+);
+
 const inputEl = ref<HTMLInputElement | null>(null);
 
 // Non-null only while the field is being edited; otherwise the live zoom shows.
 const draft = ref<string | null>(null);
 
 const displayValue = computed(
-  () => draft.value ?? `${Math.round(currentZoom.value * 100)}%`,
+  () => draft.value ?? `${Math.round(displayZoom.value * 100)}%`,
 );
 
 function startEditing() {

@@ -23,6 +23,7 @@ import {
   SelectionLayer,
 } from "@embedpdf/plugin-selection/vue";
 import { RotatePluginPackage, Rotate } from "@embedpdf/plugin-rotate/vue";
+import { pdfLiveZoomScaleKey } from "@/lib/pdf-zoom";
 
 const props = defineProps<{
   pdfUrl: string;
@@ -72,6 +73,45 @@ const normalizedWheelEvents = new WeakSet<WheelEvent>();
 
 const MOUSE_NOTCH_DELTA_THRESHOLD = 40;
 
+const liveZoomScale = ref(1);
+provide(pdfLiveZoomScaleKey, liveZoomScale);
+
+let gestureEl: HTMLElement | null = null;
+let gestureObserver: MutationObserver | null = null;
+
+function gestureScale(el: HTMLElement) {
+  const transform = el.style.transform;
+  if (!transform || transform === "none") return 1;
+  try {
+    return new DOMMatrix(transform).a || 1;
+  } catch {
+    return 1;
+  }
+}
+
+// The gesture writes its preview transform straight to the element, so watching
+// that attribute is the only way to read the scale while the gesture is live.
+function observeZoomGesture(viewport: HTMLElement) {
+  if (gestureEl?.isConnected) return;
+
+  const el = viewport.querySelector<HTMLElement>(".pdf-zoom-gesture");
+  if (!el) return;
+
+  gestureObserver?.disconnect();
+  gestureEl = el;
+  liveZoomScale.value = gestureScale(el);
+  gestureObserver = new MutationObserver(() => {
+    liveZoomScale.value = gestureScale(el);
+  });
+  gestureObserver.observe(el, { attributes: true, attributeFilter: ["style"] });
+}
+
+onUnmounted(() => {
+  gestureObserver?.disconnect();
+  gestureObserver = null;
+  gestureEl = null;
+});
+
 function isMouseNotch(event: WheelEvent) {
   return (
     event.deltaMode !== WheelEvent.DOM_DELTA_PIXEL ||
@@ -116,6 +156,10 @@ function dispatchNormalizedWheel(
 function handleWheelCapture(event: WheelEvent) {
   if (normalizedWheelEvents.has(event)) return;
   if (!event.ctrlKey && !event.metaKey) return;
+
+  const gestureRoot = event.currentTarget as HTMLElement | null;
+  if (gestureRoot) observeZoomGesture(gestureRoot);
+
   if (!isMouseNotch(event)) return;
 
   const notches = Math.max(
