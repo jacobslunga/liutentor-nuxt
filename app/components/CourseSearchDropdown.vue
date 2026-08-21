@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import courseCodes from "~/data/courseCodes.json";
-
 const props = defineProps<{
   size?: "sm" | "md" | "lg";
   class?: string;
@@ -16,9 +14,8 @@ const showSuggestions = ref(false);
 const selectedIndex = ref(-1);
 const isFocused = ref(false);
 const inputRef = ref<HTMLInputElement | null>(null);
+const { codes } = useCourseCodes();
 const suggestionsRef = ref<HTMLDivElement | null>(null);
-
-const upperCodes = (courseCodes as string[]).map((c) => c.toUpperCase());
 
 watch(courseCode, (val) => {
   const q = val.toUpperCase().trim();
@@ -26,7 +23,7 @@ watch(courseCode, (val) => {
     suggestions.value = [];
     return;
   }
-  suggestions.value = upperCodes.filter((c) => c.includes(q)).slice(0, 10);
+  suggestions.value = codes.value.filter((c) => c.includes(q)).slice(0, 10);
   showSuggestions.value = true;
   selectedIndex.value = -1;
 });

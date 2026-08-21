@@ -1,3 +1,4 @@
+import { GO_API_URL } from "../../utils/api";
 import { courseTag, setCdnCache } from "../../utils/cache";
 
 export default defineEventHandler(async (e) => {
@@ -6,9 +7,7 @@ export default defineEventHandler(async (e) => {
   if (courseCode) setCdnCache(e, [courseTag(courseCode)]);
 
   try {
-    const data = await $fetch(
-      `https://liutentor-go-687405545415.europe-west1.run.app/v1/exams/LIU/${courseCode}`,
-    );
+    const data = await $fetch(`${GO_API_URL}/v1/exams/LIU/${courseCode}`);
     return data;
   } catch (err: any) {
     if (err?.status === 404) {

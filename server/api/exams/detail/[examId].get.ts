@@ -1,3 +1,4 @@
+import { GO_API_URL } from "../../../utils/api";
 import { courseTag, setCdnCache } from "../../../utils/cache";
 
 interface ExamDetailResponse {
@@ -13,7 +14,7 @@ export default defineEventHandler(async (event): Promise<ExamDetailResponse> => 
   const examId = getRouterParam(event, "examId");
 
   const data = await $fetch<ExamDetailResponse>(
-    `https://liutentor-go-687405545415.europe-west1.run.app/v1/exams/${examId}`,
+    `${GO_API_URL}/v1/exams/${examId}`,
   );
 
   const code = data?.data?.exam?.course_code ?? data?.data?.course_code;

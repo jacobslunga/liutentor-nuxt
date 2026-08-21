@@ -33,6 +33,7 @@ bun run preview
 - **AI Study Assistant**: Chat tutor integrated with exam context for explaining solutions and answering questions.
 - **Quiz & Lock-in Mode**: Timer-focused practice mode and AI-generated practice quizzes.
 - **Grade & Pass Rate Analytics**: Visual charts showing pass rate trends and grade distributions.
+- **Dagens kurskod**: A daily Wordle-style puzzle where the answer is a real LiU course code, shared by every player and openable via `/?showDaily=1`.
 
 ---
 
@@ -76,6 +77,8 @@ liutentor-nuxt/
 │   │   └── quiz/               # AI quiz generator & practice
 │   ├── stores/                 # Pinia stores (chat, layout, quiz)
 │   └── types/                  # TypeScript interface definitions
+├── shared/                     # Code shared by app/ and server/ (`#shared/*`)
+│   └── utils/dailyCourse.ts    # Pure daily-puzzle logic (scoring, answer pick)
 ├── public/                     # Static assets (fonts, logo, manifest)
 │   └── fonts/                  # Custom logo webfont (GT-Super-Text-Bold.otf)
 ├── server/                     # Nitro server engine
@@ -102,3 +105,8 @@ liutentor-nuxt/
    - Course pages (`/search/**`), home (`/`), and API endpoints (`/api/exams/**`) use Stale-While-Revalidate (`swr: 3600`).
 6. **Fonts**:
    - The interface uses the system sans-serif stack. The custom `GT-Super-Text-Bold.otf` font is reserved for the logo.
+7. **Course Codes**:
+   - The list of course codes comes from `GET /api/courses`, which proxies the Go service's `/v1/courses/LIU` and is CDN-cached under the `courses` tag. Consume it through `useCourseCodes()` — never re-bundle a static list. It contains only codes that actually have exams, and each entry carries the Swedish course name and an exam count.
+8. **Daily Puzzle**:
+   - Pure logic lives in `shared/utils/dailyCourse.ts` so the server and browser agree, and so `bun test` can exercise it without Nuxt.
+   - The answer is derived from the date in `Europe/Stockholm`, making it identical for every player, and never leaves the server: `POST /api/daily/guess` scores a whole board and only returns the answer once the game is won or lost.

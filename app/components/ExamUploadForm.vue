@@ -154,14 +154,22 @@ const exIndex = ref(0);
 const charIndex = ref(0);
 const deleting = ref(false);
 let typingTimer: ReturnType<typeof setTimeout> | null = null;
+const { codes: courseCodes } = useCourseCodes();
 const shuffledExamples = ref<string[]>([]);
 
-async function loadExampleCourseCodes() {
+function loadExampleCourseCodes() {
   if (props.fixedCourseCode || shuffledExamples.value.length) return;
-  const { default: courseCodes } = await import("~/data/courseCodes.json");
-  shuffledExamples.value = [...courseCodes].sort(() => Math.random() - 0.5);
+  const codes = courseCodes.value;
+  if (!codes.length) return;
+  shuffledExamples.value = [...codes].sort(() => Math.random() - 0.5);
   exIndex.value = Math.floor(Math.random() * shuffledExamples.value.length);
 }
+
+// The codes come from /api/courses, so they may land after this mounts.
+watch(courseCodes, () => {
+  loadExampleCourseCodes();
+  if (!typingTimer) runTyping();
+});
 
 function runTyping() {
   if (kurskod.value || props.fixedCourseCode) return;
@@ -194,8 +202,8 @@ watch(kurskod, (val) => {
   } else if (!val && !typingTimer) runTyping();
 });
 
-onMounted(async () => {
-  await loadExampleCourseCodes();
+onMounted(() => {
+  loadExampleCourseCodes();
   runTyping();
 });
 onUnmounted(() => {
