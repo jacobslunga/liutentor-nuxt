@@ -213,105 +213,55 @@ const plugins = computed(() => {
 
 <template>
   <div class="group/pdf relative h-full w-full overflow-hidden bg-background">
-    <div
-      v-if="isLoading || !engine"
-      class="flex h-full w-full items-center justify-center"
-    >
+    <div v-if="isLoading || !engine" class="flex h-full w-full items-center justify-center">
       <LucideLoader2 class="h-5 w-5 animate-spin text-muted-foreground" />
     </div>
 
     <EmbedPDF v-else :engine="engine" :plugins="plugins">
       <template #default="{ activeDocumentId }">
         <template v-if="activeDocumentId">
-          <PdfZoomController
-            :document-id="activeDocumentId"
-            :max-page-width="maxPageWidth"
-          >
-            <PdfPageControls
-              v-if="!isMobile"
-              :document-id="activeDocumentId"
-              class="absolute bottom-4 left-1/2 z-30 -translate-x-1/2"
-            />
+          <PdfZoomController :document-id="activeDocumentId" :max-page-width="maxPageWidth">
+            <PdfPageControls v-if="!isMobile" :document-id="activeDocumentId"
+              class="absolute bottom-4 left-1/2 z-30 -translate-x-1/2" />
           </PdfZoomController>
 
-          <PdfZoomControls
-            v-if="isMobile"
-            :document-id="activeDocumentId"
-            class="absolute right-0 top-3 z-20"
-          />
+          <PdfZoomControls v-if="isMobile" :document-id="activeDocumentId" class="absolute right-0 top-3 z-20" />
 
           <DocumentContent :document-id="activeDocumentId">
             <template #default="{ isLoaded }">
-              <div
-                v-if="!isLoaded"
-                class="flex h-full w-full items-center justify-center"
-              >
-                <LucideLoader2
-                  class="h-5 w-5 animate-spin text-muted-foreground"
-                />
+              <div v-if="!isLoaded" class="flex h-full w-full items-center justify-center">
+                <LucideLoader2 class="h-5 w-5 animate-spin text-muted-foreground" />
               </div>
 
-              <Viewport
-                v-else
-                :document-id="activeDocumentId"
-                class="h-full w-full bg-background pdf-viewport"
-                @scroll="handleViewportScroll"
-                @wheel.capture="handleWheelCapture"
-              >
+              <Viewport v-else :document-id="activeDocumentId" class="h-full w-full bg-background pdf-viewport"
+                @scroll="handleViewportScroll" @wheel.capture="handleWheelCapture">
                 <template v-if="isMobile">
                   <Scroller :document-id="activeDocumentId">
                     <template #default="{ page }">
-                      <div
-                        :style="{
-                          width: `${page.rotatedWidth}px`,
-                          height: `${page.rotatedHeight}px`,
-                        }"
-                        class="relative mx-auto my-4 pdf-page-shell"
-                      >
-                        <PagePointerProvider
-                          :document-id="activeDocumentId"
-                          :page-index="page.pageIndex"
-                          class="pdf-mobile-pointer"
-                        >
-                          <Rotate
-                            :document-id="activeDocumentId"
-                            :page-index="page.pageIndex"
-                            class="bg-background"
+                      <div :style="{
+                        width: `${page.rotatedWidth}px`,
+                        height: `${page.rotatedHeight}px`,
+                      }" class="relative mx-auto my-4 pdf-page-shell">
+                        <PagePointerProvider :document-id="activeDocumentId" :page-index="page.pageIndex"
+                          class="pdf-mobile-pointer">
+                          <Rotate :document-id="activeDocumentId" :page-index="page.pageIndex" class="bg-background"
                             :style="{
                               width: `${page.width}px`,
                               height: `${page.height}px`,
-                            }"
-                          >
-                            <div
-                              class="absolute inset-0 z-0 pdf-render-surface"
-                              :style="pageStyle"
-                            >
-                              <RenderLayer
-                                :document-id="activeDocumentId"
-                                :page-index="page.pageIndex"
-                              />
+                            }">
+                            <div class="absolute inset-0 z-0 pdf-render-surface" :style="pageStyle">
+                              <RenderLayer :document-id="activeDocumentId" :page-index="page.pageIndex" />
                             </div>
-                            <div
-                              class="absolute inset-0 z-10 pdf-selection-surface"
-                            >
-                              <SelectionLayer
-                                :document-id="activeDocumentId"
-                                :page-index="page.pageIndex"
-                                :text-style="{ background: selectionColor }"
-                              >
-                                <template
-                                  v-if="props.explainEnabled"
-                                  #selection-menu="{
-                                    menuWrapperProps,
-                                    placement,
-                                  }"
-                                >
+                            <div class="absolute inset-0 z-10 pdf-selection-surface">
+                              <SelectionLayer :document-id="activeDocumentId" :page-index="page.pageIndex"
+                                :text-style="{ background: selectionColor }">
+                                <template v-if="props.explainEnabled" #selection-menu="{
+                                  menuWrapperProps,
+                                  placement,
+                                }">
                                   <div v-bind="menuWrapperProps">
-                                    <PdfSelectionMenu
-                                      :document-id="activeDocumentId"
-                                      :above="placement.suggestTop"
-                                      @explain="emit('explain', $event)"
-                                    />
+                                    <PdfSelectionMenu :document-id="activeDocumentId" :above="placement.suggestTop"
+                                      @explain="emit('explain', $event)" />
                                   </div>
                                 </template>
                               </SelectionLayer>
@@ -325,64 +275,33 @@ const plugins = computed(() => {
 
                 <template v-else>
                   <PdfInner>
-                    <ZoomGestureWrapper
-                      :document-id="activeDocumentId"
-                      :enable-pinch="false"
-                      :enable-wheel="true"
-                      class="pdf-zoom-gesture"
-                    >
+                    <ZoomGestureWrapper :document-id="activeDocumentId" :enable-pinch="false" :enable-wheel="true"
+                      class="pdf-zoom-gesture">
                       <Scroller :document-id="activeDocumentId">
                         <template #default="{ page }">
-                          <div
-                            :style="{
-                              width: `${page.rotatedWidth}px`,
-                              height: `${page.rotatedHeight}px`,
-                            }"
-                            class="relative mx-auto my-4 pdf-page-shell"
-                          >
-                            <PagePointerProvider
-                              :document-id="activeDocumentId"
-                              :page-index="page.pageIndex"
-                            >
-                              <Rotate
-                                :document-id="activeDocumentId"
-                                :page-index="page.pageIndex"
-                                class="bg-background"
+                          <div :style="{
+                            width: `${page.rotatedWidth}px`,
+                            height: `${page.rotatedHeight}px`,
+                          }" class="relative mx-auto my-4 pdf-page-shell">
+                            <PagePointerProvider :document-id="activeDocumentId" :page-index="page.pageIndex">
+                              <Rotate :document-id="activeDocumentId" :page-index="page.pageIndex" class="bg-background"
                                 :style="{
                                   width: `${page.width}px`,
                                   height: `${page.height}px`,
-                                }"
-                              >
-                                <div
-                                  class="absolute inset-0 z-0 pdf-render-surface"
-                                  :style="pageStyle"
-                                >
-                                  <RenderLayer
-                                    :document-id="activeDocumentId"
-                                    :page-index="page.pageIndex"
-                                  />
+                                }">
+                                <div class="absolute inset-0 z-0 pdf-render-surface" :style="pageStyle">
+                                  <RenderLayer :document-id="activeDocumentId" :page-index="page.pageIndex" />
                                 </div>
-                                <div
-                                  class="absolute inset-0 z-10 pdf-selection-surface"
-                                >
-                                  <SelectionLayer
-                                    :document-id="activeDocumentId"
-                                    :page-index="page.pageIndex"
-                                    :text-style="{ background: selectionColor }"
-                                  >
-                                    <template
-                                      v-if="props.explainEnabled"
-                                      #selection-menu="{
-                                        menuWrapperProps,
-                                        placement,
-                                      }"
-                                    >
+                                <div class="absolute inset-0 z-10 pdf-selection-surface">
+                                  <SelectionLayer :document-id="activeDocumentId" :page-index="page.pageIndex"
+                                    :text-style="{ background: selectionColor }">
+                                    <template v-if="props.explainEnabled" #selection-menu="{
+                                      menuWrapperProps,
+                                      placement,
+                                    }">
                                       <div v-bind="menuWrapperProps">
-                                        <PdfSelectionMenu
-                                          :document-id="activeDocumentId"
-                                          :above="placement.suggestTop"
-                                          @explain="emit('explain', $event)"
-                                        />
+                                        <PdfSelectionMenu :document-id="activeDocumentId" :above="placement.suggestTop"
+                                          @explain="emit('explain', $event)" />
                                       </div>
                                     </template>
                                   </SelectionLayer>
