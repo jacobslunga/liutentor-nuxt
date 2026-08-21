@@ -188,7 +188,7 @@ function confirmLockIn() {
 
 <template>
   <div
-    class="pointer-events-none relative isolate hidden h-14 w-full shrink-0 items-start justify-between px-3 pt-2 lg:flex bg-linear-to-b from-background via-background/80 to-transparent"
+    class="pointer-events-none relative isolate hidden h-12 w-full shrink-0 items-center justify-between px-3 lg:flex"
   >
     <div class="pointer-events-auto flex items-center gap-1">
       <Button
@@ -334,7 +334,7 @@ function confirmLockIn() {
       </Button>
 
       <Tabs :model-value="layoutMode" @update:model-value="switchLayout">
-        <TabsList class="h-8">
+        <TabsList class="h-8 bg-transparent">
           <TabsTrigger value="exam-with-facit" class="px-2.5 h-full">
             <LucideColumns2 class="size-4" />
           </TabsTrigger>

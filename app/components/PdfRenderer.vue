@@ -28,8 +28,6 @@ const props = defineProps<{
   pdfUrl: string;
   layoutMode?: "exam-only" | "exam-with-facit" | "default";
 
-  topInset?: number;
-
   explainEnabled?: boolean;
 }>();
 
@@ -62,10 +60,6 @@ const isMobile = window.innerWidth < 1024;
 
 const viewportEl = ref<HTMLElement | null>(null);
 const showScrollTop = ref(false);
-
-const viewportInsetStyle = computed(() =>
-  props.topInset ? { paddingTop: `${props.topInset}px` } : undefined,
-);
 
 // EmbedPDF interprets mouse-wheel notches as trackpad deltas, causing extreme zoom jumps.
 const WHEEL_PIXELS_PER_NOTCH = 100;
@@ -217,7 +211,6 @@ const plugins = computed(() => {
                 v-else
                 :document-id="activeDocumentId"
                 class="h-full w-full bg-background pdf-viewport"
-                :style="viewportInsetStyle"
                 @scroll="handleViewportScroll"
                 @wheel.capture="handleWheelCapture"
               >
