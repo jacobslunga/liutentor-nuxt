@@ -459,6 +459,7 @@ onUnmounted(() => {
               >
                 <div class="relative z-100 w-0 shrink-0">
                   <ResizeHandle
+                    panel-edge
                     :is-resizing="isOverlayResizing"
                     @start-resize="startOverlayResize"
                   />
@@ -501,6 +502,7 @@ onUnmounted(() => {
               >
                 <div class="relative z-100 w-0 shrink-0">
                   <ResizeHandle
+                    panel-edge
                     :is-resizing="isOverlayResizing"
                     @start-resize="startOverlayResize"
                   />
