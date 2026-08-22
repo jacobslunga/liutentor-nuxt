@@ -86,6 +86,8 @@ export function useChat(options: {
       }
     }
 
+    for (const msg of chatStore.messages) msg.status = null;
+
     chatStore.setLoading(false);
     return cancelledUserMessage;
   }
@@ -97,6 +99,7 @@ export function useChat(options: {
       modelId?: string;
       context?: string;
       selectionContext?: string;
+      webSearch?: boolean;
     } = {},
   ) {
     if ((!content.trim() && attachments.length === 0) || chatStore.isLoading) {
@@ -138,7 +141,12 @@ export function useChat(options: {
       }
     }
 
-    const { modelId = DEFAULT_MODEL_ID, context, selectionContext } = opts;
+    const {
+      modelId = DEFAULT_MODEL_ID,
+      context,
+      selectionContext,
+      webSearch = false,
+    } = opts;
     const resolvedModelId = modelId || DEFAULT_MODEL_ID;
 
     const userMessage = {
@@ -191,6 +199,7 @@ export function useChat(options: {
           modelId: resolvedModelId,
           conversationId: chatStore.currentConversationId,
           selectionContext: selectionContext || undefined,
+          webSearch: webSearch || undefined,
         }),
       );
       for (const attachment of chatStore.getActiveAttachments()) {
@@ -202,6 +211,9 @@ export function useChat(options: {
       const response = await fetch(`${CHAT_API_URL}/${options.examId}`, {
         method: "POST",
         headers: {
+          // Opting in to the framed protocol. A client that omits this still gets
+          // the old concatenate-the-bytes stream, so a stale bundle keeps working.
+          Accept: "text/event-stream",
           "x-anonymous-user-id": getAnonymousId(),
           ...authHeaders,
         },
@@ -216,11 +228,17 @@ export function useChat(options: {
 
       const decoder = new TextDecoder("utf-8");
       let streamText = "";
+      let failed = false;
 
-      const writeStreamText = (text: string) => {
+      const lastAssistant = () => {
         const msgs = chatStore.messages;
         const last = msgs[msgs.length - 1];
-        if (last?.role === "assistant") last.content = text;
+        return last?.role === "assistant" ? last : null;
+      };
+
+      const writeStreamText = (text: string) => {
+        const last = lastAssistant();
+        if (last) last.content = text;
       };
 
       const flush = () => {
@@ -229,16 +247,77 @@ export function useChat(options: {
         writeStreamText(streamText);
       };
 
+      const handleEvent = (type: string, data: any) => {
+        const last = lastAssistant();
+        if (!last) return;
+
+        if (type === "text") {
+          // Text stays coalesced to one paint per frame; the other events are
+          // rare enough to write straight through.
+          streamText += data.delta ?? "";
+          if (!pendingFrame) pendingFrame = requestAnimationFrame(flush);
+          return;
+        }
+
+        if (type === "status") {
+          last.status =
+            data.step === "search_done"
+              ? null
+              : { step: data.step, message: data.message };
+          return;
+        }
+
+        if (type === "sources") {
+          last.sources = data.items ?? [];
+          return;
+        }
+
+        if (type === "done") {
+          last.status = null;
+          return;
+        }
+
+        if (type === "error") {
+          failed = true;
+          last.status = null;
+        }
+      };
+
+      // Same frame shape the quiz stream already uses: `event:`/`data:` pairs
+      // separated by a blank line, with the trailing partial held back.
+      let buffer = "";
+
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
 
-        streamText += decoder.decode(value, { stream: true });
-        if (!pendingFrame) pendingFrame = requestAnimationFrame(flush);
+        buffer += decoder.decode(value, { stream: true });
+
+        const frames = buffer.split("\n\n");
+        buffer = frames.pop() ?? "";
+
+        for (const frame of frames) {
+          const eventMatch = frame.match(/^event: (\w+)/m);
+          const dataMatch = frame.match(/^data: (.+)/m);
+          if (!eventMatch?.[1] || !dataMatch?.[1]) continue;
+          try {
+            handleEvent(eventMatch[1], JSON.parse(dataMatch[1]));
+          } catch {
+            // A frame we can't parse is not worth killing the turn over.
+          }
+        }
       }
 
       cancelPendingFlush();
-      writeStreamText(streamText.trim() || "Jag kunde inte generera ett svar.");
+      if (failed) {
+        writeStreamText(
+          streamText.trim() || "Något gick fel. Försök igen senare.",
+        );
+      } else {
+        writeStreamText(
+          streamText.trim() || "Jag kunde inte generera ett svar.",
+        );
+      }
     } catch (error) {
       cancelPendingFlush();
       if (error instanceof Error && error.name === "AbortError") return;
@@ -251,6 +330,8 @@ export function useChat(options: {
     } finally {
       cancelPendingFlush();
       abortController.value = null;
+      const last = chatStore.messages[chatStore.messages.length - 1];
+      if (last?.role === "assistant") last.status = null;
       chatStore.setLoading(false);
     }
   }

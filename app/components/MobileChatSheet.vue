@@ -39,6 +39,7 @@ const {
   toggleHistory,
   startNewChat,
   selectedModelId,
+  webSearch,
 } = useChatPanel({
   examId: props.examId,
   examUrl: props.examUrl,
@@ -167,6 +168,7 @@ watch(transcriptRef, (transcript) => {
             :initial-attachments="chatStore.draftAttachments"
             :is-loading="isLoading"
             :selected-model-id="selectedModelId"
+            :web-search="webSearch"
             :show-scroll-button="showScrollButton"
             :course-code="courseCode"
             :has-solution="hasSolution"
@@ -181,6 +183,7 @@ watch(transcriptRef, (transcript) => {
             @scroll-to-bottom="transcriptRef?.scrollToBottom('smooth')"
             @clear-selection-context="selectionContext = ''"
             @update:selected-model-id="selectedModelId = $event"
+            @update:web-search="webSearch = $event"
           />
         </div>
       </div>

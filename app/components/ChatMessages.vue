@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick, onMounted, onUnmounted } from "vue";
 import { useResizeObserver } from "@vueuse/core";
-import type { Message } from "@/stores/chat";
+import type { Message, MessageSource } from "@/stores/chat";
 import {
   initChatMarkdown,
   renderChatMarkdown,
@@ -72,6 +72,24 @@ const loadingPhrases = [
 ];
 
 const loadingPhrase = ref(loadingPhrases[0]);
+
+/**
+ * A bare hostname reads better in a chip than a page title that will be clipped
+ * anyway — the title stays available on hover. Gemini is the exception: it hands
+ * back an opaque grounding-redirect URL whose host says nothing, and puts the
+ * real domain in the title instead.
+ */
+const OPAQUE_SOURCE_HOSTS = ["vertexaisearch.cloud.google.com"];
+
+function sourceLabel(source: MessageSource): string {
+  try {
+    const host = new URL(source.url).hostname.replace(/^www\./, "");
+    if (OPAQUE_SOURCE_HOSTS.includes(host)) return source.title || host;
+    return host;
+  } catch {
+    return source.title || source.url;
+  }
+}
 
 const copyTimers = new WeakMap<HTMLElement, number>();
 
@@ -294,6 +312,8 @@ defineExpose({
           msg.attachments
             ?.map((attachment) => `${attachment.id}:${attachment.active}`)
             .join(','),
+          msg.status?.message,
+          msg.sources?.length,
           isLoading && i === messages.length - 1,
           mdReady,
         ]"
@@ -361,17 +381,41 @@ defineExpose({
           "
         >
           <div
-            v-if="!msg.content && isLoading && i === messages.length - 1"
+            v-if="
+              msg.status?.message ||
+              (!msg.content && isLoading && i === messages.length - 1)
+            "
             class="flex items-center gap-2 h-6"
+            :class="msg.content ? 'mb-2' : ''"
           >
             <LucideLoader class="variable-spin w-4 h-4 text-muted-foreground" />
-            <span class="shimmer-text font-sans text-sm">{{ loadingPhrase }}</span>
+            <span class="shimmer-text font-sans text-sm">{{
+              msg.status?.message || loadingPhrase
+            }}</span>
           </div>
           <div
             v-if="renderedAssistantHtml[i]"
             class="prose max-w-full min-w-0 prose-headings:font-semibold prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-h4:text-base dark:prose-invert marker:text-foreground marker:font-medium"
             v-html="renderedAssistantHtml[i]"
           />
+          <!--
+            Rendered as real markup rather than through the markdown v-html, so
+            the DOMPurify allowlist in lib/chat-markdown.ts never has to grow.
+          -->
+          <div v-if="msg.sources?.length" class="mt-3 flex flex-wrap gap-1.5">
+            <a
+              v-for="source in msg.sources"
+              :key="source.url"
+              :href="source.url"
+              :title="source.title"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex max-w-56 items-center gap-1.5 rounded-full border bg-background px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-accent/70 hover:text-foreground"
+            >
+              <LucideGlobe class="size-3 shrink-0" />
+              <span class="truncate">{{ sourceLabel(source) }}</span>
+            </a>
+          </div>
         </div>
       </div>
 

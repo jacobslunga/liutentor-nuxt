@@ -1,12 +1,28 @@
 import { defineStore } from "pinia";
 import { ref } from "vue";
 
+export interface MessageSource {
+  title: string;
+  url: string;
+}
+
+export interface MessageStatus {
+  step: string;
+  message: string;
+}
+
 export interface Message {
   role: "user" | "assistant";
   content: string;
   context?: string;
   selectionContext?: string;
   attachments?: ChatAttachment[];
+  /**
+   * What the assistant is doing right now, e.g. searching the web. Live only for
+   * the turn being streamed; history reloads from `ai_chat_logs` never carry it.
+   */
+  status?: MessageStatus | null;
+  sources?: MessageSource[];
 }
 
 export interface ChatAttachment {
