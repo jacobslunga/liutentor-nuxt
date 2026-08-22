@@ -27,14 +27,15 @@ export const CHAT_MODELS = [
   },
 ] as const;
 
-const DEFAULT_MODEL_ID = "gpt-5.6-luna";
+const DEFAULT_MODEL_ID = "gemini-3.1-flash-lite";
 const VALID_MODEL_ID_SET = new Set<string>(CHAT_MODELS.map((m) => m.id));
 const AUTHED_ONLY_MODEL_IDS = new Set<string>(
   CHAT_MODELS.filter((m) => m.requiresAuth).map((m) => m.id),
 );
-const MODEL_COOKIE_KEY = "liutentor_selected_model_v10";
+const MODEL_COOKIE_KEY = "liutentor_selected_model_v11";
 
 const LEGACY_MODEL_COOKIE_KEYS = [
+  "liutentor_selected_model_v10",
   "liutentor_selected_model",
   "liutentor_selected_model_v9",
   "liutentor_selected_model_v8",
