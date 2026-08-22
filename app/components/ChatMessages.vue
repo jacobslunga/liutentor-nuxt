@@ -33,9 +33,15 @@ const chatStore = useChatStore();
 
 const mdReady = ref(false);
 
-initChatMarkdown().then(() => {
-  mdReady.value = true;
-});
+initChatMarkdown()
+  .catch((error) => {
+    console.error("[chat] markdown failed to initialise", error);
+  })
+  .finally(() => {
+    // Unblock rendering either way: on failure renderChatMarkdown falls back to
+    // the raw message text, which beats leaving every reply blank.
+    mdReady.value = true;
+  });
 
 const messagesContainer = ref<HTMLDivElement | null>(null);
 const messagesList = ref<HTMLDivElement | null>(null);
