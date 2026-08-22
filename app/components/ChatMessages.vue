@@ -7,10 +7,6 @@ import {
   renderChatMarkdown,
   renderCachedChatMarkdown,
 } from "@/lib/chat-markdown";
-import {
-  parseAssistantContent,
-  type InteractiveGraphSpec,
-} from "@/lib/interactive-graph";
 
 const props = withDefaults(
   defineProps<{
@@ -107,7 +103,6 @@ function handleCodeCopy(e: MouseEvent) {
 
 function handleMessageMouseUp(e: MouseEvent) {
   if (!props.enableSelectionPopover) return;
-  if ((e.target as HTMLElement | null)?.closest?.(".interactive-graph")) return;
   setTimeout(() => {
     const selection = window.getSelection();
     const text = selection?.toString().trim();
@@ -160,32 +155,14 @@ function formatFileSize(bytes: number): string {
     : `${Math.max(1, Math.round(bytes / 1024))} kB`;
 }
 
-type RenderedAssistantSegment =
-  | { type: "markdown"; html: string }
-  | { type: "graph"; spec: InteractiveGraphSpec }
-  | { type: "graph-pending" }
-  | { type: "graph-error"; message: string };
-
-const renderedAssistantSegments = computed<RenderedAssistantSegment[][]>(() => {
-  if (!mdReady.value) return props.messages.map(() => []);
+const renderedAssistantHtml = computed<string[]>(() => {
+  if (!mdReady.value) return props.messages.map(() => "");
   const lastIndex = props.messages.length - 1;
   return props.messages.map((msg, i) => {
-    if (msg.role !== "assistant" || !msg.content) return [];
-    const isStreamingLast = props.isLoading && i === lastIndex;
-    return parseAssistantContent(msg.content).map(
-      (segment): RenderedAssistantSegment => {
-        if (segment.type === "graph" && isStreamingLast) {
-          return { type: "graph-pending" };
-        }
-        if (segment.type !== "markdown") return segment;
-        return {
-          type: "markdown",
-          html: isStreamingLast
-            ? renderChatMarkdown(segment.content)
-            : renderCachedChatMarkdown(segment.content),
-        };
-      },
-    );
+    if (msg.role !== "assistant" || !msg.content) return "";
+    return props.isLoading && i === lastIndex
+      ? renderChatMarkdown(msg.content)
+      : renderCachedChatMarkdown(msg.content);
   });
 });
 
@@ -390,36 +367,11 @@ defineExpose({
             <LucideLoader class="variable-spin w-4 h-4 text-muted-foreground" />
             <span class="shimmer-text font-sans text-sm">{{ loadingPhrase }}</span>
           </div>
-          <div class="assistant-segments">
-            <template
-              v-for="(segment, segmentIndex) in renderedAssistantSegments[i]"
-              :key="`${segment.type}:${segmentIndex}`"
-            >
-              <div
-                v-if="segment.type === 'markdown'"
-                class="prose max-w-full min-w-0 prose-headings:font-semibold prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-h4:text-base dark:prose-invert marker:text-foreground marker:font-medium"
-                v-html="segment.html"
-              />
-              <ClientOnly v-else-if="segment.type === 'graph'">
-                <LazyChatInteractiveGraph :spec="segment.spec" />
-                <template #fallback>
-                  <div class="graph-artifact-status shimmer-text font-sans">
-                    Förbereder graf...
-                  </div>
-                </template>
-              </ClientOnly>
-              <div
-                v-else-if="segment.type === 'graph-pending'"
-                class="graph-artifact-status shimmer-text font-sans"
-              >
-                Förbereder graf...
-              </div>
-              <div v-else class="graph-artifact-error" role="alert">
-                <LucideTriangleAlert class="size-4 shrink-0" />
-                <span>Grafen kunde inte visas. {{ segment.message }}</span>
-              </div>
-            </template>
-          </div>
+          <div
+            v-if="renderedAssistantHtml[i]"
+            class="prose max-w-full min-w-0 prose-headings:font-semibold prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-h4:text-base dark:prose-invert marker:text-foreground marker:font-medium"
+            v-html="renderedAssistantHtml[i]"
+          />
         </div>
       </div>
 
@@ -451,30 +403,6 @@ defineExpose({
   --tw-prose-invert-quote-borders: var(--border);
   --tw-prose-invert-th-borders: var(--border);
   --tw-prose-invert-td-borders: var(--border);
-}
-
-.assistant-segments > :first-child {
-  margin-top: 0;
-}
-
-.assistant-segments > :last-child {
-  margin-bottom: 0;
-}
-
-.graph-artifact-status,
-.graph-artifact-error {
-  margin: 1.25rem 0;
-  padding: 1rem 1.25rem;
-  border: 1px solid color-mix(in oklch, var(--foreground) 10%, transparent);
-  border-radius: 1.25rem;
-  font-size: 0.875rem;
-}
-
-.graph-artifact-error {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: var(--destructive);
 }
 
 .prose :deep(.katex-display) {
