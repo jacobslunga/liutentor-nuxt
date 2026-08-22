@@ -39,6 +39,11 @@ const emit = defineEmits<{ explain: [text: string] }>();
 const colorMode = useColorMode();
 const { engine, isLoading } = usePdfiumEngine();
 
+// The PDF is the longest wait on an exam page and none of it is awaited by
+// navigation, so the bar has to cover the wasm engine and the document too.
+const { trackWhile } = usePageLoading();
+trackWhile(() => isLoading.value || !engine.value);
+
 const selectionColor =
   "color-mix(in oklch, var(--primary) 35%, transparent)";
 
@@ -235,6 +240,7 @@ const plugins = computed(() => {
 
           <DocumentContent :document-id="activeDocumentId">
             <template #default="{ isLoaded }">
+              <PageLoadingTask :pending="!isLoaded" />
               <div v-if="!isLoaded" class="flex h-full w-full items-center justify-center">
                 <LucideLoader2 class="h-5 w-5 animate-spin text-muted-foreground" />
               </div>
