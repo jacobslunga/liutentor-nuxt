@@ -53,6 +53,7 @@ const {
   selectionContext,
   chatHeaderTitle,
   selectedModelId,
+  webSearch,
   handleSend,
   handleCancel,
   handleReplyToSelection,
@@ -157,6 +158,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
             :initial-attachments="chatStore.draftAttachments"
             :is-loading="isLoading"
             :selected-model-id="selectedModelId"
+            :web-search="webSearch"
             :show-scroll-button="showScrollButton"
             :course-code="courseCode"
             :has-solution="hasSolution"
@@ -167,6 +169,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
             @cancel="handleCancel"
             @scroll-to-bottom="transcriptRef?.scrollToBottom('smooth')"
             @update:selected-model-id="selectedModelId = $event"
+            @update:web-search="webSearch = $event"
             @clear-selection-context="selectionContext = ''"
           />
         </div>

@@ -52,6 +52,7 @@ export function useChatPanel(opts: ChatPanelOptions) {
     storeToRefs(chatStore);
 
   const { selectedModelId } = useSelectedModel();
+  const { webSearch } = useWebSearch();
 
   const { send, cancelGeneration } = useChat({
     examId: opts.examId,
@@ -88,6 +89,7 @@ export function useChatPanel(opts: ChatPanelOptions) {
     await send(text, attachments, {
       modelId: opts.fixedModelId ?? selectedModelId.value,
       selectionContext: context,
+      webSearch: webSearch.value,
     });
   }
 
@@ -205,6 +207,7 @@ export function useChatPanel(opts: ChatPanelOptions) {
     selectionContext,
     chatHeaderTitle,
     selectedModelId,
+    webSearch,
     submit,
     handleSend,
     handleCancel,
