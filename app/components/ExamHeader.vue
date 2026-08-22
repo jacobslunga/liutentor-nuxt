@@ -8,7 +8,12 @@ const props = defineProps<{
   examId: string;
   courseCode: string;
   solutionPdfUrl?: string | null;
+  /** The pointer is near the top edge, so the secondary controls come forward. */
+  active?: boolean;
+  focusMode?: boolean;
 }>();
+
+const emit = defineEmits<{ toggleFocusMode: [] }>();
 
 const router = useRouter();
 const chatStore = useChatStore();
@@ -123,6 +128,12 @@ const selectedDurationLabel = computed(
   () => TIME_OPTIONS.find((o) => o.value === lockInDuration.value)?.label ?? "",
 );
 
+// Secondary chrome is a ghost until the pointer comes near, but an open menu or
+// a keyboard focus has to keep it readable.
+const isSecondaryLit = computed(
+  () => props.active || isActionsOpen.value || isDropdownOpen.value,
+);
+
 function switchLayout(val: string | number) {
   if (val !== "exam-with-facit" && val !== "exam-only") return;
   layoutStore.setLayoutMode(val);
@@ -187,18 +198,19 @@ function confirmLockIn() {
 </script>
 
 <template>
-  <div
-    class="pointer-events-none relative isolate hidden h-10 w-full shrink-0 items-center justify-between px-2.5 lg:flex">
-    <div class="pointer-events-auto flex items-center gap-1">
-      <Button size="icon-sm" variant="ghost" aria-label="Tillbaka till kursen"
-        @click="router.push(`/search/${courseCode}`)">
+  <div class="pointer-events-none relative isolate hidden h-12 w-full items-center justify-between px-3 lg:flex">
+    <ButtonGroup class="pointer-events-auto overflow-hidden rounded-lg bg-secondary">
+      <Button size="sm" variant="ghost" aria-label="Tillbaka till kursen" @click="router.push(`/search/${courseCode}`)">
         <LucideArrowLeft />
+        <span class="text-xs font-medium text-muted-foreground">{{
+          courseCode
+          }}</span>
       </Button>
 
       <DropdownMenu v-if="selectedExam" v-model:open="isDropdownOpen">
         <DropdownMenuTrigger as-child>
-          <Button variant="ghost" size="sm" class="gap-2">
-            <div class="flex flex-row items-center gap-2 leading-none">
+          <Button variant="ghost" size="sm" class="gap-1.5">
+            <div class="flex flex-row items-baseline gap-1.5 leading-none">
               <span class="text-sm font-bold">{{
                 selectedExam.exam_date
                 }}</span>
@@ -264,7 +276,7 @@ function confirmLockIn() {
           </div>
         </DropdownMenuContent>
       </DropdownMenu>
-    </div>
+    </ButtonGroup>
 
     <div class="pointer-events-auto flex items-center gap-2">
       <Button size="sm" @click="chatStore.toggle()">
@@ -273,81 +285,89 @@ function confirmLockIn() {
         <span class="text-xs">{{ chatStore.isOpen ? "Stäng" : "Chatt" }}</span>
       </Button>
 
-      <Tabs :model-value="layoutMode" @update:model-value="switchLayout">
-        <TabsList class="h-8 border border-canvas-border bg-background"
-          indicator-class="border-transparent bg-accent shadow-none dark:border-transparent dark:bg-accent">
-          <TabsTrigger value="exam-with-facit" class="h-full px-2.5" aria-label="Visa tenta och facit"
-            title="Tenta och facit">
-            <LucideColumns2 class="size-4" />
-          </TabsTrigger>
-          <TabsTrigger value="exam-only" class="h-full px-2.5" aria-label="Visa endast tentan" title="Endast tenta">
-            <LucidePanelRight class="size-4" />
-          </TabsTrigger>
-        </TabsList>
-      </Tabs>
+      <div class="flex items-center gap-1.5 transition-opacity duration-200 hover:opacity-100 focus-within:opacity-100">
+        <Tabs :model-value="layoutMode" @update:model-value="switchLayout">
+          <TabsList class="h-8">
+            <TabsTrigger value="exam-with-facit" class="h-full px-2.5" aria-label="Visa tenta och facit"
+              title="Tenta och facit">
+              <LucideColumns2 class="size-4" />
+            </TabsTrigger>
+            <TabsTrigger value="exam-only" class="h-full px-2.5" aria-label="Visa endast tentan" title="Endast tenta">
+              <LucidePanelRight class="size-4" />
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
 
-      <DropdownMenu v-model:open="isActionsOpen">
-        <DropdownMenuTrigger as-child>
-          <Button variant="ghost" size="sm" class="h-8 w-8 shrink-0 p-0 text-muted-foreground hover:text-foreground"
-            aria-label="Fler åtgärder">
-            <LucideEllipsis class="size-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" :side-offset="8" class="w-52">
-          <DropdownMenuItem class="cursor-pointer" @click="isSettingsOpen = true">
-            <LucideSettings class="size-4" />
-            Inställningar
-          </DropdownMenuItem>
+        <DropdownMenu v-model:open="isActionsOpen">
+          <DropdownMenuTrigger as-child>
+            <Button variant="ghost" size="sm" class="h-8 w-8 shrink-0 p-0 text-muted-foreground hover:text-foreground"
+              aria-label="Fler åtgärder">
+              <LucideEllipsis class="size-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" :side-offset="8" class="w-52">
+            <DropdownMenuItem class="cursor-pointer" @click="emit('toggleFocusMode')">
+              <LucideMaximize v-if="!focusMode" class="size-4" />
+              <LucideMinimize v-else class="size-4" />
+              {{ focusMode ? "Avsluta fokusläge" : "Fokusläge" }}
+              <DropdownMenuShortcut>F</DropdownMenuShortcut>
+            </DropdownMenuItem>
 
-          <DropdownMenuItem class="cursor-pointer" @click="openUploadModal(courseCode)">
-            <LucideUpload class="size-4" />
-            Ladda upp tenta/facit
-          </DropdownMenuItem>
+            <DropdownMenuItem class="cursor-pointer" @click="isSettingsOpen = true">
+              <LucideSettings class="size-4" />
+              Inställningar
+            </DropdownMenuItem>
 
-          <DropdownMenuSeparator />
+            <DropdownMenuItem class="cursor-pointer" @click="openUploadModal(courseCode)">
+              <LucideUpload class="size-4" />
+              Ladda upp tenta/facit
+            </DropdownMenuItem>
 
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger :disabled="!hasDownload">
-              <LucideDownload class="size-4" />
-              Ladda ned
-            </DropdownMenuSubTrigger>
-            <DropdownMenuSubContent class="w-48">
-              <DropdownMenuItem class="cursor-pointer" :disabled="!selectedExam?.pdf_url" @click="
-                downloadFile(
-                  selectedExam!.pdf_url,
-                  `${selectedExam!.course_code}_${selectedExam!.exam_date}_EXAM.pdf`,
-                )
-                ">
-                <LucideFileText class="size-4" />
-                Tenta
-              </DropdownMenuItem>
-              <DropdownMenuItem class="cursor-pointer" :disabled="!solutionPdfUrl" @click="
-                downloadFile(
-                  solutionPdfUrl!,
-                  `${selectedExam?.course_code}_${selectedExam?.exam_date}_SOLUTION.pdf`,
-                )
-                ">
-                <LucideFileCheck class="size-4" />
-                Facit
-              </DropdownMenuItem>
-            </DropdownMenuSubContent>
-          </DropdownMenuSub>
+            <DropdownMenuSeparator />
 
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger :disabled="!selectedExam">
-              <LucideLock class="size-4" />
-              Lock in
-            </DropdownMenuSubTrigger>
-            <DropdownMenuSubContent class="w-44">
-              <DropdownMenuItem v-for="opt in TIME_OPTIONS" :key="opt.value" class="cursor-pointer"
-                @click="selectLockInDuration(opt.value)">
-                <LucideTimer class="size-3.5 opacity-70" />
-                {{ opt.label }}
-              </DropdownMenuItem>
-            </DropdownMenuSubContent>
-          </DropdownMenuSub>
-        </DropdownMenuContent>
-      </DropdownMenu>
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger :disabled="!hasDownload">
+                <LucideDownload class="size-4" />
+                Ladda ned
+              </DropdownMenuSubTrigger>
+              <DropdownMenuSubContent class="w-48">
+                <DropdownMenuItem class="cursor-pointer" :disabled="!selectedExam?.pdf_url" @click="
+                  downloadFile(
+                    selectedExam!.pdf_url,
+                    `${selectedExam!.course_code}_${selectedExam!.exam_date}_EXAM.pdf`,
+                  )
+                  ">
+                  <LucideFileText class="size-4" />
+                  Tenta
+                </DropdownMenuItem>
+                <DropdownMenuItem class="cursor-pointer" :disabled="!solutionPdfUrl" @click="
+                  downloadFile(
+                    solutionPdfUrl!,
+                    `${selectedExam?.course_code}_${selectedExam?.exam_date}_SOLUTION.pdf`,
+                  )
+                  ">
+                  <LucideFileCheck class="size-4" />
+                  Facit
+                </DropdownMenuItem>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger :disabled="!selectedExam">
+                <LucideLock class="size-4" />
+                Lock in
+              </DropdownMenuSubTrigger>
+              <DropdownMenuSubContent class="w-44">
+                <DropdownMenuItem v-for="opt in TIME_OPTIONS" :key="opt.value" class="cursor-pointer"
+                  @click="selectLockInDuration(opt.value)">
+                  <LucideTimer class="size-3.5 opacity-70" />
+                  {{ opt.label }}
+                </DropdownMenuItem>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </div>
   </div>
 
