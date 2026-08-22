@@ -22,14 +22,6 @@ const { open: openUploadModal } = useUploadModal();
     </div>
 
     <div class="w-full max-w-150 flex flex-col items-center gap-6 mb-20">
-      <div
-        class="inline-flex items-center gap-2 rounded-full border border-border bg-secondary/40 py-1.5 pr-4 pl-1.5 text-xs text-muted-foreground">
-        <span class="rounded-full bg-primary/10 px-2 py-0.5 text-2xs font-semibold text-primary">
-          Nytt
-        </span>
-        Chatten kan nu rita interaktiva grafer
-      </div>
-
       <div class="flex flex-row items-center justify-center space-x-2">
         <LogoIcon class="w-12 h-12 md:w-14 md:h-14 lg:w-24 lg:h-24" />
         <h1 class="text-4xl lg:text-5xl font-medium font-logo tracking-tighter">
