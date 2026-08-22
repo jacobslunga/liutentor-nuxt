@@ -439,10 +439,34 @@ defineExpose({
 
 <style scoped>
 .prose {
+  --tw-prose-body: var(--foreground);
+  --tw-prose-headings: var(--foreground);
+  --tw-prose-lead: var(--foreground);
+  --tw-prose-links: var(--foreground);
+  --tw-prose-bold: var(--foreground);
+  --tw-prose-counters: var(--foreground);
+  --tw-prose-bullets: var(--foreground);
+  --tw-prose-quotes: var(--foreground);
+  --tw-prose-captions: var(--foreground);
+  --tw-prose-kbd: var(--foreground);
+  --tw-prose-code: var(--foreground);
+  --tw-prose-pre-code: var(--foreground);
   --tw-prose-hr: var(--border);
   --tw-prose-quote-borders: var(--border);
   --tw-prose-th-borders: var(--border);
   --tw-prose-td-borders: var(--border);
+  --tw-prose-invert-body: var(--foreground);
+  --tw-prose-invert-headings: var(--foreground);
+  --tw-prose-invert-lead: var(--foreground);
+  --tw-prose-invert-links: var(--foreground);
+  --tw-prose-invert-bold: var(--foreground);
+  --tw-prose-invert-counters: var(--foreground);
+  --tw-prose-invert-bullets: var(--foreground);
+  --tw-prose-invert-quotes: var(--foreground);
+  --tw-prose-invert-captions: var(--foreground);
+  --tw-prose-invert-kbd: var(--foreground);
+  --tw-prose-invert-code: var(--foreground);
+  --tw-prose-invert-pre-code: var(--foreground);
   --tw-prose-invert-hr: var(--border);
   --tw-prose-invert-quote-borders: var(--border);
   --tw-prose-invert-th-borders: var(--border);
