@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useEventListener } from "@vueuse/core";
 import { useChatStore, type ChatAttachment } from "@/stores/chat";
 import { toast } from "vue-sonner";
 
@@ -31,6 +30,7 @@ const props = withDefaults(
     initialAttachments?: ChatAttachment[];
     isLoading: boolean;
     selectedModelId: string;
+    webSearch?: boolean;
     showScrollButton: boolean;
     courseCode?: string;
     hasSolution?: boolean;
@@ -52,6 +52,7 @@ const props = withDefaults(
     autoResize: true,
     reactiveInput: true,
     showDisclaimer: false,
+    webSearch: false,
   },
 );
 
@@ -60,15 +61,13 @@ const emit = defineEmits<{
   cancel: [];
   scrollToBottom: [];
   "update:selectedModelId": [value: string];
+  "update:webSearch": [value: boolean];
   clearSelectionContext: [];
 }>();
 
 const textareaRef = ref<HTMLTextAreaElement | null>(null);
 const chatShellRef = ref<HTMLDivElement | null>(null);
 const fileInputRef = ref<HTMLInputElement | null>(null);
-const rowRef = ref<HTMLElement | null>(null);
-const attachmentButtonRef = ref<HTMLElement | null>(null);
-const controlsRef = ref<HTMLElement | null>(null);
 const text = ref(props.initialText ?? "");
 const pendingAttachments = ref<ChatAttachment[]>([...props.initialAttachments]);
 const chatStore = useChatStore();
@@ -77,11 +76,6 @@ const nonReactiveCanSend = ref(
   !!props.initialText?.trim() && props.initialText.length <= MAX_LENGTH,
 );
 const nonReactiveTooLong = ref((props.initialText?.length ?? 0) > MAX_LENGTH);
-
-const singleLineHeight = ref(0);
-const isMultiline = ref(false);
-let heightExpansionAnimation: Animation | null = null;
-let heightExpansionRequest = 0;
 
 const canSend = computed(() => {
   const hasContent = props.reactiveInput
@@ -115,27 +109,12 @@ const selectedModelLabel = computed(
     availableModels.value[0]!.label,
 );
 
-const oneRowWidth = () => {
-  const row = rowRef.value;
-  const controls = controlsRef.value;
-  if (!row || !controls) return 0;
-
-  const attachmentButton = attachmentButtonRef.value;
-
-  const style = getComputedStyle(row);
-  const gap = parseFloat(style.columnGap) || 0;
-  const inner =
-    row.clientWidth -
-    parseFloat(style.paddingLeft) -
-    parseFloat(style.paddingRight);
-  return (
-    inner -
-    (attachmentButton?.offsetWidth ?? 0) -
-    controls.offsetWidth -
-    gap * (attachmentButton ? 2 : 1)
-  );
-};
-
+/**
+ * The textarea owns its own row now, so growing it is a plain scrollHeight read
+ * capped at 180px. The previous layout had it sharing a row with the controls
+ * until the text stopped fitting, which needed width probing and a hand-rolled
+ * expansion animation; none of that survives the stacked design.
+ */
 const applyHeight = (allowShrink = false) => {
   const el = textareaRef.value;
   if (!el) return;
@@ -151,109 +130,11 @@ const applyHeight = (allowShrink = false) => {
   if (el.style.overflowY !== overflowY) el.style.overflowY = overflowY;
 };
 
-const cancelHeightExpansion = () => {
-  heightExpansionRequest += 1;
-  heightExpansionAnimation?.cancel();
-  heightExpansionAnimation = null;
-};
-
-const animateFirstMultilineHeight = (startHeight: number) => {
-  cancelHeightExpansion();
-  const request = heightExpansionRequest;
-
-  nextTick(() => {
-    const el = textareaRef.value;
-    if (
-      !el ||
-      !isMultiline.value ||
-      request !== heightExpansionRequest
-    ) {
-      return;
-    }
-
-    applyHeight(true);
-    const endHeight = el.getBoundingClientRect().height;
-    if (endHeight <= startHeight) return;
-
-    const animation = el.animate(
-      [
-        { height: `${startHeight}px` },
-        { height: `${endHeight}px` },
-      ],
-      {
-        duration: 160,
-        easing: "cubic-bezier(0.22, 1, 0.36, 1)",
-      },
-    );
-    heightExpansionAnimation = animation;
-    animation.addEventListener(
-      "finish",
-      () => {
-        if (heightExpansionAnimation === animation) {
-          heightExpansionAnimation = null;
-        }
-      },
-      { once: true },
-    );
-  });
-};
-
-const recalculateLayout = () => {
-  const el = textareaRef.value;
-  if (!el) return;
-
-  cancelHeightExpansion();
-
-  const was = isMultiline.value;
-  const width = oneRowWidth();
-  if (width > 0) {
-    el.style.flex = `0 0 ${width}px`;
-    el.style.height = "auto";
-    isMultiline.value = el.scrollHeight > singleLineHeight.value + 4;
-    el.style.flex = "";
-  }
-
-  if (isMultiline.value === was) {
-    applyHeight(true);
-    return;
-  }
-
-  nextTick(() => applyHeight(true));
-};
-
 const updateHeight = (event?: Event) => {
   if (!props.autoResize) return;
-
-  const el = textareaRef.value;
-  if (!el) return;
-
+  // Deleting can free up a row, so it needs the shrink pass; typing only grows.
   const inputType = event instanceof InputEvent ? event.inputType : "";
-
-  // Deletion can make a multiline textarea fit on one row again, so it needs
-  // the more expensive width probe. Insertions only need a single scrollHeight
-  // read and should not force the surrounding mobile sheet to reflow.
-  if (!event) {
-    recalculateLayout();
-    return;
-  }
-
-  if (inputType.startsWith("delete")) {
-    if (isMultiline.value) recalculateLayout();
-    return;
-  }
-
-  if (!isMultiline.value) {
-    if (el.scrollHeight <= singleLineHeight.value + 4) return;
-    const startHeight = el.getBoundingClientRect().height;
-    isMultiline.value = true;
-    animateFirstMultilineHeight(startHeight);
-    return;
-  }
-
-  // Once multiline, additional rows should resize immediately. If another
-  // newline arrives during the first expansion, stop that animation first.
-  cancelHeightExpansion();
-  applyHeight();
+  applyHeight(!event || inputType.startsWith("delete"));
 };
 
 const handleInput = (event: Event) => {
@@ -287,7 +168,7 @@ function setText(value: string) {
   if (textareaRef.value) textareaRef.value.value = value;
   nonReactiveCanSend.value = !!value.trim() && value.length <= MAX_LENGTH;
   nonReactiveTooLong.value = value.length > MAX_LENGTH;
-  if (props.autoResize) nextTick(recalculateLayout);
+  if (props.autoResize) nextTick(() => applyHeight(true));
 }
 
 function formatFileSize(bytes: number): string {
@@ -395,22 +276,8 @@ function removePendingAttachment(id: string) {
 }
 
 onMounted(() => {
-  const el = textareaRef.value;
-  if (el && props.autoResize) {
-    const draft = el.value;
-    el.value = "";
-    el.style.height = "auto";
-    singleLineHeight.value = el.scrollHeight;
-    el.value = draft;
-  }
-  if (props.autoResize) recalculateLayout();
+  if (props.autoResize) applyHeight(true);
   if (props.autofocus) textareaRef.value?.focus();
-});
-
-onUnmounted(cancelHeightExpansion);
-
-useEventListener("resize", () => {
-  if (props.autoResize) recalculateLayout();
 });
 
 defineExpose({
@@ -477,10 +344,10 @@ defineExpose({
               <LucideImage v-else class="size-3.5 shrink-0 text-muted-foreground" />
               <span class="max-w-20 truncate" :title="attachment.name">{{
                 attachment.name
-                }}</span>
+              }}</span>
               <span class="shrink-0 text-muted-foreground">{{
                 formatFileSize(attachment.size)
-                }}</span>
+              }}</span>
               <button type="button"
                 class="shrink-0 cursor-pointer rounded-full text-muted-foreground hover:text-foreground"
                 :aria-label="`Ta bort ${attachment.name}`" @click="removePendingAttachment(attachment.id)">
@@ -489,24 +356,31 @@ defineExpose({
             </div>
           </TransitionGroup>
 
-          <div ref="rowRef" class="flex flex-wrap items-center gap-1.5 px-2.5 py-2.5">
-            <div ref="attachmentButtonRef" class="shrink-0" :class="isMultiline ? 'order-2' : 'order-1'">
-              <input ref="fileInputRef" type="file" multiple class="hidden" :accept="FILE_INPUT_ACCEPT"
-                @change="handleFileInput" />
-              <Button variant="ghost" size="icon" aria-label="Bifoga filer"
-                class="size-8 rounded-full text-muted-foreground hover:text-foreground"
-                :disabled="isLoading || attachmentCapacityReached" @click="fileInputRef?.click()">
-                <LucidePlus class="size-4" />
-              </Button>
-            </div>
-
+          <div class="px-4 pt-3.5 pb-1">
             <textarea ref="textareaRef" :value="text" rows="1" placeholder="Fråga vad som helst"
-              class="chat-textarea min-w-0 resize-none border-0 bg-transparent px-2 py-1 text-base leading-relaxed outline-none placeholder:text-muted-foreground/70 focus:ring-0 max-h-45 sm:text-[15px]"
-              :class="isMultiline ? 'order-1 basis-full' : 'order-2 flex-1'" @input="handleInput"
-              @keydown="handleKeyDown" />
+              class="chat-textarea block w-full min-w-0 resize-none border-0 bg-transparent p-0 text-base leading-relaxed outline-none placeholder:text-muted-foreground/70 focus:ring-0 max-h-45 sm:text-[15px]"
+              @input="handleInput" @keydown="handleKeyDown" />
+          </div>
 
-            <div ref="controlsRef" class="order-3 flex shrink-0 items-center gap-1.5"
-              :class="{ 'ml-auto': isMultiline }">
+          <div class="flex items-center gap-1.5 px-2.5 pb-2.5">
+            <input ref="fileInputRef" type="file" multiple class="hidden" :accept="FILE_INPUT_ACCEPT"
+              @change="handleFileInput" />
+            <Button variant="ghost" size="icon" aria-label="Bifoga filer"
+              class="size-8 shrink-0 rounded-full text-muted-foreground hover:text-foreground"
+              :disabled="isLoading || attachmentCapacityReached" @click="fileInputRef?.click()">
+              <LucidePlus class="size-4" />
+            </Button>
+
+            <Button variant="ghost" size="sm" type="button" aria-label="Sök på webben" :aria-pressed="webSearch"
+              :title="webSearch ? 'Webbsökning på' : 'Sök på webben'"
+              class="h-8 shrink-0 gap-1.5 rounded-full px-2.5 text-xs font-normal hover:bg-accent/70" :class="webSearch
+                ? 'bg-accent/70 text-primary hover:text-primary'
+                : 'text-muted-foreground hover:text-foreground'" @click="emit('update:webSearch', !webSearch)">
+              <LucideGlobe class="size-4" />
+              <span v-if="webSearch">Webb</span>
+            </Button>
+
+            <div class="ml-auto flex shrink-0 items-center gap-1.5">
               <DropdownMenu>
                 <DropdownMenuTrigger as-child>
                   <Button variant="ghost" size="sm"
