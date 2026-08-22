@@ -17,7 +17,7 @@
 <script setup lang="ts">
 import "vue-sonner/style.css";
 import { Toaster } from "@/components/ui/sonner";
-import sansFontUrl from "~/assets/fonts/open-sauce-sans-latin-400-normal.woff2?url&no-inline";
+import sansFontUrl from "~/assets/fonts/matter-regular.woff2?url&no-inline";
 import logoFontUrl from "~/assets/fonts/gt-super-text-bold.woff2?url&no-inline";
 
 const colorMode = useColorMode();
