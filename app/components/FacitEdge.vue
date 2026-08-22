@@ -5,6 +5,14 @@ const props = defineProps<{
   intensity: number;
 }>();
 
+const colorMode = useColorMode();
+
+// --primary is a light mint in dark mode, so the same mix reads far hotter
+// against the dark pane. Damp the glow only; the tab still has to stay legible.
+const glowScale = computed(() =>
+  ["dark", "dim"].includes(colorMode.value) ? 0.6 : 1,
+);
+
 const spring = ref(0);
 let targetValue = 0;
 let rafId: number | null = null;
@@ -27,8 +35,9 @@ function animateTo(target: number) {
 
 const glowStyle = computed(() => {
   const v = spring.value;
+  const s = glowScale.value;
   const mix = (percent: number) =>
-    `color-mix(in oklab, var(--primary) ${percent.toFixed(1)}%, transparent)`;
+    `color-mix(in oklab, var(--primary) ${(percent * s).toFixed(1)}%, transparent)`;
 
   return {
     width: `${150 + v * 90}px`,
@@ -43,9 +52,7 @@ const tabStyle = computed(() => {
   return {
     opacity: 0.68 + v * 0.32,
     transform: `translate(${(10 - v * 27).toFixed(1)}px, -50%)`,
-    backgroundColor: `color-mix(in oklab, var(--background) ${(88 - v * 8).toFixed(0)}%, var(--primary))`,
     borderColor: `color-mix(in oklab, var(--primary) ${(28 + v * 42).toFixed(0)}%, var(--border))`,
-    boxShadow: `-10px 0 28px -14px color-mix(in oklab, var(--primary) ${(18 + v * 42).toFixed(0)}%, transparent)`,
   };
 });
 
@@ -64,23 +71,15 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div
-    class="pointer-events-none absolute inset-y-0 right-0 w-64 overflow-hidden"
-  >
-    <div
-      class="absolute right-0 top-1/2 h-[min(34rem,62vh)] origin-right will-change-[width,transform,opacity]"
-      :style="glowStyle"
-    />
+  <div class="pointer-events-none absolute inset-y-0 right-0 w-64 overflow-hidden">
+    <div class="absolute right-0 top-1/2 h-[min(34rem,62vh)] origin-right will-change-[width,transform,opacity]"
+      :style="glowStyle" />
 
     <div
-      class="absolute right-0 top-1/2 flex h-10 items-center gap-2 whitespace-nowrap rounded-l-full border border-r-0 py-2 pl-3 pr-4 backdrop-blur-sm will-change-[transform,opacity]"
-      :style="tabStyle"
-    >
+      class="absolute right-0 top-1/2 flex h-10 items-center gap-2 whitespace-nowrap pr-4 will-change-[transform,opacity]"
+      :style="tabStyle">
       <template v-if="facitPdfUrl">
-        <LucideChevronLeft
-          class="size-4 shrink-0 text-primary will-change-transform"
-          :style="iconStyle"
-        />
+        <LucideChevronLeft class="size-4 shrink-0 text-primary will-change-transform" :style="iconStyle" />
         <span class="text-xs font-semibold text-primary">
           {{ label ?? "Facit" }}
         </span>
