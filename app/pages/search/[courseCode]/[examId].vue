@@ -19,23 +19,19 @@ const { data: examData, status } = useFetch(
   },
 );
 
-const loadingIndicator = useLoadingIndicator();
-watch(
-  status,
-  (fetchStatus) => {
-    if (fetchStatus === "pending") {
-      loadingIndicator.start({ force: true });
-    } else if (loadingIndicator.isLoading.value) {
-      loadingIndicator.finish({ error: fetchStatus === "error" });
-    }
-  },
-  { immediate: true },
-);
+const { track } = usePageLoading();
+track(status);
 
-const { data: courseData } = useFetch(() => `/api/exams/${courseCode.value}`, {
-  key: () => `course-exams-${courseCode.value}`,
-  lazy: true,
-});
+const { data: courseData, status: courseStatus } = useFetch(
+  () => `/api/exams/${courseCode.value}`,
+  {
+    key: () => `course-exams-${courseCode.value}`,
+    lazy: true,
+  },
+);
+// Lazy means navigation does not await it, so without this the bar completed
+// while the exam picker was still empty.
+track(courseStatus);
 
 const exams = computed(() => (courseData.value as any)?.data?.exams ?? []);
 const exam = computed(() => (examData.value as any)?.data?.exam);
