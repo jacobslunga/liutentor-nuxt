@@ -15,10 +15,10 @@
 </template>
 
 <script setup lang="ts">
-import "@fontsource-variable/jetbrains-mono/wght.css";
-import "@fontsource-variable/jetbrains-mono/wght-italic.css";
 import "vue-sonner/style.css";
 import { Toaster } from "@/components/ui/sonner";
+import sansFontUrl from "~/assets/fonts/open-sauce-sans-latin-400-normal.woff2?url&no-inline";
+import logoFontUrl from "~/assets/fonts/gt-super-text-bold.woff2?url&no-inline";
 
 const colorMode = useColorMode();
 
@@ -32,6 +32,22 @@ onMounted(() => {
 
 useHead({
   link: [
+    {
+      key: "sans-font-preload",
+      rel: "preload",
+      as: "font",
+      type: "font/woff2",
+      crossorigin: "anonymous",
+      href: sansFontUrl,
+    },
+    {
+      key: "logo-font-preload",
+      rel: "preload",
+      as: "font",
+      type: "font/woff2",
+      crossorigin: "anonymous",
+      href: logoFontUrl,
+    },
     {
       key: "favicon",
       rel: "icon",
