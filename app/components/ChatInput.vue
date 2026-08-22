@@ -100,13 +100,13 @@ const activeAttachmentBytes = computed(() =>
 const attachmentCapacityReached = computed(
   () =>
     activeAttachments.value.length + pendingAttachments.value.length >=
-      MAX_ATTACHMENTS ||
+    MAX_ATTACHMENTS ||
     activeAttachmentBytes.value +
-      pendingAttachments.value.reduce(
-        (sum, attachment) => sum + attachment.size,
-        0,
-      ) >=
-      MAX_ATTACHMENTS_TOTAL_SIZE,
+    pendingAttachments.value.reduce(
+      (sum, attachment) => sum + attachment.size,
+      0,
+    ) >=
+    MAX_ATTACHMENTS_TOTAL_SIZE,
 );
 
 const selectedModelLabel = computed(
@@ -441,169 +441,87 @@ defineExpose({
   <div class="px-4 bg-transparent relative w-full pointer-events-auto z-10">
     <div class="max-w-2xl mx-auto relative">
       <div class="space-y-2">
-        <p
-          v-if="showDisclaimer"
-          class="px-4 text-center text-2xs text-muted-foreground/60"
-        >
+        <p v-if="showDisclaimer" class="px-4 text-center text-2xs text-muted-foreground/60">
           AI kan göra misstag. Kontrollera svaren.
         </p>
 
-        <div
-          ref="chatShellRef"
-          class="chat-shell relative rounded-[28px] border border-border bg-background shadow-[0_16px_45px_-18px_rgba(0,0,0,0.22)] focus-within:border-border dark:shadow-[0_16px_45px_-18px_rgba(0,0,0,0.55)]"
-        >
+        <div ref="chatShellRef"
+          class="chat-shell relative rounded-[28px] border border-border bg-background dark:bg-secondary shadow-[0_16px_45px_-18px_rgba(0,0,0,0.22)] focus-within:border-border dark:shadow-[0_16px_45px_-18px_rgba(0,0,0,0.55)]">
           <Transition name="fade-up">
-            <div
-              v-if="showScrollButton"
-              class="pointer-events-none absolute -top-12 right-3 z-20"
-            >
-              <Button
-                variant="outline"
-                size="icon"
-                class="pointer-events-auto rounded-full"
-                @click="emit('scrollToBottom')"
-              >
+            <div v-if="showScrollButton" class="pointer-events-none absolute -top-12 right-3 z-20">
+              <Button variant="outline" size="icon" class="pointer-events-auto rounded-full"
+                @click="emit('scrollToBottom')">
                 <LucideArrowDown class="w-4 h-4" />
               </Button>
             </div>
           </Transition>
 
           <Transition name="context-chip">
-            <div
-              v-if="selectionContext"
-              class="flex items-center gap-2 w-full border-b border-border/60 px-5 py-2.5"
-            >
-              <LucideCornerUpLeft
-                class="w-3.5 h-3.5 shrink-0 text-muted-foreground"
-              />
-              <span
-                class="flex-1 min-w-0 text-sm italic text-muted-foreground truncate"
-                >"{{ selectionContext }}"</span
-              >
-              <Button
-                variant="ghost"
-                size="icon-xs"
-                class="shrink-0"
-                @click.prevent="emit('clearSelectionContext')"
-              >
+            <div v-if="selectionContext" class="flex items-center gap-2 w-full border-b border-border/60 px-5 py-2.5">
+              <LucideCornerUpLeft class="w-3.5 h-3.5 shrink-0 text-muted-foreground" />
+              <span class="flex-1 min-w-0 text-sm italic text-muted-foreground truncate">"{{ selectionContext }}"</span>
+              <Button variant="ghost" size="icon-xs" class="shrink-0" @click.prevent="emit('clearSelectionContext')">
                 <LucideX class="w-3.5 h-3.5" />
               </Button>
             </div>
           </Transition>
 
-          <TransitionGroup
-            v-if="pendingAttachments.length"
-            name="attachment-chip"
-            tag="div"
-            appear
-            class="relative flex flex-wrap gap-2 border-b border-border/60 px-4 py-2.5"
-          >
-            <div
-              v-for="attachment in pendingAttachments"
-              :key="attachment.id"
-              class="flex min-w-0 max-w-full items-center gap-2 rounded-xl bg-secondary/60 px-2.5 py-1.5 text-xs"
-            >
-              <LucideFileText
-                v-if="attachment.mediaType === 'application/pdf'"
-                class="size-3.5 shrink-0 text-muted-foreground"
-              />
-              <img
-                v-else-if="attachment.previewUrl"
-                :src="attachment.previewUrl"
-                alt=""
-                class="size-10 shrink-0 rounded-lg object-cover"
-              />
-              <LucideImage
-                v-else
-                class="size-3.5 shrink-0 text-muted-foreground"
-              />
+          <TransitionGroup v-if="pendingAttachments.length" name="attachment-chip" tag="div" appear
+            class="relative flex flex-wrap gap-2 border-b border-border/60 px-4 py-2.5">
+            <div v-for="attachment in pendingAttachments" :key="attachment.id"
+              class="flex min-w-0 max-w-full items-center gap-2 rounded-xl bg-secondary/60 px-2.5 py-1.5 text-xs">
+              <LucideFileText v-if="attachment.mediaType === 'application/pdf'"
+                class="size-3.5 shrink-0 text-muted-foreground" />
+              <img v-else-if="attachment.previewUrl" :src="attachment.previewUrl" alt=""
+                class="size-10 shrink-0 rounded-lg object-cover" />
+              <LucideImage v-else class="size-3.5 shrink-0 text-muted-foreground" />
               <span class="max-w-20 truncate" :title="attachment.name">{{
                 attachment.name
-              }}</span>
+                }}</span>
               <span class="shrink-0 text-muted-foreground">{{
                 formatFileSize(attachment.size)
-              }}</span>
-              <button
-                type="button"
+                }}</span>
+              <button type="button"
                 class="shrink-0 cursor-pointer rounded-full text-muted-foreground hover:text-foreground"
-                :aria-label="`Ta bort ${attachment.name}`"
-                @click="removePendingAttachment(attachment.id)"
-              >
+                :aria-label="`Ta bort ${attachment.name}`" @click="removePendingAttachment(attachment.id)">
                 <LucideX class="size-3.5" />
               </button>
             </div>
           </TransitionGroup>
 
-          <div
-            ref="rowRef"
-            class="flex flex-wrap items-center gap-1.5 px-2.5 py-2.5"
-          >
-            <div
-              ref="attachmentButtonRef"
-              class="shrink-0"
-              :class="isMultiline ? 'order-2' : 'order-1'"
-            >
-              <input
-                ref="fileInputRef"
-                type="file"
-                multiple
-                class="hidden"
-                :accept="FILE_INPUT_ACCEPT"
-                @change="handleFileInput"
-              />
-              <Button
-                variant="ghost"
-                size="icon"
-                aria-label="Bifoga filer"
+          <div ref="rowRef" class="flex flex-wrap items-center gap-1.5 px-2.5 py-2.5">
+            <div ref="attachmentButtonRef" class="shrink-0" :class="isMultiline ? 'order-2' : 'order-1'">
+              <input ref="fileInputRef" type="file" multiple class="hidden" :accept="FILE_INPUT_ACCEPT"
+                @change="handleFileInput" />
+              <Button variant="ghost" size="icon" aria-label="Bifoga filer"
                 class="size-8 rounded-full text-muted-foreground hover:text-foreground"
-                :disabled="isLoading || attachmentCapacityReached"
-                @click="fileInputRef?.click()"
-              >
+                :disabled="isLoading || attachmentCapacityReached" @click="fileInputRef?.click()">
                 <LucidePlus class="size-4" />
               </Button>
             </div>
 
-            <textarea
-              ref="textareaRef"
-              :value="text"
-              rows="1"
-              placeholder="Fråga vad som helst"
+            <textarea ref="textareaRef" :value="text" rows="1" placeholder="Fråga vad som helst"
               class="chat-textarea min-w-0 resize-none border-0 bg-transparent px-2 py-1 text-base leading-relaxed outline-none placeholder:text-muted-foreground/70 focus:ring-0 max-h-45 sm:text-[15px]"
-              :class="isMultiline ? 'order-1 basis-full' : 'order-2 flex-1'"
-              @input="handleInput"
-              @keydown="handleKeyDown"
-            />
+              :class="isMultiline ? 'order-1 basis-full' : 'order-2 flex-1'" @input="handleInput"
+              @keydown="handleKeyDown" />
 
-            <div
-              ref="controlsRef"
-              class="order-3 flex shrink-0 items-center gap-1.5"
-              :class="{ 'ml-auto': isMultiline }"
-            >
+            <div ref="controlsRef" class="order-3 flex shrink-0 items-center gap-1.5"
+              :class="{ 'ml-auto': isMultiline }">
               <DropdownMenu>
                 <DropdownMenuTrigger as-child>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    class="h-8 gap-1.5 rounded-full px-3 text-xs font-normal text-muted-foreground hover:bg-accent/70 hover:text-foreground data-[state=open]:bg-accent/70"
-                  >
+                  <Button variant="ghost" size="sm"
+                    class="h-8 gap-1.5 rounded-full px-3 text-xs font-normal text-muted-foreground hover:bg-accent/70 hover:text-foreground data-[state=open]:bg-accent/70">
                     {{ selectedModelLabel }}
-                    <LucideChevronDown
-                      class="w-3.5 h-3.5 text-muted-foreground/70"
-                    />
+                    <LucideChevronDown class="w-3.5 h-3.5 text-muted-foreground/70" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" class="w-60 p-1.5">
-                  <DropdownMenuLabel
-                    class="px-2.5 pb-1 pt-1.5 text-xs font-normal text-muted-foreground"
-                  >
+                  <DropdownMenuLabel class="px-2.5 pb-1 pt-1.5 text-xs font-normal text-muted-foreground">
                     Tankenivå
                   </DropdownMenuLabel>
-                  <DropdownMenuItem
-                    v-for="model in availableModels"
-                    :key="model.id"
+                  <DropdownMenuItem v-for="model in availableModels" :key="model.id"
                     class="cursor-pointer items-start justify-between gap-2 rounded-md px-2.5 py-1.5 focus:bg-accent/70"
-                    @click="emit('update:selectedModelId', model.id)"
-                  >
+                    @click="emit('update:selectedModelId', model.id)">
                     <span class="flex min-w-0 flex-col gap-0.5">
                       <span class="text-xs font-medium text-foreground">
                         {{ model.label }}
@@ -612,33 +530,18 @@ defineExpose({
                         {{ model.hint }}
                       </span>
                     </span>
-                    <LucideCheck
-                      v-if="model.id === selectedModelId"
-                      class="mt-0.5 size-3.5 shrink-0 text-primary"
-                    />
+                    <LucideCheck v-if="model.id === selectedModelId" class="mt-0.5 size-3.5 shrink-0 text-primary" />
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
 
               <Transition name="scale" mode="out-in">
-                <Button
-                  v-if="isLoading"
-                  key="stop"
-                  size="icon"
-                  variant="secondary"
-                  class="size-8 rounded-full"
-                  @click="emit('cancel')"
-                >
+                <Button v-if="isLoading" key="stop" size="icon" variant="secondary" class="size-8 rounded-full"
+                  @click="emit('cancel')">
                   <LucideSquare class="size-3.5 fill-current" />
                 </Button>
-                <Button
-                  v-else
-                  key="send"
-                  size="icon"
-                  class="size-8 rounded-full"
-                  :disabled="!canSend"
-                  @click="emit('send')"
-                >
+                <Button v-else key="send" size="icon" class="size-8 rounded-full" :disabled="!canSend"
+                  @click="emit('send')">
                   <LucideArrowUp class="size-4" />
                 </Button>
               </Transition>
@@ -646,18 +549,12 @@ defineExpose({
           </div>
         </div>
 
-        <div
-          v-if="reactiveInput && text.length > MAX_LENGTH * 0.8"
-          class="flex items-center justify-center gap-2 px-4 text-center"
-        >
-          <p
-            class="text-xs"
-            :class="
-              text.length > MAX_LENGTH
-                ? 'text-destructive font-bold'
-                : 'text-muted-foreground'
-            "
-          >
+        <div v-if="reactiveInput && text.length > MAX_LENGTH * 0.8"
+          class="flex items-center justify-center gap-2 px-4 text-center">
+          <p class="text-xs" :class="text.length > MAX_LENGTH
+            ? 'text-destructive font-bold'
+            : 'text-muted-foreground'
+            ">
             {{ text.length }} / {{ MAX_LENGTH }}
           </p>
         </div>
@@ -743,6 +640,7 @@ defineExpose({
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .attachment-chip-enter-active,
   .attachment-chip-leave-active,
   .attachment-chip-move {
