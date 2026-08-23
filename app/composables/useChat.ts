@@ -6,7 +6,7 @@ const CHAT_API_URL =
 
 // const CHAT_API_URL_LOCAL = "http://localhost:8080/api/v1/chat/completion";
 
-const DEFAULT_MODEL_ID = "gemini-3.1-flash-lite";
+const DEFAULT_MODEL_ID = "gemini-flash-lite-minimal";
 
 function truncateTitle(title: string, maxLength: number): string {
   if (title.length <= maxLength) return title;
