@@ -85,6 +85,10 @@
   --ease-spring: cubic-bezier(0.25, 0.1, 0.25, 1);
   --duration-fast: 150ms;
   --duration-base: 200ms;
+
+  /* Skills (slash-kommandon). Fast blå i båda teman — den ska läsa som en
+     etikett, inte som temats gröna primärfärg. */
+  --color-skill: #3a83f7;
 }
 
 ::-webkit-scrollbar {
