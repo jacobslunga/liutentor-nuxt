@@ -4,9 +4,9 @@ import { useChatStore, type ChatAttachment } from "@/stores/chat";
 const CHAT_API_URL =
   "https://liutentor-hono-687405545415.europe-north2.run.app/api/v1/chat/completion";
 
-const CHAT_API_URL_LOCAL = "http://localhost:8080/api/v1/chat/completion";
+// const CHAT_API_URL_LOCAL = "http://localhost:8080/api/v1/chat/completion";
 
-const DEFAULT_MODEL_ID = "gemini-3.1-flash-lite";
+const DEFAULT_MODEL_ID = "gemini-flash-lite-minimal";
 
 function truncateTitle(title: string, maxLength: number): string {
   if (title.length <= maxLength) return title;
@@ -215,7 +215,7 @@ export function useChat(options: {
         }
       }
 
-      const response = await fetch(`${CHAT_API_URL_LOCAL}/${options.examId}`, {
+      const response = await fetch(`${CHAT_API_URL}/${options.examId}`, {
         method: "POST",
         headers: {
           // Opting in to the framed protocol. A client that omits this still gets

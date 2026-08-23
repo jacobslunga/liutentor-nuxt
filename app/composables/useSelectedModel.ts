@@ -5,36 +5,37 @@
  */
 export const CHAT_MODELS = [
   {
-    id: "gemini-3.1-flash-lite",
+    id: "gemini-flash-lite-minimal",
     label: "Låg",
     hint: "Snabbast. Bra för korta frågor.",
     provider: "Google",
     requiresAuth: false,
   },
   {
-    id: "gpt-5.6-luna",
+    id: "gemini-flash-lite-medium",
     label: "Balanserad",
     hint: "Standard för de flesta uppgifter.",
-    provider: "OpenAI",
+    provider: "Google",
     requiresAuth: false,
   },
   {
-    id: "gpt-5.6-terra",
+    id: "gemini-flash-lite-high",
     label: "Djup",
     hint: "Tänker längre. Bäst på svåra uppgifter.",
-    provider: "OpenAI",
+    provider: "Google",
     requiresAuth: true,
   },
 ] as const;
 
-const DEFAULT_MODEL_ID = "gemini-3.1-flash-lite";
+const DEFAULT_MODEL_ID = "gemini-flash-lite-minimal";
 const VALID_MODEL_ID_SET = new Set<string>(CHAT_MODELS.map((m) => m.id));
 const AUTHED_ONLY_MODEL_IDS = new Set<string>(
   CHAT_MODELS.filter((m) => m.requiresAuth).map((m) => m.id),
 );
-const MODEL_COOKIE_KEY = "liutentor_selected_model_v11";
+const MODEL_COOKIE_KEY = "liutentor_selected_model_v12";
 
 const LEGACY_MODEL_COOKIE_KEYS = [
+  "liutentor_selected_model_v11",
   "liutentor_selected_model_v10",
   "liutentor_selected_model",
   "liutentor_selected_model_v9",
