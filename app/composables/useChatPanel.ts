@@ -20,6 +20,8 @@ export interface ChatInputApi {
   getShellTop: () => number | null;
   getText: () => string;
   setText: (value: string) => void;
+  getSkill: () => string | null;
+  setSkill: (id: string | null) => void;
   getAttachments: () => ChatAttachment[];
   setAttachments: (value: ChatAttachment[]) => void;
   clearAttachments: () => void;
@@ -83,6 +85,7 @@ export function useChatPanel(opts: ChatPanelOptions) {
     text: string,
     context?: string,
     attachments: ChatAttachment[] = [],
+    skill?: string | null,
   ) {
     nextTick(() => opts.transcript.value?.scrollToBottom("smooth"));
 
@@ -90,6 +93,7 @@ export function useChatPanel(opts: ChatPanelOptions) {
       modelId: opts.fixedModelId ?? selectedModelId.value,
       selectionContext: context,
       webSearch: webSearch.value,
+      skill,
     });
   }
 
@@ -98,11 +102,13 @@ export function useChatPanel(opts: ChatPanelOptions) {
     const attachments = opts.input.value?.getAttachments() ?? [];
     if ((!text.trim() && attachments.length === 0) || isLoading.value) return;
     const context = selectionContext.value || undefined;
+    const skill = opts.input.value?.getSkill() ?? null;
     opts.input.value?.setText("");
     opts.input.value?.clearAttachments();
+    opts.input.value?.setSkill(null);
     selectionContext.value = "";
 
-    await submit(text, context, attachments);
+    await submit(text, context, attachments, skill);
   }
 
   function handleCancel() {
@@ -110,6 +116,7 @@ export function useChatPanel(opts: ChatPanelOptions) {
     if (cancelled) {
       opts.input.value?.setText(cancelled.content);
       opts.input.value?.setAttachments(cancelled.attachments);
+      opts.input.value?.setSkill(cancelled.skill);
       opts.input.value?.focus();
     }
   }

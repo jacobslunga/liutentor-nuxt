@@ -7,6 +7,7 @@ import {
   renderChatMarkdown,
   renderCachedChatMarkdown,
 } from "@/lib/chat-markdown";
+import { getSkillById } from "@/lib/chat-skills";
 
 const props = withDefaults(
   defineProps<{
@@ -309,6 +310,7 @@ defineExpose({
           msg.role,
           msg.content,
           msg.selectionContext,
+          msg.skill,
           msg.attachments
             ?.map((attachment) => `${attachment.id}:${attachment.active}`)
             .join(','),
@@ -360,6 +362,12 @@ defineExpose({
                 formatFileSize(attachment.size)
               }}</span>
             </div>
+          </div>
+          <div
+            v-if="msg.skill"
+            class="w-fit rounded-md bg-skill px-1.5 py-0.5 text-xs font-medium text-white"
+          >
+            {{ getSkillById(msg.skill)?.label }}
           </div>
           <div
             v-if="msg.content"

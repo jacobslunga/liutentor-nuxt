@@ -1,5 +1,19 @@
 <script setup lang="ts">
+import type { Component } from "vue";
 import { useChatStore, type ChatAttachment } from "@/stores/chat";
+import {
+  matchSkills,
+  getSkillById,
+  type ChatSkill,
+} from "@/lib/chat-skills";
+import { onClickOutside, useResizeObserver } from "@vueuse/core";
+import {
+  GraduationCap,
+  BookOpen,
+  ListChecks,
+  Lightbulb,
+  AlignLeft,
+} from "lucide-vue-next";
 import { toast } from "vue-sonner";
 
 const { availableModels } = useSelectedModel();
@@ -137,8 +151,70 @@ const updateHeight = (event?: Event) => {
   applyHeight(!event || inputType.startsWith("delete"));
 };
 
+/**
+ * Slash-menyn. Den öppnas bara när "/" är hela fältets inledning och inget
+ * mellanslag skrivits än, vilket `^\/(\S*)$` uttrycker direkt: så fort man
+ * skriver mellanslag eller raderar snedstrecket slutar mönstret matcha.
+ */
+const activeSkill = ref<ChatSkill | null>(null);
+const menuOpen = ref(false);
+const menuQuery = ref("");
+const highlightedIndex = ref(0);
+const skillPillRef = ref<HTMLElement | null>(null);
+const skillMenuRef = ref<HTMLElement | null>(null);
+
+const filteredSkills = computed(() => matchSkills(menuQuery.value));
+
+onClickOutside(skillMenuRef, () => {
+  menuOpen.value = false;
+});
+
+// Textarean är ett <textarea>, så pillen kan inte ligga i textflödet. Den ligger
+// absolut positionerad ovanpå, och `text-indent` — som per definition bara rör
+// första raden — skjuter texten åt sidan exakt så mycket som pillen är bred.
+useResizeObserver(skillPillRef, () => {
+  const width = skillPillRef.value?.offsetWidth ?? 0;
+  const el = textareaRef.value;
+  if (el) el.style.textIndent = width ? `${width + 8}px` : "";
+});
+
+function syncSlashMenu(value: string) {
+  const match = activeSkill.value ? null : /^\/(\S*)$/.exec(value);
+  menuQuery.value = match?.[1] ?? "";
+  menuOpen.value = !!match && filteredSkills.value.length > 0;
+  if (menuOpen.value) highlightedIndex.value = 0;
+}
+
+function selectSkill(skill: ChatSkill | undefined) {
+  if (!skill) return;
+  activeSkill.value = skill;
+  menuOpen.value = false;
+  menuQuery.value = "";
+  setText("");
+  nextTick(() => textareaRef.value?.focus());
+}
+
+/**
+ * Nuxts auto-import löser komponenter vid kompilering, så en sträng i `:is` hade
+ * inte gått att slå upp vid körning. Därför en explicit tabell.
+ */
+const SKILL_ICONS: Record<string, Component> = {
+  explain: GraduationCap,
+  theory: BookOpen,
+  solution: ListChecks,
+  hint: Lightbulb,
+  summary: AlignLeft,
+};
+
+function clearSkill() {
+  activeSkill.value = null;
+  if (textareaRef.value) textareaRef.value.style.textIndent = "";
+  nextTick(() => textareaRef.value?.focus());
+}
+
 const handleInput = (event: Event) => {
   const value = (event.target as HTMLTextAreaElement).value;
+  syncSlashMenu(value);
 
   if (props.reactiveInput) {
     text.value = value;
@@ -156,6 +232,42 @@ const handleInput = (event: Event) => {
 };
 
 const handleKeyDown = (e: KeyboardEvent) => {
+  // Menyn hanteras före allt annat: mobilen skickar `submitOnEnter: false` och
+  // skulle annars aldrig se piltangenterna.
+  if (menuOpen.value) {
+    const count = filteredSkills.value.length;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      highlightedIndex.value = (highlightedIndex.value + 1) % count;
+      return;
+    }
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      highlightedIndex.value = (highlightedIndex.value - 1 + count) % count;
+      return;
+    }
+    if (e.key === "Enter" || e.key === "Tab") {
+      e.preventDefault();
+      selectSkill(filteredSkills.value[highlightedIndex.value]);
+      return;
+    }
+    if (e.key === "Escape") {
+      e.preventDefault();
+      menuOpen.value = false;
+      return;
+    }
+  }
+
+  // Backsteg längst till vänster äter pillen istället för ett tecken.
+  if (e.key === "Backspace" && activeSkill.value) {
+    const el = e.target as HTMLTextAreaElement;
+    if (el.selectionStart === 0 && el.selectionEnd === 0) {
+      e.preventDefault();
+      clearSkill();
+      return;
+    }
+  }
+
   if (!props.submitOnEnter) return;
   if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();
@@ -285,6 +397,16 @@ defineExpose({
   getShellTop: () => chatShellRef.value?.getBoundingClientRect().top ?? null,
   getText: () => textareaRef.value?.value ?? text.value,
   setText,
+  getSkill: () => activeSkill.value?.id ?? null,
+  setSkill: (id: string | null) => {
+    const skill = getSkillById(id);
+    if (skill) {
+      activeSkill.value = skill;
+    } else {
+      activeSkill.value = null;
+      if (textareaRef.value) textareaRef.value.style.textIndent = "";
+    }
+  },
   getAttachments: () => [...pendingAttachments.value],
   setAttachments: (value: ChatAttachment[]) => {
     pendingAttachments.value = value.filter(
@@ -313,7 +435,7 @@ defineExpose({
         </p>
 
         <div ref="chatShellRef"
-          class="chat-shell relative rounded-[28px] border border-border bg-background dark:bg-secondary shadow-[0_16px_45px_-18px_rgba(0,0,0,0.22)] focus-within:border-border dark:shadow-[0_16px_45px_-18px_rgba(0,0,0,0.55)]">
+          class="chat-shell relative rounded-3xl border border-border bg-background dark:bg-secondary shadow-[0_16px_45px_-18px_rgba(0,0,0,0.22)] focus-within:border-border dark:shadow-[0_16px_45px_-18px_rgba(0,0,0,0.55)]">
           <Transition name="fade-up">
             <div v-if="showScrollButton" class="pointer-events-none absolute -top-12 right-3 z-20">
               <Button variant="outline" size="icon" class="pointer-events-auto rounded-full"
@@ -344,10 +466,10 @@ defineExpose({
               <LucideImage v-else class="size-3.5 shrink-0 text-muted-foreground" />
               <span class="max-w-20 truncate" :title="attachment.name">{{
                 attachment.name
-              }}</span>
+                }}</span>
               <span class="shrink-0 text-muted-foreground">{{
                 formatFileSize(attachment.size)
-              }}</span>
+                }}</span>
               <button type="button"
                 class="shrink-0 cursor-pointer rounded-full text-muted-foreground hover:text-foreground"
                 :aria-label="`Ta bort ${attachment.name}`" @click="removePendingAttachment(attachment.id)">
@@ -356,13 +478,47 @@ defineExpose({
             </div>
           </TransitionGroup>
 
-          <div class="px-4 pt-3.5 pb-1">
-            <textarea ref="textareaRef" :value="text" rows="1" placeholder="Fråga vad som helst"
+          <Transition name="fade-up">
+            <div v-if="menuOpen" id="chat-skill-menu" ref="skillMenuRef" role="listbox" aria-label="Skills"
+              class="absolute bottom-full left-0 right-0 z-30 mb-2 overflow-hidden rounded-lg border border-border bg-popover p-1.5 shadow-lg">
+              <div class="px-2.5 pb-1 pt-1 text-2xs font-normal text-muted-foreground">
+                Skills
+              </div>
+              <button v-for="(skill, index) in filteredSkills" :id="`chat-skill-${skill.id}`" :key="skill.id"
+                type="button" role="option" :aria-selected="index === highlightedIndex"
+                class="flex w-full cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 text-left"
+                :class="index === highlightedIndex ? 'bg-accent' : ''" @mouseenter="highlightedIndex = index"
+                @mousedown.prevent="selectSkill(skill)">
+                <component :is="SKILL_ICONS[skill.id]" class="mt-0.5 size-3.5 shrink-0 text-muted-foreground" />
+                <span class="flex min-w-0 flex-col gap-0.5">
+                  <span class="flex items-baseline gap-1.5">
+                    <span class="text-xs font-medium text-foreground">{{ skill.label }}</span>
+                    <span class="text-2xs text-muted-foreground">/{{ skill.command }}</span>
+                  </span>
+                  <span class="text-2xs leading-snug text-muted-foreground">{{ skill.description }}</span>
+                </span>
+              </button>
+            </div>
+          </Transition>
+
+          <div class="relative px-4 pt-4 pb-2">
+            <span v-if="activeSkill" ref="skillPillRef"
+              class="pointer-events-auto absolute left-4 top-4 inline-flex items-center gap-1 rounded-md bg-skill px-1.5 py-0.5 text-[13px] font-medium leading-relaxed text-white">
+              {{ activeSkill.label }}
+              <button type="button" class="cursor-pointer opacity-70 hover:opacity-100"
+                :aria-label="`Ta bort ${activeSkill.label}`" @mousedown.prevent="clearSkill()">
+                <LucideX class="size-3" />
+              </button>
+            </span>
+            <textarea ref="textareaRef" :value="text" rows="1"
+              :placeholder="activeSkill ? 'Fråga vad som helst' : 'Fråga vad som helst, skriv / för skills'"
+              role="combobox" :aria-expanded="menuOpen" aria-controls="chat-skill-menu"
+              :aria-activedescendant="menuOpen ? `chat-skill-${filteredSkills[highlightedIndex]?.id}` : undefined"
               class="chat-textarea block w-full min-w-0 resize-none border-0 bg-transparent p-0 text-base leading-relaxed outline-none placeholder:text-muted-foreground/70 focus:ring-0 max-h-45 sm:text-[15px]"
               @input="handleInput" @keydown="handleKeyDown" />
           </div>
 
-          <div class="flex items-center gap-1.5 px-2.5 pb-2.5">
+          <div class="flex items-center gap-1.5 px-3 pb-3">
             <input ref="fileInputRef" type="file" multiple class="hidden" :accept="FILE_INPUT_ACCEPT"
               @change="handleFileInput" />
             <Button variant="ghost" size="icon" aria-label="Bifoga filer"

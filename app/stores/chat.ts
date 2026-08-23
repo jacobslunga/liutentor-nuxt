@@ -17,6 +17,8 @@ export interface Message {
   context?: string;
   selectionContext?: string;
   attachments?: ChatAttachment[];
+  /** Vald skill (slash-kommando) för just den här turen. */
+  skill?: string;
   /**
    * What the assistant is doing right now, e.g. searching the web. Live only for
    * the turn being streamed; history reloads from `ai_chat_logs` never carry it.

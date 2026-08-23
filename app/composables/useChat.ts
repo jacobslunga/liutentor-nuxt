@@ -4,7 +4,7 @@ import { useChatStore, type ChatAttachment } from "@/stores/chat";
 const CHAT_API_URL =
   "https://liutentor-hono-687405545415.europe-north2.run.app/api/v1/chat/completion";
 
-// const CHAT_API_URL_LOCAL = "http://localhost:8080/api/v1/chat/completion";
+const CHAT_API_URL_LOCAL = "http://localhost:8080/api/v1/chat/completion";
 
 const DEFAULT_MODEL_ID = "gemini-3.1-flash-lite";
 
@@ -45,6 +45,7 @@ export function useChat(options: {
   function cancelGeneration(): {
     content: string;
     attachments: ChatAttachment[];
+    skill: string | null;
   } | null {
     abortController.value?.abort();
     abortController.value = null;
@@ -52,6 +53,7 @@ export function useChat(options: {
     let cancelledUserMessage: {
       content: string;
       attachments: ChatAttachment[];
+      skill: string | null;
     } | null = null;
     const msgs = chatStore.messages;
     const last = msgs[msgs.length - 1];
@@ -63,6 +65,7 @@ export function useChat(options: {
           cancelledUserMessage = {
             content: userMsg.content,
             attachments: userMsg.attachments ?? [],
+            skill: userMsg.skill ?? null,
           };
         }
 
@@ -100,6 +103,7 @@ export function useChat(options: {
       context?: string;
       selectionContext?: string;
       webSearch?: boolean;
+      skill?: string | null;
     } = {},
   ) {
     if ((!content.trim() && attachments.length === 0) || chatStore.isLoading) {
@@ -146,6 +150,7 @@ export function useChat(options: {
       context,
       selectionContext,
       webSearch = false,
+      skill,
     } = opts;
     const resolvedModelId = modelId || DEFAULT_MODEL_ID;
 
@@ -155,6 +160,7 @@ export function useChat(options: {
       ...(context ? { context } : {}),
       ...(selectionContext ? { selectionContext } : {}),
       ...(attachments.length ? { attachments } : {}),
+      ...(skill ? { skill } : {}),
     };
 
     chatStore.messages.push(userMessage);
@@ -200,6 +206,7 @@ export function useChat(options: {
           conversationId: chatStore.currentConversationId,
           selectionContext: selectionContext || undefined,
           webSearch: webSearch || undefined,
+          skill: skill || undefined,
         }),
       );
       for (const attachment of chatStore.getActiveAttachments()) {
@@ -208,7 +215,7 @@ export function useChat(options: {
         }
       }
 
-      const response = await fetch(`${CHAT_API_URL}/${options.examId}`, {
+      const response = await fetch(`${CHAT_API_URL_LOCAL}/${options.examId}`, {
         method: "POST",
         headers: {
           // Opting in to the framed protocol. A client that omits this still gets
