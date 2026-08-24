@@ -1,26 +1,17 @@
 <template>
-  <div
-    class="pointer-events-none absolute inset-0 z-60 bg-background/90"
-    role="status"
-    aria-live="polite"
-  >
-    <div
-      class="flex h-full flex-col items-center justify-center p-8 text-center"
-    >
+  <div class="pointer-events-none absolute inset-0 z-60 bg-background/90" role="status" aria-live="polite">
+    <div class="flex h-full flex-col items-center justify-center p-8 text-center">
       <div class="drop-illustration relative mb-7 h-20 w-32" aria-hidden="true">
         <div
-          class="drop-tile-back absolute left-4 top-3 flex size-14 -rotate-12 items-center justify-center rounded-2xl text-primary-foreground shadow-lg"
-        >
+          class="drop-tile-back absolute left-4 top-3 flex size-14 -rotate-12 items-center justify-center rounded-2xl text-primary-foreground shadow-lg">
           <LucideImage class="size-7" />
         </div>
         <div
-          class="drop-tile-middle absolute right-4 top-1 flex size-14 rotate-12 items-center justify-center rounded-2xl text-primary-foreground shadow-lg"
-        >
+          class="drop-tile-middle absolute right-4 top-1 flex size-14 rotate-12 items-center justify-center rounded-2xl text-primary-foreground shadow-lg">
           <LucideFileText class="size-7" />
         </div>
         <div
-          class="absolute bottom-0 left-1/2 flex size-14 -translate-x-1/2 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-xl"
-        >
+          class="absolute bottom-0 left-1/2 flex size-14 -translate-x-1/2 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-xl">
           <LucideImagePlus class="size-7" />
         </div>
       </div>
@@ -65,6 +56,7 @@
     opacity: 0;
     transform: translateY(8px) scale(0.9);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
