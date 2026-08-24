@@ -466,10 +466,10 @@ defineExpose({
               <LucideImage v-else class="size-3.5 shrink-0 text-muted-foreground" />
               <span class="max-w-20 truncate" :title="attachment.name">{{
                 attachment.name
-                }}</span>
+              }}</span>
               <span class="shrink-0 text-muted-foreground">{{
                 formatFileSize(attachment.size)
-                }}</span>
+              }}</span>
               <button type="button"
                 class="shrink-0 cursor-pointer rounded-full text-muted-foreground hover:text-foreground"
                 :aria-label="`Ta bort ${attachment.name}`" @click="removePendingAttachment(attachment.id)">
