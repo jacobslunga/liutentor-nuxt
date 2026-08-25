@@ -32,12 +32,12 @@ export default defineNuxtConfig({
         { name: "format-detection", content: "telephone=no" },
         {
           name: "theme-color",
-          content: "#ffffff",
+          content: "#fafdfc",
           media: "(prefers-color-scheme: light)",
         },
         {
           name: "theme-color",
-          content: "#181818",
+          content: "#161916",
           media: "(prefers-color-scheme: dark)",
         },
         { property: "og:site_name", content: "LiU Tentor" },
@@ -143,7 +143,11 @@ export default defineNuxtConfig({
     },
   },
 
-  css: ["~/assets/css/tailwind.css"],
+  css: [
+    "@fontsource-variable/google-sans",
+    "@fontsource-variable/google-sans-code",
+    "~/assets/css/tailwind.css",
+  ],
 
   vite: {
     plugins: [tailwindcss()],

@@ -530,7 +530,7 @@ defineExpose({
 }
 
 .prose :deep(.code-lang) {
-  font-family: "SF Mono", monospace;
+  font-family: var(--font-mono);
   font-size: 0.7rem;
   letter-spacing: 0.04em;
   color: var(--muted-foreground);
