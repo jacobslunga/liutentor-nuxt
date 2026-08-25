@@ -19,10 +19,20 @@ const measured = computed(() =>
   props.points.filter((p) => p.rate !== undefined),
 );
 
-const xScale = Scale.scaleTime();
+// Tentatillfällena ligger inte jämnt i tiden: vissa år saknar tentor helt medan
+// ett aktivt år kan ha sex. På en äkta tidsaxel blir det stora tomrum och
+// klungor som klibbar ihop. Vi ritar därför en stapel per tillfälle med samma
+// bredd (index som x) och låter årsetiketterna bära tidsinformationen i stället.
+const xScale = Scale.scaleLinear();
 
-const x = (d: PassRatePoint) => d.timestamp;
+const x = (_d: PassRatePoint, i: number) => i;
 const y = (d: PassRatePoint) => d.rate;
+
+// Halvt steg i varje ände så att den första och sista stapeln inte klipps.
+const xDomain = computed<[number, number]>(() => [
+  -0.5,
+  Math.max(measured.value.length - 1, 0) + 0.5,
+]);
 
 const yTicks = [0, 25, 50, 75, 100];
 
@@ -46,28 +56,37 @@ function barColor(d: PassRatePoint) {
   );
 }
 
-const DAY_MS = 24 * 60 * 60 * 1000;
+// Staplarna ligger i kronologisk ordning, så varje år upptar ett sammanhängande
+// spann av index. Vi märker upp spannets mitt med årtalet och drar en tunn linje
+// vid varje årsskifte — det är den som gör klungorna läsbara.
+const yearGroups = computed(() => {
+  const groups: { year: number; start: number; end: number }[] = [];
 
-// Varje tentatillfälle är en diskret händelse, så vi ritar staplar i stället för
-// en kurva. Tidsaxeln behålls — luckorna mellan tillfällena säger något — men då
-// måste unovis få veta det förväntade avståndet mellan staplarna för att kunna
-// räkna ut bredden. Vi använder medianavståndet, så en enstaka tät period inte
-// krymper alla staplar.
-const dataStep = computed(() => {
-  const stamps = measured.value.map(x).sort((a, b) => a - b);
+  measured.value.forEach((point, i) => {
+    const year = new Date(point.timestamp).getFullYear();
+    const current = groups.at(-1);
 
-  if (stamps.length < 2) return 90 * DAY_MS;
+    if (current && current.year === year) current.end = i;
+    else groups.push({ year, start: i, end: i });
+  });
 
-  const gaps = stamps
-    .slice(1)
-    .map((t, i) => t - (stamps[i] as number))
-    .filter((gap) => gap > 0)
-    .sort((a, b) => a - b);
-
-  if (!gaps.length) return 90 * DAY_MS;
-
-  return gaps[Math.floor(gaps.length / 2)] as number;
+  return groups;
 });
+
+const yearTicks = computed(() =>
+  yearGroups.value.map((g) => (g.start + g.end) / 2),
+);
+
+const yearLabels = computed(
+  () =>
+    new Map(
+      yearGroups.value.map((g) => [(g.start + g.end) / 2, String(g.year)]),
+    ),
+);
+
+const yearBoundaries = computed(() =>
+  yearGroups.value.slice(1).map((g) => g.start - 0.5),
+);
 
 const plotBox = ref<{ top: number; bottom: number; left: number } | null>(null);
 
@@ -158,17 +177,28 @@ const averageLabel = computed(() => `Snitt ${Math.round(props.average)}%`);
       :data="measured"
       :height="300"
       :x-scale="xScale"
+      :x-domain="xDomain"
       :y-domain="[0, 100]"
       :margin="{ top: 16, right: 12, bottom: 0, left: 0 }"
       :duration="200"
       :on-render-complete="onRenderComplete"
     >
 
+      <VisPlotline
+        v-for="boundary in yearBoundaries"
+        :key="`year-${boundary}`"
+        :value="boundary"
+        axis="x"
+        color="var(--vis-year-separator-color)"
+        :line-width="1"
+        :duration="0"
+      />
+
       <VisStackedBar
         :x="x"
         :y="y"
         :color="barColor"
-        :dataStep="dataStep"
+        :dataStep="1"
         :barMaxWidth="34"
         :barPadding="0.25"
         :roundedCorners="4"
@@ -188,9 +218,9 @@ const averageLabel = computed(() => `Snitt ${Math.round(props.average)}%`);
         :grid-line="false"
         :tick-line="false"
         :domain-line="false"
-        :num-ticks="6"
+        :tick-values="yearTicks"
         :tick-text-hide-overlapping="true"
-        :tick-format="(t: number | Date) => String(new Date(t).getFullYear())"
+        :tick-format="(t: number | Date) => yearLabels.get(Number(t)) ?? ''"
       />
       <VisAxis
         type="y"
@@ -221,6 +251,11 @@ const averageLabel = computed(() => `Snitt ${Math.round(props.average)}%`);
 
 <style scoped>
 .pass-rate-chart {
+  --vis-year-separator-color: color-mix(
+    in oklch,
+    var(--border) 70%,
+    transparent
+  );
 
   --vis-plotline-color: color-mix(in oklch, var(--foreground) 45%, transparent);
   --vis-plotline-label-font-size: 11px;
