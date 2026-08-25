@@ -18,6 +18,7 @@
 import "vue-sonner/style.css";
 import { Toaster } from "@/components/ui/sonner";
 import logoFontUrl from "~/assets/fonts/gt-super-text-bold.woff2?url&no-inline";
+import sansFontUrl from "@fontsource-variable/google-sans/files/google-sans-latin-wght-normal.woff2?url&no-inline";
 
 const colorMode = useColorMode();
 
@@ -31,6 +32,14 @@ onMounted(() => {
 
 useHead({
   link: [
+    {
+      key: "sans-font-preload",
+      rel: "preload",
+      as: "font",
+      type: "font/woff2",
+      crossorigin: "anonymous",
+      href: sansFontUrl,
+    },
     {
       key: "logo-font-preload",
       rel: "preload",

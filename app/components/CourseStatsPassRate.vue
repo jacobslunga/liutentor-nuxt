@@ -1,15 +1,13 @@
 <script setup lang="ts">
 import {
-  VisArea,
   VisAxis,
   VisCrosshair,
-  VisLine,
   VisPlotline,
-  VisScatter,
+  VisStackedBar,
   VisTooltip,
   VisXYContainer,
 } from "@unovis/vue";
-import { CurveType, Position, Scale } from "@unovis/ts";
+import { Position, Scale } from "@unovis/ts";
 import type { PassRatePoint } from "~/composables/useCourseStats";
 
 const props = defineProps<{
@@ -17,13 +15,9 @@ const props = defineProps<{
   average: number;
 }>();
 
-const tokens = useChartTokens(["background", "success"] as const);
-
 const measured = computed(() =>
   props.points.filter((p) => p.rate !== undefined),
 );
-
-const gradientId = `${useId()}-pass-rate-area`;
 
 const xScale = Scale.scaleTime();
 
@@ -32,9 +26,48 @@ const y = (d: PassRatePoint) => d.rate;
 
 const yTicks = [0, 25, 50, 75, 100];
 
-const curveType = CurveType.MonotoneX;
+// Staplarna skuggas efter andelen godkända: låg andel ger en blek ton, hög ger
+// en mättad. Trösklarna är absoluta så att samma färg betyder samma sak när man
+// jämför två kurser. Ramp-tokens är temamedvetna — ljust tema går blekt → djupt,
+// mörkt tema dovt → ljust — så "starkare färg = högre andel" gäller i båda.
+const RATE_SHADES = [
+  { min: 80, color: "var(--chart-5)" },
+  { min: 60, color: "var(--chart-4)" },
+  { min: 40, color: "var(--chart-3)" },
+  { min: 20, color: "var(--chart-2)" },
+  { min: 0, color: "var(--chart-1)" },
+];
 
-const isSinglePoint = computed(() => measured.value.length === 1);
+function barColor(d: PassRatePoint) {
+  const rate = d.rate ?? 0;
+
+  return (
+    RATE_SHADES.find((shade) => rate >= shade.min)?.color ?? "var(--chart-1)"
+  );
+}
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+// Varje tentatillfälle är en diskret händelse, så vi ritar staplar i stället för
+// en kurva. Tidsaxeln behålls — luckorna mellan tillfällena säger något — men då
+// måste unovis få veta det förväntade avståndet mellan staplarna för att kunna
+// räkna ut bredden. Vi använder medianavståndet, så en enstaka tät period inte
+// krymper alla staplar.
+const dataStep = computed(() => {
+  const stamps = measured.value.map(x).sort((a, b) => a - b);
+
+  if (stamps.length < 2) return 90 * DAY_MS;
+
+  const gaps = stamps
+    .slice(1)
+    .map((t, i) => t - (stamps[i] as number))
+    .filter((gap) => gap > 0)
+    .sort((a, b) => a - b);
+
+  if (!gaps.length) return 90 * DAY_MS;
+
+  return gaps[Math.floor(gaps.length / 2)] as number;
+});
 
 const plotBox = ref<{ top: number; bottom: number; left: number } | null>(null);
 
@@ -121,17 +154,6 @@ const averageLabel = computed(() => `Snitt ${Math.round(props.average)}%`);
 
 <template>
   <div class="vis-chart pass-rate-chart relative w-full">
-
-    <svg width="0" height="0" class="absolute" aria-hidden="true">
-      <defs>
-        <linearGradient :id="gradientId" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" :stop-color="tokens.success" stop-opacity="0.32" />
-          <stop offset="55%" :stop-color="tokens.success" stop-opacity="0.12" />
-          <stop offset="100%" :stop-color="tokens.success" stop-opacity="0" />
-        </linearGradient>
-      </defs>
-    </svg>
-
     <VisXYContainer
       :data="measured"
       :height="300"
@@ -142,27 +164,15 @@ const averageLabel = computed(() => `Snitt ${Math.round(props.average)}%`);
       :on-render-complete="onRenderComplete"
     >
 
-      <VisArea
+      <VisStackedBar
         :x="x"
         :y="y"
-        :curve-type="curveType"
-        :color="`url(#${gradientId})`"
-        :baseline="0"
-      />
-      <VisLine
-        :x="x"
-        :y="y"
-        :curve-type="curveType"
-        :color="tokens.success"
-        :line-width="2"
-      />
-
-      <VisScatter
-        v-if="isSinglePoint"
-        :x="x"
-        :y="y"
-        :size="7"
-        :color="tokens.success"
+        :color="barColor"
+        :dataStep="dataStep"
+        :barMaxWidth="34"
+        :barPadding="0.25"
+        :roundedCorners="4"
+        :barMinHeight1Px="true"
       />
 
       <VisPlotline
@@ -194,10 +204,7 @@ const averageLabel = computed(() => `Snitt ${Math.round(props.average)}%`);
       <VisCrosshair
         :x="x"
         :y="y"
-        :color="tokens.success"
-        :circle-radius="3"
-        :stroke-color="tokens.background"
-        :stroke-width="2"
+        :circle-radius="0"
         :template="tooltipTemplate"
       />
       <VisTooltip />
