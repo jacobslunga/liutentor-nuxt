@@ -82,13 +82,13 @@ watch(transcriptRef, (transcript) => {
       <button
         v-if="!isOpen"
         type="button"
-        class="fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom,0px))] z-80 flex h-14 items-center gap-2.5 rounded-full border border-border bg-background px-3 shadow-lg"
+        class="fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom,0px))] z-80 flex h-14 items-center gap-2.5 rounded-2xl border border-border bg-background px-3 shadow-lg"
         aria-label="Öppna chatten"
         @click="openChat"
       >
         <ChatMascot class="size-7 shrink-0" />
         <span
-          class="flex h-10 min-w-0 flex-1 items-center rounded-full bg-secondary/40 px-4 text-left text-base text-muted-foreground/80"
+          class="flex h-10 min-w-0 flex-1 items-center rounded-lg bg-secondary/40 px-4 text-left text-base text-muted-foreground/80"
         >
           Fråga vad som helst
         </span>

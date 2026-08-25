@@ -84,7 +84,7 @@ const principles = [
         </p>
         <div class="mt-10 grid gap-10 sm:grid-cols-3 sm:gap-8">
           <div v-for="(principle, i) in principles" :key="principle.title">
-            <span class="font-serif text-3xl font-medium leading-none text-primary">
+            <span class="text-3xl font-medium leading-none text-primary">
               {{ String(i + 1).padStart(2, "0") }}
             </span>
             <h3 class="mt-4 text-base font-medium text-foreground">

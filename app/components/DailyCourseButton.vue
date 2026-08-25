@@ -46,7 +46,7 @@ const TILE_CLASSES: Record<TileState, string> = {
 <template>
   <NuxtLink
     to="/dagens-kurskod"
-    class="group inline-flex h-8 items-center gap-2 rounded-full border border-border bg-secondary/40 pr-3 pl-2 text-xs text-muted-foreground transition-colors duration-150 ease-spring hover:border-foreground/40 hover:text-foreground active:scale-[0.98]"
+    class="group inline-flex h-8 items-center gap-2 rounded-lg border border-border bg-secondary/40 pr-3 pl-2 text-xs text-muted-foreground transition-colors duration-150 ease-spring hover:border-foreground/40 hover:text-foreground active:scale-[0.98]"
   >
     <span class="flex flex-row gap-[2px]" aria-hidden="true">
       <span
@@ -61,7 +61,7 @@ const TILE_CLASSES: Record<TileState, string> = {
 
     <span
       v-if="isMounted && finished"
-      class="rounded-full bg-primary/10 px-1.5 font-mono text-2xs font-semibold text-primary"
+      class="rounded-sm bg-primary/10 px-1.5 font-mono text-2xs font-semibold text-primary"
     >
       {{ status === "won" ? `${attempts}/${MAX_GUESSES}` : `X/${MAX_GUESSES}` }}
     </span>

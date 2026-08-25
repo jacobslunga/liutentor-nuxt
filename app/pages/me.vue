@@ -496,7 +496,7 @@ async function handleSignOut() {
                                         >Kontostatus</span
                                     >
                                     <span
-                                        class="text-xs font-medium text-success bg-success/10 px-2 py-0.5 rounded-full"
+                                        class="text-xs font-medium text-success bg-success/10 px-2 py-0.5 rounded-sm"
                                         >Aktiv</span
                                     >
                                 </p>

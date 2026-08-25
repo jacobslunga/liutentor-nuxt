@@ -90,12 +90,12 @@ const courseCodeLabel = computed(() => {
       >
         <div class="mb-3 flex items-center gap-2">
           <span
-            class="inline-flex items-center rounded-full border border-border bg-muted/40 px-2 py-0.5 text-2xs"
+            class="inline-flex items-center rounded-sm border border-border bg-muted/40 px-2 py-0.5 text-2xs"
           >
             Fråga {{ qi + 1 }}
           </span>
           <span
-            class="inline-flex items-center rounded-full px-2 py-0.5 text-2xs font-medium border"
+            class="inline-flex items-center rounded-sm px-2 py-0.5 text-2xs font-medium border"
             :class="
               answers[question.id] === question.answer
                 ? 'bg-success/10 text-success border-success/30'

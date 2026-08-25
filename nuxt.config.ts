@@ -32,12 +32,12 @@ export default defineNuxtConfig({
         { name: "format-detection", content: "telephone=no" },
         {
           name: "theme-color",
-          content: "#fafdfc",
+          content: "#fbfcfc",
           media: "(prefers-color-scheme: light)",
         },
         {
           name: "theme-color",
-          content: "#161916",
+          content: "#171918",
           media: "(prefers-color-scheme: dark)",
         },
         { property: "og:site_name", content: "LiU Tentor" },
@@ -144,15 +144,11 @@ export default defineNuxtConfig({
   },
 
   css: [
-    // Bara wght-axeln och latin/latin-ext-subseten — inte paketens index.css,
-    // som drar in varje subset (kyrilliska, grekiska, vietnamesiska) fonten
-    // råkar ha. Kursiverna kostar inget förrän kursiv text faktiskt renderas.
-    "@fontsource-variable/schibsted-grotesk/wght.css",
-    "@fontsource-variable/schibsted-grotesk/wght-italic.css",
-    "@fontsource-variable/newsreader/wght.css",
-    "@fontsource-variable/newsreader/wght-italic.css",
-    "@fontsource-variable/spline-sans-mono/wght.css",
-    "@fontsource-variable/spline-sans-mono/wght-italic.css",
+    // Bara wght-axeln — inte paketets index.css, som drar in varje viktaxel
+    // och optisk storlek. Kursiven kostar inget förrän kursiv text faktiskt
+    // renderas. Mono är systemsnitt och importeras inte alls.
+    "@fontsource-variable/inter/wght.css",
+    "@fontsource-variable/inter/wght-italic.css",
     "~/assets/css/tailwind.css",
   ],
 

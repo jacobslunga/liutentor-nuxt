@@ -210,7 +210,7 @@ function confirmLockIn() {
             <div class="flex flex-row items-baseline gap-1.5 leading-none">
               <span class="text-sm font-semibold">{{
                 selectedExam.exam_date
-                }}</span>
+              }}</span>
             </div>
             <LucideChevronDown class="size-4 text-muted-foreground transition-transform duration-200"
               :class="{ 'rotate-180': isDropdownOpen }" />
@@ -242,7 +242,7 @@ function confirmLockIn() {
                   </DropdownMenuRadioGroup>
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
-              <span class="text-xs font-mono px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">
+              <span class="text-xs font-mono px-2 py-0.5 rounded-sm bg-muted text-muted-foreground font-medium">
                 {{ sortedExams.length }} st
               </span>
             </div>

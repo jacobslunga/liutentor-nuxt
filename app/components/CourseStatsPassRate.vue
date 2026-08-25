@@ -241,7 +241,7 @@ const averageLabel = computed(() => `Snitt ${Math.round(props.average)}%`);
     </VisXYContainer>
 
     <span
-      class="pointer-events-none absolute -translate-y-1/2 rounded-full border border-border/60 bg-background/70 px-2 py-0.5 text-[11px] font-medium text-muted-foreground backdrop-blur-[2px]"
+      class="pointer-events-none absolute -translate-y-1/2 rounded-sm border border-border/60 bg-background/70 px-2 py-0.5 text-[11px] font-medium text-muted-foreground backdrop-blur-[2px]"
       :style="averageStyle"
     >
       {{ averageLabel }}

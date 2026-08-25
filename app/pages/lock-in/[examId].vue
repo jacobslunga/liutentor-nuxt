@@ -115,7 +115,7 @@ function formatTime(ms: number): string {
   <div class="relative h-screen w-screen overflow-hidden bg-background flex flex-col">
     <div class="absolute top-0 left-0 right-0 z-40 px-4 py-2 flex items-center justify-center pointer-events-none">
       <div
-        class="bg-background/80 backdrop-blur-sm border border-border/60 rounded-full px-4 py-2 flex items-center gap-6 pointer-events-auto">
+        class="bg-background/80 backdrop-blur-sm border border-border/60 rounded-lg px-4 py-2 flex items-center gap-6 pointer-events-auto">
         <div class="flex items-center gap-3 min-w-30 justify-center">
           <LucideTimer class="w-5 h-5" :class="timeRemaining < 300000
             ? 'text-destructive animate-pulse'
@@ -168,7 +168,7 @@ function formatTime(ms: number): string {
             {{ formatTime(timeRemaining) }} återstår
           </p>
         </div>
-        <Button size="lg" class="rounded-full px-8 h-12 text-lg gap-2 mt-4" @click="handlePauseResume">
+        <Button size="lg" class=" px-8 h-12 text-lg gap-2 mt-4" @click="handlePauseResume">
           <LucidePlay class="w-5 h-5 fill-current" />
           Återuppta
         </Button>

@@ -259,7 +259,7 @@ function passColor(rate: number) {
       <div class="flex justify-center">
         <div class="flex flex-col items-start w-full max-w-4xl gap-8">
           <div class="w-full">
-            <h1 class="text-3xl sm:text-4xl font-medium text-foreground leading-tight w-full wrap-break-word">
+            <h1 class="text-3xl sm:text-4xl font-semibold text-foreground leading-tight w-full wrap-break-word">
               {{ courseData.courseName }}
             </h1>
 
@@ -270,14 +270,14 @@ function passColor(rate: number) {
               <span>
                 <span class="font-medium text-foreground">{{
                   exams.length
-                  }}</span>
+                }}</span>
                 tentor
               </span>
               <span aria-hidden="true">·</span>
               <span>
                 <span class="font-medium text-foreground">{{
                   examsWithSolutions
-                  }}</span>
+                }}</span>
                 med facit
               </span>
               <template v-if="avgPassRate !== null">

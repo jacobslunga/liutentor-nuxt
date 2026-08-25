@@ -471,7 +471,7 @@ defineExpose({
                 formatFileSize(attachment.size)
               }}</span>
               <button type="button"
-                class="shrink-0 cursor-pointer rounded-full text-muted-foreground hover:text-foreground"
+                class="shrink-0 cursor-pointer rounded-sm text-muted-foreground hover:text-foreground"
                 :aria-label="`Ta bort ${attachment.name}`" @click="removePendingAttachment(attachment.id)">
                 <LucideX class="size-3.5" />
               </button>
@@ -522,14 +522,14 @@ defineExpose({
             <input ref="fileInputRef" type="file" multiple class="hidden" :accept="FILE_INPUT_ACCEPT"
               @change="handleFileInput" />
             <Button variant="ghost" size="icon" aria-label="Bifoga filer"
-              class="size-8 shrink-0 rounded-full text-muted-foreground hover:text-foreground"
+              class="size-8 shrink-0 text-muted-foreground hover:text-foreground"
               :disabled="isLoading || attachmentCapacityReached" @click="fileInputRef?.click()">
               <LucidePlus class="size-4" />
             </Button>
 
             <Button variant="ghost" size="sm" type="button" aria-label="Sök på webben" :aria-pressed="webSearch"
               :title="webSearch ? 'Webbsökning på' : 'Sök på webben'"
-              class="h-8 shrink-0 gap-1.5 rounded-full px-2.5 text-xs font-normal hover:bg-accent/70" :class="webSearch
+              class="h-8 shrink-0 gap-1.5 px-2.5 text-xs font-normal hover:bg-accent/70" :class="webSearch
                 ? 'bg-accent/70 text-primary hover:text-primary'
                 : 'text-muted-foreground hover:text-foreground'" @click="emit('update:webSearch', !webSearch)">
               <LucideGlobe class="size-4" />
@@ -540,7 +540,7 @@ defineExpose({
               <DropdownMenu>
                 <DropdownMenuTrigger as-child>
                   <Button variant="ghost" size="sm"
-                    class="h-8 gap-1.5 rounded-full px-3 text-xs font-normal text-muted-foreground hover:bg-accent/70 hover:text-foreground data-[state=open]:bg-accent/70">
+                    class="h-8 gap-1.5 px-3 text-xs font-normal text-muted-foreground hover:bg-accent/70 hover:text-foreground data-[state=open]:bg-accent/70">
                     {{ selectedModelLabel }}
                     <LucideChevronDown class="w-3.5 h-3.5 text-muted-foreground/70" />
                   </Button>
@@ -566,12 +566,11 @@ defineExpose({
               </DropdownMenu>
 
               <Transition name="scale" mode="out-in">
-                <Button v-if="isLoading" key="stop" size="icon" variant="secondary" class="size-8 rounded-full"
+                <Button v-if="isLoading" key="stop" size="icon" variant="secondary" class="size-8"
                   @click="emit('cancel')">
                   <LucideSquare class="size-3.5 fill-current" />
                 </Button>
-                <Button v-else key="send" size="icon" class="size-8 rounded-full" :disabled="!canSend"
-                  @click="emit('send')">
+                <Button v-else key="send" size="icon" class="size-8" :disabled="!canSend" @click="emit('send')">
                   <LucideArrowUp class="size-4" />
                 </Button>
               </Transition>

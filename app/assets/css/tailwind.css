@@ -71,48 +71,33 @@
    landar (CLS). Overriden nedan är uträknade ur de faktiska filerna — bredden
    mot ett representativt textprov, ascent/descent ur typo-metrikerna — så
    reserven upptar exakt samma yta som riktiga snittet. De används aldrig
-   direkt, bara som nästa steg i stackarna i @theme.
+   direkt, bara som nästa steg i --font-sans.
+
+   Mono har ingen reserv: den är ett rent systemsnitt och laddas aldrig.
    --------------------------------------------------------------------------- */
 
 @font-face {
-  font-family: "Schibsted Grotesk Fallback";
+  font-family: "Inter Fallback";
   src: local("Arial"), local("Helvetica Neue"), local("Liberation Sans");
-  size-adjust: 104.2%;
-  ascent-override: 93.7%;
-  descent-override: 24.7%;
-  line-gap-override: 0%;
-}
-
-@font-face {
-  font-family: "Newsreader Fallback";
-  src: local("Times New Roman"), local("Times"), local("Liberation Serif");
-  size-adjust: 106.1%;
-  ascent-override: 69.3%;
-  descent-override: 25%;
-  line-gap-override: 0%;
-}
-
-@font-face {
-  font-family: "Spline Sans Mono Fallback";
-  src: local("Courier New"), local("Liberation Mono");
-  size-adjust: 100%;
-  ascent-override: 96.4%;
-  descent-override: 23.7%;
+  size-adjust: 107.4%;
+  ascent-override: 90.2%;
+  descent-override: 22.5%;
   line-gap-override: 0%;
 }
 
 @theme {
   --font-logo: "Logo", serif;
+
+  /* Systemets egen monospace — ingen webfont hämtas för kod och siffror. */
   --font-mono:
-    "Spline Sans Mono Variable", "Spline Sans Mono Fallback", ui-monospace,
-    "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
-  --font-serif:
-    "Newsreader Variable", "Newsreader Fallback", Georgia, Cambria,
-    "Times New Roman", Times, serif;
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+
+  --font-serif: Georgia, Cambria, "Times New Roman", Times, serif;
+
   --font-sans:
-    "Schibsted Grotesk Variable", "Schibsted Grotesk Fallback", system-ui,
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
-    sans-serif;
+    "Inter Variable", "Inter Fallback", system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
 
   --text-2xs: 0.6875rem;
 }
@@ -143,7 +128,7 @@ body {
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 2px);
   --radius-2xl: calc(var(--radius) + 6px);
-  --radius-3xl: calc(var(--radius) + 14px);
+  --radius-3xl: calc(var(--radius) + 10px);
 
   --color-background: var(--background);
   --color-canvas: var(--canvas);
@@ -193,38 +178,44 @@ body {
 }
 
 /* ---------------------------------------------------------------------------
-   Paletten härleds ur varumärkesfärgen. --primary är den enda "riktiga" färgen
-   i varje tema; ytor, ramar och texttoner byggs av den med relativ färgsyntax
-   — oklch(from var(--primary) <l> <c> h) — så de ärver primärens nyans men
-   behåller temats gamla ljushetstrappa. Byt --primary och hela temat följer
-   med. Undantag: destructive/success/warning är semantiska och står fast.
+   Två oberoende ankare. --primary är varumärkesfärgen och används bara där
+   färgen betyder något: knappar, markeringar, diagram och betygsskalan.
+   --foreground är det neutrala ankaret — alla ytor, ramar och texttoner är
+   ljushetssteg av den, via oklch(from var(--foreground) <l> <c> h). Kromat
+   ligger runt 0.001-0.006, dvs precis så mycket att grått inte blir dött,
+   utan att ytorna tar färg av varumärket.
+
+   Byt --primary och bara de färgbärande delarna följer med; byt --foregrounds
+   nyans och hela gråskalan vrids med. Undantag: destructive/success/warning
+   är semantiska och står fast.
    --------------------------------------------------------------------------- */
 
 :root {
-  --radius: 1rem;
+  --radius: 0.5rem;
   --primary: oklch(0.6193 0.1154 172.06);
   --primary-foreground: oklch(0.985 0 0);
   --primary-container: oklch(from var(--primary) 0.9 0.055 h);
   --primary-container-foreground: oklch(from var(--primary) 0.3 0.06 h);
 
-  --background: oklch(from var(--primary) 0.99107 0.003 h);
-  --canvas: oklch(from var(--primary) 0.965 0.012 h);
-  --canvas-border: oklch(from var(--primary) 0.915 0.018 h);
+  --foreground: oklch(0.245 0.005 172.06);
+
+  --background: oklch(from var(--foreground) 0.99107 0.001 h);
+  --canvas: oklch(from var(--foreground) 0.965 0.004 h);
+  --canvas-border: oklch(from var(--foreground) 0.915 0.005 h);
 
   --background-0: oklch(from var(--background) l c h / 0);
   --background-soft: oklch(from var(--background) l c h / 0.7);
-  --foreground: oklch(from var(--primary) 0.245 0.014 h);
 
-  --card: oklch(from var(--primary) 0.972 0.01 h);
-  --card-foreground: oklch(from var(--primary) 0.145 0.014 h);
-  --popover: oklch(from var(--primary) 0.97 0.008 h);
-  --popover-foreground: oklch(from var(--primary) 0.145 0.014 h);
-  --secondary: oklch(from var(--primary) 0.969 0.012 h);
-  --secondary-foreground: oklch(from var(--primary) 0.2 0.014 h);
-  --muted: oklch(from var(--primary) 0.96 0.014 h);
-  --muted-foreground: oklch(from var(--primary) 0.48 0.016 h);
-  --accent: oklch(from var(--primary) 0.94 0.022 h);
-  --accent-foreground: oklch(from var(--primary) 0.2 0.018 h);
+  --card: oklch(from var(--foreground) 0.972 0.003 h);
+  --card-foreground: oklch(from var(--foreground) 0.145 0.005 h);
+  --popover: oklch(from var(--foreground) 0.97 0.003 h);
+  --popover-foreground: oklch(from var(--foreground) 0.145 0.005 h);
+  --secondary: oklch(from var(--foreground) 0.969 0.004 h);
+  --secondary-foreground: oklch(from var(--foreground) 0.2 0.005 h);
+  --muted: oklch(from var(--foreground) 0.96 0.004 h);
+  --muted-foreground: oklch(from var(--foreground) 0.48 0.005 h);
+  --accent: oklch(from var(--foreground) 0.94 0.006 h);
+  --accent-foreground: oklch(from var(--foreground) 0.2 0.005 h);
 
   --destructive: oklch(0.577 0.245 27.325);
   --success: oklch(70.9% 0.17602 148.766);
@@ -232,10 +223,12 @@ body {
   --warning: oklch(81.007% 0.16264 90.418);
   --warning-foreground: oklch(0.2 0 0);
 
-  --border: oklch(from var(--primary) 0.95 0.012 h);
-  --input: oklch(from var(--primary) 0.9 0.018 h);
-  --ring: oklch(from var(--primary) 0.7 0.045 h);
+  --border: oklch(from var(--foreground) 0.95 0.004 h);
+  --input: oklch(from var(--foreground) 0.9 0.005 h);
+  --ring: oklch(from var(--foreground) 0.7 0.008 h);
 
+  /* Diagram och betyg bär fortfarande varumärkesfärgen — där är färgen data,
+     inte dekor. */
   --chart-1: oklch(from var(--primary) 0.911 0.0453 h);
   --chart-2: oklch(from var(--primary) 0.8072 0.1109 h);
   --chart-3: oklch(from var(--primary) 0.7521 0.1557 h);
@@ -246,17 +239,17 @@ body {
   --grade-mid: oklch(from var(--primary) 0.6 0.145 h);
   --grade-high: oklch(from var(--primary) 0.46 0.11 h);
   --grade-fail: var(--destructive);
-  --tile-absent: oklch(from var(--primary) 0.72 0.01 h);
-  --tile-absent-foreground: oklch(from var(--primary) 0.99 0.003 h);
+  --tile-absent: oklch(from var(--foreground) 0.72 0.003 h);
+  --tile-absent-foreground: oklch(from var(--foreground) 0.99 0.001 h);
 
-  --sidebar: oklch(from var(--primary) 0.985 0.006 h);
-  --sidebar-foreground: oklch(from var(--primary) 0.145 0.014 h);
+  --sidebar: oklch(from var(--foreground) 0.985 0.002 h);
+  --sidebar-foreground: oklch(from var(--foreground) 0.145 0.005 h);
   --sidebar-primary: var(--primary);
   --sidebar-primary-foreground: var(--primary-foreground);
-  --sidebar-accent: oklch(from var(--primary) 0.94 0.022 h);
-  --sidebar-accent-foreground: oklch(from var(--primary) 0.2 0.018 h);
-  --sidebar-border: oklch(from var(--primary) 0.915 0.016 h);
-  --sidebar-ring: oklch(from var(--primary) 0.7 0.045 h);
+  --sidebar-accent: oklch(from var(--foreground) 0.94 0.006 h);
+  --sidebar-accent-foreground: oklch(from var(--foreground) 0.2 0.005 h);
+  --sidebar-border: oklch(from var(--foreground) 0.915 0.005 h);
+  --sidebar-ring: oklch(from var(--foreground) 0.7 0.008 h);
 }
 
 .dark,
@@ -268,23 +261,24 @@ body {
   --primary-container: oklch(from var(--primary) 0.38 0.05 h);
   --primary-container-foreground: oklch(from var(--primary) 0.88 0.07 h);
 
-  --background: oklch(from var(--primary) 0.21 0.008 h);
-  --canvas: oklch(from var(--primary) 0.165 0.007 h);
-  --canvas-border: oklch(from var(--primary) 0.285 0.01 h);
+  --foreground: oklch(0.94 0.004 172.06);
+
+  --background: oklch(from var(--foreground) 0.21 0.003 h);
+  --canvas: oklch(from var(--foreground) 0.165 0.002 h);
+  --canvas-border: oklch(from var(--foreground) 0.285 0.003 h);
   --background-0: oklch(from var(--background) l c h / 0);
   --background-soft: oklch(from var(--background) l c h / 0.7);
-  --foreground: oklch(from var(--primary) 0.94 0.006 h);
 
-  --card: oklch(from var(--primary) 0.265 0.009 h);
-  --card-foreground: oklch(from var(--primary) 0.94 0.006 h);
-  --popover: oklch(from var(--primary) 0.315 0.011 h);
-  --popover-foreground: oklch(from var(--primary) 0.94 0.006 h);
-  --secondary: oklch(from var(--primary) 0.27 0.01 h);
-  --secondary-foreground: oklch(from var(--primary) 0.94 0.006 h);
-  --muted: oklch(from var(--primary) 0.29 0.01 h);
-  --muted-foreground: oklch(from var(--primary) 0.65 0.014 h);
-  --accent: oklch(from var(--primary) 0.34 0.013 h);
-  --accent-foreground: oklch(from var(--primary) 0.94 0.006 h);
+  --card: oklch(from var(--foreground) 0.265 0.003 h);
+  --card-foreground: oklch(from var(--foreground) 0.94 0.002 h);
+  --popover: oklch(from var(--foreground) 0.315 0.004 h);
+  --popover-foreground: oklch(from var(--foreground) 0.94 0.002 h);
+  --secondary: oklch(from var(--foreground) 0.27 0.003 h);
+  --secondary-foreground: oklch(from var(--foreground) 0.94 0.002 h);
+  --muted: oklch(from var(--foreground) 0.29 0.003 h);
+  --muted-foreground: oklch(from var(--foreground) 0.65 0.005 h);
+  --accent: oklch(from var(--foreground) 0.34 0.004 h);
+  --accent-foreground: oklch(from var(--foreground) 0.94 0.002 h);
 
   --destructive: oklch(0.704 0.191 22.216);
   --success: oklch(0.78 0.13 150);
@@ -292,12 +286,12 @@ body {
   --warning: oklch(0.82 0.14 80);
   --warning-foreground: oklch(0.2 0 0);
 
-  --border: oklch(from var(--primary) 0.285 0.01 h);
-  --input: oklch(from var(--primary) 0.3 0.011 h);
-  --ring: oklch(from var(--primary) 0.42 0.018 h);
+  --border: oklch(from var(--foreground) 0.285 0.003 h);
+  --input: oklch(from var(--foreground) 0.3 0.004 h);
+  --ring: oklch(from var(--foreground) 0.42 0.006 h);
 
   /* Egen ramp för mörkt tema — 1 = dovast, 5 = ljusast, så "5 är starkast"
-     stämmer i båda teman. (Tidigare var ljus och mörk ramp identiska.) */
+     stämmer i båda teman. */
   --chart-1: oklch(from var(--primary) 0.42 0.05 h);
   --chart-2: oklch(from var(--primary) 0.53 0.07 h);
   --chart-3: oklch(from var(--primary) 0.65 0.085 h);
@@ -308,17 +302,17 @@ body {
   --grade-mid: oklch(from var(--primary) 0.68 0.145 h);
   --grade-high: oklch(from var(--primary) 0.83 0.13 h);
   --grade-fail: var(--destructive);
-  --tile-absent: oklch(from var(--primary) 0.235 0.008 h);
-  --tile-absent-foreground: oklch(from var(--primary) 0.52 0.012 h);
+  --tile-absent: oklch(from var(--foreground) 0.235 0.003 h);
+  --tile-absent-foreground: oklch(from var(--foreground) 0.52 0.004 h);
 
-  --sidebar: oklch(from var(--primary) 0.13 0.007 h);
-  --sidebar-foreground: oklch(from var(--primary) 0.94 0.006 h);
+  --sidebar: oklch(from var(--foreground) 0.13 0.002 h);
+  --sidebar-foreground: oklch(from var(--foreground) 0.94 0.002 h);
   --sidebar-primary: var(--primary);
   --sidebar-primary-foreground: var(--primary-foreground);
-  --sidebar-accent: oklch(from var(--primary) 0.24 0.009 h);
-  --sidebar-accent-foreground: oklch(from var(--primary) 0.94 0.006 h);
-  --sidebar-border: oklch(from var(--primary) 0.285 0.01 h);
-  --sidebar-ring: oklch(from var(--primary) 0.42 0.018 h);
+  --sidebar-accent: oklch(from var(--foreground) 0.24 0.003 h);
+  --sidebar-accent-foreground: oklch(from var(--foreground) 0.94 0.002 h);
+  --sidebar-border: oklch(from var(--foreground) 0.285 0.003 h);
+  --sidebar-ring: oklch(from var(--foreground) 0.42 0.006 h);
 }
 
 @layer base {

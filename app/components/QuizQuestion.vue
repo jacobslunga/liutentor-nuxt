@@ -25,7 +25,7 @@ const emit = defineEmits<{
           : 'border-border hover:border-border hover:bg-muted/30'
           " @click="emit('answer', i)" @keydown.enter.space.prevent="emit('answer', i)">
         <span
-          class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border text-sm font-medium transition-colors"
+          class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border text-sm font-medium transition-colors"
           :class="selectedAnswer === i
             ? 'border-primary bg-primary text-primary-foreground'
             : 'border-muted-foreground/30 bg-background group-hover:border-muted-foreground/50'
