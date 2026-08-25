@@ -450,3 +450,34 @@ body {
     var(--background) 100%
   );
 }
+
+.step-dot-active {
+  animation: step-dot-breathe 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes step-dot-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(0.7);
+    opacity: 0.4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .step-dot-active,
+  .variable-spin {
+    animation: none;
+  }
+
+  .shimmer-text {
+    animation: none;
+    background: none;
+    color: var(--muted-foreground);
+    -webkit-text-fill-color: var(--muted-foreground);
+  }
+}
