@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { Exam } from "@/types/quiz";
+import type { Exam, QuizDifficulty } from "@/types/quiz";
+import { DEFAULT_QUIZ_DIFFICULTY, QUIZ_DIFFICULTIES } from "@/types/quiz";
 import { toast } from "vue-sonner";
 import { useQuizStore } from "@/stores/quiz";
 import { useQuizHistory } from "@/composables/useQuizHistory";
@@ -24,6 +25,23 @@ const { courseHistory, findById, refresh, remove } = useQuizHistory(courseCode);
 const examPool = computed(() => props.exams.filter((e) => e.pdf_url));
 const canStart = computed(() => examPool.value.length > 0);
 
+// Remembered across visits: a student who wants easy quizzes wants them every
+// time, and re-picking on every generation is the kind of friction that makes
+// them just take the default instead.
+const DIFFICULTY_STORAGE_KEY = "liutentor.quiz.difficulty";
+const difficulty = ref<QuizDifficulty>(DEFAULT_QUIZ_DIFFICULTY);
+
+onMounted(() => {
+  const stored = localStorage.getItem(DIFFICULTY_STORAGE_KEY);
+  if (stored && QUIZ_DIFFICULTIES.includes(stored as QuizDifficulty)) {
+    difficulty.value = stored as QuizDifficulty;
+  }
+});
+
+watch(difficulty, (value) => {
+  localStorage.setItem(DIFFICULTY_STORAGE_KEY, value);
+});
+
 function startQuiz() {
   const pool = examPool.value;
   if (pool.length === 0) return;
@@ -36,6 +54,7 @@ function startQuiz() {
 
   quiz.generate(courseCode.value, {
     examIds: shuffled.slice(0, count).map((e) => e.id),
+    difficulty: difficulty.value,
   });
 }
 
@@ -82,6 +101,7 @@ onUnmounted(() => quiz.abort());
     >
       <div v-if="quiz.stage === 'setup'">
         <QuizStart
+          v-model:difficulty="difficulty"
           :is-loading="quiz.isGenerating"
           :can-start="canStart"
           @start="startQuiz"
