@@ -23,9 +23,10 @@ const sections: DocSection[] = [
   {
     title: "Tekniken bakom",
     content:
-      "Vi använder en modern Gemini-modell från Google för att ge snabba och pedagogiska svar:",
+      "Vi använder moderna GPT-modeller från OpenAI för att ge snabba och pedagogiska svar:",
     items: [
-      "Google Gemini 3.1 Flash-Lite för chatt, quizgenerering och bearbetning av tentamens-PDF:er.",
+      "OpenAI GPT-5.6 Luna för chatt, quizgenerering och bearbetning av tentamens-PDF:er.",
+      "OpenAI GPT-5.6 Terra för den djupa tankenivån i chatten.",
     ],
   },
   {

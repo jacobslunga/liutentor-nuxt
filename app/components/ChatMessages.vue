@@ -76,9 +76,9 @@ const loadingPhrase = ref(loadingPhrases[0]);
 
 /**
  * A bare hostname reads better in a chip than a page title that will be clipped
- * anyway — the title stays available on hover. Gemini is the exception: it hands
- * back an opaque grounding-redirect URL whose host says nothing, and puts the
- * real domain in the title instead.
+ * anyway — the title stays available on hover. Sources saved back when search ran
+ * through Gemini are the exception: they carry an opaque grounding-redirect URL
+ * whose host says nothing, with the real domain in the title instead.
  */
 const OPAQUE_SOURCE_HOSTS = ["vertexaisearch.cloud.google.com"];
 
