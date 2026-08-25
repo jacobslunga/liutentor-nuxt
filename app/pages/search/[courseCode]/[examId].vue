@@ -245,6 +245,9 @@ function handleKeyDown(e: KeyboardEvent) {
     return;
   }
 
+  // Let browser/OS shortcuts through (cmd/ctrl+F, cmd+E, alt combos, ...)
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+
   if (!isExamOnly.value && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
     e.preventDefault();
     splitPercent.value = clampSplit(
@@ -254,7 +257,7 @@ function handleKeyDown(e: KeyboardEvent) {
     return;
   }
 
-  if (!e.metaKey && !e.ctrlKey && e.key.toLowerCase() === "c") {
+  if (e.key.toLowerCase() === "c") {
     e.preventDefault();
     chatStore.open();
     return;

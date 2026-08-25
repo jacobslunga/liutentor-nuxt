@@ -30,16 +30,18 @@ const currentStepIndex = computed(() =>
         <div
           v-for="(step, i) in STEP_ORDER"
           :key="step"
-          class="rounded-full transition-[width] duration-200 ease-spring"
+          class="rounded-full transition-all duration-300 ease-spring"
           :class="[
             i < currentStepIndex ? 'h-1.5 w-1.5 bg-foreground' : '',
-            i === currentStepIndex ? 'h-2 w-2 bg-foreground animate-pulse' : '',
+            i === currentStepIndex
+              ? 'h-2 w-2 bg-foreground step-dot-active'
+              : '',
             i > currentStepIndex ? 'h-1.5 w-1.5 bg-muted-foreground/20' : '',
           ]"
         />
       </div>
 
-      <p class="text-sm font-medium text-muted-foreground animate-pulse">
+      <p class="shimmer-text text-sm font-medium">
         {{ statusMessage }}
       </p>
 
