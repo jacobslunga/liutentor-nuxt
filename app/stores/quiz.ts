@@ -5,11 +5,10 @@ import type {
   GenerateQuizPayload,
 } from "@/types/quiz";
 
-// const QUIZ_API_BASE =
-//   "https://liutentor-hono-687405545415.europe-north2.run.app/api/v1/quiz";
-
-const QUIZ_API_BASE_LOCAL =
-  "http://localhost:8080/api/v1/quiz";
+const QUIZ_API_BASE =
+  "https://liutentor-hono-687405545415.europe-north2.run.app/api/v1/quiz";
+// const QUIZ_API_BASE_LOCAL =
+//   "http://localhost:8080/api/v1/quiz";
 
 function getAnonymousId(): string {
   if (typeof window === "undefined") return "unknown";
@@ -62,7 +61,7 @@ export const useQuizStore = defineStore("quiz", () => {
       const authHeaders = await getAuthHeaders();
 
       const response = await fetch(
-        `${QUIZ_API_BASE_LOCAL}/multiple-choice/${courseCode}`,
+        `${QUIZ_API_BASE}/multiple-choice/${courseCode}`,
         {
           method: "POST",
           headers: {

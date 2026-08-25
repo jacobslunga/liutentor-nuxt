@@ -1,4 +1,9 @@
-import type { MultipleChoiceQuizResponse, StoredQuizItem } from "@/types/quiz";
+import type {
+  MultipleChoiceQuizResponse,
+  QuizDifficulty,
+  StoredQuizItem,
+} from "@/types/quiz";
+import { QUIZ_DIFFICULTIES } from "@/types/quiz";
 
 export function useQuizHistory(courseCode: Ref<string>) {
   const supabase = useSupabaseClient();
@@ -23,6 +28,15 @@ export function useQuizHistory(courseCode: Ref<string>) {
     return value.trim().toUpperCase();
   }
 
+  // Quizzes generated before difficulty existed have no value on the row, and
+  // the column is plain text, so anything unrecognised is dropped rather than
+  // shown as a level the app does not have.
+  function normalizeDifficulty(value: unknown): QuizDifficulty | undefined {
+    return QUIZ_DIFFICULTIES.includes(value as QuizDifficulty)
+      ? (value as QuizDifficulty)
+      : undefined;
+  }
+
   async function refresh() {
     const userId = (user.value as any)?.id ?? (user.value as any)?.sub;
     const currentCourseCode = normalizeCourse(courseCode.value);
@@ -35,7 +49,7 @@ export function useQuizHistory(courseCode: Ref<string>) {
     const { data, error } = await (supabase as any)
       .from("ai_quiz_logs")
       .select(
-        "id, created_at, quiz, source_count, source_exam_ids, course_code, model",
+        "id, created_at, quiz, source_count, source_exam_ids, course_code, model, difficulty",
       )
       .eq("user_id", userId)
       .eq("course_code", currentCourseCode)
@@ -60,6 +74,9 @@ export function useQuizHistory(courseCode: Ref<string>) {
             courseCode:
               quiz?.meta?.courseCode ?? row.course_code ?? currentCourseCode,
             model: quiz?.meta?.model ?? row.model ?? "okand-modell",
+            difficulty:
+              normalizeDifficulty(quiz?.meta?.difficulty) ??
+              normalizeDifficulty(row.difficulty),
           },
         };
 

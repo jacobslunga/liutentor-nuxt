@@ -9,11 +9,19 @@ interface Quiz {
   questions: QuizQuestion[];
 }
 
+export type QuizDifficulty = "easy" | "medium" | "hard";
+
+export const QUIZ_DIFFICULTIES: QuizDifficulty[] = ["easy", "medium", "hard"];
+
+export const DEFAULT_QUIZ_DIFFICULTY: QuizDifficulty = "medium";
+
 interface QuizMeta {
   courseCode: string;
   sourceExamIds: number[];
   sourceCount: number;
   model: string;
+  // Absent on quizzes generated before difficulty existed.
+  difficulty?: QuizDifficulty;
 }
 
 export interface MultipleChoiceQuizResponse {
@@ -38,4 +46,5 @@ export interface Exam {
 
 export interface GenerateQuizPayload {
   examIds: number[];
+  difficulty: QuizDifficulty;
 }

@@ -1,5 +1,11 @@
 <script setup lang="ts">
-import type { StoredQuizItem } from "@/types/quiz";
+import type { QuizDifficulty, StoredQuizItem } from "@/types/quiz";
+
+const DIFFICULTY_LABELS: Record<QuizDifficulty, string> = {
+  easy: "Lätt",
+  medium: "Medel",
+  hard: "Svår",
+};
 
 const props = defineProps<{
   history: StoredQuizItem[];
@@ -29,6 +35,9 @@ const historyItems = computed(() =>
     }),
     questionCount: item.data.quiz.questions.length,
     sourceCount: item.data.meta?.sourceCount ?? 0,
+    difficultyLabel: item.data.meta?.difficulty
+      ? DIFFICULTY_LABELS[item.data.meta.difficulty]
+      : null,
   })),
 );
 
@@ -87,6 +96,9 @@ function confirmDelete() {
             {{ item.label }}
           </span>
           <span class="shrink-0 text-xs text-muted-foreground">
+            <span v-if="item.difficultyLabel">
+              {{ item.difficultyLabel }} ·
+            </span>
             {{ item.questionCount }} frågor
             <span v-if="item.sourceCount">· {{ item.sourceCount }} tentor</span>
           </span>
