@@ -18,7 +18,8 @@
 import "vue-sonner/style.css";
 import { Toaster } from "@/components/ui/sonner";
 import logoFontUrl from "~/assets/fonts/gt-super-text-bold.woff2?url&no-inline";
-import sansFontUrl from "@fontsource-variable/google-sans/files/google-sans-latin-wght-normal.woff2?url&no-inline";
+import sansFontUrl from "@fontsource-variable/schibsted-grotesk/files/schibsted-grotesk-latin-wght-normal.woff2?url&no-inline";
+import serifFontUrl from "@fontsource-variable/newsreader/files/newsreader-latin-wght-normal.woff2?url&no-inline";
 
 const colorMode = useColorMode();
 
@@ -32,6 +33,9 @@ onMounted(() => {
 
 useHead({
   link: [
+    // Bara latin-subseten av de tre snitt som syns direkt: brödtexten, den
+    // serif som sätter sidrubrikerna och logotypen. Mono hämtas först när
+    // kod eller en tangentbordsetikett faktiskt renderas.
     {
       key: "sans-font-preload",
       rel: "preload",
@@ -39,6 +43,14 @@ useHead({
       type: "font/woff2",
       crossorigin: "anonymous",
       href: sansFontUrl,
+    },
+    {
+      key: "serif-font-preload",
+      rel: "preload",
+      as: "font",
+      type: "font/woff2",
+      crossorigin: "anonymous",
+      href: serifFontUrl,
     },
     {
       key: "logo-font-preload",

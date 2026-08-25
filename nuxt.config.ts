@@ -144,8 +144,15 @@ export default defineNuxtConfig({
   },
 
   css: [
-    "@fontsource-variable/google-sans",
-    "@fontsource-variable/google-sans-code",
+    // Bara wght-axeln och latin/latin-ext-subseten — inte paketens index.css,
+    // som drar in varje subset (kyrilliska, grekiska, vietnamesiska) fonten
+    // råkar ha. Kursiverna kostar inget förrän kursiv text faktiskt renderas.
+    "@fontsource-variable/schibsted-grotesk/wght.css",
+    "@fontsource-variable/schibsted-grotesk/wght-italic.css",
+    "@fontsource-variable/newsreader/wght.css",
+    "@fontsource-variable/newsreader/wght-italic.css",
+    "@fontsource-variable/spline-sans-mono/wght.css",
+    "@fontsource-variable/spline-sans-mono/wght-italic.css",
     "~/assets/css/tailwind.css",
   ],
 
