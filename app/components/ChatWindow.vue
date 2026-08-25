@@ -138,7 +138,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
           ref="transcriptRef"
           :messages="messages"
           :is-loading="isLoading"
-          assistant-class="font-serif"
+          assistant-class="font-sans"
           content-class="pt-12"
           @reply-to-selection="handleReplyToSelection"
           @update:show-scroll-button="showScrollButton = $event"
