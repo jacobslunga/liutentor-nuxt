@@ -17,7 +17,7 @@ const canZoomOut = computed(() => currentZoom.value > MIN_ZOOM + EPSILON);
 
 <template>
   <div
-    class="flex flex-col overflow-hidden rounded-l-2xl border border-r-0 border-border bg-background/95 backdrop-blur-sm shadow-sm">
+    class="flex flex-col overflow-hidden rounded-l-full border border-r-0 border-border bg-background/95 backdrop-blur-sm shadow-sm">
     <button type="button" aria-label="Zooma in" :disabled="!canZoomIn"
       class="flex size-10 items-center justify-center text-muted-foreground transition-colors active:bg-secondary disabled:opacity-35 disabled:active:bg-transparent"
       @click="zoom?.zoomIn()">

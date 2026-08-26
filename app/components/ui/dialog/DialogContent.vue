@@ -64,7 +64,7 @@ const VARIANT_CLASSES = {
       <DialogClose
         v-if="showCloseButton"
         data-slot="dialog-close"
-        class="ring-offset-background focus:ring-ring data-[state=open]:bg-secondary data-[state=open]:text-muted-foreground absolute top-4 right-4 cursor-pointer rounded-md opacity-70 transition-opacity duration-150 ease-spring hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
+        class="ring-offset-background focus:ring-ring data-[state=open]:bg-secondary data-[state=open]:text-muted-foreground absolute top-4 right-4 cursor-pointer rounded-full opacity-70 transition-opacity duration-150 ease-spring hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
       >
         <LucideX />
         <span class="sr-only">Close</span>

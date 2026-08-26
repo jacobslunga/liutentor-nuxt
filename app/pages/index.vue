@@ -31,7 +31,7 @@ const { open: openUploadModal } = useUploadModal();
 
       <div class="relative w-full">
         <div
-          class="w-full border border-foreground/20 bg-background flex flex-row items-center justify-center rounded-2xl transition-colors duration-200 ease-spring text-sm text-foreground/80 outline-none"
+          class="w-full border border-foreground/20 bg-background flex flex-row items-center justify-center rounded-full transition-colors duration-200 ease-spring text-sm text-foreground/80 outline-none"
           :class="focusInput
             ? 'border-primary ring-1 ring-primary'
             : 'hover:border-foreground/40'

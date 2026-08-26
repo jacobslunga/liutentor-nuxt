@@ -194,13 +194,13 @@ function handleClickOutside(event: MouseEvent) {
 
 <template>
   <div class="relative w-full">
-    <div class="w-full relative flex flex-row items-center justify-center px-4">
+    <div class="w-full relative flex flex-row items-center justify-center pl-5 pr-2">
       <LucideSearch class="text-muted-foreground" />
 
       <input
         ref="inputRef"
         :value="courseCode.toUpperCase()"
-        class="min-w-0 w-full p-4 border-none bg-transparent text-md text-foreground/80 outline-none"
+        class="min-w-0 w-full py-4 pl-3 pr-2 border-none bg-transparent text-md text-foreground/80 outline-none"
         :placeholder="`Sök efter ${typed}`"
         @input="courseCode = ($event.target as HTMLInputElement).value"
         @keydown="handleKeyDown"
@@ -209,7 +209,7 @@ function handleClickOutside(event: MouseEvent) {
       />
 
       <Button
-        class="shrink-0 ml-2"
+        class="shrink-0"
         variant="outline"
         size="icon-sm"
         :disabled="!courseCode"
