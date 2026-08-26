@@ -480,7 +480,7 @@ defineExpose({
 
           <Transition name="fade-up">
             <div v-if="menuOpen" id="chat-skill-menu" ref="skillMenuRef" role="listbox" aria-label="Skills"
-              class="absolute bottom-full left-0 right-0 z-30 mb-2 overflow-hidden rounded-lg border border-border bg-popover p-1.5 shadow-lg">
+              class="absolute bottom-full left-0 right-0 z-30 mb-2 overflow-hidden rounded-2xl border border-border bg-popover p-1.5 shadow-lg">
               <div class="px-2.5 pb-1 pt-1 text-2xs font-normal text-muted-foreground">
                 Skills
               </div>
@@ -503,7 +503,7 @@ defineExpose({
 
           <div class="relative px-4 pt-4 pb-2">
             <span v-if="activeSkill" ref="skillPillRef"
-              class="pointer-events-auto absolute left-4 top-4 inline-flex items-center gap-1 rounded-md bg-skill px-1.5 py-0.5 text-[13px] font-medium leading-relaxed text-white">
+              class="pointer-events-auto absolute left-4 top-4 inline-flex items-center gap-1 rounded-full bg-skill px-2 py-0.5 text-[13px] font-medium leading-relaxed text-white">
               {{ activeSkill.label }}
               <button type="button" class="cursor-pointer opacity-70 hover:opacity-100"
                 :aria-label="`Ta bort ${activeSkill.label}`" @mousedown.prevent="clearSkill()">

@@ -152,7 +152,7 @@ const iconSize = computed(
         ref="inputRef"
         :value="courseCode.toUpperCase()"
         placeholder="Sök kurskod..."
-        class="w-full rounded-lg border bg-background pl-9 pr-9 text-foreground outline-none placeholder:text-muted-foreground hover:bg-background"
+        class="w-full rounded-full border bg-background pl-9 pr-9 text-foreground outline-none placeholder:text-muted-foreground hover:bg-background"
         :class="[sizeClass, isFocused ? 'border-primary' : 'border-border']"
         @input="courseCode = ($event.target as HTMLInputElement).value"
         @keydown="handleKeyDown"

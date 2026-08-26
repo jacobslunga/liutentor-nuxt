@@ -93,7 +93,8 @@
     ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
     "Liberation Mono", monospace;
 
-  --font-serif: Georgia, Cambria, "Times New Roman", Times, serif;
+  --font-serif:
+    "Newsreader Variable", Georgia, Cambria, "Times New Roman", Times, serif;
 
   --font-sans:
     "Inter Variable", "Inter Fallback", system-ui, -apple-system,
@@ -123,12 +124,18 @@ body {
 @custom-variant dark (&:where(.dark, .dark *, .dim, .dim *));
 
 @theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 2px);
-  --radius-2xl: calc(var(--radius) + 6px);
-  --radius-3xl: calc(var(--radius) + 10px);
+  /* Radien går i två spår. Allt som är en yta — kort, paneler, dialoger,
+     menyer — ligger på skalan nedan och är genomgående mjukt rundat. Allt
+     som är en kontroll man trycker på — knappar, chips, flikar, sökfältet —
+     är helrundat via rounded-full och står utanför skalan. Blanda inte: en
+     knapp som får ett värde härifrån ser ut som en liten yta, inte en knapp. */
+  --radius-xs: 0.375rem; /* 6px  — taggar, färgprickar, brickor */
+  --radius-sm: 0.5rem; /* 8px  — inline-etiketter, tabellceller */
+  --radius-md: 0.75rem; /* 12px — menyrader, listrader */
+  --radius-lg: 0.875rem; /* 14px — inputfält, små plattor */
+  --radius-xl: 1rem; /* 16px — kort, popovers, toasts */
+  --radius-2xl: 1.25rem; /* 20px — paneler, större kort, menyer */
+  --radius-3xl: 1.5rem; /* 24px — dialoger, sheets, chattfältet */
 
   --color-background: var(--background);
   --color-canvas: var(--canvas);
@@ -191,7 +198,6 @@ body {
    --------------------------------------------------------------------------- */
 
 :root {
-  --radius: 0.5rem;
   --primary: oklch(0.6193 0.1154 172.06);
   --primary-foreground: oklch(0.985 0 0);
   --primary-container: oklch(from var(--primary) 0.9 0.055 h);
