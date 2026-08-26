@@ -64,7 +64,7 @@ const principles = [
         class="grid gap-x-12 gap-y-5 py-10 lg:grid-cols-[13rem_minmax(0,1fr)] lg:py-14"
         :class="i > 0 ? 'border-t' : ''"
       >
-        <h2 class="text-lg font-medium leading-snug text-foreground lg:sticky lg:top-24 lg:self-start">
+        <h2 class="font-serif text-lg font-medium leading-snug text-foreground lg:sticky lg:top-24 lg:self-start">
           {{ block.heading }}
         </h2>
         <div class="max-w-2xl space-y-4">
@@ -98,7 +98,7 @@ const principles = [
       </section>
 
       <section class="grid gap-x-12 gap-y-6 border-t py-14 lg:grid-cols-[13rem_minmax(0,1fr)] lg:py-20">
-        <h2 class="text-lg font-medium text-foreground">Hjälp till</h2>
+        <h2 class="font-serif text-lg font-medium text-foreground">Hjälp till</h2>
         <div class="max-w-2xl">
           <p class="text-[0.9375rem] leading-[1.75] text-foreground/75">
             Arkivet växer när studenter delar med sig. Ligger det tentor på din dator som saknas
