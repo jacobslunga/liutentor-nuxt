@@ -149,6 +149,9 @@ export default defineNuxtConfig({
     // renderas. Mono är systemsnitt och importeras inte alls.
     "@fontsource-variable/inter/wght.css",
     "@fontsource-variable/inter/wght-italic.css",
+    // Newsreader är rubriksnittet på infosidorna. Bara wght — opsz-axeln och
+    // kursiven används aldrig i en rubrik.
+    "@fontsource-variable/newsreader/wght.css",
     "~/assets/css/tailwind.css",
   ],
 

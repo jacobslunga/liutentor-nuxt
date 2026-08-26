@@ -51,7 +51,7 @@ function jumpTo(id: string) {
       >
         <div class="lg:sticky lg:top-24 lg:self-start">
           <span class="text-xs tabular-nums text-primary">{{ entry.number }}</span>
-          <h2 class="mt-2 text-lg font-medium leading-snug text-foreground">
+          <h2 class="mt-2 font-serif text-lg font-medium leading-snug text-foreground">
             {{ entry.title }}
           </h2>
         </div>
