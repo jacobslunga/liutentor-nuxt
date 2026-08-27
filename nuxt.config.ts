@@ -144,11 +144,6 @@ export default defineNuxtConfig({
   },
 
   css: [
-    // Bara wght-axeln — inte paketets index.css, som drar in varje viktaxel
-    // och optisk storlek. Kursiven kostar inget förrän kursiv text faktiskt
-    // renderas. Mono är systemsnitt och importeras inte alls.
-    "@fontsource-variable/inter/wght.css",
-    "@fontsource-variable/inter/wght-italic.css",
     // Newsreader är rubriksnittet på infosidorna. Bara wght — opsz-axeln och
     // kursiven används aldrig i en rubrik.
     "@fontsource-variable/newsreader/wght.css",

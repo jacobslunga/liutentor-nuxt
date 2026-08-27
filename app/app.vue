@@ -18,7 +18,6 @@
 import "vue-sonner/style.css";
 import { Toaster } from "@/components/ui/sonner";
 import logoFontUrl from "~/assets/fonts/gt-super-text-bold.woff2?url&no-inline";
-import sansFontUrl from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url&no-inline";
 
 const colorMode = useColorMode();
 
@@ -32,16 +31,7 @@ onMounted(() => {
 
 useHead({
   link: [
-    // Bara latin-subseten av de två snitt som syns direkt: brödtexten och
-    // logotypen.
-    {
-      key: "sans-font-preload",
-      rel: "preload",
-      as: "font",
-      type: "font/woff2",
-      crossorigin: "anonymous",
-      href: sansFontUrl,
-    },
+    // Logotypen är det enda typsnittet som behöver förladdas.
     {
       key: "logo-font-preload",
       rel: "preload",

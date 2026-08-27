@@ -46,7 +46,7 @@ export async function sendUploadNotification(files: UploadedDocument[]) {
   const subject = `${count} ${count === 1 ? "ny fil" : "nya filer"} väntar på granskning`;
   const html = `<!doctype html>
 <html lang="sv">
-  <body style="margin:0;background:#f3f4f6;font-family:Inter,Arial,sans-serif;color:#111827">
+  <body style="margin:0;background:#f3f4f6;font-family:system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;color:#111827">
     <div style="display:none;max-height:0;overflow:hidden">${subject} i LiU Tentor.</div>
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f3f4f6;padding:32px 12px">
       <tr><td align="center">
