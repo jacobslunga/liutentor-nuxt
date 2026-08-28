@@ -1,6 +1,6 @@
 <template>
   <div
-    class="pointer-events-none relative isolate flex h-12 items-start justify-between gap-2 overflow-visible px-3 pt-1 bg-linear-to-b from-background via-background/80 to-transparent"
+    class="pointer-events-none relative isolate flex h-10 items-center justify-between gap-2 border-b border-border/70 bg-background px-2"
   >
     <div class="pointer-events-auto flex min-w-0 flex-1 items-center gap-1.5">
       <Button
@@ -13,7 +13,7 @@
         <LucideChevronRight />
       </Button>
       <p
-        class="min-w-0 truncate overflow-hidden text-sm font-normal text-muted-foreground"
+        class="min-w-0 truncate overflow-hidden text-xs font-normal text-muted-foreground"
       >
         {{ displayTitle }}
       </p>

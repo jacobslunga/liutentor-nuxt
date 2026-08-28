@@ -289,7 +289,7 @@ defineExpose({
       </NuxtLink>
     </div>
 
-    <div ref="messagesList" v-else class="space-y-6 max-w-2xl mx-auto w-full">
+    <div ref="messagesList" v-else class="mx-auto w-full max-w-2xl space-y-6 pt-2">
       <div v-for="(msg, i) in messages" :key="i" :class="msg.role === 'user' ? 'flex justify-end' : ''" v-memo="[
         msg.role,
         msg.content,
