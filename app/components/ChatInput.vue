@@ -427,15 +427,15 @@ defineExpose({
 </script>
 
 <template>
-  <div class="px-4 bg-transparent relative w-full pointer-events-auto z-10">
-    <div class="max-w-2xl mx-auto relative">
+  <div class="relative z-10 w-full bg-transparent px-3 pointer-events-auto sm:px-4">
+    <div class="relative mx-auto max-w-3xl">
       <div class="space-y-2">
         <p v-if="showDisclaimer" class="px-4 text-center text-2xs text-muted-foreground/60">
           AI kan göra misstag. Kontrollera svaren.
         </p>
 
         <div ref="chatShellRef"
-          class="chat-shell relative rounded-3xl border border-border bg-background dark:bg-secondary shadow-[0_16px_45px_-18px_rgba(0,0,0,0.22)] focus-within:border-border dark:shadow-[0_16px_45px_-18px_rgba(0,0,0,0.55)]">
+          class="chat-shell relative rounded-3xl border border-black/8 bg-background/90 dark:bg-background/95 shadow-[0_12px_36px_-16px_rgba(0,0,0,0.1),0_1px_3px_rgba(0,0,0,0.06)] backdrop-blur-sm dark:border-white/[0.1] dark:bg-secondary/95 dark:shadow-[0_16px_44px_-18px_rgba(0,0,0,0.72)]">
           <Transition name="fade-up">
             <div v-if="showScrollButton" class="pointer-events-none absolute -top-12 right-3 z-20">
               <Button variant="outline" size="icon" class="pointer-events-auto rounded-full"
@@ -501,9 +501,9 @@ defineExpose({
             </div>
           </Transition>
 
-          <div class="relative px-4 pt-4 pb-2">
+          <div class="relative px-4 pb-2 pt-3.5 sm:px-5">
             <span v-if="activeSkill" ref="skillPillRef"
-              class="pointer-events-auto absolute left-4 top-4 inline-flex items-center gap-1 rounded-full bg-skill px-2 py-0.5 text-[13px] font-medium leading-relaxed text-white">
+              class="pointer-events-auto absolute left-4 top-3.5 inline-flex items-center gap-1 rounded-full bg-skill px-2 py-0.5 text-[13px] font-medium leading-relaxed text-white sm:left-5">
               {{ activeSkill.label }}
               <button type="button" class="cursor-pointer opacity-70 hover:opacity-100"
                 :aria-label="`Ta bort ${activeSkill.label}`" @mousedown.prevent="clearSkill()">
@@ -514,11 +514,11 @@ defineExpose({
               :placeholder="activeSkill ? 'Fråga vad som helst' : 'Fråga vad som helst, skriv / för skills'"
               role="combobox" :aria-expanded="menuOpen" aria-controls="chat-skill-menu"
               :aria-activedescendant="menuOpen ? `chat-skill-${filteredSkills[highlightedIndex]?.id}` : undefined"
-              class="chat-textarea block w-full min-w-0 resize-none border-0 bg-transparent p-0 text-base leading-relaxed outline-none placeholder:text-muted-foreground/70 focus:ring-0 max-h-45 sm:text-[15px]"
+              class="chat-textarea block max-h-45 w-full min-w-0 resize-none border-0 bg-transparent p-0 text-[15px] font-normal leading-6 tracking-[-0.008em] outline-none placeholder:text-muted-foreground/65 focus:ring-0 sm:text-[15px]"
               @input="handleInput" @keydown="handleKeyDown" />
           </div>
 
-          <div class="flex items-center gap-1.5 px-3 pb-3">
+          <div class="flex items-center gap-1 px-2.5 pb-2.5 sm:px-3">
             <input ref="fileInputRef" type="file" multiple class="hidden" :accept="FILE_INPUT_ACCEPT"
               @change="handleFileInput" />
             <Button variant="ghost" size="icon" aria-label="Bifoga filer"
@@ -540,7 +540,7 @@ defineExpose({
               <DropdownMenu>
                 <DropdownMenuTrigger as-child>
                   <Button variant="ghost" size="sm"
-                    class="h-8 gap-1.5 px-3 text-xs font-normal text-muted-foreground hover:bg-accent/70 hover:text-foreground data-[state=open]:bg-accent/70">
+                    class="h-8 gap-1 px-2.5 text-xs font-normal text-muted-foreground hover:bg-accent/70 hover:text-foreground data-[state=open]:bg-accent/70">
                     {{ selectedModelLabel }}
                     <LucideChevronDown class="w-3.5 h-3.5 text-muted-foreground/70" />
                   </Button>
@@ -594,7 +594,22 @@ defineExpose({
 
 <style scoped>
 .chat-shell {
-  transition: border-color var(--duration-fast) ease;
+  transition:
+    border-color var(--duration-fast) ease,
+    box-shadow var(--duration-fast) ease;
+}
+
+.chat-shell:focus-within {
+  border-color: color-mix(in srgb, var(--foreground), transparent 84%);
+  box-shadow:
+    0 16px 42px -18px rgb(0 0 0 / 0.3),
+    0 1px 3px rgb(0 0 0 / 0.08);
+}
+
+:global(.dark) .chat-shell:focus-within,
+:global(.dim) .chat-shell:focus-within {
+  border-color: color-mix(in srgb, var(--foreground), transparent 80%);
+  box-shadow: 0 18px 48px -20px rgb(0 0 0 / 0.78);
 }
 
 .chat-textarea {

@@ -48,19 +48,16 @@ const selectionColor =
   "color-mix(in oklch, var(--primary) 35%, transparent)";
 
 const darkPageStyle = {
+  // Screen blending lets the dark app background replace the PDF's inverted
+  // black page while keeping document content and diagrams readable.
   filter: "invert(1) hue-rotate(180deg) brightness(0.92)",
   mixBlendMode: "screen",
 } as const;
 
-const lightPageStyle = {
-  // PDF pages render with an opaque white canvas. Multiplying it over the app
-  // background makes that white resolve to the exact --background token.
-  mixBlendMode: "multiply",
-} as const;
-
 const pageStyle = computed(() => {
   if (["dark", "dim"].includes(colorMode.value)) return darkPageStyle;
-  return lightPageStyle;
+  // Keep the source PDF untouched in light mode so its page stays pure white.
+  return undefined;
 });
 
 // Keep this non-reactive: rebuilding the plugin registry during resize reloads the PDF.
@@ -223,7 +220,7 @@ const plugins = computed(() => {
 </script>
 
 <template>
-  <div class="group/pdf relative h-full w-full overflow-hidden bg-background">
+  <div class="group/pdf relative h-full w-full overflow-hidden bg-white dark:bg-background">
     <div v-if="isLoading || !engine" class="flex h-full w-full items-center justify-center">
       <LucideLoader2 class="h-5 w-5 animate-spin text-muted-foreground" />
     </div>
@@ -245,7 +242,8 @@ const plugins = computed(() => {
                 <LucideLoader2 class="h-5 w-5 animate-spin text-muted-foreground" />
               </div>
 
-              <Viewport v-else :document-id="activeDocumentId" class="h-full w-full bg-background pdf-viewport"
+              <Viewport v-else :document-id="activeDocumentId"
+                class="h-full w-full bg-white dark:bg-background pdf-viewport"
                 :style="viewportInsetStyle" @scroll="handleViewportScroll" @wheel.capture="handleWheelCapture">
                 <template v-if="isMobile">
                   <Scroller :document-id="activeDocumentId">
@@ -256,7 +254,8 @@ const plugins = computed(() => {
                       }" class="relative mx-auto my-4 pdf-page-shell">
                         <PagePointerProvider :document-id="activeDocumentId" :page-index="page.pageIndex"
                           class="pdf-mobile-pointer">
-                          <Rotate :document-id="activeDocumentId" :page-index="page.pageIndex" class="bg-background"
+                          <Rotate :document-id="activeDocumentId" :page-index="page.pageIndex"
+                            class="bg-white dark:bg-background"
                             :style="{
                               width: `${page.width}px`,
                               height: `${page.height}px`,
@@ -296,7 +295,8 @@ const plugins = computed(() => {
                             height: `${page.rotatedHeight}px`,
                           }" class="relative mx-auto my-4 pdf-page-shell">
                             <PagePointerProvider :document-id="activeDocumentId" :page-index="page.pageIndex">
-                              <Rotate :document-id="activeDocumentId" :page-index="page.pageIndex" class="bg-background"
+                              <Rotate :document-id="activeDocumentId" :page-index="page.pageIndex"
+                                class="bg-white dark:bg-background"
                                 :style="{
                                   width: `${page.width}px`,
                                   height: `${page.height}px`,

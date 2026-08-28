@@ -18,9 +18,8 @@
   --duration-fast: 150ms;
   --duration-base: 200ms;
 
-  /* Skills (slash-kommandon). Fast blå i båda teman — den ska läsa som en
-     etikett, inte som temats gröna primärfärg. */
-  --color-skill: #3a83f7;
+  /* Skills are interactive labels and use the one intentional brand color. */
+  --color-skill: var(--primary);
 }
 
 ::-webkit-scrollbar {
@@ -76,15 +75,23 @@
   --font-serif:
     "Newsreader Variable", Georgia, Cambria, "Times New Roman", Times, serif;
 
+  /* Match native desktop UI: San Francisco on Apple platforms, Segoe UI on
+     Windows, and the platform sans everywhere else. */
   --font-sans:
-    system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Helvetica Neue", sans-serif;
+    -apple-system, BlinkMacSystemFont, "Segoe UI Variable", "Segoe UI",
+    system-ui, sans-serif;
+
+  /* Keep hierarchy while taking the visual weight down across the interface. */
+  --font-weight-medium: 450;
+  --font-weight-semibold: 550;
 
   --text-2xs: 0.6875rem;
 }
 
 body {
   font-family: var(--font-sans);
+  font-weight: 400;
+  letter-spacing: -0.006em;
 }
 
 ::selection {
@@ -161,14 +168,12 @@ body {
 /* ---------------------------------------------------------------------------
    Två oberoende ankare. --primary är varumärkesfärgen och används bara där
    färgen betyder något: knappar, markeringar, diagram och betygsskalan.
-   --foreground är det neutrala ankaret — alla ytor, ramar och texttoner är
-   ljushetssteg av den, via oklch(from var(--foreground) <l> <c> h). Kromat
-   ligger runt 0.001-0.006, dvs precis så mycket att grått inte blir dött,
-   utan att ytorna tar färg av varumärket.
+   Resten av gränssnittet är helt neutralt: ytor, ramar och texttoner är
+   rena ljushetssteg utan chroma.
 
-   Byt --primary och bara de färgbärande delarna följer med; byt --foregrounds
-   nyans och hela gråskalan vrids med. Undantag: destructive/success/warning
-   är semantiska och står fast.
+   Byt --primary och bara de färgbärande delarna följer med; justera
+   --foregrounds ljushet och hela gråskalan följer med. Undantag:
+   destructive/success/warning är semantiska och står fast.
    --------------------------------------------------------------------------- */
 
 :root {
@@ -177,25 +182,25 @@ body {
   --primary-container: oklch(from var(--primary) 0.9 0.055 h);
   --primary-container-foreground: oklch(from var(--primary) 0.3 0.06 h);
 
-  --foreground: oklch(0.245 0.005 172.06);
+  --foreground: oklch(0.245 0 0);
 
-  --background: oklch(from var(--foreground) 0.99107 0.001 h);
-  --canvas: oklch(from var(--foreground) 0.965 0.004 h);
-  --canvas-border: oklch(from var(--foreground) 0.915 0.005 h);
+  --background: oklch(from var(--foreground) 0.99107 0 h);
+  --canvas: oklch(from var(--foreground) 0.965 0 h);
+  --canvas-border: oklch(from var(--foreground) 0.915 0 h);
 
   --background-0: oklch(from var(--background) l c h / 0);
   --background-soft: oklch(from var(--background) l c h / 0.7);
 
-  --card: oklch(from var(--foreground) 0.972 0.003 h);
-  --card-foreground: oklch(from var(--foreground) 0.145 0.005 h);
-  --popover: oklch(from var(--foreground) 0.97 0.003 h);
-  --popover-foreground: oklch(from var(--foreground) 0.145 0.005 h);
-  --secondary: oklch(from var(--foreground) 0.969 0.004 h);
-  --secondary-foreground: oklch(from var(--foreground) 0.2 0.005 h);
-  --muted: oklch(from var(--foreground) 0.96 0.004 h);
-  --muted-foreground: oklch(from var(--foreground) 0.48 0.005 h);
-  --accent: oklch(from var(--foreground) 0.94 0.006 h);
-  --accent-foreground: oklch(from var(--foreground) 0.2 0.005 h);
+  --card: oklch(from var(--foreground) 0.972 0 h);
+  --card-foreground: oklch(from var(--foreground) 0.145 0 h);
+  --popover: oklch(from var(--foreground) 0.97 0 h);
+  --popover-foreground: oklch(from var(--foreground) 0.145 0 h);
+  --secondary: oklch(from var(--foreground) 0.969 0 h);
+  --secondary-foreground: oklch(from var(--foreground) 0.2 0 h);
+  --muted: oklch(from var(--foreground) 0.96 0 h);
+  --muted-foreground: oklch(from var(--foreground) 0.48 0 h);
+  --accent: oklch(from var(--foreground) 0.94 0 h);
+  --accent-foreground: oklch(from var(--foreground) 0.2 0 h);
 
   --destructive: oklch(0.577 0.245 27.325);
   --success: oklch(70.9% 0.17602 148.766);
@@ -203,9 +208,9 @@ body {
   --warning: oklch(81.007% 0.16264 90.418);
   --warning-foreground: oklch(0.2 0 0);
 
-  --border: oklch(from var(--foreground) 0.95 0.004 h);
-  --input: oklch(from var(--foreground) 0.9 0.005 h);
-  --ring: oklch(from var(--foreground) 0.7 0.008 h);
+  --border: oklch(from var(--foreground) 0.95 0 h);
+  --input: oklch(from var(--foreground) 0.9 0 h);
+  --ring: oklch(from var(--foreground) 0.7 0 h);
 
   /* Diagram och betyg bär fortfarande varumärkesfärgen — där är färgen data,
      inte dekor. */
@@ -219,17 +224,17 @@ body {
   --grade-mid: oklch(from var(--primary) 0.6 0.145 h);
   --grade-high: oklch(from var(--primary) 0.46 0.11 h);
   --grade-fail: var(--destructive);
-  --tile-absent: oklch(from var(--foreground) 0.72 0.003 h);
-  --tile-absent-foreground: oklch(from var(--foreground) 0.99 0.001 h);
+  --tile-absent: oklch(from var(--foreground) 0.72 0 h);
+  --tile-absent-foreground: oklch(from var(--foreground) 0.99 0 h);
 
-  --sidebar: oklch(from var(--foreground) 0.985 0.002 h);
-  --sidebar-foreground: oklch(from var(--foreground) 0.145 0.005 h);
+  --sidebar: oklch(from var(--foreground) 0.985 0 h);
+  --sidebar-foreground: oklch(from var(--foreground) 0.145 0 h);
   --sidebar-primary: var(--primary);
   --sidebar-primary-foreground: var(--primary-foreground);
-  --sidebar-accent: oklch(from var(--foreground) 0.94 0.006 h);
-  --sidebar-accent-foreground: oklch(from var(--foreground) 0.2 0.005 h);
-  --sidebar-border: oklch(from var(--foreground) 0.915 0.005 h);
-  --sidebar-ring: oklch(from var(--foreground) 0.7 0.008 h);
+  --sidebar-accent: oklch(from var(--foreground) 0.94 0 h);
+  --sidebar-accent-foreground: oklch(from var(--foreground) 0.2 0 h);
+  --sidebar-border: oklch(from var(--foreground) 0.915 0 h);
+  --sidebar-ring: oklch(from var(--foreground) 0.7 0 h);
 }
 
 .dark,
@@ -241,24 +246,24 @@ body {
   --primary-container: oklch(from var(--primary) 0.38 0.05 h);
   --primary-container-foreground: oklch(from var(--primary) 0.88 0.07 h);
 
-  --foreground: oklch(0.94 0.004 172.06);
+  --foreground: oklch(0.94 0 0);
 
-  --background: oklch(from var(--foreground) 0.21 0.003 h);
-  --canvas: oklch(from var(--foreground) 0.165 0.002 h);
-  --canvas-border: oklch(from var(--foreground) 0.285 0.003 h);
+  --background: oklch(from var(--foreground) 0.21 0 h);
+  --canvas: oklch(from var(--foreground) 0.165 0 h);
+  --canvas-border: oklch(from var(--foreground) 0.285 0 h);
   --background-0: oklch(from var(--background) l c h / 0);
   --background-soft: oklch(from var(--background) l c h / 0.7);
 
-  --card: oklch(from var(--foreground) 0.265 0.003 h);
-  --card-foreground: oklch(from var(--foreground) 0.94 0.002 h);
-  --popover: oklch(from var(--foreground) 0.315 0.004 h);
-  --popover-foreground: oklch(from var(--foreground) 0.94 0.002 h);
-  --secondary: oklch(from var(--foreground) 0.27 0.003 h);
-  --secondary-foreground: oklch(from var(--foreground) 0.94 0.002 h);
-  --muted: oklch(from var(--foreground) 0.29 0.003 h);
-  --muted-foreground: oklch(from var(--foreground) 0.65 0.005 h);
-  --accent: oklch(from var(--foreground) 0.34 0.004 h);
-  --accent-foreground: oklch(from var(--foreground) 0.94 0.002 h);
+  --card: oklch(from var(--foreground) 0.265 0 h);
+  --card-foreground: oklch(from var(--foreground) 0.94 0 h);
+  --popover: oklch(from var(--foreground) 0.315 0 h);
+  --popover-foreground: oklch(from var(--foreground) 0.94 0 h);
+  --secondary: oklch(from var(--foreground) 0.27 0 h);
+  --secondary-foreground: oklch(from var(--foreground) 0.94 0 h);
+  --muted: oklch(from var(--foreground) 0.29 0 h);
+  --muted-foreground: oklch(from var(--foreground) 0.65 0 h);
+  --accent: oklch(from var(--foreground) 0.34 0 h);
+  --accent-foreground: oklch(from var(--foreground) 0.94 0 h);
 
   --destructive: oklch(0.704 0.191 22.216);
   --success: oklch(0.78 0.13 150);
@@ -266,9 +271,9 @@ body {
   --warning: oklch(0.82 0.14 80);
   --warning-foreground: oklch(0.2 0 0);
 
-  --border: oklch(from var(--foreground) 0.285 0.003 h);
-  --input: oklch(from var(--foreground) 0.3 0.004 h);
-  --ring: oklch(from var(--foreground) 0.42 0.006 h);
+  --border: oklch(from var(--foreground) 0.285 0 h);
+  --input: oklch(from var(--foreground) 0.3 0 h);
+  --ring: oklch(from var(--foreground) 0.42 0 h);
 
   /* Egen ramp för mörkt tema — 1 = dovast, 5 = ljusast, så "5 är starkast"
      stämmer i båda teman. */
@@ -282,17 +287,17 @@ body {
   --grade-mid: oklch(from var(--primary) 0.68 0.145 h);
   --grade-high: oklch(from var(--primary) 0.83 0.13 h);
   --grade-fail: var(--destructive);
-  --tile-absent: oklch(from var(--foreground) 0.235 0.003 h);
-  --tile-absent-foreground: oklch(from var(--foreground) 0.52 0.004 h);
+  --tile-absent: oklch(from var(--foreground) 0.235 0 h);
+  --tile-absent-foreground: oklch(from var(--foreground) 0.52 0 h);
 
-  --sidebar: oklch(from var(--foreground) 0.13 0.002 h);
-  --sidebar-foreground: oklch(from var(--foreground) 0.94 0.002 h);
+  --sidebar: oklch(from var(--foreground) 0.13 0 h);
+  --sidebar-foreground: oklch(from var(--foreground) 0.94 0 h);
   --sidebar-primary: var(--primary);
   --sidebar-primary-foreground: var(--primary-foreground);
-  --sidebar-accent: oklch(from var(--foreground) 0.24 0.003 h);
-  --sidebar-accent-foreground: oklch(from var(--foreground) 0.94 0.002 h);
-  --sidebar-border: oklch(from var(--foreground) 0.285 0.003 h);
-  --sidebar-ring: oklch(from var(--foreground) 0.42 0.006 h);
+  --sidebar-accent: oklch(from var(--foreground) 0.24 0 h);
+  --sidebar-accent-foreground: oklch(from var(--foreground) 0.94 0 h);
+  --sidebar-border: oklch(from var(--foreground) 0.285 0 h);
+  --sidebar-ring: oklch(from var(--foreground) 0.42 0 h);
 }
 
 @layer base {
