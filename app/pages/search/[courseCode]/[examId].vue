@@ -332,7 +332,7 @@ onUnmounted(() => {
       <Transition enter-active-class="transition-all duration-200 ease-spring"
         enter-from-class="-translate-y-2 opacity-0" leave-active-class="transition-all duration-150 ease-spring"
         leave-to-class="-translate-y-2 opacity-0">
-        <div v-if="exam && isHeaderMounted" class="absolute inset-x-0 top-0 z-70 hidden lg:block">
+        <div v-if="exam && isHeaderMounted" class="absolute inset-x-0 top-0 z-30 hidden lg:block">
           <ExamHeader :exams="exams" :exam-id="examId" :course-code="courseCode" :solution-pdf-url="solutionPdfUrl"
             :active="isHeaderActive" :focus-mode="focusMode" @toggle-focus-mode="toggleFocusMode" />
         </div>
@@ -359,7 +359,7 @@ onUnmounted(() => {
 
           <div v-else ref="splitRow" class="h-full flex flex-row overflow-hidden"
             :class="{ 'select-none': isResizing || isOverlayResizing }">
-            <div class="relative h-full overflow-hidden bg-background" :style="isExamOnly ? { width: '100%' } : { width: `${splitPercent}%` }
+            <div class="relative isolate h-full overflow-hidden bg-background" :style="isExamOnly ? { width: '100%' } : { width: `${splitPercent}%` }
               ">
               <LazyPdfRenderer :pdf-url="exam.pdf_url" :layout-mode="layoutMode" :top-inset="64"
                 :explain-enabled="showExplainPopover" @explain="explainSelection" />
@@ -370,11 +370,11 @@ onUnmounted(() => {
             </div>
 
             <template v-if="!isExamOnly">
-              <div class="relative z-60 w-0 shrink-0">
+              <div class="relative z-20 w-0 shrink-0">
                 <ResizeHandle :is-resizing="isResizing" @start-resize="startSplitResize" />
               </div>
 
-              <div class="relative h-full flex-1 min-w-0 overflow-hidden bg-background">
+              <div class="relative isolate h-full flex-1 min-w-0 overflow-hidden bg-background">
                 <div class="absolute inset-0 h-full w-full flex flex-col">
                   <div v-if="solution" class="h-full relative" @mouseenter="solutionBlurred = false"
                     @mouseleave="solutionBlurred = blurFacitUntilHover">
@@ -382,7 +382,7 @@ onUnmounted(() => {
                       :explain-enabled="showExplainPopover" @explain="explainSelection" />
                     <Transition name="fade">
                       <div v-if="solutionBlurred"
-                        class="absolute inset-0 z-50 backdrop-blur-sm bg-background/30 flex flex-col gap-2 items-center justify-center pointer-events-none">
+                        class="absolute inset-0 z-20 backdrop-blur-sm bg-background/30 flex flex-col gap-2 items-center justify-center pointer-events-none">
                         <p class="text-sm font-normal text-muted-foreground">
                           Håll muspekaren för att visa facit
                         </p>
@@ -431,9 +431,9 @@ onUnmounted(() => {
               leave-active-class="transition-all duration-200 ease-spring"
               leave-from-class="translate-x-0 opacity-100 blur-0" leave-to-class="translate-x-full opacity-0 blur-sm">
               <div v-if="!isMobile && isExamOnly && hasFacit" v-show="isFacitVisible && !chatStore.isOpen"
-                class="fixed right-0 bottom-0 z-70 flex h-screen border-l border-canvas-border bg-background shadow-xl dark:shadow-none"
+                class="fixed right-0 bottom-0 z-30 flex h-screen border-l border-canvas-border bg-background shadow-xl dark:shadow-none"
                 :class="{ 'select-none': isOverlayResizing }" :style="{ width: `${overlayWidth}px` }">
-                <div class="relative z-100 w-0 shrink-0">
+                <div class="relative z-10 w-0 shrink-0">
                   <ResizeHandle :is-resizing="isOverlayResizing" @start-resize="startOverlayResize" />
                 </div>
                 <div class="flex-1 overflow-hidden">
@@ -451,9 +451,9 @@ onUnmounted(() => {
               leave-active-class="transition-all duration-200 ease-spring"
               leave-from-class="translate-x-0 opacity-100 blur-0" leave-to-class="translate-x-full opacity-0 blur-sm">
               <div v-if="!isMobile && chatHasBeenOpened" v-show="chatStore.isOpen"
-                class="fixed right-0 bottom-0 z-80 flex h-screen border-l border-canvas-border bg-background shadow-xl dark:shadow-none"
+                class="fixed right-0 bottom-0 z-40 flex h-screen border-l border-canvas-border bg-background shadow-xl dark:shadow-none"
                 :class="{ 'select-none': isOverlayResizing }" :style="{ width: `${overlayWidth}px` }">
-                <div class="relative z-100 w-0 shrink-0">
+                <div class="relative z-10 w-0 shrink-0">
                   <ResizeHandle :is-resizing="isOverlayResizing" @start-resize="startOverlayResize" />
                 </div>
                 <div class="flex-1 overflow-hidden">

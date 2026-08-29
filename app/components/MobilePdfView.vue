@@ -88,7 +88,7 @@ const downloadFile = async (url: string, filename: string) => {
 <template>
   <div class="relative h-dvh w-full bg-background overflow-hidden">
     <div
-      class="absolute inset-x-0 top-0 z-40 bg-background border-b border-border pt-[env(safe-area-inset-top,0px)]">
+      class="absolute inset-x-0 top-0 z-30 bg-background border-b border-border pt-[env(safe-area-inset-top,0px)]">
       <div class="flex h-14 shrink-0 items-center gap-3 px-3">
         <NuxtLink :to="`/search/${courseCode}`">
           <Button aria-label="Gå tillbaka" variant="outline" size="icon-sm">
@@ -170,7 +170,7 @@ const downloadFile = async (url: string, filename: string) => {
     >
       <section
         v-show="showSolution"
-        class="fixed inset-0 z-50 h-dvh w-screen bg-background overflow-hidden"
+        class="fixed inset-0 z-40 h-dvh w-screen bg-background overflow-hidden"
         role="dialog"
         aria-modal="true"
       >

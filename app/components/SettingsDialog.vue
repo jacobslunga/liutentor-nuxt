@@ -29,109 +29,8 @@ const SECTIONS = [
 
 const activeSection = ref<string>(SECTIONS[0].id);
 
-const DISMISS_DISTANCE = 120;
-const DISMISS_VELOCITY = 0.5;
-const SETTLE_MS = 240;
-const SETTLE_EASE = "cubic-bezier(0.32, 0.72, 0, 1)";
-
-const dragY = ref(0);
-const isDragging = ref(false);
-
-const isDismissing = ref(false);
-let dismissTimer: ReturnType<typeof setTimeout> | null = null;
-
-const sheetStyle = computed(() => {
-  if (!isDragging.value && !dragY.value) return undefined;
-  return {
-    transform: `translateY(${dragY.value}px)`,
-    transition: isDragging.value
-      ? "none"
-      : `transform ${SETTLE_MS}ms ${SETTLE_EASE}`,
-
-    ...(isDismissing.value ? { animation: "none" } : {}),
-  };
-});
-
-let activePointerId: number | null = null;
-let startY = 0;
-let lastY = 0;
-let lastTime = 0;
-
-let velocity = 0;
-
-function detachPointer(el: HTMLElement) {
-  el.removeEventListener("pointermove", onGrabberMove);
-  el.removeEventListener("pointerup", onGrabberUp);
-  el.removeEventListener("pointercancel", onGrabberUp);
-  if (activePointerId !== null && el.hasPointerCapture?.(activePointerId)) {
-    el.releasePointerCapture(activePointerId);
-  }
-  activePointerId = null;
-}
-
-function onGrabberDown(e: PointerEvent) {
-  if (e.pointerType === "mouse" && e.button !== 0) return;
-
-  const el = e.currentTarget as HTMLElement;
-  activePointerId = e.pointerId;
-  el.setPointerCapture(e.pointerId);
-
-  isDragging.value = true;
-  startY = e.clientY;
-  lastY = e.clientY;
-  lastTime = e.timeStamp;
-  velocity = 0;
-
-  el.addEventListener("pointermove", onGrabberMove);
-  el.addEventListener("pointerup", onGrabberUp);
-  el.addEventListener("pointercancel", onGrabberUp);
-}
-
-function onGrabberMove(e: PointerEvent) {
-  if (e.pointerId !== activePointerId) return;
-
-  dragY.value = Math.max(0, e.clientY - startY);
-
-  const elapsed = e.timeStamp - lastTime;
-  if (elapsed > 0) {
-    velocity = (e.clientY - lastY) / elapsed;
-    lastY = e.clientY;
-    lastTime = e.timeStamp;
-  }
-}
-
-function onGrabberUp(e: PointerEvent) {
-  if (e.pointerId !== activePointerId) return;
-  detachPointer(e.currentTarget as HTMLElement);
-  isDragging.value = false;
-
-  if (dragY.value > DISMISS_DISTANCE || velocity > DISMISS_VELOCITY) {
-
-    isDismissing.value = true;
-    dragY.value = window.innerHeight;
-    dismissTimer = setTimeout(() => {
-      dismissTimer = null;
-      open.value = false;
-    }, SETTLE_MS);
-    return;
-  }
-
-  dragY.value = 0;
-}
-
-onUnmounted(() => {
-  if (dismissTimer) clearTimeout(dismissTimer);
-});
-
 watch(open, (isOpen) => {
-  if (!isOpen) return;
-  if (dismissTimer) {
-    clearTimeout(dismissTimer);
-    dismissTimer = null;
-  }
-  activeSection.value = SECTIONS[0].id;
-  dragY.value = 0;
-  isDismissing.value = false;
+  if (isOpen) activeSection.value = SECTIONS[0].id;
 });
 </script>
 
@@ -143,16 +42,11 @@ watch(open, (isOpen) => {
       </Button>
     </DialogTrigger>
 
-    <DialogContent :show-close-button="false" variant="sheet" :style="sheetStyle"
-      class="flex h-[88dvh] w-full flex-col gap-0 overflow-hidden p-0 pb-[env(safe-area-inset-bottom,0px)] sm:h-[85vh] sm:max-h-[620px] sm:max-w-3xl sm:pb-0">
+    <DialogContent :show-close-button="false"
+      class="flex h-[85dvh] max-h-[620px] w-full flex-col gap-0 overflow-hidden p-0 sm:max-w-3xl">
       <VisuallyHidden>
         <DialogDescription>Anpassa hur LiU Tentor beter sig.</DialogDescription>
       </VisuallyHidden>
-
-      <div class="flex shrink-0 cursor-grab touch-none justify-center pt-2.5 pb-1 active:cursor-grabbing sm:hidden"
-        @pointerdown="onGrabberDown">
-        <div class="h-1 w-9 rounded-full bg-muted-foreground/30" />
-      </div>
 
       <div class="flex min-h-0 flex-1">
 

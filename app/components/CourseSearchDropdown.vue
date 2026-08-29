@@ -186,7 +186,7 @@ const iconSize = computed(
     <div
       v-if="showSuggestions && suggestions.length > 0"
       ref="suggestionsRef"
-      class="absolute w-full left-0 mt-2 bg-background border border-border rounded-2xl z-60 max-h-72 overflow-y-auto text-sm"
+      class="absolute w-full left-0 mt-2 bg-background border border-border rounded-2xl z-40 max-h-72 overflow-y-auto text-sm"
     >
       <div class="px-3 pt-3 pb-1 text-xs text-muted-foreground">
         Alla kurser

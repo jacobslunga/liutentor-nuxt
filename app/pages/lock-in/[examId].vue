@@ -157,7 +157,7 @@ function formatTime(ms: number): string {
       enter-to-class="opacity-100" leave-active-class="transition-opacity duration-200" leave-from-class="opacity-100"
       leave-to-class="opacity-0">
       <div v-if="paused"
-        class="absolute inset-0 z-50 bg-background/60 backdrop-blur-sm flex flex-col items-center justify-center gap-6">
+        class="absolute inset-0 z-40 bg-background/60 backdrop-blur-sm flex flex-col items-center justify-center gap-6">
         <div class="p-4 rounded-md bg-warning/10 mb-2">
           <LucidePause class="w-16 h-16 text-warning fill-current" />
         </div>

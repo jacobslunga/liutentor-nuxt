@@ -11,7 +11,7 @@ const emit = defineEmits<{ reply: [] }>();
 <template>
   <Teleport to="body">
     <Transition name="popover-fade">
-      <div v-if="visible" class="fixed z-100" :style="{
+      <div v-if="visible" class="fixed z-45" :style="{
         left: `${x}px`,
         top: `${y}px`,
         transform: 'translate(-50%, calc(-100% - 8px))',
