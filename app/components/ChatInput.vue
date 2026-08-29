@@ -58,6 +58,9 @@ const props = withDefaults(
     autoResize?: boolean;
 
     reactiveInput?: boolean;
+
+    /** Startläget utan meddelanden: fältet är högre och alltid uppfällt. */
+    hero?: boolean;
   }>(),
   {
     autofocus: true,
@@ -67,6 +70,7 @@ const props = withDefaults(
     reactiveInput: true,
     showDisclaimer: false,
     webSearch: false,
+    hero: false,
   },
 );
 
@@ -90,6 +94,7 @@ const nonReactiveCanSend = ref(
   !!props.initialText?.trim() && props.initialText.length <= MAX_LENGTH,
 );
 const nonReactiveTooLong = ref((props.initialText?.length ?? 0) > MAX_LENGTH);
+const isMultiline = ref(false);
 
 const canSend = computed(() => {
   const hasContent = props.reactiveInput
@@ -124,24 +129,49 @@ const selectedModelLabel = computed(
 );
 
 /**
- * The textarea owns its own row now, so growing it is a plain scrollHeight read
- * capped at 180px. The previous layout had it sharing a row with the controls
- * until the text stopped fitting, which needed width probing and a hand-rolled
- * expansion animation; none of that survives the stacked design.
+ * Fältet har två lägen. Ihopfällt ligger allt på en rad — plus, text, knappar —
+ * vilket är det som möter en tom chatt. Så fort texten går om en rad, eller
+ * något annat behöver egen plats (en skill-pill, bifogade filer), lägger sig
+ * texten på egen rad och kontrollerna vandrar ner under den.
  */
+const isExpanded = computed(
+  () =>
+    props.hero ||
+    isMultiline.value ||
+    !!activeSkill.value ||
+    pendingAttachments.value.length > 0,
+);
+
+/** Höjden på exakt en rad text: leading-6 på en textarea utan egen padding. */
+const SINGLE_LINE_HEIGHT = 24;
+const MAX_HEIGHT = 180;
+
+/**
+ * Mätning kräver att höjden släpps till `auto`, men om `auto` hinner bli det
+ * beräknade värdet tappar height-övergången sitt startvärde och fältet hoppar.
+ * Därför återställs den gamla pixelhöjden direkt efter avläsningen — webbläsaren
+ * hinner aldrig måla `auto`, och animationen går från gammal till ny höjd.
+ */
+const measureContentHeight = (el: HTMLTextAreaElement) => {
+  const previous = el.style.height;
+  el.style.height = "auto";
+  const measured = el.scrollHeight;
+  el.style.height = previous;
+  return measured;
+};
+
 const applyHeight = (allowShrink = false) => {
   const el = textareaRef.value;
   if (!el) return;
 
-  if (allowShrink) el.style.height = "auto";
-
-  const scrollHeight = el.scrollHeight;
-  const nextHeight = Math.min(scrollHeight, 180);
-  const height = `${nextHeight}px`;
-  const overflowY = scrollHeight > 180 ? "auto" : "hidden";
+  const contentHeight = allowShrink ? measureContentHeight(el) : el.scrollHeight;
+  const height = `${Math.min(contentHeight, MAX_HEIGHT)}px`;
+  const overflowY = contentHeight > MAX_HEIGHT ? "auto" : "hidden";
 
   if (el.style.height !== height) el.style.height = height;
   if (el.style.overflowY !== overflowY) el.style.overflowY = overflowY;
+
+  isMultiline.value = contentHeight > SINGLE_LINE_HEIGHT + 2;
 };
 
 const updateHeight = (event?: Event) => {
@@ -428,14 +458,9 @@ defineExpose({
 
 <template>
   <div class="relative z-10 w-full bg-transparent px-3 pointer-events-auto sm:px-4">
-    <div class="relative mx-auto max-w-3xl">
-      <div class="space-y-2">
-        <p v-if="showDisclaimer" class="px-4 text-center text-2xs text-muted-foreground/60">
-          AI kan göra misstag. Kontrollera svaren.
-        </p>
-
-        <div ref="chatShellRef"
-          class="chat-shell relative rounded-3xl border border-black/8 bg-background/90 dark:bg-background/95 shadow-[0_12px_36px_-16px_rgba(0,0,0,0.1),0_1px_3px_rgba(0,0,0,0.06)] backdrop-blur-sm dark:border-white/[0.1] dark:bg-secondary/95 dark:shadow-[0_16px_44px_-18px_rgba(0,0,0,0.72)]">
+    <div class="relative mx-auto max-w-2xl">
+      <div>
+        <div ref="chatShellRef" class="chat-shell relative rounded-xl border bg-background shadow-xs">
           <Transition name="fade-up">
             <div v-if="showScrollButton" class="pointer-events-none absolute -top-12 right-3 z-20">
               <Button variant="outline" size="icon" class="pointer-events-auto rounded-full"
@@ -501,69 +526,44 @@ defineExpose({
             </div>
           </Transition>
 
-          <div class="relative px-4 pb-2 pt-3.5 sm:px-5">
-            <span v-if="activeSkill" ref="skillPillRef"
-              class="pointer-events-auto absolute left-4 top-3.5 inline-flex items-center gap-1 rounded-full bg-skill px-2 py-0.5 text-[13px] font-medium leading-relaxed text-white sm:left-5">
-              {{ activeSkill.label }}
-              <button type="button" class="cursor-pointer opacity-70 hover:opacity-100"
-                :aria-label="`Ta bort ${activeSkill.label}`" @mousedown.prevent="clearSkill()">
-                <LucideX class="size-3" />
-              </button>
-            </span>
-            <textarea ref="textareaRef" :value="text" rows="1"
-              :placeholder="activeSkill ? 'Fråga vad som helst' : 'Fråga vad som helst, skriv / för skills'"
-              role="combobox" :aria-expanded="menuOpen" aria-controls="chat-skill-menu"
-              :aria-activedescendant="menuOpen ? `chat-skill-${filteredSkills[highlightedIndex]?.id}` : undefined"
-              class="chat-textarea block max-h-45 w-full min-w-0 resize-none border-0 bg-transparent p-0 text-[15px] font-normal leading-6 tracking-[-0.008em] outline-none placeholder:text-muted-foreground/65 focus:ring-0 sm:text-[15px]"
-              @input="handleInput" @keydown="handleKeyDown" />
-          </div>
+          <div class="composer flex flex-wrap items-center gap-1 p-2" :class="{ 'is-expanded': isExpanded }">
+            <!-- Starthöjden ligger på rutan, aldrig på textarean: höjden där
+                 mäts för att avgöra om texten gått om en rad, och en min-height
+                 hade fått en tom rad att mäta som flera. -->
+            <div class="composer-field relative min-w-0 px-2 py-1.5" :class="hero ? 'min-h-13' : ''">
+              <span v-if="activeSkill" ref="skillPillRef"
+                class="pointer-events-auto absolute left-2 top-1.5 inline-flex items-center gap-1 rounded-full bg-skill px-2 py-0.5 text-[13px] font-medium leading-relaxed text-white">
+                {{ activeSkill.label }}
+                <button type="button" class="opacity-70 hover:opacity-100" :aria-label="`Ta bort ${activeSkill.label}`"
+                  @mousedown.prevent="clearSkill()">
+                  <LucideX class="size-3" />
+                </button>
+              </span>
+              <textarea ref="textareaRef" :value="text" rows="1"
+                :placeholder="activeSkill ? 'Fråga vad som helst' : 'Fråga vad som helst, skriv / för skills'"
+                role="combobox" :aria-expanded="menuOpen" aria-controls="chat-skill-menu"
+                :aria-activedescendant="menuOpen ? `chat-skill-${filteredSkills[highlightedIndex]?.id}` : undefined"
+                class="chat-textarea block w-full min-w-0 resize-none border-0 bg-transparent p-0 text-[15px] font-normal leading-6 outline-none placeholder:text-muted-foreground/65 focus:ring-0"
+                @input="handleInput" @keydown="handleKeyDown" />
+            </div>
 
-          <div class="flex items-center gap-1 px-2.5 pb-2.5 sm:px-3">
             <input ref="fileInputRef" type="file" multiple class="hidden" :accept="FILE_INPUT_ACCEPT"
               @change="handleFileInput" />
             <Button variant="ghost" size="icon" aria-label="Bifoga filer"
-              class="size-8 shrink-0 text-muted-foreground hover:text-foreground"
+              class="composer-lead size-8 shrink-0 text-muted-foreground hover:text-foreground"
               :disabled="isLoading || attachmentCapacityReached" @click="fileInputRef?.click()">
               <LucidePlus class="size-4" />
             </Button>
 
-            <Button variant="ghost" size="sm" type="button" aria-label="Sök på webben" :aria-pressed="webSearch"
-              :title="webSearch ? 'Webbsökning på' : 'Sök på webben'"
-              class="h-8 shrink-0 gap-1.5 px-2.5 text-xs font-normal hover:bg-accent/70" :class="webSearch
-                ? 'bg-accent/70 text-primary hover:text-primary'
-                : 'text-muted-foreground hover:text-foreground'" @click="emit('update:webSearch', !webSearch)">
-              <LucideGlobe class="size-4" />
-              <span v-if="webSearch">Webb</span>
-            </Button>
-
-            <div class="ml-auto flex shrink-0 items-center gap-1.5">
-              <DropdownMenu>
-                <DropdownMenuTrigger as-child>
-                  <Button variant="ghost" size="sm"
-                    class="h-8 gap-1 px-2.5 text-xs font-normal text-muted-foreground hover:bg-accent/70 hover:text-foreground data-[state=open]:bg-accent/70">
-                    {{ selectedModelLabel }}
-                    <LucideChevronDown class="w-3.5 h-3.5 text-muted-foreground/70" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" class="w-60 p-1.5">
-                  <DropdownMenuLabel class="px-2.5 pb-1 pt-1.5 text-xs font-normal text-muted-foreground">
-                    Tankenivå
-                  </DropdownMenuLabel>
-                  <DropdownMenuItem v-for="model in availableModels" :key="model.id"
-                    class="cursor-pointer items-start justify-between gap-2 rounded-md px-2.5 py-1.5 focus:bg-accent/70"
-                    @click="emit('update:selectedModelId', model.id)">
-                    <span class="flex min-w-0 flex-col gap-0.5">
-                      <span class="text-xs font-medium text-foreground">
-                        {{ model.label }}
-                      </span>
-                      <span class="text-2xs leading-snug text-muted-foreground">
-                        {{ model.hint }}
-                      </span>
-                    </span>
-                    <LucideCheck v-if="model.id === selectedModelId" class="mt-0.5 size-3.5 shrink-0 text-primary" />
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+            <div class="composer-actions ml-auto flex shrink-0 items-center gap-1">
+              <Button variant="ghost" size="sm" type="button" aria-label="Sök på webben" :aria-pressed="webSearch"
+                :title="webSearch ? 'Webbsökning på' : 'Sök på webben'"
+                class="h-8 shrink-0 gap-1.5 px-2.5 text-xs font-normal hover:bg-accent/70" :class="webSearch
+                  ? 'bg-accent/70 text-primary hover:text-primary'
+                  : 'text-muted-foreground hover:text-foreground'" @click="emit('update:webSearch', !webSearch)">
+                <LucideGlobe class="size-4" />
+                <span v-if="webSearch">Webb</span>
+              </Button>
 
               <Transition name="scale" mode="out-in">
                 <Button v-if="isLoading" key="stop" size="icon" variant="secondary" class="size-8"
@@ -578,14 +578,48 @@ defineExpose({
           </div>
         </div>
 
-        <div v-if="reactiveInput && text.length > MAX_LENGTH * 0.8"
-          class="flex items-center justify-center gap-2 px-4 text-center">
-          <p class="text-xs" :class="text.length > MAX_LENGTH
-            ? 'text-destructive font-bold'
+        <!-- Foten ligger utanför ytan: ansvarsfriskrivningen till vänster,
+             tankenivån till höger. Båda är text, inte kontroller som tävlar med
+             skicka-knappen om uppmärksamheten. -->
+        <div class="mt-2 flex items-center justify-between gap-3 px-1.5">
+          <p v-if="reactiveInput && text.length > MAX_LENGTH * 0.8" class="text-2xs" :class="text.length > MAX_LENGTH
+            ? 'font-medium text-destructive'
             : 'text-muted-foreground'
             ">
             {{ text.length }} / {{ MAX_LENGTH }}
           </p>
+          <p v-else-if="showDisclaimer" class="min-w-0 truncate text-2xs text-muted-foreground/60">
+            AI kan göra misstag. Kontrollera svaren.
+          </p>
+          <span v-else />
+
+          <DropdownMenu>
+            <DropdownMenuTrigger as-child>
+              <Button variant="ghost" size="sm"
+                class="-my-1 h-6 shrink-0 gap-1 px-1.5 text-2xs font-normal text-muted-foreground hover:bg-accent/70 hover:text-foreground data-[state=open]:bg-accent/70">
+                {{ selectedModelLabel }}
+                <LucideChevronDown class="size-3 text-muted-foreground/70" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" class="w-60 p-1.5">
+              <DropdownMenuLabel class="px-2.5 pb-1 pt-1.5 text-xs font-normal text-muted-foreground">
+                Tankenivå
+              </DropdownMenuLabel>
+              <DropdownMenuItem v-for="model in availableModels" :key="model.id"
+                class="cursor-pointer items-start justify-between gap-2 rounded-md px-2.5 py-1.5 focus:bg-accent/70"
+                @click="emit('update:selectedModelId', model.id)">
+                <span class="flex min-w-0 flex-col gap-0.5">
+                  <span class="text-xs font-medium text-foreground">
+                    {{ model.label }}
+                  </span>
+                  <span class="text-2xs leading-snug text-muted-foreground">
+                    {{ model.hint }}
+                  </span>
+                </span>
+                <LucideCheck v-if="model.id === selectedModelId" class="mt-0.5 size-3.5 shrink-0 text-primary" />
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </div>
@@ -593,28 +627,55 @@ defineExpose({
 </template>
 
 <style scoped>
+/* Ytan är opak och platt — ingen backdrop-filter, eftersom fältet ligger över
+   tentan och all oskärpa där läser som att pdf:en är suddig. Djupet kommer från
+   hårlinjen, och fokus märks genom att den mörknar. */
 .chat-shell {
-  transition:
-    border-color var(--duration-fast) ease,
-    box-shadow var(--duration-fast) ease;
+  transition: border-color var(--duration-fast) ease;
 }
 
-.chat-shell:focus-within {
-  border-color: color-mix(in srgb, var(--foreground), transparent 84%);
-  box-shadow:
-    0 16px 42px -18px rgb(0 0 0 / 0.3),
-    0 1px 3px rgb(0 0 0 / 0.08);
+/* Bara textfältet tänder ramen. Knapparna ligger inne i ytan — bläddra-ner
+   längst upp, plus och skicka längst ner — och med :focus-within hade ett klick
+   på någon av dem sett ut som att man börjat skriva. */
+.chat-shell:has(.chat-textarea:focus) {
+  border-color: color-mix(in srgb, var(--foreground), transparent 72%);
 }
 
-:global(.dark) .chat-shell:focus-within,
-:global(.dim) .chat-shell:focus-within {
-  border-color: color-mix(in srgb, var(--foreground), transparent 80%);
-  box-shadow: 0 18px 48px -20px rgb(0 0 0 / 0.78);
+/* Ihopfällt: plus, textfält och knappar delar en rad. Uppfällt: textfältet tar
+   hela första raden via flex-basis 100%, vilket tvingar de andra att radbrytas
+   ner under det. Ordningen är den enda skillnaden — samma element hela vägen,
+   så ingenting monteras om och fokus i textarean överlever bytet. */
+.composer-lead {
+  order: 1;
 }
 
+.composer-field {
+  order: 2;
+  flex: 1 1 auto;
+}
+
+.composer-actions {
+  order: 3;
+}
+
+.composer.is-expanded .composer-field {
+  order: 0;
+  flex: 1 1 100%;
+}
+
+/* Höjden följer texten mjukt medan man skriver. Radbrytningen till uppfällt
+   läge är däremot ett enda steg i flödeslayouten och sker direkt — det är
+   avsiktligt, väntan där skulle synas som eftersläpning i skrivandet. */
 .chat-textarea {
+  transition: height 130ms var(--ease-spring);
   scrollbar-width: none;
   -ms-overflow-style: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-textarea {
+    transition: none;
+  }
 }
 
 .chat-textarea::-webkit-scrollbar {

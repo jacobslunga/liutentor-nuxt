@@ -131,9 +131,11 @@ function handleClearRecentSearches() {
               v-for="option in THEME_OPTIONS"
               :key="option.id"
               variant="outline"
-              class="h-auto flex-col gap-2 rounded-2xl py-4 hover:border-primary hover:bg-primary/5"
+              class="h-auto flex-col gap-2 rounded-2xl py-4 hover:border-primary hover:bg-primary/5 dark:hover:border-primary dark:hover:bg-primary/10"
               :class="
-                theme === option.id ? 'border-primary bg-primary/5' : 'bg-card'
+                theme === option.id
+                  ? 'border-primary bg-primary/5 dark:border-primary dark:bg-primary/15'
+                  : 'bg-card dark:bg-card'
               "
               @click="theme = option.id"
             >

@@ -220,7 +220,7 @@ const plugins = computed(() => {
 </script>
 
 <template>
-  <div class="group/pdf relative h-full w-full overflow-hidden bg-white dark:bg-background">
+  <div class="group/pdf relative isolate h-full w-full overflow-hidden bg-white dark:bg-background">
     <div v-if="isLoading || !engine" class="flex h-full w-full items-center justify-center">
       <LucideLoader2 class="h-5 w-5 animate-spin text-muted-foreground" />
     </div>

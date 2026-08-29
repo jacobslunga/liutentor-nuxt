@@ -1,11 +1,10 @@
 <script lang="ts" setup>
-import type { ToasterProps } from "vue-sonner";
-import { Toaster as Sonner } from "vue-sonner";
-import { cn } from "@/lib/utils";
+import type { ToasterProps } from "vue-sonner"
+import { CircleCheckIcon, InfoIcon, Loader2Icon, OctagonXIcon, TriangleAlertIcon, XIcon } from "@lucide/vue"
+import { Toaster as Sonner } from "vue-sonner"
+import { cn } from "@/lib/utils"
 
-const props = withDefaults(defineProps<ToasterProps>(), {
-  richColors: true,
-});
+const props = defineProps<ToasterProps>()
 </script>
 
 <template>
@@ -15,29 +14,29 @@ const props = withDefaults(defineProps<ToasterProps>(), {
       '--normal-bg': 'var(--popover)',
       '--normal-text': 'var(--popover-foreground)',
       '--normal-border': 'var(--border)',
-      '--border-radius': 'var(--radius-xl)',
+      '--border-radius': 'var(--radius)',
     }"
     v-bind="props"
   >
     <template #success-icon>
-      <LucideCheckCircle class="size-4" />
+      <CircleCheckIcon class="size-4" />
     </template>
     <template #info-icon>
-      <LucideInfo class="size-4" />
+      <InfoIcon class="size-4" />
     </template>
     <template #warning-icon>
-      <LucideAlertCircle class="size-4" />
+      <TriangleAlertIcon class="size-4" />
     </template>
     <template #error-icon>
-      <LucideCircleX class="size-4" />
+      <OctagonXIcon class="size-4" />
     </template>
     <template #loading-icon>
       <div>
-        <LucideLoader2 class="size-4 animate-spin" />
+        <Loader2Icon class="size-4 animate-spin" />
       </div>
     </template>
     <template #close-icon>
-      <LucideX class="size-4" />
+      <XIcon class="size-4" />
     </template>
   </Sonner>
 </template>

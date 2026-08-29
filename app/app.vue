@@ -18,6 +18,7 @@
 import "vue-sonner/style.css";
 import { Toaster } from "@/components/ui/sonner";
 import logoFontUrl from "~/assets/fonts/gt-super-text-bold.woff2?url&no-inline";
+import sansFontUrl from "@fontsource-variable/figtree/files/figtree-latin-wght-normal.woff2?url&no-inline";
 
 const colorMode = useColorMode();
 
@@ -31,7 +32,17 @@ onMounted(() => {
 
 useHead({
   link: [
-    // Logotypen är det enda typsnittet som behöver förladdas.
+    // Gränssnittssnittet först — det används av varenda vy och ska hämtas
+    // parallellt med CSS:en i stället för att vänta på att den parsats.
+    {
+      key: "sans-font-preload",
+      rel: "preload",
+      as: "font",
+      type: "font/woff2",
+      crossorigin: "anonymous",
+      href: sansFontUrl,
+    },
+    // Logotypen syns i headern på varje sida och förladdas av samma skäl.
     {
       key: "logo-font-preload",
       rel: "preload",

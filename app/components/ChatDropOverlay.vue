@@ -1,5 +1,5 @@
 <template>
-  <div class="pointer-events-none absolute inset-0 z-60 bg-background/90" role="status" aria-live="polite">
+  <div class="pointer-events-none absolute inset-0 z-30 bg-background/90" role="status" aria-live="polite">
     <div class="flex h-full flex-col items-center justify-center p-8 text-center">
       <div class="drop-illustration relative mb-7 h-20 w-32" aria-hidden="true">
         <div
