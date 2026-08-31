@@ -13,11 +13,6 @@
     U+0072, U+0074;
 }
 
-/* Figtree är gränssnittssnittet, självhostat från @fontsource-variable/figtree.
-   En enda fil på ~20 kB bär hela viktaxeln 300-900, så ingen extra begäran görs
-   när något går från regular till semibold. Bara latin-subsetet hämtas — svenska
-   ligger helt inom U+0000-00FF — och kursiven laddas aldrig; den syntetiseras i
-   de få fall den behövs. Filen förladdas i app.vue. */
 @font-face {
   font-family: "Figtree Variable";
   src: url("@fontsource-variable/figtree/files/figtree-latin-wght-normal.woff2?no-inline")
@@ -30,16 +25,30 @@
     U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
-/* Systemsnittet som visas under swap, omskalat till Figtrees metrics. Värdena
-   är uträknade ur båda snittens hmtx/OS2: medelbredden skiljer 0,35 % och
-   Figtree har ascent 950 / descent 250 på 1000 units. Resultatet är att texten
-   tar exakt lika stor plats före och efter att fonten landat — inget hopp. */
 @font-face {
   font-family: "Figtree Fallback";
   src: local("Helvetica Neue"), local("Arial"), local("Segoe UI");
   size-adjust: 100.35%;
   ascent-override: 94.66%;
   descent-override: 24.91%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: "Source Serif 4 Variable";
+  font-style: normal;
+  font-display: swap;
+  font-weight: 200 900;
+  src: url(@fontsource-variable/source-serif-4/files/source-serif-4-latin-wght-normal.woff2) format("woff2-variations");
+  unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+
+@font-face {
+  font-family: "Source Serif 4 Fallback";
+  src: local("Georgia"), local("Times New Roman");
+  size-adjust: 108.35%;
+  ascent-override: 95.62%;
+  descent-override: 30.92%;
   line-gap-override: 0%;
 }
 
@@ -97,13 +106,12 @@
 @theme {
   --font-logo: "Logo", serif;
 
-  /* Systemets egen monospace — ingen webfont hämtas för kod och siffror. */
   --font-mono:
     ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
     "Liberation Mono", monospace;
 
   --font-serif:
-    "Newsreader Variable", Georgia, Cambria, "Times New Roman", Times, serif;
+    "Source Serif 4 Variable", "Source Serif 4 Fallback", Georgia, Cambria, "Times New Roman", Times, serif;
 
   --font-sans:
     "Figtree Variable", "Figtree Fallback", -apple-system, BlinkMacSystemFont,
@@ -124,39 +132,22 @@ body {
   background: color-mix(in oklch, var(--primary) 35%, transparent);
 }
 
-/* ---------------------------------------------------------------------------
-   Z-lager. shadcn portalerar dialoger, menyer och popovers till body på z-50
-   och den nivån är reserverad — allt appen ritar själv ligger under, annars
-   hamnar en dialog bakom sidans egen kromlist.
-
-     0-19   innehåll: pdf-lager, markeringsytor, gradienter
-     20-29  flytande kontroller inuti en panel: zoom, resize, overlays
-     30     sidans krom: sticky headers, tentaheadern, facit-panelen
-     40     chattpanelen och mobilens helskärmsvyer — över tentan, under allt
-            som är modalt
-     45     markeringspopovern, som måste nå över chatten
-     50     shadcn: dialog, alert dialog, dropdown, popover, toasts
-
-   Ett element som får z-index och är positionerat skapar en egen stackningskontext,
-   så siffror inuti en panel (t.ex. resize-handtaget) räknas bara mot syskonen där.
-   --------------------------------------------------------------------------- */
-
 @custom-variant dark (&:where(.dark, .dark *, .dim, .dim *));
 
 @theme inline {
-  /* Egen radieskala. shadcn-komponenterna ligger på registryts egna
-     rounded-md/lg/xl och plockar därför sina värden härifrån; app-egna ytor
-     använder samma skala. Kontroller som ska vara helrundade sätter
-     rounded-full själva, utanför skalan. */
-  --radius-xs: 0.375rem; /* 6px  — taggar, färgprickar, brickor */
-  --radius-sm: 0.5rem; /* 8px  — inline-etiketter, tabellceller */
-  --radius-md: 0.75rem; /* 12px — menyrader, listrader */
-  --radius-lg: 0.875rem; /* 14px — inputfält, små plattor */
-  --radius-xl: 1rem; /* 16px — kort, popovers, toasts */
-  --radius-2xl: 1.25rem; /* 20px — paneler, större kort, menyer */
-  --radius-3xl: 1.5rem; /* 24px — dialoger, sheets, chattfältet */
+  /* Skalan är multiplar av --radius, inte fasta steg: små ytor får små hörn och
+     stora ytor stora, och proportionerna håller när basen ändras. Basen är
+     kontrollradien — knappar, fält och menyer sitter på den. */
+  --radius-xs: calc(var(--radius) * 0.5); /* 4px  — brickor, färgprickar, kbd */
+  --radius-sm: calc(var(--radius) * 0.75); /* 6px  — menyrader, listrader, chips */
+  --radius-md: var(--radius); /* 8px  — knappar, fält, menyytor, flikar */
+  --radius-lg: calc(var(--radius) * 1.25); /* 10px — små plattor */
+  --radius-xl: calc(var(--radius) * 1.5); /* 12px — dialoger, kort */
+  --radius-2xl: calc(var(--radius) * 2); /* 16px — chattfältet, större paneler */
+  --radius-3xl: calc(var(--radius) * 2.5); /* 20px — sheets */
 
   --color-background: var(--background);
+  --color-surface: var(--surface);
   --color-canvas: var(--canvas);
   --color-canvas-border: var(--canvas-border);
   --color-foreground: var(--foreground);
@@ -204,21 +195,9 @@ body {
   --font-heading: var(--font-sans);
 }
 
-/* ---------------------------------------------------------------------------
-   Två oberoende ankare. --primary är varumärkesfärgen och används bara där
-   färgen betyder något: knappar, markeringar, diagram och betygsskalan.
-   Resten av gränssnittet är helt neutralt: ytor, ramar och texttoner är
-   rena ljushetssteg utan chroma.
-
-   Byt --primary och bara de färgbärande delarna följer med; justera
-   --foregrounds ljushet och hela gråskalan följer med. Undantag:
-   destructive/success/warning är semantiska och står fast.
-   --------------------------------------------------------------------------- */
-
 :root {
-  /* shadcns egen radieankare. Registry-komponenter som Sonner läser den
-     direkt via var(--radius), så den måste finnas. */
-  --radius: 0.625rem;
+  /* En ratt för hela radieskalan. Allt i @theme är en multipel av den här. */
+  --radius: 0.5rem;
 
   --primary: oklch(0.6193 0.1154 172.06);
   --primary-foreground: oklch(0.985 0 0);
@@ -227,27 +206,24 @@ body {
 
   --foreground: oklch(0.245 0 0);
 
-  --background: oklch(from var(--foreground) 0.99107 0 h);
-  --canvas: oklch(from var(--foreground) 0.965 0 h);
-  --canvas-border: oklch(from var(--foreground) 0.915 0 h);
+  --background: oklch(from var(--foreground) 0.99 0 h);
+  --surface: oklch(1 0 0);
+  --canvas: oklch(from var(--foreground) 0.955 0 h);
+  --canvas-border: oklch(from var(--foreground) 0.905 0 h);
 
   --background-0: oklch(from var(--background) l c h / 0);
   --background-soft: oklch(from var(--background) l c h / 0.7);
 
-  --card: oklch(from var(--foreground) 0.972 0 h);
+  --card: oklch(from var(--foreground) 0.96 0 h);
   --card-foreground: oklch(from var(--foreground) 0.145 0 h);
 
-  /* Menyer och popovers ligger på samma yta som sidan och lyfts av ram plus
-     skugga, inte av en egen ljushet. Annars får en meny som innehåller egna
-     ytor (rubrikrader, sektioner) ett omvänt djup: menyn ljusare än sitt
-     eget innehåll. */
   --popover: var(--background);
   --popover-foreground: var(--foreground);
-  --secondary: oklch(from var(--foreground) 0.969 0 h);
+  --secondary: oklch(from var(--foreground) 0.958 0 h);
   --secondary-foreground: oklch(from var(--foreground) 0.2 0 h);
-  --muted: oklch(from var(--foreground) 0.96 0 h);
+  --muted: oklch(from var(--foreground) 0.95 0 h);
   --muted-foreground: oklch(from var(--foreground) 0.48 0 h);
-  --accent: oklch(from var(--foreground) 0.94 0 h);
+  --accent: oklch(from var(--foreground) 0.93 0 h);
   --accent-foreground: oklch(from var(--foreground) 0.2 0 h);
 
   --destructive: oklch(0.577 0.245 27.325);
@@ -256,12 +232,10 @@ body {
   --warning: oklch(81.007% 0.16264 90.418);
   --warning-foreground: oklch(0.2 0 0);
 
-  --border: oklch(from var(--foreground) 0.95 0 h);
-  --input: oklch(from var(--foreground) 0.9 0 h);
+  --border: oklch(from var(--foreground) 0.94 0 h);
+  --input: oklch(from var(--foreground) 0.89 0 h);
   --ring: oklch(from var(--foreground) 0.7 0 h);
 
-  /* Diagram och betyg bär fortfarande varumärkesfärgen — där är färgen data,
-     inte dekor. */
   --chart-1: oklch(from var(--primary) 0.911 0.0453 h);
   --chart-2: oklch(from var(--primary) 0.8072 0.1109 h);
   --chart-3: oklch(from var(--primary) 0.7521 0.1557 h);
@@ -275,13 +249,13 @@ body {
   --tile-absent: oklch(from var(--foreground) 0.72 0 h);
   --tile-absent-foreground: oklch(from var(--foreground) 0.99 0 h);
 
-  --sidebar: oklch(from var(--foreground) 0.985 0 h);
+  --sidebar: oklch(from var(--foreground) 0.975 0 h);
   --sidebar-foreground: oklch(from var(--foreground) 0.145 0 h);
   --sidebar-primary: var(--primary);
   --sidebar-primary-foreground: var(--primary-foreground);
-  --sidebar-accent: oklch(from var(--foreground) 0.94 0 h);
+  --sidebar-accent: oklch(from var(--foreground) 0.93 0 h);
   --sidebar-accent-foreground: oklch(from var(--foreground) 0.2 0 h);
-  --sidebar-border: oklch(from var(--foreground) 0.915 0 h);
+  --sidebar-border: oklch(from var(--foreground) 0.905 0 h);
   --sidebar-ring: oklch(from var(--foreground) 0.7 0 h);
 }
 
@@ -297,6 +271,9 @@ body {
   --foreground: oklch(0.94 0 0);
 
   --background: oklch(from var(--foreground) 0.21 0 h);
+  /* Mörkt läge kan inte gå ljusare än vitt, så den upphöjda ytan ligger på
+     kortnivå i stället — samma steg uppåt från sidan som vitt är i ljust. */
+  --surface: oklch(from var(--foreground) 0.265 0 h);
   --canvas: oklch(from var(--foreground) 0.165 0 h);
   --canvas-border: oklch(from var(--foreground) 0.285 0 h);
   --background-0: oklch(from var(--background) l c h / 0);
@@ -413,8 +390,6 @@ body {
   }
 }
 
-/* Skelett för laddningstillstånd. En enda definition delas av alla vyer så att
-   pulsen går i takt överallt. */
 .skeleton {
   background: var(--muted);
   animation: skeleton-fade 1.6s var(--ease-spring) infinite;
@@ -528,10 +503,9 @@ body {
   font-family: var(--font-sans);
 }
 
-/* Bandet ovanför chattfältet. Två stopp, rak lutning — inget mer. Varje extra
-   stopp gör kurvan ojämn och då börjar bandet läsa som en egen yta ovanför
-   fältet istället för att texten bara tonar bort. --background-0 är bakgrunden
-   med noll alfa, vilket håller tonen färgren hela vägen. */
+/* Övergången mellan transkriptet och chattfältets yta. Den slutar en bit ovanför
+   fältet — resten är solid bakgrund — så att fältet ligger och flyter ovanpå
+   toningen i stället för att sitta fast i dess kant. */
 .fade-to-background {
   background-image: linear-gradient(
     to top,

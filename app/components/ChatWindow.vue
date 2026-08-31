@@ -105,48 +105,50 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
     </Transition>
 
     <div class="flex min-w-0 flex-1 flex-col overflow-hidden">
-      <div class="relative z-20 shrink-0">
-        <ChatHeader :has-solution="hasSolution" :title="chatHeaderTitle" :history-open="isHistoryOpen"
-          @close="emit('close')" @open-history="toggleHistory" @new-chat="startNewChat" />
-      </div>
-
       <div class="relative min-h-0 w-full flex-1">
         <ChatMessages ref="transcriptRef" :messages="messages" :is-loading="isLoading" assistant-class="font-sans"
-          hide-empty-state content-class="pb-24" @reply-to-selection="handleReplyToSelection"
+          hide-empty-state content-class="pt-16 pb-6" @reply-to-selection="handleReplyToSelection"
           @update:show-scroll-button="showScrollButton = $event" />
 
-        <!-- Samma skrivfält i båda lägena — bara omslaget byter plats, så
-             instansen lever vidare och fokus och utkast följer med när det
-             första meddelandet skickas. -->
-        <div class="pointer-events-none absolute z-10" :class="hasMessages
-          ? 'inset-x-0 bottom-0 pb-4'
-          : 'inset-0 flex flex-col items-center justify-center gap-7 px-4 pb-10'
-          ">
-          <!-- Omslaget börjar exakt vid skrivfältets överkant, så tonen slutar
-               där och texten glider in under fältet — det är fältets egen opaka
-               yta som döljer den. Plattan behövs bara för att foten under
-               fältet, med ansvarsfriskrivning och tankenivå, ska stå på solid
-               bakgrund istället för på rullande text. -->
-          <template v-if="hasMessages">
-            <div class="fade-to-background pointer-events-none absolute inset-x-0 bottom-full h-12 -z-10" />
-            <div class="pointer-events-none absolute inset-0 bg-background -z-10" />
-          </template>
+        <!-- Headern ligger ovanpå transkriptet i stället för över det, så att
+             meddelandena rullar in under den. Listans pt-16 håller det första
+             meddelandet fritt från toningen när man är högst upp. -->
+        <div class="pointer-events-none absolute inset-x-0 top-0 z-20">
+          <ChatHeader :has-solution="hasSolution" :title="chatHeaderTitle" :history-open="isHistoryOpen"
+            @close="emit('close')" @open-history="toggleHistory" @new-chat="startNewChat" />
+        </div>
 
-          <div v-else class="flex flex-col items-center gap-4">
+        <div class="pointer-events-none absolute inset-0 z-10 flex flex-col justify-end">
+          <div v-if="!hasMessages"
+            class="flex min-h-0 flex-1 flex-col items-center justify-center gap-4 px-4 text-center">
             <ChatMascot class="size-14 shrink-0" />
-            <h2 class="text-2xl font-semibold text-foreground">
-              Vad kan jag hjälpa till med?
-            </h2>
+            <div class="space-y-2">
+              <h2 class="text-2xl font-semibold text-foreground">
+                Vad kan jag hjälpa till med?
+              </h2>
+              <p class="mx-auto max-w-70 text-sm leading-relaxed text-muted-foreground sm:max-w-md">
+                Ställ frågor om tentan eller få hjälp att förstå lösningarna.
+              </p>
+            </div>
+            <NuxtLink to="/ai-policy" target="_blank"
+              class="pointer-events-auto mt-2 border-b border-transparent pb-0.5 text-2xs text-muted-foreground/60 transition-colors duration-200 hover:border-foreground/30 hover:text-foreground">
+              Läs vår AI-policy
+            </NuxtLink>
           </div>
 
-          <ChatInput ref="chatInputRef" :initial-text="chatStore.draftInput"
-            :initial-attachments="chatStore.draftAttachments" :is-loading="isLoading"
-            :selected-model-id="selectedModelId" :web-search="webSearch" :show-scroll-button="showScrollButton"
-            :course-code="courseCode" :has-solution="hasSolution" :selection-context="selectionContext"
-            :hero="!hasMessages" show-disclaimer class="pointer-events-auto" @send="handleSend" @cancel="handleCancel"
-            @scroll-to-bottom="transcriptRef?.scrollToBottom('smooth')"
-            @update:selected-model-id="selectedModelId = $event" @update:web-search="webSearch = $event"
-            @clear-selection-context="selectionContext = ''" />
+          <div class="relative pb-2">
+            <div
+              class="pointer-events-none absolute inset-x-0 h-36 bottom-0 -z-10 bg-linear-to-t from-background via-background to-transparent" />
+
+            <ChatInput ref="chatInputRef" :initial-text="chatStore.draftInput"
+              :initial-attachments="chatStore.draftAttachments" :is-loading="isLoading"
+              :selected-model-id="selectedModelId" :web-search="webSearch" :show-scroll-button="showScrollButton"
+              :course-code="courseCode" :has-solution="hasSolution" :selection-context="selectionContext"
+              show-disclaimer class="pointer-events-auto" @send="handleSend" @cancel="handleCancel"
+              @scroll-to-bottom="transcriptRef?.scrollToBottom('smooth')"
+              @update:selected-model-id="selectedModelId = $event" @update:web-search="webSearch = $event"
+              @clear-selection-context="selectionContext = ''" />
+          </div>
         </div>
       </div>
     </div>

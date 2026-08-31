@@ -8,9 +8,6 @@ defineProps<{
   meta?: string;
 }>();
 
-// Rubriksnittet förladdas här och inte i app.vue: Newsreader syns bara på
-// infosidorna, och de är precis de sidor som renderar PageIntro. Startsidan
-// slipper därmed hämta en fil den aldrig ritar med.
 useHead({
   link: [
     {
@@ -33,15 +30,11 @@ useHead({
       </p>
 
       <h1
-        class="mt-5 max-w-3xl font-serif text-[2.25rem] font-medium leading-[1.1] tracking-[-0.015em] text-foreground sm:text-5xl lg:text-6xl"
-      >
+        class="mt-5 max-w-3xl font-serif text-[2.25rem] font-medium leading-[1.1] tracking-[-0.015em] text-foreground sm:text-5xl lg:text-6xl">
         {{ title }}
       </h1>
 
-      <p
-        v-if="lead"
-        class="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg"
-      >
+      <p v-if="lead" class="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
         {{ lead }}
       </p>
 

@@ -90,9 +90,9 @@ function toggleFilter(p: string) {
       </Button>
     </div>
 
-    <div class="w-full overflow-x-auto rounded-xl border border-border">
+    <div class="w-full overflow-x-auto rounded-sm border border-border">
 
-      <div class="w-max min-w-full sm:w-full rounded-xl overflow-hidden">
+      <div class="w-max min-w-full sm:w-full rounded-sm overflow-hidden">
         <div :class="gridCols" class="py-3 border-b border-border/60 bg-muted/30">
           <div class="text-xs text-muted-foreground">Tentamen</div>
           <div class="text-xs text-muted-foreground">Typ</div>

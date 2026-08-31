@@ -275,8 +275,6 @@ defineExpose({
   <div ref="messagesContainer"
     class="h-full w-full overflow-y-auto overflow-x-hidden overscroll-contain px-4 custom-scrollbar"
     :class="contentClass" @scroll="handleScroll" @mouseup="handleMessageMouseUp" @click="handleCodeCopy">
-    <!-- Tom chatt: skrivbordsvyn ritar sitt eget startläge runt ett större
-         skrivfält, så där stängs det här av med `hide-empty-state`. -->
     <div class="min-h-full flex flex-col items-center justify-center px-4 py-8 text-center"
       v-if="messages.length === 0 && !hideEmptyState">
       <ChatMascot class="w-16 h-16 mb-5 shrink-0" />
@@ -306,14 +304,14 @@ defineExpose({
           </div>
           <div v-if="msg.attachments?.length" class="flex flex-wrap justify-end gap-1.5">
             <div v-for="attachment in msg.attachments" :key="attachment.id"
-              class="attachment-context-item flex min-w-0 max-w-full items-center gap-1.5 rounded-xl border px-2.5 py-1.5 text-xs"
+              class="attachment-context-item flex min-w-0 max-w-full items-center gap-1.5 rounded-sm border px-2.5 py-1.5 text-xs"
               :class="attachment.active
                 ? 'bg-background'
                 : 'bg-muted/40 text-muted-foreground opacity-70'
                 ">
               <LucideFileText v-if="attachment.mediaType === 'application/pdf'" class="size-3.5 shrink-0" />
               <img v-else-if="attachment.previewUrl" :src="attachment.previewUrl" alt=""
-                class="size-16 shrink-0 rounded-lg object-cover" />
+                class="size-16 shrink-0 rounded-sm object-cover" />
               <LucideImage v-else class="size-3.5 shrink-0" />
               <span class="max-w-20 truncate" :title="attachment.name">{{
                 attachment.name
@@ -323,7 +321,7 @@ defineExpose({
                 }}</span>
             </div>
           </div>
-          <div v-if="msg.skill" class="w-fit rounded-md bg-skill px-1.5 py-0.5 text-xs font-medium text-white">
+          <div v-if="msg.skill" class="w-fit rounded-sm bg-skill px-1.5 py-0.5 text-xs font-medium text-white">
             {{ getSkillById(msg.skill)?.label }}
           </div>
           <div v-if="msg.content" class="w-fit rounded-2xl bg-secondary px-4 py-2 text-secondary-foreground">
@@ -346,16 +344,13 @@ defineExpose({
               }}</span>
           </div>
           <div v-if="renderedAssistantHtml[i]"
-            class="prose max-w-full min-w-0 prose-headings:font-semibold prose-strong:font-semibold prose-h1:text-2xl prose-h2:text-xl prose-h3:text-lg prose-h4:text-base dark:prose-invert marker:text-foreground marker:font-semibold"
+            class="prose max-w-full min-w-0 font-serif prose-headings:font-semibold prose-strong:font-semibold dark:prose-invert marker:text-foreground marker:font-semibold"
             v-html="renderedAssistantHtml[i]" />
-          <!--
-            Rendered as real markup rather than through the markdown v-html, so
-            the DOMPurify allowlist in lib/chat-markdown.ts never has to grow.
-          -->
+
           <div v-if="msg.sources?.length" class="mt-3 flex flex-wrap gap-1.5">
             <a v-for="source in msg.sources" :key="source.url" :href="source.url" :title="source.title" target="_blank"
               rel="noopener noreferrer"
-              class="inline-flex max-w-56 items-center gap-1.5 rounded-md border bg-background px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-accent/70 hover:text-foreground">
+              class="inline-flex max-w-56 items-center gap-1.5 rounded-sm border bg-background px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-accent/70 hover:text-foreground">
               <LucideGlobe class="size-3 shrink-0" />
               <span class="truncate">{{ sourceLabel(source) }}</span>
             </a>

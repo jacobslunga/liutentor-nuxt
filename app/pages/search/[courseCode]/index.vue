@@ -297,7 +297,7 @@ function passColor(rate: number) {
               <template #controls>
                 <DropdownMenu v-if="activeTab === 'exams'">
                   <DropdownMenuTrigger as-child>
-                    <Button variant="outline" size="sm" aria-label="Sortera tentor">
+                    <Button variant="outline" aria-label="Sortera tentor">
                       <LucideArrowUpDown class="size-4" />
                       {{ examSortLabel }}
                       <LucideArrowDown v-if="examSortDirection === 'desc'" class="size-3.5 text-muted-foreground" />

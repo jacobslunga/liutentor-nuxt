@@ -58,9 +58,6 @@ const props = withDefaults(
     autoResize?: boolean;
 
     reactiveInput?: boolean;
-
-    /** Startläget utan meddelanden: fältet är högre och alltid uppfällt. */
-    hero?: boolean;
   }>(),
   {
     autofocus: true,
@@ -70,7 +67,6 @@ const props = withDefaults(
     reactiveInput: true,
     showDisclaimer: false,
     webSearch: false,
-    hero: false,
   },
 );
 
@@ -128,30 +124,16 @@ const selectedModelLabel = computed(
     availableModels.value[0]!.label,
 );
 
-/**
- * Fältet har två lägen. Ihopfällt ligger allt på en rad — plus, text, knappar —
- * vilket är det som möter en tom chatt. Så fort texten går om en rad, eller
- * något annat behöver egen plats (en skill-pill, bifogade filer), lägger sig
- * texten på egen rad och kontrollerna vandrar ner under den.
- */
 const isExpanded = computed(
   () =>
-    props.hero ||
     isMultiline.value ||
     !!activeSkill.value ||
     pendingAttachments.value.length > 0,
 );
 
-/** Höjden på exakt en rad text: leading-6 på en textarea utan egen padding. */
 const SINGLE_LINE_HEIGHT = 24;
 const MAX_HEIGHT = 180;
 
-/**
- * Mätning kräver att höjden släpps till `auto`, men om `auto` hinner bli det
- * beräknade värdet tappar height-övergången sitt startvärde och fältet hoppar.
- * Därför återställs den gamla pixelhöjden direkt efter avläsningen — webbläsaren
- * hinner aldrig måla `auto`, och animationen går från gammal till ny höjd.
- */
 const measureContentHeight = (el: HTMLTextAreaElement) => {
   const previous = el.style.height;
   el.style.height = "auto";
@@ -176,16 +158,10 @@ const applyHeight = (allowShrink = false) => {
 
 const updateHeight = (event?: Event) => {
   if (!props.autoResize) return;
-  // Deleting can free up a row, so it needs the shrink pass; typing only grows.
   const inputType = event instanceof InputEvent ? event.inputType : "";
   applyHeight(!event || inputType.startsWith("delete"));
 };
 
-/**
- * Slash-menyn. Den öppnas bara när "/" är hela fältets inledning och inget
- * mellanslag skrivits än, vilket `^\/(\S*)$` uttrycker direkt: så fort man
- * skriver mellanslag eller raderar snedstrecket slutar mönstret matcha.
- */
 const activeSkill = ref<ChatSkill | null>(null);
 const menuOpen = ref(false);
 const menuQuery = ref("");
@@ -199,9 +175,6 @@ onClickOutside(skillMenuRef, () => {
   menuOpen.value = false;
 });
 
-// Textarean är ett <textarea>, så pillen kan inte ligga i textflödet. Den ligger
-// absolut positionerad ovanpå, och `text-indent` — som per definition bara rör
-// första raden — skjuter texten åt sidan exakt så mycket som pillen är bred.
 useResizeObserver(skillPillRef, () => {
   const width = skillPillRef.value?.offsetWidth ?? 0;
   const el = textareaRef.value;
@@ -224,10 +197,6 @@ function selectSkill(skill: ChatSkill | undefined) {
   nextTick(() => textareaRef.value?.focus());
 }
 
-/**
- * Nuxts auto-import löser komponenter vid kompilering, så en sträng i `:is` hade
- * inte gått att slå upp vid körning. Därför en explicit tabell.
- */
 const SKILL_ICONS: Record<string, Component> = {
   explain: GraduationCap,
   theory: BookOpen,
@@ -252,8 +221,6 @@ const handleInput = (event: Event) => {
     return;
   }
 
-  // Keep rapid mobile typing out of Vue's render cycle. In this mode the DOM
-  // owns the textarea value; reactive state only changes when sendability does.
   const nextCanSend = !!value.trim() && value.length <= MAX_LENGTH;
   nonReactiveTooLong.value = value.length > MAX_LENGTH;
   if (nonReactiveCanSend.value !== nextCanSend) {
@@ -262,8 +229,6 @@ const handleInput = (event: Event) => {
 };
 
 const handleKeyDown = (e: KeyboardEvent) => {
-  // Menyn hanteras före allt annat: mobilen skickar `submitOnEnter: false` och
-  // skulle annars aldrig se piltangenterna.
   if (menuOpen.value) {
     const count = filteredSkills.value.length;
     if (e.key === "ArrowDown") {
@@ -460,7 +425,7 @@ defineExpose({
   <div class="relative z-10 w-full bg-transparent px-3 pointer-events-auto sm:px-4">
     <div class="relative mx-auto max-w-2xl">
       <div>
-        <div ref="chatShellRef" class="chat-shell relative rounded-xl border bg-background shadow-xs">
+        <div ref="chatShellRef" class="chat-shell relative rounded-2xl border bg-surface shadow-xs">
           <Transition name="fade-up">
             <div v-if="showScrollButton" class="pointer-events-none absolute -top-12 right-3 z-20">
               <Button variant="outline" size="icon" class="pointer-events-auto rounded-full"
@@ -483,11 +448,11 @@ defineExpose({
           <TransitionGroup v-if="pendingAttachments.length" name="attachment-chip" tag="div" appear
             class="relative flex flex-wrap gap-2 border-b border-border/60 px-4 py-2.5">
             <div v-for="attachment in pendingAttachments" :key="attachment.id"
-              class="flex min-w-0 max-w-full items-center gap-2 rounded-xl bg-secondary/60 px-2.5 py-1.5 text-xs">
+              class="flex min-w-0 max-w-full items-center gap-2 rounded-sm bg-secondary/60 px-2.5 py-1.5 text-xs">
               <LucideFileText v-if="attachment.mediaType === 'application/pdf'"
                 class="size-3.5 shrink-0 text-muted-foreground" />
               <img v-else-if="attachment.previewUrl" :src="attachment.previewUrl" alt=""
-                class="size-10 shrink-0 rounded-lg object-cover" />
+                class="size-10 shrink-0 rounded-sm object-cover" />
               <LucideImage v-else class="size-3.5 shrink-0 text-muted-foreground" />
               <span class="max-w-20 truncate" :title="attachment.name">{{
                 attachment.name
@@ -505,13 +470,13 @@ defineExpose({
 
           <Transition name="fade-up">
             <div v-if="menuOpen" id="chat-skill-menu" ref="skillMenuRef" role="listbox" aria-label="Skills"
-              class="absolute bottom-full left-0 right-0 z-30 mb-2 overflow-hidden rounded-2xl border border-border bg-popover p-1.5 shadow-lg">
+              class="absolute bottom-full left-0 right-0 z-30 mb-2 overflow-hidden rounded-md border border-border bg-popover p-1.5 shadow-lg">
               <div class="px-2.5 pb-1 pt-1 text-2xs font-normal text-muted-foreground">
                 Skills
               </div>
               <button v-for="(skill, index) in filteredSkills" :id="`chat-skill-${skill.id}`" :key="skill.id"
                 type="button" role="option" :aria-selected="index === highlightedIndex"
-                class="flex w-full cursor-pointer items-start gap-2.5 rounded-md px-2.5 py-1.5 text-left"
+                class="flex w-full cursor-pointer items-start gap-2.5 rounded-sm px-2.5 py-1.5 text-left"
                 :class="index === highlightedIndex ? 'bg-accent' : ''" @mouseenter="highlightedIndex = index"
                 @mousedown.prevent="selectSkill(skill)">
                 <component :is="SKILL_ICONS[skill.id]" class="mt-0.5 size-3.5 shrink-0 text-muted-foreground" />
@@ -527,10 +492,7 @@ defineExpose({
           </Transition>
 
           <div class="composer flex flex-wrap items-center gap-1 p-2" :class="{ 'is-expanded': isExpanded }">
-            <!-- Starthöjden ligger på rutan, aldrig på textarean: höjden där
-                 mäts för att avgöra om texten gått om en rad, och en min-height
-                 hade fått en tom rad att mäta som flera. -->
-            <div class="composer-field relative min-w-0 px-2 py-1.5" :class="hero ? 'min-h-13' : ''">
+            <div class="composer-field relative min-w-0 px-2 py-1.5">
               <span v-if="activeSkill" ref="skillPillRef"
                 class="pointer-events-auto absolute left-2 top-1.5 inline-flex items-center gap-1 rounded-full bg-skill px-2 py-0.5 text-[13px] font-medium leading-relaxed text-white">
                 {{ activeSkill.label }}
@@ -578,9 +540,6 @@ defineExpose({
           </div>
         </div>
 
-        <!-- Foten ligger utanför ytan: ansvarsfriskrivningen till vänster,
-             tankenivån till höger. Båda är text, inte kontroller som tävlar med
-             skicka-knappen om uppmärksamheten. -->
         <div class="mt-2 flex items-center justify-between gap-3 px-1.5">
           <p v-if="reactiveInput && text.length > MAX_LENGTH * 0.8" class="text-2xs" :class="text.length > MAX_LENGTH
             ? 'font-medium text-destructive'
@@ -588,17 +547,18 @@ defineExpose({
             ">
             {{ text.length }} / {{ MAX_LENGTH }}
           </p>
-          <p v-else-if="showDisclaimer" class="min-w-0 truncate text-2xs text-muted-foreground/60">
+          <p v-else-if="showDisclaimer" class="min-w-0 truncate text-[13px] text-muted-foreground/60">
             AI kan göra misstag. Kontrollera svaren.
           </p>
           <span v-else />
 
           <DropdownMenu>
             <DropdownMenuTrigger as-child>
-              <Button variant="ghost" size="sm"
-                class="-my-1 h-6 shrink-0 gap-1 px-1.5 text-2xs font-normal text-muted-foreground hover:bg-accent/70 hover:text-foreground data-[state=open]:bg-accent/70">
-                {{ selectedModelLabel }}
-                <LucideChevronDown class="size-3 text-muted-foreground/70" />
+              <Button variant="ghost" size="xs" class="group">
+                <span class="text-muted-foreground group-hover:text-foreground">
+                  Gemini
+                  •
+                  {{ selectedModelLabel }}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" class="w-60 p-1.5">
@@ -606,7 +566,7 @@ defineExpose({
                 Tankenivå
               </DropdownMenuLabel>
               <DropdownMenuItem v-for="model in availableModels" :key="model.id"
-                class="cursor-pointer items-start justify-between gap-2 rounded-md px-2.5 py-1.5 focus:bg-accent/70"
+                class="cursor-pointer items-start justify-between gap-2 rounded-sm px-2.5 py-1.5 focus:bg-accent/70"
                 @click="emit('update:selectedModelId', model.id)">
                 <span class="flex min-w-0 flex-col gap-0.5">
                   <span class="text-xs font-medium text-foreground">
@@ -627,24 +587,14 @@ defineExpose({
 </template>
 
 <style scoped>
-/* Ytan är opak och platt — ingen backdrop-filter, eftersom fältet ligger över
-   tentan och all oskärpa där läser som att pdf:en är suddig. Djupet kommer från
-   hårlinjen, och fokus märks genom att den mörknar. */
 .chat-shell {
   transition: border-color var(--duration-fast) ease;
 }
 
-/* Bara textfältet tänder ramen. Knapparna ligger inne i ytan — bläddra-ner
-   längst upp, plus och skicka längst ner — och med :focus-within hade ett klick
-   på någon av dem sett ut som att man börjat skriva. */
 .chat-shell:has(.chat-textarea:focus) {
   border-color: color-mix(in srgb, var(--foreground), transparent 72%);
 }
 
-/* Ihopfällt: plus, textfält och knappar delar en rad. Uppfällt: textfältet tar
-   hela första raden via flex-basis 100%, vilket tvingar de andra att radbrytas
-   ner under det. Ordningen är den enda skillnaden — samma element hela vägen,
-   så ingenting monteras om och fokus i textarean överlever bytet. */
 .composer-lead {
   order: 1;
 }
