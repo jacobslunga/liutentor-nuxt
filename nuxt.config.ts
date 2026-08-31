@@ -19,7 +19,6 @@ export default defineNuxtConfig({
       htmlAttrs: { lang: "sv" },
       charset: "utf-8",
 
-      // Required for safe-area insets on notched iPhones.
       viewport:
         "width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content",
       meta: [
@@ -32,7 +31,7 @@ export default defineNuxtConfig({
         { name: "format-detection", content: "telephone=no" },
         {
           name: "theme-color",
-          content: "#fbfcfc",
+          content: "#f8f8f8",
           media: "(prefers-color-scheme: light)",
         },
         {
@@ -83,7 +82,6 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
-
     revalidateSecret: "",
     resendApiKey: "",
     uploadNotificationTo: "jacobslunga21@yahoo.se",
@@ -144,9 +142,6 @@ export default defineNuxtConfig({
   },
 
   css: [
-    // Newsreader är rubriksnittet på infosidorna. Bara wght — opsz-axeln och
-    // kursiven används aldrig i en rubrik.
-    "@fontsource-variable/newsreader/wght.css",
     "~/assets/css/tailwind.css",
   ],
 

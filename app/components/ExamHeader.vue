@@ -18,6 +18,7 @@ const emit = defineEmits<{ toggleFocusMode: [] }>();
 const router = useRouter();
 const chatStore = useChatStore();
 const layoutStore = useLayoutStore();
+const colorMode = useColorMode();
 const { layoutMode } = storeToRefs(layoutStore);
 const { startSession } = useLockInMode();
 const isDropdownOpen = ref(false);
@@ -40,6 +41,26 @@ watch(isDropdownOpen, (open) => {
 });
 
 const { open: openUploadModal } = useUploadModal();
+
+// "dim" är det gamla namnet på den mörka paletten och kan ligga kvar i sparade
+// inställningar; menyn visar den som "Mörkt".
+const theme = computed(() =>
+  colorMode.preference === "dim" ? "dark" : colorMode.preference,
+);
+
+const THEME_OPTIONS = [
+  { value: "light", label: "Ljust" },
+  { value: "dark", label: "Mörkt" },
+  { value: "system", label: "System" },
+] as const;
+
+const themeLabel = computed(
+  () => THEME_OPTIONS.find((o) => o.value === theme.value)?.label ?? "System",
+);
+
+function setTheme(value: unknown) {
+  if (typeof value === "string") colorMode.preference = value;
+}
 
 const TIME_OPTIONS = [
   { value: "30", label: "30 min" },
@@ -199,7 +220,7 @@ function confirmLockIn() {
 
 <template>
   <div class="pointer-events-none relative isolate hidden h-12 w-full items-center justify-between px-3 lg:flex">
-    <ButtonGroup class="pointer-events-auto overflow-hidden rounded-lg bg-secondary">
+    <ButtonGroup class="pointer-events-auto overflow-hidden rounded-md bg-secondary">
       <Button size="sm" variant="ghost" aria-label="Tillbaka till kursen" @click="router.push(`/search/${courseCode}`)">
         <LucideArrowLeft />
       </Button>
@@ -247,7 +268,7 @@ function confirmLockIn() {
           </div>
           <div ref="scrollRef" class="max-h-80 overflow-y-auto p-1.5 space-y-0.5 custom-scrollbar">
             <button v-for="e in sortedExams" :key="e.id" :data-current="e.id.toString() === examId"
-              class="grid w-full grid-cols-[3.25rem_6.75rem_3.75rem_3.5rem_1rem] items-center gap-x-2 rounded-md px-3 py-2 text-left transition-colors duration-150 cursor-pointer group"
+              class="grid w-full grid-cols-[3.25rem_6.75rem_3.75rem_3.5rem_1rem] items-center gap-x-2 rounded-sm px-3 py-2 text-left transition-colors duration-150 cursor-pointer group"
               :class="e.id.toString() === examId
                 ? 'bg-accent font-semibold text-accent-foreground'
                 : 'hover:bg-muted/70 text-foreground/90 hover:text-foreground'
@@ -259,7 +280,7 @@ function confirmLockIn() {
                 {{ e.exam_date }}
               </span>
               <Badge v-if="e.has_solution" variant="outline"
-                class="col-start-3 justify-self-start text-2xs px-1.5 py-0.5 rounded-md font-medium border-success/30 bg-success/10 text-success">
+                class="col-start-3 justify-self-start text-2xs px-1.5 py-0.5 rounded-sm font-medium border-success/30 bg-success/10 text-success">
                 Facit
               </Badge>
               <span class="col-start-4 justify-self-end font-mono text-xs tabular-nums" :class="passColor(e)">
@@ -274,7 +295,7 @@ function confirmLockIn() {
     </ButtonGroup>
 
     <div class="pointer-events-auto flex items-center gap-2">
-      <Button size="sm" @click="chatStore.toggle()">
+      <Button size="sm" @click="chatStore.toggle()" class="font-medium">
         <LucideLoader2 v-if="chatStore.isLoading" class="size-3.5 animate-spin" />
         <LucideMessageSquare v-else class="size-3.5" />
         <span class="text-xs">{{ chatStore.isOpen ? "Stäng" : "Chatt" }}</span>
@@ -307,6 +328,24 @@ function confirmLockIn() {
               {{ focusMode ? "Avsluta fokusläge" : "Fokusläge" }}
               <DropdownMenuShortcut>F</DropdownMenuShortcut>
             </DropdownMenuItem>
+
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger>
+                <LucideSun v-if="theme === 'light'" class="size-4" />
+                <LucideMoonStar v-else-if="theme === 'dark'" class="size-4" />
+                <LucideMonitor v-else class="size-4" />
+                Tema
+                <span class="ml-auto pl-3 text-xs text-muted-foreground">{{ themeLabel }}</span>
+              </DropdownMenuSubTrigger>
+              <DropdownMenuSubContent class="w-40">
+                <DropdownMenuRadioGroup :model-value="theme" @update:model-value="setTheme">
+                  <DropdownMenuRadioItem v-for="option in THEME_OPTIONS" :key="option.value" :value="option.value"
+                    class="cursor-pointer" @select.prevent>
+                    {{ option.label }}
+                  </DropdownMenuRadioItem>
+                </DropdownMenuRadioGroup>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
 
             <DropdownMenuItem class="cursor-pointer" @click="isSettingsOpen = true">
               <LucideSettings class="size-4" />

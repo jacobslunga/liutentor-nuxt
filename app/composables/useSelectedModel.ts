@@ -13,14 +13,14 @@ export const CHAT_MODELS = [
   },
   {
     id: "gemini-flash-lite-medium",
-    label: "Balanserad",
+    label: "Medium",
     hint: "Standard för de flesta uppgifter.",
     provider: "Google",
     requiresAuth: false,
   },
   {
     id: "gemini-flash-lite-high",
-    label: "Djup",
+    label: "Hög",
     hint: "Tänker längre. Bäst på svåra uppgifter.",
     provider: "Google",
     requiresAuth: true,

@@ -15,7 +15,7 @@ const emit = defineEmits<{
     <div class="absolute inset-y-0 w-px group-hover:w-0.5 transition-colors duration-200"
       :class="isResizing ? 'bg-primary' : 'bg-border group-hover:bg-primary/50'" />
     <div
-      class="relative flex shadow-md h-8 w-4 items-center justify-center rounded-md border transition-colors duration-200 ease-spring bg-background dark:bg-secondary"
+      class="relative flex shadow-md h-8 w-4 items-center justify-center rounded-xs border transition-colors duration-200 ease-spring bg-background dark:bg-secondary"
       :class="isResizing
         ? 'border-primary scale-110'
         : 'border-border group-hover:border-primary/50'

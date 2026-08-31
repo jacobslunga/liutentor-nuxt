@@ -51,28 +51,19 @@ const principles = [
 
 <template>
   <div>
-    <PageIntro
-      eyebrow="Om oss"
-      title="Tentaplugget borde inte börja med en filjakt."
-      lead="LiU Tentor är ett studentdrivet, fristående projekt. Vår mission är att göra tentaplugg så smidigt och tillgängligt som möjligt för alla vid Linköpings universitet."
-    />
+    <PageIntro eyebrow="Om oss" title="Tentaplugget borde inte börja med en filjakt."
+      lead="LiU Tentor är ett studentdrivet, fristående projekt. Vår mission är att göra tentaplugg så smidigt och tillgängligt som möjligt för alla vid Linköpings universitet." />
 
     <div class="mx-auto max-w-6xl px-5 sm:px-8">
-      <section
-        v-for="(block, i) in story"
-        :key="block.heading"
+      <section v-for="(block, i) in story" :key="block.heading"
         class="grid gap-x-12 gap-y-5 py-10 lg:grid-cols-[13rem_minmax(0,1fr)] lg:py-14"
-        :class="i > 0 ? 'border-t' : ''"
-      >
+        :class="i > 0 ? 'border-t' : ''">
         <h2 class="font-serif text-lg font-medium leading-snug text-foreground lg:sticky lg:top-24 lg:self-start">
           {{ block.heading }}
         </h2>
         <div class="max-w-2xl space-y-4">
-          <p
-            v-for="(paragraph, j) in block.paragraphs"
-            :key="j"
-            class="text-[0.9375rem] leading-[1.75] text-foreground/75"
-          >
+          <p v-for="(paragraph, j) in block.paragraphs" :key="j"
+            class="text-[0.9375rem] leading-[1.75] text-foreground/75">
             {{ paragraph }}
           </p>
         </div>

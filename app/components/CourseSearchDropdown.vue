@@ -141,67 +141,37 @@ const iconSize = computed(
 <template>
   <div class="relative" :class="props.class">
     <div class="relative flex items-center">
-      <LucideSearch
-        class="absolute left-3 pointer-events-none z-10 transition-colors"
-        :class="[
-          iconSize,
-          isFocused ? 'text-primary' : 'text-muted-foreground',
-        ]"
-      />
-      <input
-        ref="inputRef"
-        :value="courseCode.toUpperCase()"
-        placeholder="Sök kurskod..."
-        class="w-full rounded-full border bg-background pl-9 pr-9 text-foreground outline-none placeholder:text-muted-foreground hover:bg-background"
+      <LucideSearch class="absolute left-3 pointer-events-none z-10 transition-colors" :class="[
+        iconSize,
+        isFocused ? 'text-primary' : 'text-muted-foreground',
+      ]" />
+      <input ref="inputRef" :value="courseCode.toUpperCase()" placeholder="Sök kurskod..."
+        class="w-full rounded-sm border bg-background pl-9 pr-9 text-foreground outline-none placeholder:text-muted-foreground hover:bg-background"
         :class="[sizeClass, isFocused ? 'border-primary' : 'border-border']"
-        @input="courseCode = ($event.target as HTMLInputElement).value"
-        @keydown="handleKeyDown"
-        @focus="handleFocus"
-        @blur="handleBlur"
-      />
-      <div
-        v-if="!courseCode"
-        class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none hidden sm:flex"
-      >
+        @input="courseCode = ($event.target as HTMLInputElement).value" @keydown="handleKeyDown" @focus="handleFocus"
+        @blur="handleBlur" />
+      <div v-if="!courseCode" class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none hidden sm:flex">
         <kbd
-          class="inline-flex h-5 items-center rounded-sm border border-border bg-background px-1.5 font-mono text-2xs text-muted-foreground"
-        >
+          class="inline-flex h-5 items-center rounded-sm border border-border bg-background px-1.5 font-mono text-2xs text-muted-foreground">
           /
         </kbd>
       </div>
-      <Button
-        v-else
-        variant="ghost"
-        size="icon-xs"
-        class="absolute right-3 top-1/2 -translate-y-1/2 z-10"
-        aria-label="Rensa"
-        @click="courseCode = ''"
-      >
-        <LucideX
-          :class="iconSize"
-        />
+      <Button v-else variant="ghost" size="icon-xs" class="absolute right-3 top-1/2 -translate-y-1/2 z-10"
+        aria-label="Rensa" @click="courseCode = ''">
+        <LucideX :class="iconSize" />
       </button>
     </div>
 
-    <div
-      v-if="showSuggestions && suggestions.length > 0"
-      ref="suggestionsRef"
-      class="absolute w-full left-0 mt-2 bg-background border border-border rounded-2xl z-40 max-h-72 overflow-y-auto text-sm"
-    >
+    <div v-if="showSuggestions && suggestions.length > 0" ref="suggestionsRef"
+      class="absolute w-full left-0 mt-2 bg-background border border-border rounded-2xl z-40 max-h-72 overflow-y-auto text-sm">
       <div class="px-3 pt-3 pb-1 text-xs text-muted-foreground">
         Alla kurser
       </div>
-      <div
-        v-for="(suggestion, index) in suggestions"
-        :key="suggestion"
-        class="flex items-center px-3 py-2 cursor-pointer transition-colors"
-        :class="
-          index === selectedIndex
-            ? 'bg-muted text-foreground'
-            : 'hover:bg-muted/50'
-        "
-        @mousedown="handleSelectCourse(suggestion)"
-      >
+      <div v-for="(suggestion, index) in suggestions" :key="suggestion"
+        class="flex items-center px-3 py-2 cursor-pointer transition-colors" :class="index === selectedIndex
+          ? 'bg-muted text-foreground'
+          : 'hover:bg-muted/50'
+          " @mousedown="handleSelectCourse(suggestion)">
         <span class="flex-1 font-normal">{{ suggestion }}</span>
         <LucideCornerDownLeft class="w-3.5 h-3.5 opacity-40" />
       </div>
