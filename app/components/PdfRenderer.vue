@@ -39,8 +39,6 @@ const emit = defineEmits<{ explain: [text: string] }>();
 const colorMode = useColorMode();
 const { engine, isLoading } = usePdfiumEngine();
 
-// The PDF is the longest wait on an exam page and none of it is awaited by
-// navigation, so the bar has to cover the wasm engine and the document too.
 const { trackWhile } = usePageLoading();
 trackWhile(() => isLoading.value || !engine.value);
 
@@ -48,19 +46,15 @@ const selectionColor =
   "color-mix(in oklch, var(--primary) 35%, transparent)";
 
 const darkPageStyle = {
-  // Screen blending lets the dark app background replace the PDF's inverted
-  // black page while keeping document content and diagrams readable.
   filter: "invert(1) hue-rotate(180deg) brightness(0.92)",
   mixBlendMode: "screen",
 } as const;
 
 const pageStyle = computed(() => {
   if (["dark", "dim"].includes(colorMode.value)) return darkPageStyle;
-  // Keep the source PDF untouched in light mode so its page stays pure white.
   return undefined;
 });
 
-// Keep this non-reactive: rebuilding the plugin registry during resize reloads the PDF.
 const isMobile = window.innerWidth < 1024;
 
 const viewportEl = ref<HTMLElement | null>(null);
@@ -70,7 +64,6 @@ const viewportInsetStyle = computed(() =>
   props.topInset ? { paddingTop: `${props.topInset}px` } : undefined,
 );
 
-// EmbedPDF interprets mouse-wheel notches as trackpad deltas, causing extreme zoom jumps.
 const WHEEL_PIXELS_PER_NOTCH = 100;
 const WHEEL_LINES_PER_NOTCH = 3;
 
@@ -97,8 +90,6 @@ function gestureScale(el: HTMLElement) {
   }
 }
 
-// The gesture writes its preview transform straight to the element, so watching
-// that attribute is the only way to read the scale while the gesture is live.
 function observeZoomGesture(viewport: HTMLElement) {
   if (gestureEl?.isConnected) return;
 
@@ -243,8 +234,8 @@ const plugins = computed(() => {
               </div>
 
               <Viewport v-else :document-id="activeDocumentId"
-                class="h-full w-full bg-white dark:bg-background pdf-viewport"
-                :style="viewportInsetStyle" @scroll="handleViewportScroll" @wheel.capture="handleWheelCapture">
+                class="h-full w-full bg-white dark:bg-background pdf-viewport" :style="viewportInsetStyle"
+                @scroll="handleViewportScroll" @wheel.capture="handleWheelCapture">
                 <template v-if="isMobile">
                   <Scroller :document-id="activeDocumentId">
                     <template #default="{ page }">
@@ -255,8 +246,7 @@ const plugins = computed(() => {
                         <PagePointerProvider :document-id="activeDocumentId" :page-index="page.pageIndex"
                           class="pdf-mobile-pointer">
                           <Rotate :document-id="activeDocumentId" :page-index="page.pageIndex"
-                            class="bg-white dark:bg-background"
-                            :style="{
+                            class="bg-white dark:bg-background" :style="{
                               width: `${page.width}px`,
                               height: `${page.height}px`,
                             }">
@@ -296,8 +286,7 @@ const plugins = computed(() => {
                           }" class="relative mx-auto my-4 pdf-page-shell">
                             <PagePointerProvider :document-id="activeDocumentId" :page-index="page.pageIndex">
                               <Rotate :document-id="activeDocumentId" :page-index="page.pageIndex"
-                                class="bg-white dark:bg-background"
-                                :style="{
+                                class="bg-white dark:bg-background" :style="{
                                   width: `${page.width}px`,
                                   height: `${page.height}px`,
                                 }">

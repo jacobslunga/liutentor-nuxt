@@ -46,7 +46,8 @@ function passColor(rate: number) {
   <LucideMinus v-if="total === 0" class="w-4 h-4 text-muted-foreground/30" />
 
   <Dialog v-else>
-    <DialogTrigger class="text-sm cursor-pointer px-2 py-1 rounded-xs hover:bg-muted transition-colors duration-150"
+    <DialogTrigger
+      class="text-sm cursor-pointer px-2 py-1 rounded-sm hover:bg-primary/10 transition-colors duration-150"
       :class="passColor(passRate)" @click.prevent.stop>
       {{ passRate.toFixed(1) }}%
     </DialogTrigger>

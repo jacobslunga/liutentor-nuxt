@@ -1,13 +1,9 @@
 <template>
   <div class="pointer-events-none relative isolate flex h-10 items-center justify-between gap-2 px-2">
-    <!-- Toningen är högre än raden med kontroller och sticker ut under den:
-         överst är den solid så att titeln och knapparna alltid har en lugn yta
-         bakom sig, sedan tonar den ut så att meddelandena löses upp när de
-         rullar in under headern i stället för att skäras av mot en kant. -->
     <div
       class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-16 bg-linear-to-b from-background from-45% to-transparent" />
     <div class="pointer-events-auto flex min-w-0 flex-1 items-center gap-1.5">
-      <Button variant="ghost" size="icon-sm" class="shrink-0" aria-label="Stäng chatten" @click="emit('close')">
+      <Button variant="ghost" size="icon-xs" class="shrink-0" aria-label="Stäng chatten" @click="emit('close')">
         <LucideChevronRight />
       </Button>
       <p class="min-w-0 truncate overflow-hidden text-xs font-normal text-muted-foreground">
@@ -15,10 +11,10 @@
       </p>
     </div>
     <div class="pointer-events-auto flex shrink-0 items-center gap-1">
-      <Button variant="ghost" size="icon-sm" aria-label="Ny chatt" @click="emit('newChat')">
+      <Button variant="ghost" size="icon-xs" aria-label="Ny chatt" @click="emit('newChat')">
         <LucidePlus class="size-4" />
       </Button>
-      <Button variant="ghost" size="icon-sm" aria-label="Historik" @click="emit('openHistory')">
+      <Button variant="ghost" size="icon-xs" aria-label="Historik" @click="emit('openHistory')">
         <LucidePanelRight class="size-4" />
       </Button>
     </div>

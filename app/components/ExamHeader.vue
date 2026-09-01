@@ -220,7 +220,7 @@ function confirmLockIn() {
 
 <template>
   <div class="pointer-events-none relative isolate hidden h-12 w-full items-center justify-between px-3 lg:flex">
-    <ButtonGroup class="pointer-events-auto overflow-hidden rounded-md bg-secondary">
+    <ButtonGroup class="pointer-events-auto overflow-hidden rounded-md bg-muted">
       <Button size="sm" variant="ghost" aria-label="Tillbaka till kursen" @click="router.push(`/search/${courseCode}`)">
         <LucideArrowLeft />
       </Button>
@@ -231,7 +231,7 @@ function confirmLockIn() {
             <div class="flex flex-row items-baseline gap-1.5 leading-none">
               <span class="text-sm font-semibold">{{
                 selectedExam.exam_date
-              }}</span>
+                }}</span>
             </div>
             <LucideChevronDown class="size-4 text-muted-foreground transition-transform duration-200"
               :class="{ 'rotate-180': isDropdownOpen }" />
@@ -271,7 +271,7 @@ function confirmLockIn() {
               class="grid w-full grid-cols-[3.25rem_6.75rem_3.75rem_3.5rem_1rem] items-center gap-x-2 rounded-sm px-3 py-2 text-left transition-colors duration-150 cursor-pointer group"
               :class="e.id.toString() === examId
                 ? 'bg-accent font-semibold text-accent-foreground'
-                : 'hover:bg-muted/70 text-foreground/90 hover:text-foreground'
+                : 'hover:bg-foreground/5 text-foreground/90 hover:text-foreground'
                 " @click="changeExam(e)">
               <span class="truncate text-sm font-normal text-foreground">
                 {{ getExamPrefix(e) }}

@@ -315,10 +315,10 @@ defineExpose({
               <LucideImage v-else class="size-3.5 shrink-0" />
               <span class="max-w-20 truncate" :title="attachment.name">{{
                 attachment.name
-                }}</span>
+              }}</span>
               <span class="shrink-0 text-muted-foreground">{{
                 formatFileSize(attachment.size)
-                }}</span>
+              }}</span>
             </div>
           </div>
           <div v-if="msg.skill" class="w-fit rounded-sm bg-skill px-1.5 py-0.5 text-xs font-medium text-white">
@@ -341,7 +341,7 @@ defineExpose({
             <LucideLoader class="variable-spin w-4 h-4 text-muted-foreground" />
             <span class="shimmer-text font-sans text-sm">{{
               msg.status?.message || loadingPhrase
-              }}</span>
+            }}</span>
           </div>
           <div v-if="renderedAssistantHtml[i]"
             class="prose max-w-full min-w-0 font-serif prose-headings:font-semibold prose-strong:font-semibold dark:prose-invert marker:text-foreground marker:font-semibold"

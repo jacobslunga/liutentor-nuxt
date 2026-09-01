@@ -456,10 +456,10 @@ defineExpose({
               <LucideImage v-else class="size-3.5 shrink-0 text-muted-foreground" />
               <span class="max-w-20 truncate" :title="attachment.name">{{
                 attachment.name
-              }}</span>
+                }}</span>
               <span class="shrink-0 text-muted-foreground">{{
                 formatFileSize(attachment.size)
-              }}</span>
+                }}</span>
               <button type="button"
                 class="shrink-0 cursor-pointer rounded-sm text-muted-foreground hover:text-foreground"
                 :aria-label="`Ta bort ${attachment.name}`" @click="removePendingAttachment(attachment.id)">
@@ -524,7 +524,7 @@ defineExpose({
                   ? 'bg-accent/70 text-primary hover:text-primary'
                   : 'text-muted-foreground hover:text-foreground'" @click="emit('update:webSearch', !webSearch)">
                 <LucideGlobe class="size-4" />
-                <span v-if="webSearch">Webb</span>
+                <span class="font-medium" v-if="webSearch">Webb</span>
               </Button>
 
               <Transition name="scale" mode="out-in">
@@ -592,7 +592,7 @@ defineExpose({
 }
 
 .chat-shell:has(.chat-textarea:focus) {
-  border-color: color-mix(in srgb, var(--foreground), transparent 72%);
+  border-color: color-mix(in srgb, var(--foreground), transparent 80%);
 }
 
 .composer-lead {
