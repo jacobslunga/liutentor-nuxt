@@ -423,7 +423,7 @@ defineExpose({
 
 <template>
   <div class="relative z-10 w-full bg-transparent px-3 pointer-events-auto sm:px-4">
-    <div class="relative mx-auto max-w-2xl">
+    <div class="relative mx-auto max-w-2xl 3xl:max-w-3xl">
       <div>
         <div ref="chatShellRef" class="chat-shell relative rounded-2xl border bg-surface shadow-xs">
           <Transition name="fade-up">
@@ -494,7 +494,7 @@ defineExpose({
           <div class="composer flex flex-wrap items-center gap-1 p-2" :class="{ 'is-expanded': isExpanded }">
             <div class="composer-field relative min-w-0 px-2 py-1.5">
               <span v-if="activeSkill" ref="skillPillRef"
-                class="pointer-events-auto absolute left-2 top-1.5 inline-flex items-center gap-1 rounded-full bg-skill px-2 py-0.5 text-[13px] font-medium leading-relaxed text-white">
+                class="pointer-events-auto absolute left-2 top-1.5 inline-flex items-center gap-1 rounded-full bg-skill px-2 py-0.5 text-[0.8125rem] font-medium leading-relaxed text-white">
                 {{ activeSkill.label }}
                 <button type="button" class="opacity-70 hover:opacity-100" :aria-label="`Ta bort ${activeSkill.label}`"
                   @mousedown.prevent="clearSkill()">
@@ -505,7 +505,7 @@ defineExpose({
                 :placeholder="activeSkill ? 'Fråga vad som helst' : 'Fråga vad som helst, skriv / för skills'"
                 role="combobox" :aria-expanded="menuOpen" aria-controls="chat-skill-menu"
                 :aria-activedescendant="menuOpen ? `chat-skill-${filteredSkills[highlightedIndex]?.id}` : undefined"
-                class="chat-textarea block w-full min-w-0 resize-none border-0 bg-transparent p-0 text-[15px] font-normal leading-6 outline-none placeholder:text-muted-foreground/65 focus:ring-0"
+                class="chat-textarea block w-full min-w-0 resize-none border-0 bg-transparent p-0 text-[0.9375rem] font-normal leading-6 outline-none placeholder:text-muted-foreground/65 focus:ring-0"
                 @input="handleInput" @keydown="handleKeyDown" />
             </div>
 
@@ -547,7 +547,7 @@ defineExpose({
             ">
             {{ text.length }} / {{ MAX_LENGTH }}
           </p>
-          <p v-else-if="showDisclaimer" class="min-w-0 truncate text-[13px] text-muted-foreground/60">
+          <p v-else-if="showDisclaimer" class="min-w-0 truncate text-[0.8125rem] text-muted-foreground/60">
             AI kan göra misstag. Kontrollera svaren.
           </p>
           <span v-else />

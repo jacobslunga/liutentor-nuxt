@@ -38,6 +38,26 @@
 
   /* Skills are interactive labels and use the one intentional brand color. */
   --color-skill: var(--primary);
+
+  /* Stora skärmar (≥1920px). Definierad i px, inte rem, så root-font-bumpen
+     nedan inte flyttar brytpunkten under sina egna fötter. */
+  --breakpoint-3xl: 1920px;
+}
+
+/* På riktigt stora skärmar räcker det inte att bredda ytorna — själva
+   innehållet ska växa. Root-em höjs stegvis så att allt som är uttryckt i rem
+   (typografi, spacing, radier) skalar med. Ligger över alla standardbrytpunkter
+   så ingen layout tippar över när skalan ändras. */
+@media (min-width: 1920px) {
+  :root {
+    font-size: 17px;
+  }
+}
+
+@media (min-width: 2560px) {
+  :root {
+    font-size: 18px;
+  }
 }
 
 ::-webkit-scrollbar {
