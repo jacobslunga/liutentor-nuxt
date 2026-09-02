@@ -1,11 +1,6 @@
 <template>
   <div>
-    <AppLoadingIndicator
-      color="var(--primary)"
-      :height="2"
-      :throttle="80"
-      :hide-delay="150"
-    />
+    <AppLoadingIndicator color="var(--primary)" :height="2" :throttle="80" :hide-delay="150" />
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>

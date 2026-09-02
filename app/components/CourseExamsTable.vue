@@ -84,51 +84,74 @@ function toggleFilter(p: string) {
 <template>
   <div class="flex flex-col gap-4 w-full">
     <div v-if="prefixes.length > 1" class="flex flex-wrap gap-2 w-full">
-      <Button v-for="p in prefixes" :key="p" :variant="activeFilters.has(p) ? 'default' : 'outline'" size="sm"
-        @click="toggleFilter(p)">
+      <Button
+        v-for="p in prefixes"
+        :key="p"
+        :variant="activeFilters.has(p) ? 'default' : 'outline'"
+        size="sm"
+        @click="toggleFilter(p)"
+      >
         {{ p }}
       </Button>
     </div>
 
     <div class="w-full overflow-x-auto rounded-2xl border border-border">
-
       <div class="w-max min-w-full sm:w-full rounded-2xl overflow-hidden">
-        <div :class="gridCols" class="py-3 border-b border-border/60 bg-muted/30">
+        <div
+          :class="gridCols"
+          class="py-3 border-b border-border/60 bg-muted/30"
+        >
           <div class="text-xs text-muted-foreground">Tentamen</div>
           <div class="text-xs text-muted-foreground">Typ</div>
           <div class="text-xs text-muted-foreground text-center">Facit</div>
           <div class="text-xs text-muted-foreground text-right">Godkänd</div>
         </div>
 
-        <div v-for="exam in filteredExams" :key="exam.id" :class="gridCols"
+        <div
+          v-for="exam in filteredExams"
+          :key="exam.id"
+          :class="gridCols"
           class="cursor-pointer py-2.5 border-b border-border/60 last:border-0 hover:bg-muted/20 transition-colors group"
-          @mouseenter="prefetchExamRoute(exam.id)" @focusin="prefetchExamRoute(exam.id)"
-          @click="navigateTo(examRoutePath(exam.id))">
-
+          @mouseenter="prefetchExamRoute(exam.id)"
+          @focusin="prefetchExamRoute(exam.id)"
+          @click="navigateTo(examRoutePath(exam.id))"
+        >
           <div class="sm:min-w-0">
             <div
-              class="text-sm font-medium text-foreground group-hover:text-foreground/80 transition-colors whitespace-nowrap sm:truncate">
+              class="text-sm font-medium text-foreground group-hover:text-foreground/80 transition-colors whitespace-nowrap sm:truncate"
+            >
               {{ exam.exam_name }}
             </div>
-            <div class="text-xs text-muted-foreground/70 mt-0.5 whitespace-nowrap">
+            <div
+              class="text-xs text-muted-foreground/70 mt-0.5 whitespace-nowrap"
+            >
               {{ exam.exam_date }}
             </div>
           </div>
 
           <div>
-            <span v-if="getExamPrefix(exam)"
-              class="text-2xs px-2 py-0.5 rounded-md border border-border bg-muted/40 text-muted-foreground font-mono">
+            <span
+              v-if="getExamPrefix(exam)"
+              class="text-2xs px-2 py-0.5 rounded-md border border-border bg-muted/40 text-muted-foreground font-mono"
+            >
               {{ getExamPrefix(exam) }}
             </span>
           </div>
 
           <div class="flex justify-center">
-            <LucideCheck v-if="exam.has_solution" class="w-4 h-4 text-success" />
+            <LucideCheck
+              v-if="exam.has_solution"
+              class="w-4 h-4 text-success"
+            />
             <LucideMinus v-else class="w-4 h-4 text-muted-foreground/30" />
           </div>
 
           <div class="text-right flex flex-col items-end gap-1">
-            <ExamStatsDialog :statistics="exam.statistics" :date="exam.exam_date" :pass-rate="exam.pass_rate" />
+            <ExamStatsDialog
+              :statistics="exam.statistics"
+              :date="exam.exam_date"
+              :pass-rate="exam.pass_rate"
+            />
           </div>
         </div>
       </div>

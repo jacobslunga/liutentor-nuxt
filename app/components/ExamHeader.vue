@@ -8,7 +8,6 @@ const props = defineProps<{
   examId: string;
   courseCode: string;
   solutionPdfUrl?: string | null;
-  /** The pointer is near the top edge, so the secondary controls come forward. */
   active?: boolean;
   focusMode?: boolean;
 }>();
@@ -42,8 +41,6 @@ watch(isDropdownOpen, (open) => {
 
 const { open: openUploadModal } = useUploadModal();
 
-// "dim" är det gamla namnet på den mörka paletten och kan ligga kvar i sparade
-// inställningar; menyn visar den som "Mörkt".
 const theme = computed(() =>
   colorMode.preference === "dim" ? "dark" : colorMode.preference,
 );
@@ -89,6 +86,22 @@ function passColor(exam: Exam) {
 const sortLabel = computed(() =>
   sortBy.value === "date" ? "Datum" : "Godkänd",
 );
+
+// The sub-menu opens on hover by default (reka-ui). Swallow the hover pointer
+// events in the capture phase before they reach the trigger so hovering never
+// opens it. reka's own click handler still opens it; we only handle closing on
+// a repeat click via recordSortState/handleSortTriggerClick.
+function blockSortHover(event: Event) {
+  event.stopPropagation();
+}
+
+let sortWasOpen = false;
+function recordSortState() {
+  sortWasOpen = isSortMenuOpen.value;
+}
+function handleSortTriggerClick() {
+  if (sortWasOpen) isSortMenuOpen.value = false;
+}
 
 function setSortBy(value: unknown) {
   if (value === "date" || value === "pass-rate") {
@@ -147,12 +160,6 @@ const hasDownload = computed(
 
 const selectedDurationLabel = computed(
   () => TIME_OPTIONS.find((o) => o.value === lockInDuration.value)?.label ?? "",
-);
-
-// Secondary chrome is a ghost until the pointer comes near, but an open menu or
-// a keyboard focus has to keep it readable.
-const isSecondaryLit = computed(
-  () => props.active || isActionsOpen.value || isDropdownOpen.value,
 );
 
 function switchLayout(val: string | number) {
@@ -221,7 +228,8 @@ function confirmLockIn() {
 <template>
   <div class="pointer-events-none relative isolate hidden h-12 w-full items-center justify-between px-3 lg:flex">
     <ButtonGroup class="pointer-events-auto overflow-hidden rounded-md">
-      <Button size="sm" variant="secondary" aria-label="Tillbaka till kursen" @click="router.push(`/search/${courseCode}`)">
+      <Button size="sm" variant="secondary" aria-label="Tillbaka till kursen"
+        @click="router.push(`/search/${courseCode}`)">
         <LucideArrowLeft />
       </Button>
 
@@ -242,11 +250,14 @@ function confirmLockIn() {
             <span class="text-xs font-semibold text-foreground">Alla tentor</span>
             <div class="flex items-center gap-1.5">
               <DropdownMenuSub v-model:open="isSortMenuOpen">
-                <DropdownMenuSubTrigger class="h-7 border px-2 py-1 text-xs" aria-label="Sortera tentor">
-                  <LucideArrowDown v-if="sortDirection === 'desc'" class="size-3.5" />
-                  <LucideArrowUp v-else class="size-3.5" />
-                  {{ sortLabel }}
-                </DropdownMenuSubTrigger>
+                <div class="contents" @pointermove.capture="blockSortHover" @pointerover.capture="blockSortHover">
+                  <DropdownMenuSubTrigger class="h-7 border px-2 py-1 text-xs" aria-label="Sortera tentor"
+                    @pointerdown.capture="recordSortState" @click="handleSortTriggerClick">
+                    <LucideArrowDown v-if="sortDirection === 'desc'" class="size-3.5" />
+                    <LucideArrowUp v-else class="size-3.5" />
+                    {{ sortLabel }}
+                  </DropdownMenuSubTrigger>
+                </div>
                 <DropdownMenuSubContent class="w-44">
                   <DropdownMenuLabel>Sortera efter</DropdownMenuLabel>
                   <DropdownMenuRadioGroup :model-value="sortBy" @update:model-value="setSortBy">
@@ -270,8 +281,8 @@ function confirmLockIn() {
             <button v-for="e in sortedExams" :key="e.id" :data-current="e.id.toString() === examId"
               class="grid w-full grid-cols-[3.25rem_6.75rem_3.75rem_3.5rem_1rem] items-center gap-x-2 rounded-sm px-3 py-2 text-left transition-colors duration-150 cursor-pointer group"
               :class="e.id.toString() === examId
-                ? 'bg-accent font-semibold text-accent-foreground'
-                : 'hover:bg-foreground/5 text-foreground/90 hover:text-foreground'
+                  ? 'bg-accent font-semibold text-accent-foreground'
+                  : 'hover:bg-foreground/5 text-foreground/90 hover:text-foreground'
                 " @click="changeExam(e)">
               <span class="truncate text-sm font-normal text-foreground">
                 {{ getExamPrefix(e) }}
@@ -335,7 +346,9 @@ function confirmLockIn() {
                 <LucideMoonStar v-else-if="theme === 'dark'" class="size-4" />
                 <LucideMonitor v-else class="size-4" />
                 Tema
-                <span class="ml-auto pl-3 text-xs text-muted-foreground">{{ themeLabel }}</span>
+                <span class="ml-auto pl-3 text-xs text-muted-foreground">{{
+                  themeLabel
+                  }}</span>
               </DropdownMenuSubTrigger>
               <DropdownMenuSubContent class="w-40">
                 <DropdownMenuRadioGroup :model-value="theme" @update:model-value="setTheme">

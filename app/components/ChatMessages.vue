@@ -49,7 +49,7 @@ function reportContentBottom() {
   emit(
     "update:contentBottom",
     contentEndMarker.value?.getBoundingClientRect().top ??
-    Number.NEGATIVE_INFINITY,
+      Number.NEGATIVE_INFINITY,
   );
 }
 
@@ -105,7 +105,7 @@ function handleCodeCopy(e: MouseEvent) {
   const code = pre?.textContent ?? "";
   if (!code) return;
 
-  navigator.clipboard.writeText(code).catch(() => { });
+  navigator.clipboard.writeText(code).catch(() => {});
 
   const label = btn.querySelector(".code-copy-label");
   if (label) label.textContent = "Kopierad";
@@ -121,7 +121,7 @@ function handleCodeCopy(e: MouseEvent) {
   copyTimers.set(btn, t);
 }
 
-function handleMessageMouseUp(e: MouseEvent) {
+function handleMessageMouseUp(_: MouseEvent) {
   if (!props.enableSelectionPopover) return;
   setTimeout(() => {
     const selection = window.getSelection();
@@ -272,46 +272,81 @@ defineExpose({
 </script>
 
 <template>
-  <div ref="messagesContainer"
+  <div
+    ref="messagesContainer"
     class="h-full w-full overflow-y-auto overflow-x-hidden overscroll-contain px-4 custom-scrollbar"
-    :class="contentClass" @scroll="handleScroll" @mouseup="handleMessageMouseUp" @click="handleCodeCopy">
-    <div class="min-h-full flex flex-col items-center justify-center px-4 py-8 text-center"
-      v-if="messages.length === 0 && !hideEmptyState">
+    :class="contentClass"
+    @scroll="handleScroll"
+    @mouseup="handleMessageMouseUp"
+    @click="handleCodeCopy"
+  >
+    <div
+      class="min-h-full flex flex-col items-center justify-center px-4 py-8 text-center"
+      v-if="messages.length === 0 && !hideEmptyState"
+    >
       <ChatMascot class="w-16 h-16 mb-5 shrink-0" />
       <h2 class="text-2xl font-semibold text-foreground">
         Vad kan jag hjälpa till med?
       </h2>
     </div>
 
-    <div ref="messagesList" v-else class="mx-auto w-full max-w-2xl 3xl:max-w-3xl space-y-6 pt-2">
-      <div v-for="(msg, i) in messages" :key="i" :class="msg.role === 'user' ? 'flex justify-end' : ''" v-memo="[
-        msg.role,
-        msg.content,
-        msg.selectionContext,
-        msg.skill,
-        msg.attachments
-          ?.map((attachment) => `${attachment.id}:${attachment.active}`)
-          .join(','),
-        msg.status?.message,
-        msg.sources?.length,
-        isLoading && i === messages.length - 1,
-        mdReady,
-      ]">
-        <div v-if="msg.role === 'user'" class="flex flex-col items-end gap-1.5 max-w-[85%]">
-          <div v-if="msg.selectionContext"
-            class="border-l-2 border-muted-foreground/30 pl-3 text-sm text-muted-foreground italic line-clamp-3 text-right">
+    <div
+      ref="messagesList"
+      v-else
+      class="mx-auto w-full max-w-2xl 3xl:max-w-3xl space-y-6 pt-2"
+    >
+      <div
+        v-for="(msg, i) in messages"
+        :key="i"
+        :class="msg.role === 'user' ? 'flex justify-end' : ''"
+        v-memo="[
+          msg.role,
+          msg.content,
+          msg.selectionContext,
+          msg.skill,
+          msg.attachments
+            ?.map((attachment) => `${attachment.id}:${attachment.active}`)
+            .join(','),
+          msg.status?.message,
+          msg.sources?.length,
+          isLoading && i === messages.length - 1,
+          mdReady,
+        ]"
+      >
+        <div
+          v-if="msg.role === 'user'"
+          class="flex flex-col items-end gap-1.5 max-w-[85%]"
+        >
+          <div
+            v-if="msg.selectionContext"
+            class="border-l-2 border-muted-foreground/30 pl-3 text-sm text-muted-foreground italic line-clamp-3 text-right"
+          >
             "{{ msg.selectionContext }}"
           </div>
-          <div v-if="msg.attachments?.length" class="flex flex-wrap justify-end gap-1.5">
-            <div v-for="attachment in msg.attachments" :key="attachment.id"
+          <div
+            v-if="msg.attachments?.length"
+            class="flex flex-wrap justify-end gap-1.5"
+          >
+            <div
+              v-for="attachment in msg.attachments"
+              :key="attachment.id"
               class="attachment-context-item flex min-w-0 max-w-full items-center gap-1.5 rounded-sm border px-2.5 py-1.5 text-xs"
-              :class="attachment.active
-                ? 'bg-background'
-                : 'bg-muted/40 text-muted-foreground opacity-70'
-                ">
-              <LucideFileText v-if="attachment.mediaType === 'application/pdf'" class="size-3.5 shrink-0" />
-              <img v-else-if="attachment.previewUrl" :src="attachment.previewUrl" alt=""
-                class="size-16 shrink-0 rounded-sm object-cover" />
+              :class="
+                attachment.active
+                  ? 'bg-background'
+                  : 'bg-muted/40 text-muted-foreground opacity-70'
+              "
+            >
+              <LucideFileText
+                v-if="attachment.mediaType === 'application/pdf'"
+                class="size-3.5 shrink-0"
+              />
+              <img
+                v-else-if="attachment.previewUrl"
+                :src="attachment.previewUrl"
+                alt=""
+                class="size-16 shrink-0 rounded-sm object-cover"
+              />
               <LucideImage v-else class="size-3.5 shrink-0" />
               <span class="max-w-20 truncate" :title="attachment.name">{{
                 attachment.name
@@ -321,36 +356,60 @@ defineExpose({
               }}</span>
             </div>
           </div>
-          <div v-if="msg.skill" class="w-fit rounded-sm bg-skill px-1.5 py-0.5 text-xs font-medium text-white">
+          <div
+            v-if="msg.skill"
+            class="w-fit rounded-sm bg-skill px-1.5 py-0.5 text-xs font-medium text-white"
+          >
             {{ getSkillById(msg.skill)?.label }}
           </div>
-          <div v-if="msg.content" class="w-fit rounded-2xl bg-secondary px-4 py-2 text-secondary-foreground">
+          <div
+            v-if="msg.content"
+            class="w-fit rounded-2xl bg-secondary px-4 py-2 text-secondary-foreground"
+          >
             <p class="text-[0.9375rem] leading-relaxed whitespace-pre-wrap">
               {{ msg.content }}
             </p>
           </div>
         </div>
 
-        <div v-else class="w-full min-w-0 px-1 py-2 overflow-hidden" :class="assistantClass" data-role="assistant"
-          :data-streaming="isLoading && i === messages.length - 1 ? 'true' : undefined
-            ">
-          <div v-if="
-            msg.status?.message ||
-            (!msg.content && isLoading && i === messages.length - 1)
-          " class="flex items-center gap-2 h-6" :class="msg.content ? 'mb-2' : ''">
+        <div
+          v-else
+          class="w-full min-w-0 px-1 py-2 overflow-hidden"
+          :class="assistantClass"
+          data-role="assistant"
+          :data-streaming="
+            isLoading && i === messages.length - 1 ? 'true' : undefined
+          "
+        >
+          <div
+            v-if="
+              msg.status?.message ||
+              (!msg.content && isLoading && i === messages.length - 1)
+            "
+            class="flex items-center gap-2 h-6"
+            :class="msg.content ? 'mb-2' : ''"
+          >
             <LucideLoader class="variable-spin w-4 h-4 text-muted-foreground" />
             <span class="shimmer-text font-sans text-sm">{{
               msg.status?.message || loadingPhrase
             }}</span>
           </div>
-          <div v-if="renderedAssistantHtml[i]"
-            class="prose 3xl:prose-lg max-w-full min-w-0 font-serif prose-headings:font-semibold prose-strong:font-semibold dark:prose-invert marker:text-foreground marker:font-semibold"
-            v-html="renderedAssistantHtml[i]" />
+          <div
+            v-if="renderedAssistantHtml[i]"
+            class="prose 3xl:prose-lg max-w-full min-w-0 prose-headings:font-medium prose-strong:font-medium dark:prose-invert marker:text-foreground marker:font-medium"
+            v-html="renderedAssistantHtml[i]"
+          />
 
           <div v-if="msg.sources?.length" class="mt-3 flex flex-wrap gap-1.5">
-            <a v-for="source in msg.sources" :key="source.url" :href="source.url" :title="source.title" target="_blank"
+            <a
+              v-for="source in msg.sources"
+              :key="source.url"
+              :href="source.url"
+              :title="source.title"
+              target="_blank"
               rel="noopener noreferrer"
-              class="inline-flex max-w-56 items-center gap-1.5 rounded-sm border bg-background px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-accent/70 hover:text-foreground">
+              class="inline-flex max-w-56 items-center gap-1.5 rounded-sm border bg-background px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-accent/70 hover:text-foreground"
+            >
               <LucideGlobe class="size-3 shrink-0" />
               <span class="truncate">{{ sourceLabel(source) }}</span>
             </a>
@@ -362,8 +421,13 @@ defineExpose({
       <div class="h-32 w-full shrink-0" />
     </div>
 
-    <SelectionPopover v-if="enableSelectionPopover" :visible="selectionPopover.visible" :x="selectionPopover.x"
-      :y="selectionPopover.y" @reply="handleReplyToSelection" />
+    <SelectionPopover
+      v-if="enableSelectionPopover"
+      :visible="selectionPopover.visible"
+      :x="selectionPopover.x"
+      :y="selectionPopover.y"
+      @reply="handleReplyToSelection"
+    />
   </div>
 </template>
 
@@ -417,7 +481,7 @@ defineExpose({
   margin: 0.75rem 0;
 }
 
-.prose :deep(.katex-display)>.katex {
+.prose :deep(.katex-display) > .katex {
   width: max-content;
   min-width: 100%;
   max-width: none;
@@ -517,7 +581,8 @@ defineExpose({
   justify-content: space-between;
   padding: 0.4rem 0.75rem 0.4rem 1rem;
   background-color: color-mix(in oklch, var(--secondary) 60%, transparent);
-  border-bottom: 1px solid color-mix(in oklch, var(--foreground) 8%, transparent);
+  border-bottom: 1px solid
+    color-mix(in oklch, var(--foreground) 8%, transparent);
 }
 
 .prose :deep(.code-lang) {
@@ -582,6 +647,7 @@ defineExpose({
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
+  font-family: var(--font-mono);
   font-size: 0.72rem;
   padding: 0.2rem 0.55rem;
   border-radius: 99px;

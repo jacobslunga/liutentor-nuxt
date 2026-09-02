@@ -77,7 +77,9 @@ onMounted(() => puzzle.load());
     class="mx-auto flex min-h-[calc(100dvh-3.5rem)] w-full max-w-2xl flex-col items-center justify-center gap-4 px-4 py-6"
   >
     <div class="flex flex-col items-center gap-0.5 text-center">
-      <h1 class="text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
+      <h1
+        class="text-xl font-semibold tracking-tight text-foreground sm:text-2xl"
+      >
         Dagens kurskod
       </h1>
       <p class="text-sm text-muted-foreground">

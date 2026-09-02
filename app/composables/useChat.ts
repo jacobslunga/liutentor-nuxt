@@ -38,8 +38,7 @@ export function useChat(options: {
 
   function getUserId(): string | null {
     return ((user.value as any)?.id ?? (user.value as any)?.sub ?? null) as
-      | string
-      | null;
+      string | null;
   }
 
   function cancelGeneration(): {
@@ -218,8 +217,6 @@ export function useChat(options: {
       const response = await fetch(`${CHAT_API_URL}/${options.examId}`, {
         method: "POST",
         headers: {
-          // Opting in to the framed protocol. A client that omits this still gets
-          // the old concatenate-the-bytes stream, so a stale bundle keeps working.
           Accept: "text/event-stream",
           "x-anonymous-user-id": getAnonymousId(),
           ...authHeaders,
@@ -259,8 +256,6 @@ export function useChat(options: {
         if (!last) return;
 
         if (type === "text") {
-          // Text stays coalesced to one paint per frame; the other events are
-          // rare enough to write straight through.
           streamText += data.delta ?? "";
           if (!pendingFrame) pendingFrame = requestAnimationFrame(flush);
           return;
@@ -290,8 +285,6 @@ export function useChat(options: {
         }
       };
 
-      // Same frame shape the quiz stream already uses: `event:`/`data:` pairs
-      // separated by a blank line, with the trailing partial held back.
       let buffer = "";
 
       while (true) {

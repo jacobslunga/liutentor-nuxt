@@ -1,11 +1,7 @@
 <script setup lang="ts">
 import type { Component } from "vue";
 import { useChatStore, type ChatAttachment } from "@/stores/chat";
-import {
-  matchSkills,
-  getSkillById,
-  type ChatSkill,
-} from "@/lib/chat-skills";
+import { matchSkills, getSkillById, type ChatSkill } from "@/lib/chat-skills";
 import { onClickOutside, useResizeObserver } from "@vueuse/core";
 import {
   GraduationCap,
@@ -109,13 +105,13 @@ const activeAttachmentBytes = computed(() =>
 const attachmentCapacityReached = computed(
   () =>
     activeAttachments.value.length + pendingAttachments.value.length >=
-    MAX_ATTACHMENTS ||
+      MAX_ATTACHMENTS ||
     activeAttachmentBytes.value +
-    pendingAttachments.value.reduce(
-      (sum, attachment) => sum + attachment.size,
-      0,
-    ) >=
-    MAX_ATTACHMENTS_TOTAL_SIZE,
+      pendingAttachments.value.reduce(
+        (sum, attachment) => sum + attachment.size,
+        0,
+      ) >=
+      MAX_ATTACHMENTS_TOTAL_SIZE,
 );
 
 const selectedModelLabel = computed(
@@ -146,7 +142,9 @@ const applyHeight = (allowShrink = false) => {
   const el = textareaRef.value;
   if (!el) return;
 
-  const contentHeight = allowShrink ? measureContentHeight(el) : el.scrollHeight;
+  const contentHeight = allowShrink
+    ? measureContentHeight(el)
+    : el.scrollHeight;
   const height = `${Math.min(contentHeight, MAX_HEIGHT)}px`;
   const overflowY = contentHeight > MAX_HEIGHT ? "auto" : "hidden";
 
@@ -422,117 +420,247 @@ defineExpose({
 </script>
 
 <template>
-  <div class="relative z-10 w-full bg-transparent px-3 pointer-events-auto sm:px-4">
+  <div
+    class="relative z-10 w-full bg-transparent px-3 pointer-events-auto sm:px-4"
+  >
     <div class="relative mx-auto max-w-2xl 3xl:max-w-3xl">
       <div>
-        <div ref="chatShellRef" class="chat-shell relative rounded-3xl border bg-surface shadow-xs inset-shadow-sm">
+        <div
+          ref="chatShellRef"
+          class="chat-shell relative rounded-3xl border bg-surface shadow-xs inset-shadow-sm"
+        >
           <Transition name="fade-up">
-            <div v-if="showScrollButton" class="pointer-events-none absolute -top-12 right-3 z-20">
-              <Button variant="outline" size="icon" class="pointer-events-auto rounded-full"
-                @click="emit('scrollToBottom')">
+            <div
+              v-if="showScrollButton"
+              class="pointer-events-none absolute -top-12 right-3 z-20"
+            >
+              <Button
+                variant="outline"
+                size="icon"
+                class="pointer-events-auto rounded-full"
+                @click="emit('scrollToBottom')"
+              >
                 <LucideArrowDown class="w-4 h-4" />
               </Button>
             </div>
           </Transition>
 
           <Transition name="context-chip">
-            <div v-if="selectionContext" class="flex items-center gap-2 w-full border-b border-border/60 px-5 py-2.5">
-              <LucideCornerUpLeft class="w-3.5 h-3.5 shrink-0 text-muted-foreground" />
-              <span class="flex-1 min-w-0 text-sm italic text-muted-foreground truncate">"{{ selectionContext }}"</span>
-              <Button variant="ghost" size="icon-xs" class="shrink-0" @click.prevent="emit('clearSelectionContext')">
+            <div
+              v-if="selectionContext"
+              class="flex items-center gap-2 w-full border-b border-border/60 px-5 py-2.5"
+            >
+              <LucideCornerUpLeft
+                class="w-3.5 h-3.5 shrink-0 text-muted-foreground"
+              />
+              <span
+                class="flex-1 min-w-0 text-sm italic text-muted-foreground truncate"
+                >"{{ selectionContext }}"</span
+              >
+              <Button
+                variant="ghost"
+                size="icon-xs"
+                class="shrink-0"
+                @click.prevent="emit('clearSelectionContext')"
+              >
                 <LucideX class="w-3.5 h-3.5" />
               </Button>
             </div>
           </Transition>
 
-          <TransitionGroup v-if="pendingAttachments.length" name="attachment-chip" tag="div" appear
-            class="relative flex flex-wrap gap-2 border-b border-border/60 px-4 py-2.5">
-            <div v-for="attachment in pendingAttachments" :key="attachment.id"
-              class="flex min-w-0 max-w-full items-center gap-2 rounded-sm bg-secondary/60 px-2.5 py-1.5 text-xs">
-              <LucideFileText v-if="attachment.mediaType === 'application/pdf'"
-                class="size-3.5 shrink-0 text-muted-foreground" />
-              <img v-else-if="attachment.previewUrl" :src="attachment.previewUrl" alt=""
-                class="size-10 shrink-0 rounded-sm object-cover" />
-              <LucideImage v-else class="size-3.5 shrink-0 text-muted-foreground" />
+          <TransitionGroup
+            v-if="pendingAttachments.length"
+            name="attachment-chip"
+            tag="div"
+            appear
+            class="relative flex flex-wrap gap-2 border-b border-border/60 px-4 py-2.5"
+          >
+            <div
+              v-for="attachment in pendingAttachments"
+              :key="attachment.id"
+              class="flex min-w-0 max-w-full items-center gap-2 rounded-sm bg-secondary/60 px-2.5 py-1.5 text-xs"
+            >
+              <LucideFileText
+                v-if="attachment.mediaType === 'application/pdf'"
+                class="size-3.5 shrink-0 text-muted-foreground"
+              />
+              <img
+                v-else-if="attachment.previewUrl"
+                :src="attachment.previewUrl"
+                alt=""
+                class="size-10 shrink-0 rounded-sm object-cover"
+              />
+              <LucideImage
+                v-else
+                class="size-3.5 shrink-0 text-muted-foreground"
+              />
               <span class="max-w-20 truncate" :title="attachment.name">{{
                 attachment.name
-                }}</span>
+              }}</span>
               <span class="shrink-0 text-muted-foreground">{{
                 formatFileSize(attachment.size)
-                }}</span>
-              <button type="button"
+              }}</span>
+              <button
+                type="button"
                 class="shrink-0 cursor-pointer rounded-sm text-muted-foreground hover:text-foreground"
-                :aria-label="`Ta bort ${attachment.name}`" @click="removePendingAttachment(attachment.id)">
+                :aria-label="`Ta bort ${attachment.name}`"
+                @click="removePendingAttachment(attachment.id)"
+              >
                 <LucideX class="size-3.5" />
               </button>
             </div>
           </TransitionGroup>
 
           <Transition name="fade-up">
-            <div v-if="menuOpen" id="chat-skill-menu" ref="skillMenuRef" role="listbox" aria-label="Skills"
-              class="absolute bottom-full left-0 right-0 z-30 mb-2 overflow-hidden rounded-md border border-border bg-popover p-1.5 shadow-lg">
-              <div class="px-2.5 pb-1 pt-1 text-2xs font-normal text-muted-foreground">
+            <div
+              v-if="menuOpen"
+              id="chat-skill-menu"
+              ref="skillMenuRef"
+              role="listbox"
+              aria-label="Skills"
+              class="absolute bottom-full left-0 right-0 z-30 mb-2 overflow-hidden rounded-md border border-border bg-popover p-1.5 shadow-lg"
+            >
+              <div
+                class="px-2.5 pb-1 pt-1 text-2xs font-normal text-muted-foreground"
+              >
                 Skills
               </div>
-              <button v-for="(skill, index) in filteredSkills" :id="`chat-skill-${skill.id}`" :key="skill.id"
-                type="button" role="option" :aria-selected="index === highlightedIndex"
+              <button
+                v-for="(skill, index) in filteredSkills"
+                :id="`chat-skill-${skill.id}`"
+                :key="skill.id"
+                type="button"
+                role="option"
+                :aria-selected="index === highlightedIndex"
                 class="flex w-full cursor-pointer items-start gap-2.5 rounded-sm px-2.5 py-1.5 text-left"
-                :class="index === highlightedIndex ? 'bg-accent' : ''" @mouseenter="highlightedIndex = index"
-                @mousedown.prevent="selectSkill(skill)">
-                <component :is="SKILL_ICONS[skill.id]" class="mt-0.5 size-3.5 shrink-0 text-muted-foreground" />
+                :class="index === highlightedIndex ? 'bg-accent' : ''"
+                @mouseenter="highlightedIndex = index"
+                @mousedown.prevent="selectSkill(skill)"
+              >
+                <component
+                  :is="SKILL_ICONS[skill.id]"
+                  class="mt-0.5 size-3.5 shrink-0 text-muted-foreground"
+                />
                 <span class="flex min-w-0 flex-col gap-0.5">
                   <span class="flex items-baseline gap-1.5">
-                    <span class="text-xs font-medium text-foreground">{{ skill.label }}</span>
-                    <span class="text-2xs text-muted-foreground">/{{ skill.command }}</span>
+                    <span class="text-xs font-medium text-foreground">{{
+                      skill.label
+                    }}</span>
+                    <span class="text-2xs text-muted-foreground"
+                      >/{{ skill.command }}</span
+                    >
                   </span>
-                  <span class="text-2xs leading-snug text-muted-foreground">{{ skill.description }}</span>
+                  <span class="text-2xs leading-snug text-muted-foreground">{{
+                    skill.description
+                  }}</span>
                 </span>
               </button>
             </div>
           </Transition>
 
-          <div class="composer flex flex-wrap items-center gap-1 p-2" :class="{ 'is-expanded': isExpanded }">
+          <div
+            class="composer flex flex-wrap items-center gap-1 p-2"
+            :class="{ 'is-expanded': isExpanded }"
+          >
             <div class="composer-field relative min-w-0 px-2 py-1.5">
-              <span v-if="activeSkill" ref="skillPillRef"
-                class="pointer-events-auto absolute left-2 top-1.5 inline-flex items-center gap-1 rounded-full bg-skill px-2 py-0.5 text-[0.8125rem] font-medium leading-relaxed text-white">
+              <span
+                v-if="activeSkill"
+                ref="skillPillRef"
+                class="pointer-events-auto absolute left-2 top-1.5 inline-flex items-center gap-1 rounded-full bg-skill px-2 py-0.5 text-[0.8125rem] font-medium leading-relaxed text-white"
+              >
                 {{ activeSkill.label }}
-                <button type="button" class="opacity-70 hover:opacity-100" :aria-label="`Ta bort ${activeSkill.label}`"
-                  @mousedown.prevent="clearSkill()">
+                <button
+                  type="button"
+                  class="opacity-70 hover:opacity-100"
+                  :aria-label="`Ta bort ${activeSkill.label}`"
+                  @mousedown.prevent="clearSkill()"
+                >
                   <LucideX class="size-3" />
                 </button>
               </span>
-              <textarea ref="textareaRef" :value="text" rows="1"
-                :placeholder="activeSkill ? 'Fråga vad som helst' : 'Fråga vad som helst, skriv / för skills'"
-                role="combobox" :aria-expanded="menuOpen" aria-controls="chat-skill-menu"
-                :aria-activedescendant="menuOpen ? `chat-skill-${filteredSkills[highlightedIndex]?.id}` : undefined"
+              <textarea
+                ref="textareaRef"
+                :value="text"
+                rows="1"
+                :placeholder="
+                  activeSkill
+                    ? 'Fråga vad som helst'
+                    : 'Fråga vad som helst, skriv / för skills'
+                "
+                role="combobox"
+                :aria-expanded="menuOpen"
+                aria-controls="chat-skill-menu"
+                :aria-activedescendant="
+                  menuOpen
+                    ? `chat-skill-${filteredSkills[highlightedIndex]?.id}`
+                    : undefined
+                "
                 class="chat-textarea block w-full min-w-0 resize-none border-0 bg-transparent p-0 text-[0.9375rem] font-normal leading-6 outline-none placeholder:text-muted-foreground/65 focus:ring-0"
-                @input="handleInput" @keydown="handleKeyDown" />
+                @input="handleInput"
+                @keydown="handleKeyDown"
+              />
             </div>
 
-            <input ref="fileInputRef" type="file" multiple class="hidden" :accept="FILE_INPUT_ACCEPT"
-              @change="handleFileInput" />
-            <Button variant="ghost" size="icon" aria-label="Bifoga filer"
+            <input
+              ref="fileInputRef"
+              type="file"
+              multiple
+              class="hidden"
+              :accept="FILE_INPUT_ACCEPT"
+              @change="handleFileInput"
+            />
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Bifoga filer"
               class="composer-lead size-8 shrink-0 text-muted-foreground hover:text-foreground"
-              :disabled="isLoading || attachmentCapacityReached" @click="fileInputRef?.click()">
+              :disabled="isLoading || attachmentCapacityReached"
+              @click="fileInputRef?.click()"
+            >
               <LucidePlus class="size-4" />
             </Button>
 
-            <div class="composer-actions ml-auto flex shrink-0 items-center gap-1">
-              <Button variant="ghost" size="sm" type="button" aria-label="Sök på webben" :aria-pressed="webSearch"
+            <div
+              class="composer-actions ml-auto flex shrink-0 items-center gap-1"
+            >
+              <Button
+                variant="ghost"
+                size="sm"
+                type="button"
+                aria-label="Sök på webben"
+                :aria-pressed="webSearch"
                 :title="webSearch ? 'Webbsökning på' : 'Sök på webben'"
-                class="h-8 shrink-0 gap-1.5 px-2.5 text-xs font-normal hover:bg-accent/70" :class="webSearch
-                  ? 'bg-accent/70 text-primary hover:text-primary'
-                  : 'text-muted-foreground hover:text-foreground'" @click="emit('update:webSearch', !webSearch)">
+                class="h-8 shrink-0 gap-1.5 px-2.5 text-xs font-normal hover:bg-accent/70"
+                :class="
+                  webSearch
+                    ? 'bg-accent/70 text-primary hover:text-primary'
+                    : 'text-muted-foreground hover:text-foreground'
+                "
+                @click="emit('update:webSearch', !webSearch)"
+              >
                 <LucideGlobe class="size-4" />
                 <span class="font-medium" v-if="webSearch">Webb</span>
               </Button>
 
               <Transition name="scale" mode="out-in">
-                <Button v-if="isLoading" key="stop" size="icon" variant="secondary" class="size-8"
-                  @click="emit('cancel')">
+                <Button
+                  v-if="isLoading"
+                  key="stop"
+                  size="icon"
+                  variant="secondary"
+                  class="size-8"
+                  @click="emit('cancel')"
+                >
                   <LucideSquare class="size-3.5 fill-current" />
                 </Button>
-                <Button v-else key="send" size="icon" class="size-8" :disabled="!canSend" @click="emit('send')">
+                <Button
+                  v-else
+                  key="send"
+                  size="icon"
+                  class="size-8"
+                  :disabled="!canSend"
+                  @click="emit('send')"
+                >
                   <LucideArrowUp class="size-4" />
                 </Button>
               </Transition>
@@ -541,13 +669,21 @@ defineExpose({
         </div>
 
         <div class="mt-2 flex items-center justify-between gap-3 px-1.5">
-          <p v-if="reactiveInput && text.length > MAX_LENGTH * 0.8" class="text-2xs" :class="text.length > MAX_LENGTH
-            ? 'font-medium text-destructive'
-            : 'text-muted-foreground'
-            ">
+          <p
+            v-if="reactiveInput && text.length > MAX_LENGTH * 0.8"
+            class="text-2xs"
+            :class="
+              text.length > MAX_LENGTH
+                ? 'font-medium text-destructive'
+                : 'text-muted-foreground'
+            "
+          >
             {{ text.length }} / {{ MAX_LENGTH }}
           </p>
-          <p v-else-if="showDisclaimer" class="min-w-0 truncate text-[0.8125rem] text-muted-foreground/60">
+          <p
+            v-else-if="showDisclaimer"
+            class="min-w-0 truncate text-[0.8125rem] text-muted-foreground/60"
+          >
             AI kan göra misstag. Kontrollera svaren.
           </p>
           <span v-else />
@@ -556,18 +692,23 @@ defineExpose({
             <DropdownMenuTrigger as-child>
               <Button variant="ghost" size="xs" class="group">
                 <span class="text-muted-foreground group-hover:text-foreground">
-                  Gemini
-                  •
-                  {{ selectedModelLabel }}</span>
+                  Gemini •
+                  {{ selectedModelLabel }}</span
+                >
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" class="w-60 p-1.5">
-              <DropdownMenuLabel class="px-2.5 pb-1 pt-1.5 text-xs font-normal text-muted-foreground">
+              <DropdownMenuLabel
+                class="px-2.5 pb-1 pt-1.5 text-xs font-normal text-muted-foreground"
+              >
                 Tankenivå
               </DropdownMenuLabel>
-              <DropdownMenuItem v-for="model in availableModels" :key="model.id"
+              <DropdownMenuItem
+                v-for="model in availableModels"
+                :key="model.id"
                 class="cursor-pointer items-start justify-between gap-2 rounded-sm px-2.5 py-1.5 focus:bg-accent/70"
-                @click="emit('update:selectedModelId', model.id)">
+                @click="emit('update:selectedModelId', model.id)"
+              >
                 <span class="flex min-w-0 flex-col gap-0.5">
                   <span class="text-xs font-medium text-foreground">
                     {{ model.label }}
@@ -576,7 +717,10 @@ defineExpose({
                     {{ model.hint }}
                   </span>
                 </span>
-                <LucideCheck v-if="model.id === selectedModelId" class="mt-0.5 size-3.5 shrink-0 text-primary" />
+                <LucideCheck
+                  v-if="model.id === selectedModelId"
+                  class="mt-0.5 size-3.5 shrink-0 text-primary"
+                />
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -695,7 +839,6 @@ defineExpose({
 }
 
 @media (prefers-reduced-motion: reduce) {
-
   .attachment-chip-enter-active,
   .attachment-chip-leave-active,
   .attachment-chip-move {
