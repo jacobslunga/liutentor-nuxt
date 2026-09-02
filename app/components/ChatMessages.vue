@@ -283,7 +283,7 @@ defineExpose({
       </h2>
     </div>
 
-    <div ref="messagesList" v-else class="mx-auto w-full max-w-2xl space-y-6 pt-2">
+    <div ref="messagesList" v-else class="mx-auto w-full max-w-2xl 3xl:max-w-3xl space-y-6 pt-2">
       <div v-for="(msg, i) in messages" :key="i" :class="msg.role === 'user' ? 'flex justify-end' : ''" v-memo="[
         msg.role,
         msg.content,
@@ -325,7 +325,7 @@ defineExpose({
             {{ getSkillById(msg.skill)?.label }}
           </div>
           <div v-if="msg.content" class="w-fit rounded-2xl bg-secondary px-4 py-2 text-secondary-foreground">
-            <p class="text-[15px] leading-relaxed whitespace-pre-wrap">
+            <p class="text-[0.9375rem] leading-relaxed whitespace-pre-wrap">
               {{ msg.content }}
             </p>
           </div>
@@ -344,7 +344,7 @@ defineExpose({
             }}</span>
           </div>
           <div v-if="renderedAssistantHtml[i]"
-            class="prose max-w-full min-w-0 font-serif prose-headings:font-semibold prose-strong:font-semibold dark:prose-invert marker:text-foreground marker:font-semibold"
+            class="prose 3xl:prose-lg max-w-full min-w-0 font-serif prose-headings:font-semibold prose-strong:font-semibold dark:prose-invert marker:text-foreground marker:font-semibold"
             v-html="renderedAssistantHtml[i]" />
 
           <div v-if="msg.sources?.length" class="mt-3 flex flex-wrap gap-1.5">
