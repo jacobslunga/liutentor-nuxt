@@ -1,25 +1,10 @@
 <script setup lang="ts">
-import serifFontUrl from "@fontsource-variable/newsreader/files/newsreader-latin-wght-normal.woff2?url&no-inline";
-
 defineProps<{
   eyebrow: string;
   title: string;
   lead?: string;
   meta?: string;
 }>();
-
-useHead({
-  link: [
-    {
-      key: "serif-font-preload",
-      rel: "preload",
-      as: "font",
-      type: "font/woff2",
-      crossorigin: "anonymous",
-      href: serifFontUrl,
-    },
-  ],
-});
 </script>
 
 <template>
