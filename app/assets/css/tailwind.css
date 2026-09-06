@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import "@fontsource-variable/literata";
+@import "@fontsource-variable/source-serif-4";
 
 @plugin "tailwindcss-animate";
 @plugin "@tailwindcss/typography";
@@ -201,7 +201,7 @@
     "Liberation Mono", monospace;
 
   --font-serif:
-    "Literata Variable", Georgia, Cambria, "Times New Roman", Times, serif;
+    "Source Serif 4 Variable", Georgia, Cambria, "Times New Roman", Times, serif;
 
   --font-sans:
     "Source Sans 3 Variable", "Source Sans 3 Fallback", system-ui,
