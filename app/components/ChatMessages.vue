@@ -396,7 +396,7 @@ defineExpose({
           </div>
           <div
             v-if="renderedAssistantHtml[i]"
-            class="prose 3xl:prose-lg max-w-full min-w-0 prose-headings:font-medium prose-strong:font-medium dark:prose-invert marker:text-foreground marker:font-medium"
+            class="prose 3xl:prose-lg max-w-full font-serif min-w-0 prose-headings:font-medium prose-strong:font-medium dark:prose-invert marker:text-foreground marker:font-medium"
             v-html="renderedAssistantHtml[i]"
           />
 

@@ -226,10 +226,16 @@ function confirmLockIn() {
 </script>
 
 <template>
-  <div class="pointer-events-none relative isolate hidden h-12 w-full items-center justify-between px-3 lg:flex">
+  <div
+    class="pointer-events-none relative isolate hidden h-12 w-full items-center justify-between px-3 lg:flex"
+  >
     <ButtonGroup class="pointer-events-auto overflow-hidden rounded-md">
-      <Button size="sm" variant="secondary" aria-label="Tillbaka till kursen"
-        @click="router.push(`/search/${courseCode}`)">
+      <Button
+        size="sm"
+        variant="secondary"
+        aria-label="Tillbaka till kursen"
+        @click="router.push(`/search/${courseCode}`)"
+      >
         <LucideArrowLeft />
       </Button>
 
@@ -239,65 +245,120 @@ function confirmLockIn() {
             <div class="flex flex-row items-baseline gap-1.5 leading-none">
               <span class="text-sm font-semibold">{{
                 selectedExam.exam_date
-                }}</span>
+              }}</span>
             </div>
-            <LucideChevronDown class="size-4 text-muted-foreground transition-transform duration-200"
-              :class="{ 'rotate-180': isDropdownOpen }" />
+            <LucideChevronDown
+              class="size-4 text-muted-foreground transition-transform duration-200"
+              :class="{ 'rotate-180': isDropdownOpen }"
+            />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" :side-offset="8" class="p-0 overflow-hidden">
-          <div class="px-3 py-2 flex items-center justify-between gap-3 border-b">
-            <span class="text-xs font-semibold text-foreground">Alla tentor</span>
+        <DropdownMenuContent
+          align="start"
+          :side-offset="8"
+          class="p-0 overflow-hidden"
+        >
+          <div
+            class="px-3 py-2 flex items-center justify-between gap-3 border-b"
+          >
+            <span class="text-xs font-semibold text-foreground"
+              >Alla tentor</span
+            >
             <div class="flex items-center gap-1.5">
               <DropdownMenuSub v-model:open="isSortMenuOpen">
-                <div class="contents" @pointermove.capture="blockSortHover" @pointerover.capture="blockSortHover">
-                  <DropdownMenuSubTrigger class="h-7 border px-2 py-1 text-xs" aria-label="Sortera tentor"
-                    @pointerdown.capture="recordSortState" @click="handleSortTriggerClick">
-                    <LucideArrowDown v-if="sortDirection === 'desc'" class="size-3.5" />
+                <div
+                  class="contents"
+                  @pointermove.capture="blockSortHover"
+                  @pointerover.capture="blockSortHover"
+                >
+                  <DropdownMenuSubTrigger
+                    class="h-7 border px-2 py-1 text-xs"
+                    aria-label="Sortera tentor"
+                    @pointerdown.capture="recordSortState"
+                    @click="handleSortTriggerClick"
+                  >
+                    <LucideArrowDown
+                      v-if="sortDirection === 'desc'"
+                      class="size-3.5"
+                    />
                     <LucideArrowUp v-else class="size-3.5" />
                     {{ sortLabel }}
                   </DropdownMenuSubTrigger>
                 </div>
                 <DropdownMenuSubContent class="w-44">
                   <DropdownMenuLabel>Sortera efter</DropdownMenuLabel>
-                  <DropdownMenuRadioGroup :model-value="sortBy" @update:model-value="setSortBy">
-                    <DropdownMenuRadioItem value="date" @select.prevent>Datum</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="pass-rate" @select.prevent>Godkänd</DropdownMenuRadioItem>
+                  <DropdownMenuRadioGroup
+                    :model-value="sortBy"
+                    @update:model-value="setSortBy"
+                  >
+                    <DropdownMenuRadioItem value="date" @select.prevent
+                      >Datum</DropdownMenuRadioItem
+                    >
+                    <DropdownMenuRadioItem value="pass-rate" @select.prevent
+                      >Godkänd</DropdownMenuRadioItem
+                    >
                   </DropdownMenuRadioGroup>
                   <DropdownMenuSeparator />
                   <DropdownMenuLabel>Ordning</DropdownMenuLabel>
-                  <DropdownMenuRadioGroup :model-value="sortDirection" @update:model-value="setSortDirection">
-                    <DropdownMenuRadioItem value="desc" @select.prevent>Fallande</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="asc" @select.prevent>Stigande</DropdownMenuRadioItem>
+                  <DropdownMenuRadioGroup
+                    :model-value="sortDirection"
+                    @update:model-value="setSortDirection"
+                  >
+                    <DropdownMenuRadioItem value="desc" @select.prevent
+                      >Fallande</DropdownMenuRadioItem
+                    >
+                    <DropdownMenuRadioItem value="asc" @select.prevent
+                      >Stigande</DropdownMenuRadioItem
+                    >
                   </DropdownMenuRadioGroup>
                 </DropdownMenuSubContent>
               </DropdownMenuSub>
-              <span class="text-xs font-mono px-2 py-0.5 rounded-sm bg-muted text-muted-foreground font-medium">
+              <span
+                class="text-xs font-mono px-2 py-0.5 rounded-sm bg-muted text-muted-foreground font-medium"
+              >
                 {{ sortedExams.length }} st
               </span>
             </div>
           </div>
-          <div ref="scrollRef" class="max-h-80 overflow-y-auto p-1.5 space-y-0.5 custom-scrollbar">
-            <button v-for="e in sortedExams" :key="e.id" :data-current="e.id.toString() === examId"
+          <div
+            ref="scrollRef"
+            class="max-h-80 overflow-y-auto p-1.5 space-y-0.5 custom-scrollbar"
+          >
+            <button
+              v-for="e in sortedExams"
+              :key="e.id"
+              :data-current="e.id.toString() === examId"
               class="grid w-full grid-cols-[3.25rem_6.75rem_3.75rem_3.5rem_1rem] items-center gap-x-2 rounded-sm px-3 py-2 text-left transition-colors duration-150 cursor-pointer group"
-              :class="e.id.toString() === examId
+              :class="
+                e.id.toString() === examId
                   ? 'bg-accent font-semibold text-accent-foreground'
                   : 'hover:bg-foreground/5 text-foreground/90 hover:text-foreground'
-                " @click="changeExam(e)">
+              "
+              @click="changeExam(e)"
+            >
               <span class="truncate text-sm font-normal text-foreground">
                 {{ getExamPrefix(e) }}
               </span>
               <span class="text-sm font-semibold tabular-nums">
                 {{ e.exam_date }}
               </span>
-              <Badge v-if="e.has_solution" variant="outline"
-                class="col-start-3 justify-self-start text-2xs px-1.5 py-0.5 rounded-sm font-medium border-success/30 bg-success/10 text-success">
+              <Badge
+                v-if="e.has_solution"
+                variant="outline"
+                class="col-start-3 justify-self-start text-2xs px-1.5 py-0.5 rounded-sm font-medium border-success/30 bg-success/10 text-success"
+              >
                 Facit
               </Badge>
-              <span class="col-start-4 justify-self-end font-mono text-xs tabular-nums" :class="passColor(e)">
+              <span
+                class="col-start-4 justify-self-end font-mono text-xs tabular-nums"
+                :class="passColor(e)"
+              >
                 {{ formatPassRate(e) }}
               </span>
-              <LucideCheck v-if="e.id.toString() === examId" class="col-start-5 size-4 text-primary" />
+              <LucideCheck
+                v-if="e.id.toString() === examId"
+                class="col-start-5 size-4 text-primary"
+              />
               <span v-else class="col-start-5 size-4" aria-hidden="true" />
             </button>
           </div>
@@ -306,20 +367,34 @@ function confirmLockIn() {
     </ButtonGroup>
 
     <div class="pointer-events-auto flex items-center gap-2">
-      <Button variant="secondary" size="sm" @click="chatStore.toggle()">
-        <LucideLoader2 v-if="chatStore.isLoading" class="size-3.5 animate-spin" />
+      <Button size="sm" @click="chatStore.toggle()">
+        <LucideLoader2
+          v-if="chatStore.isLoading"
+          class="size-3.5 animate-spin"
+        />
         <LucideMessageSquare v-else class="size-3.5" />
         <span class="text-xs">{{ chatStore.isOpen ? "Stäng" : "Chatt" }}</span>
       </Button>
 
-      <div class="flex items-center gap-1.5 transition-opacity duration-200 hover:opacity-100 focus-within:opacity-100">
+      <div
+        class="flex items-center gap-1.5 transition-opacity duration-200 hover:opacity-100 focus-within:opacity-100"
+      >
         <Tabs :model-value="layoutMode" @update:model-value="switchLayout">
           <TabsList class="h-7">
-            <TabsTrigger value="exam-with-facit" class="h-full px-2.5" aria-label="Visa tenta och facit"
-              title="Tenta och facit">
+            <TabsTrigger
+              value="exam-with-facit"
+              class="h-full px-2.5"
+              aria-label="Visa tenta och facit"
+              title="Tenta och facit"
+            >
               <LucideColumns2 class="size-4" />
             </TabsTrigger>
-            <TabsTrigger value="exam-only" class="h-full px-2.5" aria-label="Visa endast tentan" title="Endast tenta">
+            <TabsTrigger
+              value="exam-only"
+              class="h-full px-2.5"
+              aria-label="Visa endast tentan"
+              title="Endast tenta"
+            >
               <LucidePanelRight class="size-4" />
             </TabsTrigger>
           </TabsList>
@@ -327,13 +402,20 @@ function confirmLockIn() {
 
         <DropdownMenu v-model:open="isActionsOpen">
           <DropdownMenuTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-7 w-7 shrink-0 p-0 text-muted-foreground hover:text-foreground"
-              aria-label="Fler åtgärder">
+            <Button
+              variant="ghost"
+              size="sm"
+              class="h-7 w-7 shrink-0 p-0 text-muted-foreground hover:text-foreground"
+              aria-label="Fler åtgärder"
+            >
               <LucideEllipsis class="size-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" :side-offset="8" class="w-52">
-            <DropdownMenuItem class="cursor-pointer" @click="emit('toggleFocusMode')">
+            <DropdownMenuItem
+              class="cursor-pointer"
+              @click="emit('toggleFocusMode')"
+            >
               <LucideMaximize v-if="!focusMode" class="size-4" />
               <LucideMinimize v-else class="size-4" />
               {{ focusMode ? "Avsluta fokusläge" : "Fokusläge" }}
@@ -348,24 +430,38 @@ function confirmLockIn() {
                 Tema
                 <span class="ml-auto pl-3 text-xs text-muted-foreground">{{
                   themeLabel
-                  }}</span>
+                }}</span>
               </DropdownMenuSubTrigger>
               <DropdownMenuSubContent class="w-40">
-                <DropdownMenuRadioGroup :model-value="theme" @update:model-value="setTheme">
-                  <DropdownMenuRadioItem v-for="option in THEME_OPTIONS" :key="option.value" :value="option.value"
-                    class="cursor-pointer" @select.prevent>
+                <DropdownMenuRadioGroup
+                  :model-value="theme"
+                  @update:model-value="setTheme"
+                >
+                  <DropdownMenuRadioItem
+                    v-for="option in THEME_OPTIONS"
+                    :key="option.value"
+                    :value="option.value"
+                    class="cursor-pointer"
+                    @select.prevent
+                  >
                     {{ option.label }}
                   </DropdownMenuRadioItem>
                 </DropdownMenuRadioGroup>
               </DropdownMenuSubContent>
             </DropdownMenuSub>
 
-            <DropdownMenuItem class="cursor-pointer" @click="isSettingsOpen = true">
+            <DropdownMenuItem
+              class="cursor-pointer"
+              @click="isSettingsOpen = true"
+            >
               <LucideSettings class="size-4" />
               Inställningar
             </DropdownMenuItem>
 
-            <DropdownMenuItem class="cursor-pointer" @click="openUploadModal(courseCode)">
+            <DropdownMenuItem
+              class="cursor-pointer"
+              @click="openUploadModal(courseCode)"
+            >
               <LucideUpload class="size-4" />
               Ladda upp tenta/facit
             </DropdownMenuItem>
@@ -378,21 +474,29 @@ function confirmLockIn() {
                 Ladda ned
               </DropdownMenuSubTrigger>
               <DropdownMenuSubContent class="w-48">
-                <DropdownMenuItem class="cursor-pointer" :disabled="!selectedExam?.pdf_url" @click="
-                  downloadFile(
-                    selectedExam!.pdf_url,
-                    `${selectedExam!.course_code}_${selectedExam!.exam_date}_EXAM.pdf`,
-                  )
-                  ">
+                <DropdownMenuItem
+                  class="cursor-pointer"
+                  :disabled="!selectedExam?.pdf_url"
+                  @click="
+                    downloadFile(
+                      selectedExam!.pdf_url,
+                      `${selectedExam!.course_code}_${selectedExam!.exam_date}_EXAM.pdf`,
+                    )
+                  "
+                >
                   <LucideFileText class="size-4" />
                   Tenta
                 </DropdownMenuItem>
-                <DropdownMenuItem class="cursor-pointer" :disabled="!solutionPdfUrl" @click="
-                  downloadFile(
-                    solutionPdfUrl!,
-                    `${selectedExam?.course_code}_${selectedExam?.exam_date}_SOLUTION.pdf`,
-                  )
-                  ">
+                <DropdownMenuItem
+                  class="cursor-pointer"
+                  :disabled="!solutionPdfUrl"
+                  @click="
+                    downloadFile(
+                      solutionPdfUrl!,
+                      `${selectedExam?.course_code}_${selectedExam?.exam_date}_SOLUTION.pdf`,
+                    )
+                  "
+                >
                   <LucideFileCheck class="size-4" />
                   Facit
                 </DropdownMenuItem>
@@ -405,8 +509,12 @@ function confirmLockIn() {
                 Lock in
               </DropdownMenuSubTrigger>
               <DropdownMenuSubContent class="w-44">
-                <DropdownMenuItem v-for="opt in TIME_OPTIONS" :key="opt.value" class="cursor-pointer"
-                  @click="selectLockInDuration(opt.value)">
+                <DropdownMenuItem
+                  v-for="opt in TIME_OPTIONS"
+                  :key="opt.value"
+                  class="cursor-pointer"
+                  @click="selectLockInDuration(opt.value)"
+                >
                   <LucideTimer class="size-3.5 opacity-70" />
                   {{ opt.label }}
                 </DropdownMenuItem>
@@ -420,18 +528,28 @@ function confirmLockIn() {
 
   <SettingsDialog v-model:open="isSettingsOpen" hide-trigger />
 
-  <AlertDialog :open="showLockInConfirm" @update:open="showLockInConfirm = $event">
+  <AlertDialog
+    :open="showLockInConfirm"
+    @update:open="showLockInConfirm = $event"
+  >
     <AlertDialogContent>
       <AlertDialogHeader>
-        <AlertDialogTitle>Är du säker på att du vill locka in?</AlertDialogTitle>
+        <AlertDialogTitle
+          >Är du säker på att du vill locka in?</AlertDialogTitle
+        >
         <AlertDialogDescription>
           Du startar en session på {{ selectedDurationLabel }}. Du kommer inte
           kunna se lösningar under denna tid.
         </AlertDialogDescription>
       </AlertDialogHeader>
       <AlertDialogFooter>
-        <AlertDialogCancel @click="showLockInConfirm = false">Avbryt</AlertDialogCancel>
-        <AlertDialogAction class="bg-destructive text-white hover:bg-destructive/90" @click="confirmLockIn">
+        <AlertDialogCancel @click="showLockInConfirm = false"
+          >Avbryt</AlertDialogCancel
+        >
+        <AlertDialogAction
+          class="bg-destructive text-white hover:bg-destructive/90"
+          @click="confirmLockIn"
+        >
           Starta timer
         </AlertDialogAction>
       </AlertDialogFooter>

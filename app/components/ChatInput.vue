@@ -609,38 +609,49 @@ defineExpose({
               :accept="FILE_INPUT_ACCEPT"
               @change="handleFileInput"
             />
-            <Button
-              variant="ghost"
-              size="icon"
-              aria-label="Bifoga filer"
-              class="composer-lead size-8 shrink-0 text-muted-foreground hover:text-foreground"
-              :disabled="isLoading || attachmentCapacityReached"
-              @click="fileInputRef?.click()"
-            >
-              <LucidePlus class="size-4" />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger as-child>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  aria-label="Bifoga filer"
+                  class="composer-lead size-8 shrink-0 text-muted-foreground hover:text-foreground"
+                  :disabled="isLoading || attachmentCapacityReached"
+                  @click="fileInputRef?.click()"
+                >
+                  <LucidePlus class="size-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Bifoga filer</TooltipContent>
+            </Tooltip>
 
             <div
               class="composer-actions ml-auto flex shrink-0 items-center gap-1"
             >
-              <Button
-                variant="ghost"
-                size="sm"
-                type="button"
-                aria-label="Sök på webben"
-                :aria-pressed="webSearch"
-                :title="webSearch ? 'Webbsökning på' : 'Sök på webben'"
-                class="h-8 shrink-0 gap-1.5 px-2.5 text-xs font-normal hover:bg-accent/70"
-                :class="
-                  webSearch
-                    ? 'bg-accent/70 text-primary hover:text-primary'
-                    : 'text-muted-foreground hover:text-foreground'
-                "
-                @click="emit('update:webSearch', !webSearch)"
-              >
-                <LucideGlobe class="size-4" />
-                <span class="font-medium" v-if="webSearch">Webb</span>
-              </Button>
+              <Tooltip>
+                <TooltipTrigger as-child>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    type="button"
+                    aria-label="Sök på webben"
+                    :aria-pressed="webSearch"
+                    class="h-8 shrink-0 gap-1.5 px-2.5 text-xs font-normal hover:bg-accent/70"
+                    :class="
+                      webSearch
+                        ? 'bg-accent/70 text-primary hover:text-primary'
+                        : 'text-muted-foreground hover:text-foreground'
+                    "
+                    @click="emit('update:webSearch', !webSearch)"
+                  >
+                    <LucideGlobe class="size-4" />
+                    <span class="font-medium" v-if="webSearch">Webb</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>{{
+                  webSearch ? "Webbsökning på" : "Sök på webben"
+                }}</TooltipContent>
+              </Tooltip>
 
               <Transition name="scale" mode="out-in">
                 <Button

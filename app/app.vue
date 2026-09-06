@@ -1,9 +1,11 @@
 <template>
   <div>
     <AppLoadingIndicator color="var(--primary)" :height="2" :throttle="80" :hide-delay="150" />
-    <NuxtLayout>
-      <NuxtPage />
-    </NuxtLayout>
+    <TooltipProvider :delay-duration="200" :ignore-non-keyboard-focus="true">
+      <NuxtLayout>
+        <NuxtPage />
+      </NuxtLayout>
+    </TooltipProvider>
     <Toaster />
     <ExamUploadDialog />
   </div>
