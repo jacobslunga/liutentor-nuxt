@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useChatStore } from "@/stores/chat";
 import type { Exam } from "~/types/exam";
+import { useChatStore } from "@/stores/chat";
 import { useLayoutStore } from "~/stores/layout";
 
 const props = defineProps<{
@@ -220,14 +220,14 @@ function confirmLockIn() {
 
 <template>
   <div class="pointer-events-none relative isolate hidden h-12 w-full items-center justify-between px-3 lg:flex">
-    <ButtonGroup class="pointer-events-auto overflow-hidden rounded-md bg-muted">
-      <Button size="sm" variant="ghost" aria-label="Tillbaka till kursen" @click="router.push(`/search/${courseCode}`)">
+    <ButtonGroup class="pointer-events-auto overflow-hidden rounded-md">
+      <Button size="sm" variant="secondary" aria-label="Tillbaka till kursen" @click="router.push(`/search/${courseCode}`)">
         <LucideArrowLeft />
       </Button>
 
       <DropdownMenu v-if="selectedExam" v-model:open="isDropdownOpen">
         <DropdownMenuTrigger as-child>
-          <Button variant="ghost" size="sm" class="gap-1.5">
+          <Button variant="secondary" size="sm" class="gap-1.5">
             <div class="flex flex-row items-baseline gap-1.5 leading-none">
               <span class="text-sm font-semibold">{{
                 selectedExam.exam_date
@@ -295,7 +295,7 @@ function confirmLockIn() {
     </ButtonGroup>
 
     <div class="pointer-events-auto flex items-center gap-2">
-      <Button size="sm" @click="chatStore.toggle()">
+      <Button variant="secondary" size="sm" @click="chatStore.toggle()">
         <LucideLoader2 v-if="chatStore.isLoading" class="size-3.5 animate-spin" />
         <LucideMessageSquare v-else class="size-3.5" />
         <span class="text-xs">{{ chatStore.isOpen ? "Stäng" : "Chatt" }}</span>
@@ -303,7 +303,7 @@ function confirmLockIn() {
 
       <div class="flex items-center gap-1.5 transition-opacity duration-200 hover:opacity-100 focus-within:opacity-100">
         <Tabs :model-value="layoutMode" @update:model-value="switchLayout">
-          <TabsList class="h-8">
+          <TabsList class="h-7">
             <TabsTrigger value="exam-with-facit" class="h-full px-2.5" aria-label="Visa tenta och facit"
               title="Tenta och facit">
               <LucideColumns2 class="size-4" />
@@ -316,7 +316,7 @@ function confirmLockIn() {
 
         <DropdownMenu v-model:open="isActionsOpen">
           <DropdownMenuTrigger as-child>
-            <Button variant="ghost" size="sm" class="h-8 w-8 shrink-0 p-0 text-muted-foreground hover:text-foreground"
+            <Button variant="ghost" size="sm" class="h-7 w-7 shrink-0 p-0 text-muted-foreground hover:text-foreground"
               aria-label="Fler åtgärder">
               <LucideEllipsis class="size-4" />
             </Button>
