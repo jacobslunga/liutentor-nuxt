@@ -425,7 +425,7 @@ defineExpose({
   <div class="relative z-10 w-full bg-transparent px-3 pointer-events-auto sm:px-4">
     <div class="relative mx-auto max-w-2xl 3xl:max-w-3xl">
       <div>
-        <div ref="chatShellRef" class="chat-shell relative rounded-3xl border bg-surface shadow-xs">
+        <div ref="chatShellRef" class="chat-shell relative rounded-3xl border bg-surface shadow-xs inset-shadow-sm">
           <Transition name="fade-up">
             <div v-if="showScrollButton" class="pointer-events-none absolute -top-12 right-3 z-20">
               <Button variant="outline" size="icon" class="pointer-events-auto rounded-full"
