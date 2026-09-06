@@ -256,6 +256,8 @@ body {
   --color-primary-container-foreground: var(--primary-container-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
+  --color-control-raised-from: var(--control-raised-from);
+  --color-control-raised-to: var(--control-raised-to);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
@@ -316,6 +318,9 @@ body {
   --popover-foreground: var(--foreground);
   --secondary: oklch(0.9427 0 0);
   --secondary-foreground: oklch(from var(--foreground) 0.2 0 h);
+  /* Toppljus → botten för upphöjda kontroller (secondary-knapp, aktiv flik). */
+  --control-raised-from: oklch(1 0 0);
+  --control-raised-to: oklch(0.9427 0 0);
   --muted: oklch(0.9627 0 0);
   --muted-foreground: oklch(from var(--foreground) 0.48 0 h);
   --accent: oklch(0.9227 0 0);
@@ -378,6 +383,9 @@ body {
   --popover-foreground: var(--foreground);
   --secondary: oklch(0.2478 0 0);
   --secondary-foreground: oklch(from var(--foreground) 0.94 0 h);
+  /* Mörkt tema behöver bredare spann för att lyftet ska synas alls. */
+  --control-raised-from: oklch(from var(--foreground) 0.32 0 h);
+  --control-raised-to: oklch(from var(--foreground) 0.235 0 h);
   --muted: oklch(0.261 0.0019 106.54);
   --muted-foreground: oklch(from var(--foreground) 0.65 0 h);
   --accent: oklch(from var(--foreground) 0.34 0 h);

@@ -17,22 +17,32 @@
       </Button>
     </div>
     <div class="pointer-events-auto flex shrink-0 items-center gap-1">
-      <Button
-        variant="ghost"
-        size="icon-xs"
-        aria-label="Ny chatt"
-        @click="emit('newChat')"
-      >
-        <LucidePlus class="size-4" />
-      </Button>
-      <Button
-        variant="ghost"
-        size="icon-xs"
-        aria-label="Historik"
-        @click="emit('openHistory')"
-      >
-        <LucidePanelRight class="size-4" />
-      </Button>
+      <Tooltip>
+        <TooltipTrigger as-child>
+          <Button
+            variant="ghost"
+            size="icon-xs"
+            aria-label="Ny chatt"
+            @click="emit('newChat')"
+          >
+            <LucidePlus class="size-4" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Ny chatt</TooltipContent>
+      </Tooltip>
+      <Tooltip>
+        <TooltipTrigger as-child>
+          <Button
+            variant="ghost"
+            size="icon-xs"
+            aria-label="Historik"
+            @click="emit('openHistory')"
+          >
+            <LucidePanelRight class="size-4" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Historik</TooltipContent>
+      </Tooltip>
     </div>
   </div>
 </template>

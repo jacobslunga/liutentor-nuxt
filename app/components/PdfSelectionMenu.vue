@@ -21,15 +21,15 @@ async function explain() {
 
   isResolving.value = true;
   try {
-
-    const pages = await capability.getSelectedText(props.documentId).toPromise();
+    const pages = await capability
+      .getSelectedText(props.documentId)
+      .toPromise();
     const text = pages.join("\n").trim();
     if (!text) return;
 
     emit("explain", text.slice(0, MAX_SELECTION_LENGTH));
     capability.clear(props.documentId);
   } catch {
-
   } finally {
     isResolving.value = false;
   }
@@ -38,9 +38,14 @@ async function explain() {
 
 <template>
   <Transition name="menu-fade" appear>
-    <Button size="sm" variant="outline" :disabled="isResolving"
+    <Button
+      size="sm"
+      variant="secondary"
+      :disabled="isResolving"
       class="pointer-events-auto absolute left-1/2 -translate-x-1/2 whitespace-nowrap shadow-sm"
-      :class="above ? 'bottom-full mb-2' : 'top-full mt-2'" @click.stop="explain">
+      :class="above ? 'bottom-full mb-2' : 'top-full mt-2'"
+      @click.stop="explain"
+    >
       Förklara
       <LucideCornerUpRight class="w-3.5 h-3.5" />
     </Button>
@@ -48,7 +53,6 @@ async function explain() {
 </template>
 
 <style scoped>
-
 .menu-fade-enter-active,
 .menu-fade-leave-active {
   transition: opacity var(--duration-fast) var(--ease-spring);

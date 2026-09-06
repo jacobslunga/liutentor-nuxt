@@ -118,7 +118,7 @@ function toggleFilter(p: string) {
         >
           <div class="sm:min-w-0">
             <div
-              class="text-sm font-medium text-foreground group-hover:text-foreground/80 transition-colors whitespace-nowrap sm:truncate"
+              class="text-sm font-semibold text-foreground group-hover:text-foreground/80 transition-colors whitespace-nowrap sm:truncate"
             >
               {{ exam.exam_name }}
             </div>
