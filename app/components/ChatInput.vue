@@ -427,7 +427,7 @@ defineExpose({
       <div>
         <div
           ref="chatShellRef"
-          class="chat-shell relative rounded-3xl border bg-surface shadow-xs inset-shadow-sm"
+          class="chat-shell relative rounded-3xl border bg-surface shadow-xs"
         >
           <Transition name="fade-up">
             <div
