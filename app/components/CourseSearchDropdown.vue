@@ -146,7 +146,7 @@ const iconSize = computed(
         isFocused ? 'text-primary' : 'text-muted-foreground',
       ]" />
       <input ref="inputRef" :value="courseCode.toUpperCase()" placeholder="Sök kurskod..."
-        class="w-full rounded-xl border bg-background pl-9 pr-9 text-foreground outline-none inset-shadow-sm placeholder:text-muted-foreground hover:bg-background"
+        class="w-full rounded-lg border bg-background pl-9 pr-9 text-foreground outline-none placeholder:text-muted-foreground"
         :class="[sizeClass, isFocused ? 'border-primary' : 'border-border']"
         @input="courseCode = ($event.target as HTMLInputElement).value" @keydown="handleKeyDown" @focus="handleFocus"
         @blur="handleBlur" />
@@ -163,7 +163,7 @@ const iconSize = computed(
     </div>
 
     <div v-if="showSuggestions && suggestions.length > 0" ref="suggestionsRef"
-      class="absolute w-full left-0 mt-2 bg-background border border-border rounded-xl z-40 max-h-72 overflow-y-auto text-sm">
+      class="absolute w-full left-0 mt-2 bg-background border border-border rounded-lg z-40 max-h-72 overflow-y-auto text-sm">
       <div class="px-3 pt-3 pb-1 text-xs text-muted-foreground">
         Alla kurser
       </div>

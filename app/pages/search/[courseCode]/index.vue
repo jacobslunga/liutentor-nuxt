@@ -26,10 +26,8 @@ const courseData = computed(() => (data.value as any)?.data);
 const exams = computed<Exam[]>(() => courseData.value?.exams ?? []);
 const router = useRouter();
 const COURSE_TABS = ["exams", "stats", "quiz"];
-const {
-  sortBy: examSortBy,
-  sortDirection: examSortDirection,
-} = useExamSortPreference("course-page");
+const { sortBy: examSortBy, sortDirection: examSortDirection } =
+  useExamSortPreference("course-page");
 const examSortLabel = computed(() =>
   examSortBy.value === "date" ? "Datum" : "Godkänd",
 );
@@ -210,7 +208,6 @@ useSeoMeta({
 });
 
 useHead(() => ({
-
   titleTemplate: "%s | LiU Tentor",
   link: [{ rel: "canonical", href: canonicalUrl.value }],
   script: [
@@ -234,14 +231,21 @@ function passColor(rate: number) {
       <CourseSearchDropdown size="md" class="mx-auto w-full max-w-xl" />
     </div>
 
-    <div v-if="status === 'pending'" class="flex items-center justify-center min-h-[60vh]">
+    <div
+      v-if="status === 'pending'"
+      class="flex items-center justify-center min-h-[60vh]"
+    >
       <LucideLoader2 class="w-6 h-6 animate-spin text-muted-foreground" />
     </div>
 
-    <div v-else-if="status === 'success' && !courseData"
-      class="mx-auto flex min-h-[60vh] w-full max-w-2xl flex-col items-center justify-center gap-8 py-8">
+    <div
+      v-else-if="status === 'success' && !courseData"
+      class="mx-auto flex min-h-[60vh] w-full max-w-2xl flex-col items-center justify-center gap-8 py-8"
+    >
       <div class="max-w-xl text-center">
-        <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+        <div
+          class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted"
+        >
           <LucideInbox class="h-6 w-6 text-muted-foreground" />
         </div>
         <h1 class="text-2xl font-medium text-foreground">
@@ -252,19 +256,28 @@ function passColor(rate: number) {
           nästa student som söker på {{ courseCode }} hjälpt direkt.
         </p>
       </div>
-      <ExamUploadForm :initial-course-code="courseCode" fixed-course-code :show-heading="false" />
+      <ExamUploadForm
+        :initial-course-code="courseCode"
+        fixed-course-code
+        :show-heading="false"
+      />
     </div>
 
     <template v-else-if="courseData">
       <div class="flex justify-center">
         <div class="flex flex-col items-start w-full max-w-4xl gap-8">
           <div class="w-full">
-            <h1 class="text-3xl sm:text-4xl font-semibold text-foreground leading-tight w-full wrap-break-word">
+            <h1
+              class="text-3xl sm:text-4xl font-semibold text-foreground leading-tight w-full wrap-break-word"
+            >
               {{ courseData.courseName }}
             </h1>
 
-            <p class="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
-              <span class="font-sans text-sm text-muted-foreground">{{ courseCode }}
+            <p
+              class="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground"
+            >
+              <span class="font-sans text-sm text-muted-foreground"
+                >{{ courseCode }}
               </span>
               <span aria-hidden="true">·</span>
               <span>
@@ -297,24 +310,44 @@ function passColor(rate: number) {
               <template #controls>
                 <DropdownMenu v-if="activeTab === 'exams'">
                   <DropdownMenuTrigger as-child>
-                    <Button variant="secondary" aria-label="Sortera tentor">
+                    <Button variant="outline" aria-label="Sortera tentor">
                       <LucideArrowUpDown class="size-4" />
                       {{ examSortLabel }}
-                      <LucideArrowDown v-if="examSortDirection === 'desc'" class="size-3.5 text-muted-foreground" />
-                      <LucideArrowUp v-else class="size-3.5 text-muted-foreground" />
+                      <LucideArrowDown
+                        v-if="examSortDirection === 'desc'"
+                        class="size-3.5 text-muted-foreground"
+                      />
+                      <LucideArrowUp
+                        v-else
+                        class="size-3.5 text-muted-foreground"
+                      />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start" class="w-44">
                     <DropdownMenuLabel>Sortera efter</DropdownMenuLabel>
-                    <DropdownMenuRadioGroup :model-value="examSortBy" @update:model-value="setExamSortBy">
-                      <DropdownMenuRadioItem value="date">Datum</DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="pass-rate">Godkänd</DropdownMenuRadioItem>
+                    <DropdownMenuRadioGroup
+                      :model-value="examSortBy"
+                      @update:model-value="setExamSortBy"
+                    >
+                      <DropdownMenuRadioItem value="date"
+                        >Datum</DropdownMenuRadioItem
+                      >
+                      <DropdownMenuRadioItem value="pass-rate"
+                        >Godkänd</DropdownMenuRadioItem
+                      >
                     </DropdownMenuRadioGroup>
                     <DropdownMenuSeparator />
                     <DropdownMenuLabel>Ordning</DropdownMenuLabel>
-                    <DropdownMenuRadioGroup :model-value="examSortDirection" @update:model-value="setExamSortDirection">
-                      <DropdownMenuRadioItem value="desc">Fallande</DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="asc">Stigande</DropdownMenuRadioItem>
+                    <DropdownMenuRadioGroup
+                      :model-value="examSortDirection"
+                      @update:model-value="setExamSortDirection"
+                    >
+                      <DropdownMenuRadioItem value="desc"
+                        >Fallande</DropdownMenuRadioItem
+                      >
+                      <DropdownMenuRadioItem value="asc"
+                        >Stigande</DropdownMenuRadioItem
+                      >
                     </DropdownMenuRadioGroup>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -328,12 +361,26 @@ function passColor(rate: number) {
             </CourseTabsBar>
 
             <Transition name="tab-panel" mode="out-in">
-              <TabsContent v-if="activeTab === 'exams'" key="exams" value="exams" class="mt-5">
-                <CourseExamsTable :course-code="courseCode" :exams="exams" :sort-by="examSortBy"
-                  :sort-direction="examSortDirection" />
+              <TabsContent
+                v-if="activeTab === 'exams'"
+                key="exams"
+                value="exams"
+                class="mt-5"
+              >
+                <CourseExamsTable
+                  :course-code="courseCode"
+                  :exams="exams"
+                  :sort-by="examSortBy"
+                  :sort-direction="examSortDirection"
+                />
               </TabsContent>
 
-              <TabsContent v-else-if="activeTab === 'stats'" key="stats" value="stats" class="mt-5">
+              <TabsContent
+                v-else-if="activeTab === 'stats'"
+                key="stats"
+                value="stats"
+                class="mt-5"
+              >
                 <Suspense>
                   <LazyCourseStats :exams="exams" />
                   <template #fallback>
