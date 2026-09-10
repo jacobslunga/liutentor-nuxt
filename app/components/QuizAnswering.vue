@@ -76,7 +76,7 @@ function confirmExit() {
         class="shrink-0 gap-1.5 text-muted-foreground"
         @click="requestExit"
       >
-        <LucideArrowLeft class="h-3.5 w-3.5" />
+        <Icon name="octicon:arrow-left-16" class="h-3.5 w-3.5" />
         Avsluta
       </Button>
     </div>
@@ -128,7 +128,7 @@ function confirmExit() {
             class="gap-1.5 border-border"
             @click="emit('previous')"
           >
-            <LucideArrowLeft class="h-3.5 w-3.5" />
+            <Icon name="octicon:arrow-left-16" class="h-3.5 w-3.5" />
             Förra
           </Button>
           <Button
@@ -140,7 +140,7 @@ function confirmExit() {
             @click="emit('next', hasAnsweredCurrent)"
           >
             Nästa
-            <LucideArrowRight class="h-3.5 w-3.5" />
+            <Icon name="octicon:arrow-right-16" class="h-3.5 w-3.5" />
           </Button>
           <Button
             v-else
@@ -149,7 +149,7 @@ function confirmExit() {
             class="gap-1.5"
             @click="submit"
           >
-            <LucideCheckCircle class="h-3.5 w-3.5" />
+            <Icon name="octicon:check-circle-16" class="h-3.5 w-3.5" />
             Rätta quiz
           </Button>
         </ButtonGroup>

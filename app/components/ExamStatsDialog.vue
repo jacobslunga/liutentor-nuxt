@@ -43,7 +43,7 @@ function passColor(rate: number) {
 
 <template>
 
-  <LucideMinus v-if="total === 0" class="w-4 h-4 text-muted-foreground/30" />
+  <Icon name="octicon:dash-16" v-if="total === 0" class="w-4 h-4 text-muted-foreground/30" />
 
   <Dialog v-else>
     <DialogTrigger

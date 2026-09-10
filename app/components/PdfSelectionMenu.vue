@@ -47,7 +47,7 @@ async function explain() {
       @click.stop="explain"
     >
       Förklara
-      <LucideCornerUpRight class="w-3.5 h-3.5" />
+      <Icon name="octicon:arrow-up-right-16" class="w-3.5 h-3.5" />
     </Button>
   </Transition>
 </template>

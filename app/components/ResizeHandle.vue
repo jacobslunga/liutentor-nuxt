@@ -20,7 +20,7 @@ const emit = defineEmits<{
         ? 'border-primary scale-110'
         : 'border-border group-hover:border-primary/50'
         ">
-      <LucideGripVertical class="size-3.5 transition-colors"
+      <Icon name="octicon:grabber-16" class="size-3.5 transition-colors"
         :class="isResizing ? 'text-primary' : 'text-muted-foreground'" />
     </div>
   </div>

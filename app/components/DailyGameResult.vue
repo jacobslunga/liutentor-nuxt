@@ -102,7 +102,7 @@ const maxInDistribution = computed(() =>
       </p>
       <p class="font-mono text-lg tabular-nums text-foreground">{{ countdown }}</p>
       <Button class="mt-1 w-full" @click="emit('share')">
-        <LucideShare2 />
+        <Icon name="octicon:share-16" />
         Dela resultat
       </Button>
       <p class="text-2xs text-muted-foreground">

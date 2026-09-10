@@ -235,7 +235,7 @@ function passColor(rate: number) {
       v-if="status === 'pending'"
       class="flex items-center justify-center min-h-[60vh]"
     >
-      <LucideLoader2 class="w-6 h-6 animate-spin text-muted-foreground" />
+      <Icon name="octicon:sync-16" class="w-6 h-6 animate-spin text-muted-foreground" />
     </div>
 
     <div
@@ -246,7 +246,7 @@ function passColor(rate: number) {
         <div
           class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted"
         >
-          <LucideInbox class="h-6 w-6 text-muted-foreground" />
+          <Icon name="octicon:inbox-16" class="h-6 w-6 text-muted-foreground" />
         </div>
         <h1 class="text-2xl font-medium text-foreground">
           Vi saknar tentor för {{ courseCode }}
@@ -311,13 +311,13 @@ function passColor(rate: number) {
                 <DropdownMenu v-if="activeTab === 'exams'">
                   <DropdownMenuTrigger as-child>
                     <Button variant="outline" aria-label="Sortera tentor">
-                      <LucideArrowUpDown class="size-4" />
+                      <Icon name="octicon:arrow-switch-16" class="size-4" />
                       {{ examSortLabel }}
-                      <LucideArrowDown
+                      <Icon name="octicon:arrow-down-16"
                         v-if="examSortDirection === 'desc'"
                         class="size-3.5 text-muted-foreground"
                       />
-                      <LucideArrowUp
+                      <Icon name="octicon:arrow-up-16"
                         v-else
                         class="size-3.5 text-muted-foreground"
                       />
@@ -354,7 +354,7 @@ function passColor(rate: number) {
               </template>
               <template #actions>
                 <Button variant="default" @click="openUploadModal(courseCode)">
-                  <LucideUpload class="w-4 h-4" />
+                  <Icon name="octicon:upload-16" class="w-4 h-4" />
                   Ladda upp
                 </Button>
               </template>

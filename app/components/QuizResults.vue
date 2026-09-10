@@ -71,7 +71,7 @@ const courseCodeLabel = computed(() => {
           class="gap-1.5 border-border"
           @click="emit('retake')"
         >
-          <LucideRefreshCw class="h-3.5 w-3.5" />
+          <Icon name="octicon:sync-16" class="h-3.5 w-3.5" />
           Gör om
         </Button>
         <Button size="sm" class="gap-1.5 ml-auto" @click="emit('newQuiz')">

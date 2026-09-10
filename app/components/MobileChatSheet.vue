@@ -101,7 +101,7 @@ watch(transcriptRef, (transcript) => {
         <header class="shrink-0 border-b border-border bg-background pt-[env(safe-area-inset-top,0px)]">
           <div class="flex h-14 items-center gap-1 px-2">
             <Button variant="ghost" size="icon-sm" class="shrink-0" aria-label="Stäng chatten" @click="closeChat">
-              <LucideX class="size-4" />
+              <Icon name="octicon:x-16" class="size-4" />
             </Button>
 
             <p class="min-w-0 flex-1 truncate text-sm font-semibold text-foreground">
@@ -109,10 +109,10 @@ watch(transcriptRef, (transcript) => {
             </p>
 
             <Button variant="ghost" size="icon-sm" aria-label="Ny chatt" @click="startNewChat">
-              <LucidePlus class="size-4" />
+              <Icon name="octicon:plus-16" class="size-4" />
             </Button>
             <Button variant="ghost" size="icon-sm" aria-label="Historik" @click="toggleHistory">
-              <LucidePanelRight class="size-4" />
+              <Icon name="octicon:sidebar-expand-16" class="size-4" />
             </Button>
           </div>
         </header>

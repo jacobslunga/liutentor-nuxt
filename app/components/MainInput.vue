@@ -195,7 +195,7 @@ function handleClickOutside(event: MouseEvent) {
 <template>
   <div class="relative w-full">
     <div class="w-full relative flex flex-row items-center justify-center pl-5 pr-2">
-      <LucideSearch class="text-muted-foreground" />
+      <Icon name="octicon:search-16" class="size-6 text-muted-foreground" />
 
       <input
         ref="inputRef"
@@ -216,7 +216,7 @@ function handleClickOutside(event: MouseEvent) {
         aria-label="Search"
         @click="handleSelectCourse(courseCode)"
       >
-        <LucideArrowUp class="w-5 h-5" />
+        <Icon name="octicon:arrow-up-16" class="w-5 h-5" />
       </Button>
     </div>
 

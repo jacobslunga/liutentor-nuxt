@@ -86,7 +86,7 @@ async function handleSubmit() {
         <div class="max-w-xl">
           <div v-if="isSuccess === true" class="flex flex-col items-start gap-4">
             <div class="flex size-10 items-center justify-center rounded-full bg-success/10 dark:bg-success/15">
-              <LucideCheck class="size-5 text-success" />
+              <Icon name="octicon:check-16" class="size-5 text-success" />
             </div>
             <div>
               <h2 class="text-xl font-medium">Tack!</h2>
@@ -101,7 +101,7 @@ async function handleSubmit() {
 
           <div v-else-if="isSuccess === false" class="flex flex-col items-start gap-4">
             <div class="flex size-10 items-center justify-center rounded-full bg-destructive/10 dark:bg-destructive/15">
-              <LucideAlertCircle class="size-5 text-destructive" />
+              <Icon name="octicon:alert-16" class="size-5 text-destructive" />
             </div>
             <div>
               <h2 class="text-xl font-medium">Något gick fel</h2>
@@ -177,7 +177,7 @@ async function handleSubmit() {
                 Vi använder din mail bara för att kunna svara.
               </p>
               <Button type="submit" size="sm" :disabled="isSubmitting">
-                <LucideLoader2 v-if="isSubmitting" class="size-3.5 animate-spin" />
+                <Icon name="octicon:sync-16" v-if="isSubmitting" class="size-3.5 animate-spin" />
                 Skicka
               </Button>
             </div>

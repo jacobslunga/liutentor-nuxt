@@ -83,7 +83,7 @@ const sections: DocSection[] = [
           body="Anser du att vi publicerat material som kränker din upphovsrätt eller dina personuppgifter? Kontakta oss så hanterar vi ditt ärende inom 48 timmar."
         >
           <Button size="sm" variant="outline" @click="openMail">
-            <LucideMail class="size-3.5" />
+            <Icon name="octicon:mail-16" class="size-3.5" />
             Skicka borttagningsbegäran
           </Button>
         </DocContact>

@@ -43,7 +43,7 @@ const { open: openUploadModal } = useUploadModal();
       <RecentSearches />
 
       <Button variant="outline" @click="openUploadModal()">
-        <LucideUpload />
+        <Icon name="octicon:upload-16" />
         Ladda upp fler tentor
       </Button>
     </div>

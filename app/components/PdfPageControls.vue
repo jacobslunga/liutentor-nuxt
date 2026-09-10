@@ -74,7 +74,7 @@ function cancel() {
     <button type="button" aria-label="Zooma ut" :disabled="!canZoomOut"
       class="flex size-8 cursor-pointer items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground disabled:cursor-default disabled:opacity-35 disabled:hover:bg-transparent"
       @click="zoom?.zoomOut()">
-      <LucideMinus class="size-3.5" />
+      <Icon name="octicon:dash-16" class="size-3.5" />
     </button>
 
     <input ref="inputEl" :value="displayValue" type="text" inputmode="numeric" aria-label="Zoomnivå i procent"
@@ -85,7 +85,7 @@ function cancel() {
     <button type="button" aria-label="Zooma in" :disabled="!canZoomIn"
       class="flex size-8 cursor-pointer items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground disabled:cursor-default disabled:opacity-35 disabled:hover:bg-transparent"
       @click="zoom?.zoomIn()">
-      <LucidePlus class="size-3.5" />
+      <Icon name="octicon:plus-16" class="size-3.5" />
     </button>
 
     <div class="mx-0.5 h-5 w-px bg-border" />
@@ -93,7 +93,7 @@ function cancel() {
     <button type="button" aria-label="Rotera medurs"
       class="flex size-8 cursor-pointer items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
       @click="rotate?.rotateForward()">
-      <LucideRotateCw class="size-3.5" />
+      <Icon name="octicon:sync-16" class="size-3.5" />
     </button>
   </div>
 </template>

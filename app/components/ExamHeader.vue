@@ -236,7 +236,7 @@ function confirmLockIn() {
         aria-label="Tillbaka till kursen"
         @click="router.push(`/search/${courseCode}`)"
       >
-        <LucideArrowLeft />
+        <Icon name="octicon:arrow-left-16" />
       </Button>
 
       <DropdownMenu v-if="selectedExam" v-model:open="isDropdownOpen">
@@ -247,7 +247,7 @@ function confirmLockIn() {
                 selectedExam.exam_date
               }}</span>
             </div>
-            <LucideChevronDown
+            <Icon name="octicon:chevron-down-16"
               class="size-4 text-muted-foreground transition-transform duration-200"
               :class="{ 'rotate-180': isDropdownOpen }"
             />
@@ -277,11 +277,11 @@ function confirmLockIn() {
                     @pointerdown.capture="recordSortState"
                     @click="handleSortTriggerClick"
                   >
-                    <LucideArrowDown
+                    <Icon name="octicon:arrow-down-16"
                       v-if="sortDirection === 'desc'"
                       class="size-3.5"
                     />
-                    <LucideArrowUp v-else class="size-3.5" />
+                    <Icon name="octicon:arrow-up-16" v-else class="size-3.5" />
                     {{ sortLabel }}
                   </DropdownMenuSubTrigger>
                 </div>
@@ -355,7 +355,7 @@ function confirmLockIn() {
               >
                 {{ formatPassRate(e) }}
               </span>
-              <LucideCheck
+              <Icon name="octicon:check-16"
                 v-if="e.id.toString() === examId"
                 class="col-start-5 size-4 text-primary"
               />
@@ -368,11 +368,11 @@ function confirmLockIn() {
 
     <div class="pointer-events-auto flex items-center gap-2">
       <Button size="sm" @click="chatStore.toggle()">
-        <LucideLoader2
+        <Icon name="octicon:sync-16"
           v-if="chatStore.isLoading"
           class="size-3.5 animate-spin"
         />
-        <LucideMessageSquare v-else class="size-3.5" />
+        <Icon name="octicon:comment-16" v-else class="size-3.5" />
         <span class="text-xs">{{ chatStore.isOpen ? "Stäng" : "Chatt" }}</span>
       </Button>
 
@@ -387,7 +387,7 @@ function confirmLockIn() {
               aria-label="Visa tenta och facit"
               title="Tenta och facit"
             >
-              <LucideColumns2 class="size-4" />
+              <Icon name="octicon:split-view-16" class="size-4" />
             </TabsTrigger>
             <TabsTrigger
               value="exam-only"
@@ -395,7 +395,7 @@ function confirmLockIn() {
               aria-label="Visa endast tentan"
               title="Endast tenta"
             >
-              <LucidePanelRight class="size-4" />
+              <Icon name="octicon:sidebar-collapse-16" class="size-4" />
             </TabsTrigger>
           </TabsList>
         </Tabs>
@@ -408,7 +408,7 @@ function confirmLockIn() {
               class="h-7 w-7 shrink-0 p-0 text-muted-foreground hover:text-foreground"
               aria-label="Fler åtgärder"
             >
-              <LucideEllipsis class="size-4" />
+              <Icon name="octicon:kebab-horizontal-16" class="size-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" :side-offset="8" class="w-52">
@@ -416,17 +416,17 @@ function confirmLockIn() {
               class="cursor-pointer"
               @click="emit('toggleFocusMode')"
             >
-              <LucideMaximize v-if="!focusMode" class="size-4" />
-              <LucideMinimize v-else class="size-4" />
+              <Icon name="octicon:screen-full-16" v-if="!focusMode" class="size-4" />
+              <Icon name="octicon:screen-normal-16" v-else class="size-4" />
               {{ focusMode ? "Avsluta fokusläge" : "Fokusläge" }}
               <DropdownMenuShortcut>F</DropdownMenuShortcut>
             </DropdownMenuItem>
 
             <DropdownMenuSub>
               <DropdownMenuSubTrigger>
-                <LucideSun v-if="theme === 'light'" class="size-4" />
-                <LucideMoonStar v-else-if="theme === 'dark'" class="size-4" />
-                <LucideMonitor v-else class="size-4" />
+                <Icon name="octicon:sun-16" v-if="theme === 'light'" class="size-4" />
+                <Icon name="octicon:moon-16" v-else-if="theme === 'dark'" class="size-4" />
+                <Icon name="octicon:device-desktop-16" v-else class="size-4" />
                 Tema
                 <span class="ml-auto pl-3 text-xs text-muted-foreground">{{
                   themeLabel
@@ -454,7 +454,7 @@ function confirmLockIn() {
               class="cursor-pointer"
               @click="isSettingsOpen = true"
             >
-              <LucideSettings class="size-4" />
+              <Icon name="octicon:gear-16" class="size-4" />
               Inställningar
             </DropdownMenuItem>
 
@@ -462,7 +462,7 @@ function confirmLockIn() {
               class="cursor-pointer"
               @click="openUploadModal(courseCode)"
             >
-              <LucideUpload class="size-4" />
+              <Icon name="octicon:upload-16" class="size-4" />
               Ladda upp tenta/facit
             </DropdownMenuItem>
 
@@ -470,7 +470,7 @@ function confirmLockIn() {
 
             <DropdownMenuSub>
               <DropdownMenuSubTrigger :disabled="!hasDownload">
-                <LucideDownload class="size-4" />
+                <Icon name="octicon:download-16" class="size-4" />
                 Ladda ned
               </DropdownMenuSubTrigger>
               <DropdownMenuSubContent class="w-48">
@@ -484,7 +484,7 @@ function confirmLockIn() {
                     )
                   "
                 >
-                  <LucideFileText class="size-4" />
+                  <Icon name="octicon:file-16" class="size-4" />
                   Tenta
                 </DropdownMenuItem>
                 <DropdownMenuItem
@@ -497,7 +497,7 @@ function confirmLockIn() {
                     )
                   "
                 >
-                  <LucideFileCheck class="size-4" />
+                  <Icon name="octicon:file-check-16" class="size-4" />
                   Facit
                 </DropdownMenuItem>
               </DropdownMenuSubContent>
@@ -505,7 +505,7 @@ function confirmLockIn() {
 
             <DropdownMenuSub>
               <DropdownMenuSubTrigger :disabled="!selectedExam">
-                <LucideLock class="size-4" />
+                <Icon name="octicon:lock-16" class="size-4" />
                 Lock in
               </DropdownMenuSubTrigger>
               <DropdownMenuSubContent class="w-44">
@@ -515,7 +515,7 @@ function confirmLockIn() {
                   class="cursor-pointer"
                   @click="selectLockInDuration(opt.value)"
                 >
-                  <LucideTimer class="size-3.5 opacity-70" />
+                  <Icon name="octicon:stopwatch-16" class="size-3.5 opacity-70" />
                   {{ opt.label }}
                 </DropdownMenuItem>
               </DropdownMenuSubContent>

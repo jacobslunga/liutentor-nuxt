@@ -1,15 +1,12 @@
 <script setup lang="ts">
-import type { Component } from "vue";
 import { useChatStore, type ChatAttachment } from "@/stores/chat";
-import { matchSkills, getSkillById, type ChatSkill } from "@/lib/chat-skills";
-import { onClickOutside, useResizeObserver } from "@vueuse/core";
 import {
-  GraduationCap,
-  BookOpen,
-  ListChecks,
-  Lightbulb,
-  AlignLeft,
-} from "lucide-vue-next";
+  matchSkills,
+  getSkillById,
+  type ChatSkill,
+  type ChatSkillId,
+} from "@/lib/chat-skills";
+import { onClickOutside, useResizeObserver } from "@vueuse/core";
 import { toast } from "vue-sonner";
 
 const { availableModels } = useSelectedModel();
@@ -195,12 +192,12 @@ function selectSkill(skill: ChatSkill | undefined) {
   nextTick(() => textareaRef.value?.focus());
 }
 
-const SKILL_ICONS: Record<string, Component> = {
-  explain: GraduationCap,
-  theory: BookOpen,
-  solution: ListChecks,
-  hint: Lightbulb,
-  summary: AlignLeft,
+const SKILL_ICONS: Record<ChatSkillId, string> = {
+  explain: "octicon:mortar-board-16",
+  theory: "octicon:book-16",
+  solution: "octicon:checklist-16",
+  hint: "octicon:light-bulb-16",
+  summary: "octicon:list-unordered-16",
 };
 
 function clearSkill() {
@@ -440,7 +437,7 @@ defineExpose({
                 class="pointer-events-auto rounded-full"
                 @click="emit('scrollToBottom')"
               >
-                <LucideArrowDown class="w-4 h-4" />
+                <Icon name="octicon:arrow-down-16" class="w-4 h-4" />
               </Button>
             </div>
           </Transition>
@@ -450,7 +447,7 @@ defineExpose({
               v-if="selectionContext"
               class="flex items-center gap-2 w-full border-b border-border/60 px-5 py-2.5"
             >
-              <LucideCornerUpLeft
+              <Icon name="octicon:reply-16"
                 class="w-3.5 h-3.5 shrink-0 text-muted-foreground"
               />
               <span
@@ -463,7 +460,7 @@ defineExpose({
                 class="shrink-0"
                 @click.prevent="emit('clearSelectionContext')"
               >
-                <LucideX class="w-3.5 h-3.5" />
+                <Icon name="octicon:x-16" class="w-3.5 h-3.5" />
               </Button>
             </div>
           </Transition>
@@ -480,7 +477,7 @@ defineExpose({
               :key="attachment.id"
               class="flex min-w-0 max-w-full items-center gap-2 rounded-sm bg-secondary/60 px-2.5 py-1.5 text-xs"
             >
-              <LucideFileText
+              <Icon name="octicon:file-16"
                 v-if="attachment.mediaType === 'application/pdf'"
                 class="size-3.5 shrink-0 text-muted-foreground"
               />
@@ -490,7 +487,7 @@ defineExpose({
                 alt=""
                 class="size-10 shrink-0 rounded-sm object-cover"
               />
-              <LucideImage
+              <Icon name="octicon:image-16"
                 v-else
                 class="size-3.5 shrink-0 text-muted-foreground"
               />
@@ -506,7 +503,7 @@ defineExpose({
                 :aria-label="`Ta bort ${attachment.name}`"
                 @click="removePendingAttachment(attachment.id)"
               >
-                <LucideX class="size-3.5" />
+                <Icon name="octicon:x-16" class="size-3.5" />
               </button>
             </div>
           </TransitionGroup>
@@ -537,8 +534,8 @@ defineExpose({
                 @mouseenter="highlightedIndex = index"
                 @mousedown.prevent="selectSkill(skill)"
               >
-                <component
-                  :is="SKILL_ICONS[skill.id]"
+                <Icon
+                  :name="SKILL_ICONS[skill.id]"
                   class="mt-0.5 size-3.5 shrink-0 text-muted-foreground"
                 />
                 <span class="flex min-w-0 flex-col gap-0.5">
@@ -575,7 +572,7 @@ defineExpose({
                   :aria-label="`Ta bort ${activeSkill.label}`"
                   @mousedown.prevent="clearSkill()"
                 >
-                  <LucideX class="size-3" />
+                  <Icon name="octicon:x-16" class="size-3" />
                 </button>
               </span>
               <textarea
@@ -619,7 +616,7 @@ defineExpose({
                   :disabled="isLoading || attachmentCapacityReached"
                   @click="fileInputRef?.click()"
                 >
-                  <LucidePlus class="size-4" />
+                  <Icon name="octicon:plus-16" class="size-4" />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>Bifoga filer</TooltipContent>
@@ -644,7 +641,7 @@ defineExpose({
                     "
                     @click="emit('update:webSearch', !webSearch)"
                   >
-                    <LucideGlobe class="size-4" />
+                    <Icon name="octicon:globe-16" class="size-4" />
                     <span class="font-medium" v-if="webSearch">Webb</span>
                   </Button>
                 </TooltipTrigger>
@@ -662,7 +659,7 @@ defineExpose({
                   class="size-8"
                   @click="emit('cancel')"
                 >
-                  <LucideSquare class="size-3.5 fill-current" />
+                  <Icon name="octicon:square-fill-16" class="size-3.5" />
                 </Button>
                 <Button
                   v-else
@@ -672,7 +669,7 @@ defineExpose({
                   :disabled="!canSend"
                   @click="emit('send')"
                 >
-                  <LucideArrowUp class="size-4" />
+                  <Icon name="octicon:arrow-up-16" class="size-4" />
                 </Button>
               </Transition>
             </div>
@@ -728,7 +725,7 @@ defineExpose({
                     {{ model.hint }}
                   </span>
                 </span>
-                <LucideCheck
+                <Icon name="octicon:check-16"
                   v-if="model.id === selectedModelId"
                   class="mt-0.5 size-3.5 shrink-0 text-primary"
                 />

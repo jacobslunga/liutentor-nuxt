@@ -213,7 +213,7 @@ const plugins = computed(() => {
 <template>
   <div class="group/pdf relative isolate h-full w-full overflow-hidden bg-white dark:bg-background">
     <div v-if="isLoading || !engine" class="flex h-full w-full items-center justify-center">
-      <LucideLoader2 class="h-5 w-5 animate-spin text-muted-foreground" />
+      <Icon name="octicon:sync-16" class="h-5 w-5 animate-spin text-muted-foreground" />
     </div>
 
     <EmbedPDF v-else :engine="engine" :plugins="plugins">
@@ -230,7 +230,7 @@ const plugins = computed(() => {
             <template #default="{ isLoaded }">
               <PageLoadingTask :pending="!isLoaded" />
               <div v-if="!isLoaded" class="flex h-full w-full items-center justify-center">
-                <LucideLoader2 class="h-5 w-5 animate-spin text-muted-foreground" />
+                <Icon name="octicon:sync-16" class="h-5 w-5 animate-spin text-muted-foreground" />
               </div>
 
               <Viewport v-else :document-id="activeDocumentId"

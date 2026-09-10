@@ -108,7 +108,7 @@ const groups = [
               <NuxtLink to="/feedback">Skicka feedback</NuxtLink>
             </Button>
             <Button size="sm" variant="outline" @click="openUploadModal()">
-              <LucideUpload class="size-3.5" />
+              <Icon name="octicon:upload-16" class="size-3.5" />
               Ladda upp tenta
             </Button>
           </div>

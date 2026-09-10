@@ -93,9 +93,9 @@ function handleClearRecentSearches() {
       <SettingsRow label="Tema" description="System följer inställningen i din enhet.">
         <SettingsSelect v-model="theme" :options="THEME_OPTIONS" content-class="w-40">
           <template #icon>
-            <LucideSun v-if="theme === 'light'" class="size-3.5" />
-            <LucideMoonStar v-else-if="theme === 'dark'" class="size-3.5" />
-            <LucideMonitor v-else class="size-3.5" />
+            <Icon name="octicon:sun-16" v-if="theme === 'light'" class="size-3.5" />
+            <Icon name="octicon:moon-16" v-else-if="theme === 'dark'" class="size-3.5" />
+            <Icon name="octicon:device-desktop-16" v-else class="size-3.5" />
           </template>
         </SettingsSelect>
       </SettingsRow>

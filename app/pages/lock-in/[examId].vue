@@ -117,7 +117,7 @@ function formatTime(ms: number): string {
       <div
         class="bg-background/80 backdrop-blur-sm border border-border/60 rounded-lg px-4 py-2 flex items-center gap-6 pointer-events-auto">
         <div class="flex items-center gap-3 min-w-30 justify-center">
-          <LucideTimer class="w-5 h-5" :class="timeRemaining < 300000
+          <Icon name="octicon:stopwatch-16" class="w-5 h-5" :class="timeRemaining < 300000
             ? 'text-destructive animate-pulse'
             : 'text-primary'
             " />
@@ -128,14 +128,14 @@ function formatTime(ms: number): string {
 
         <div class="flex items-center gap-2 border-l pl-4">
           <Button variant="ghost" size="icon" class="h-8 w-8" @click="toggleFullscreen">
-            <LucideMinimize v-if="isFullscreen" class="w-4 h-4" />
-            <LucideMaximize v-else class="w-4 h-4" />
+            <Icon name="octicon:screen-normal-16" v-if="isFullscreen" class="w-4 h-4" />
+            <Icon name="octicon:screen-full-16" v-else class="w-4 h-4" />
           </Button>
 
           <Button variant="ghost" size="icon" class="h-8 w-8" :class="paused ? 'text-warning bg-warning/10' : ''"
             @click="handlePauseResume">
-            <LucidePlay v-if="paused" class="w-4 h-4 fill-current" />
-            <LucidePause v-else class="w-4 h-4 fill-current" />
+            <Icon name="octicon:play-16" v-if="paused" class="w-4 h-4" />
+            <Icon name="octicon:pause-16" v-else class="w-4 h-4" />
           </Button>
 
           <Button variant="destructive" size="sm" class="h-8 px-3 ml-2" @click="showFinishDialog = true">
@@ -159,7 +159,7 @@ function formatTime(ms: number): string {
       <div v-if="paused"
         class="absolute inset-0 z-40 bg-background/60 backdrop-blur-sm flex flex-col items-center justify-center gap-6">
         <div class="p-4 rounded-md bg-warning/10 mb-2">
-          <LucidePause class="w-16 h-16 text-warning fill-current" />
+          <Icon name="octicon:pause-16" class="w-16 h-16 text-warning" />
         </div>
         <h2 class="text-4xl font-medium">PAUSAD</h2>
         <div class="flex flex-col items-center gap-2">
@@ -169,7 +169,7 @@ function formatTime(ms: number): string {
           </p>
         </div>
         <Button size="lg" class=" px-8 h-12 text-lg gap-2 mt-4" @click="handlePauseResume">
-          <LucidePlay class="w-5 h-5 fill-current" />
+          <Icon name="octicon:play-16" class="w-5 h-5" />
           Återuppta
         </Button>
       </div>

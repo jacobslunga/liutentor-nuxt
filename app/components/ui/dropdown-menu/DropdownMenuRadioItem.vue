@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { DropdownMenuRadioItemEmits, DropdownMenuRadioItemProps } from "reka-ui"
 import type { HTMLAttributes } from "vue"
-import { Check } from "@lucide/vue"
 import { reactiveOmit } from "@vueuse/core"
 import {
   DropdownMenuItemIndicator,
@@ -28,7 +27,7 @@ const forwarded = useForwardPropsEmits(delegatedProps, emits)
     <span class="pointer-events-none ml-auto flex size-4 shrink-0 items-center justify-center pl-3">
       <DropdownMenuItemIndicator>
         <slot name="indicator-icon">
-          <Check class="size-4 text-primary" />
+          <Icon name="octicon:check-16" class="size-4 text-primary" />
         </slot>
       </DropdownMenuItemIndicator>
     </span>
