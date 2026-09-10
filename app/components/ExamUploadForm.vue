@@ -226,7 +226,7 @@ onUnmounted(() => {
       <div v-if="fixedCourseCode" class="space-y-2">
         <p class="text-sm font-medium text-muted-foreground">Kurskod</p>
         <div class="flex items-center justify-center gap-2 rounded-md border border-border/60 bg-muted/30 px-4 py-3">
-          <LucideBookOpen class="h-4 w-4 text-muted-foreground" />
+          <Icon name="octicon:book-16" class="h-4 w-4 text-muted-foreground" />
           <span class="font-mono text-lg font-medium tracking-wide">
             {{ kurskod }}
           </span>
@@ -250,7 +250,7 @@ onUnmounted(() => {
         <input ref="fileInputRef" type="file" accept="application/pdf" multiple class="hidden"
           @change="handleFileInput" />
         <div class="flex flex-col items-center justify-center gap-2 text-muted-foreground">
-          <LucideUpload class="h-8 w-8" />
+          <Icon name="octicon:upload-16" class="h-8 w-8" />
           <p class="font-medium">
             Dra och släpp PDF-filer här, eller klicka för att välja
           </p>
@@ -262,22 +262,22 @@ onUnmounted(() => {
           <div v-for="(file, index) in files" :key="`${file.name}-${index}`"
             class="flex items-center justify-between text-sm p-2 bg-muted/50 rounded-md">
             <div class="flex items-center gap-2 overflow-hidden">
-              <LucideFileText class="h-4 w-4 shrink-0 text-muted-foreground" />
+              <Icon name="octicon:file-16" class="h-4 w-4 shrink-0 text-muted-foreground" />
               <span class="truncate">{{ file.name }}</span>
             </div>
             <Button variant="ghost" size="icon" class="h-6 w-6" @click.stop="removeFile(index)">
-              <LucideX class="h-4 w-4" />
+              <Icon name="octicon:x-16" class="h-4 w-4" />
             </Button>
           </div>
         </div>
         <Button class="w-full" size="lg" :disabled="!kurskod || loading" @click="handleUpload">
-          <LucideLoader2 v-if="loading" class="h-5 w-5 animate-spin" />
+          <Icon name="octicon:sync-16" v-if="loading" class="h-5 w-5 animate-spin" />
           <span v-else>Ladda upp</span>
         </Button>
       </div>
 
       <div class="p-4 bg-muted/50 border rounded-md flex items-start gap-2 text-left">
-        <LucideInfo class="h-4 w-4 text-muted-foreground shrink-0" />
+        <Icon name="octicon:info-16" class="h-4 w-4 text-muted-foreground shrink-0" />
         <p class="text-xs text-muted-foreground">
           Uppladdade tentor granskas innan de blir tillgängliga för andra
           studenter.
@@ -289,8 +289,8 @@ onUnmounted(() => {
       <AlertDialogContent>
         <AlertDialogHeader class="text-center">
           <div class="flex justify-center mb-2">
-            <LucideCheckCircle v-if="uploadStatus === 'success'" class="h-12 w-12 text-success" />
-            <LucideAlertCircle v-else class="h-12 w-12 text-destructive" />
+            <Icon name="octicon:check-circle-16" v-if="uploadStatus === 'success'" class="h-12 w-12 text-success" />
+            <Icon name="octicon:alert-16" v-else class="h-12 w-12 text-destructive" />
           </div>
           <AlertDialogTitle class="text-xl">
             {{

@@ -18,7 +18,7 @@ const scrolled = computed(() => y.value > 8);
         </NuxtLink>
 
         <Button variant="outline" size="sm" @click="openUploadModal()">
-          <LucideUpload class="size-3.5" />
+          <Icon name="octicon:upload-16" class="size-3.5" />
           <span class="hidden sm:inline">Ladda upp tenta</span>
           <span class="sm:hidden">Ladda upp</span>
         </Button>

@@ -97,7 +97,7 @@ const principles = [
           </p>
           <div class="mt-7 flex flex-wrap items-center gap-3">
             <Button size="sm" @click="openUploadModal()">
-              <LucideUpload class="size-3.5" />
+              <Icon name="octicon:upload-16" class="size-3.5" />
               Ladda upp tenta
             </Button>
             <Button size="sm" variant="outline" as-child>

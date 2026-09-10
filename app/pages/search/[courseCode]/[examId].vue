@@ -340,7 +340,7 @@ onUnmounted(() => {
 
       <div class="relative min-h-0 flex-1">
         <div v-if="isLoading" class="flex h-full items-center justify-center flex-col gap-2">
-          <LucideLoader2 class="w-8 h-8 animate-spin text-muted-foreground" />
+          <Icon name="octicon:sync-16" class="w-8 h-8 animate-spin text-muted-foreground" />
           <p class="text-sm text-muted-foreground">Laddar tenta...</p>
         </div>
 
@@ -398,7 +398,7 @@ onUnmounted(() => {
                         <div class="flex flex-col items-center text-center gap-4">
                           <div
                             class="flex size-12 items-center justify-center rounded-md bg-muted/60 group-hover:bg-primary/10 transition-colors">
-                            <LucideUpload
+                            <Icon name="octicon:upload-16"
                               class="size-6 text-muted-foreground group-hover:text-primary transition-colors" />
                           </div>
                           <div>
@@ -412,7 +412,7 @@ onUnmounted(() => {
                           </div>
                           <NuxtLink to="/upload-exams">
                             <Button size="sm" variant="outline">
-                              <LucideUpload class="size-3.5" />
+                              <Icon name="octicon:upload-16" class="size-3.5" />
                               Ladda upp
                             </Button>
                           </NuxtLink>

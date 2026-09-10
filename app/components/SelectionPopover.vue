@@ -26,7 +26,7 @@ const emit = defineEmits<{ reply: [] }>();
           @mousedown.prevent.stop="emit('reply')"
         >
           Svara
-          <LucideCornerUpLeft class="w-3.5 h-3.5" />
+          <Icon name="octicon:reply-16" class="w-3.5 h-3.5" />
         </Button>
       </div>
     </Transition>

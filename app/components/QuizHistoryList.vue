@@ -102,7 +102,7 @@ function confirmDelete() {
             {{ item.questionCount }} frågor
             <span v-if="item.sourceCount">· {{ item.sourceCount }} tentor</span>
           </span>
-          <LucideCheck
+          <Icon name="octicon:check-16"
             v-if="item.id === activeQuizId"
             class="h-4 w-4 shrink-0 text-primary"
           />
@@ -115,7 +115,7 @@ function confirmDelete() {
           :aria-label="`Ta bort quiz från ${item.label}`"
           @click="requestDelete(item.id)"
         >
-          <LucideTrash2 class="h-4 w-4" />
+          <Icon name="octicon:trash-16" class="h-4 w-4" />
         </Button>
       </div>
     </div>

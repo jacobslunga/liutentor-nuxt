@@ -13,7 +13,7 @@
         aria-label="Stäng chatten"
         @click="emit('close')"
       >
-        <LucideChevronRight />
+        <Icon name="octicon:chevron-right-16" />
       </Button>
     </div>
     <div class="pointer-events-auto flex shrink-0 items-center gap-1">
@@ -25,7 +25,7 @@
             aria-label="Ny chatt"
             @click="emit('newChat')"
           >
-            <LucidePlus class="size-4" />
+            <Icon name="octicon:plus-16" class="size-4" />
           </Button>
         </TooltipTrigger>
         <TooltipContent>Ny chatt</TooltipContent>
@@ -38,7 +38,7 @@
             aria-label="Historik"
             @click="emit('openHistory')"
           >
-            <LucidePanelRight class="size-4" />
+            <Icon name="octicon:sidebar-expand-16" class="size-4" />
           </Button>
         </TooltipTrigger>
         <TooltipContent>Historik</TooltipContent>

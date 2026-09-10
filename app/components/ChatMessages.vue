@@ -309,10 +309,10 @@ defineExpose({
                 ? 'bg-background'
                 : 'bg-muted/40 text-muted-foreground opacity-70'
                 ">
-              <LucideFileText v-if="attachment.mediaType === 'application/pdf'" class="size-3.5 shrink-0" />
+              <Icon name="octicon:file-16" v-if="attachment.mediaType === 'application/pdf'" class="size-3.5 shrink-0" />
               <img v-else-if="attachment.previewUrl" :src="attachment.previewUrl" alt=""
                 class="size-16 shrink-0 rounded-sm object-cover" />
-              <LucideImage v-else class="size-3.5 shrink-0" />
+              <Icon name="octicon:image-16" v-else class="size-3.5 shrink-0" />
               <span class="max-w-20 truncate" :title="attachment.name">{{
                 attachment.name
               }}</span>
@@ -338,7 +338,7 @@ defineExpose({
             msg.status?.message ||
             (!msg.content && isLoading && i === messages.length - 1)
           " class="flex items-center gap-2 h-6" :class="msg.content ? 'mb-2' : ''">
-            <LucideLoader class="variable-spin w-4 h-4 text-muted-foreground" />
+            <Icon name="octicon:sync-16" class="variable-spin w-4 h-4 text-muted-foreground" />
             <span class="shimmer-text font-sans text-sm">{{
               msg.status?.message || loadingPhrase
             }}</span>
@@ -351,7 +351,7 @@ defineExpose({
             <a v-for="source in msg.sources" :key="source.url" :href="source.url" :title="source.title" target="_blank"
               rel="noopener noreferrer"
               class="inline-flex max-w-56 items-center gap-1.5 rounded-sm border bg-background px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-accent/70 hover:text-foreground">
-              <LucideGlobe class="size-3 shrink-0" />
+              <Icon name="octicon:globe-16" class="size-3 shrink-0" />
               <span class="truncate">{{ sourceLabel(source) }}</span>
             </a>
           </div>

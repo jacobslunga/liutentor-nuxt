@@ -92,7 +92,7 @@ const downloadFile = async (url: string, filename: string) => {
       <div class="flex h-14 shrink-0 items-center gap-3 px-3">
         <NuxtLink :to="`/search/${courseCode}`">
           <Button aria-label="Gå tillbaka" variant="outline" size="icon-sm">
-            <LucideArrowLeft class="w-4 h-4" />
+            <Icon name="octicon:arrow-left-16" class="w-4 h-4" />
           </Button>
         </NuxtLink>
         <div class="min-w-0 flex-1">
@@ -111,7 +111,7 @@ const downloadFile = async (url: string, filename: string) => {
               :disabled="!hasDownload"
               aria-label="Ladda ned"
             >
-              <LucideDownload class="w-4 h-4" />
+              <Icon name="octicon:download-16" class="w-4 h-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" :side-offset="8">
@@ -122,7 +122,7 @@ const downloadFile = async (url: string, filename: string) => {
                 downloadFile(examPdfUrl, `${courseCode}_${examDate}_EXAM.pdf`)
               "
             >
-              <LucideDownload class="size-4" /> Ladda ned tenta
+              <Icon name="octicon:download-16" class="size-4" /> Ladda ned tenta
             </DropdownMenuItem>
             <DropdownMenuItem
               class="gap-2 text-sm cursor-pointer"
@@ -134,7 +134,7 @@ const downloadFile = async (url: string, filename: string) => {
                 )
               "
             >
-              <LucideDownload class="size-4" /> Ladda ned facit
+              <Icon name="octicon:download-16" class="size-4" /> Ladda ned facit
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -144,7 +144,7 @@ const downloadFile = async (url: string, filename: string) => {
           size="sm"
           @click="showSolution = true"
         >
-          <LucideBookOpen class="w-3.5 h-3.5 text-primary" />
+          <Icon name="octicon:book-16" class="w-3.5 h-3.5 text-primary" />
           Facit
         </Button>
       </div>
@@ -193,7 +193,7 @@ const downloadFile = async (url: string, filename: string) => {
               aria-label="Stäng"
               @click="showSolution = false"
             >
-              <LucideX class="w-4 h-4" />
+              <Icon name="octicon:x-16" class="w-4 h-4" />
             </Button>
           </div>
         </div>

@@ -11,7 +11,7 @@ const { latest } = useRecentSearches();
     <Button v-for="s in latest" :key="s.courseCode" as-child size="sm" variant="ghost">
       <NuxtLink :to="`/search/${s.courseCode}`">
         {{ s.courseCode }}
-        <LucideArrowUpRight class="w-3.5 h-3.5 ml-1" />
+        <Icon name="octicon:arrow-up-right-16" class="w-3.5 h-3.5 ml-1" />
       </NuxtLink>
     </Button>
   </div>

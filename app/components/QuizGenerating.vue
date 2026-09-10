@@ -52,7 +52,7 @@ const currentStepIndex = computed(() =>
         class="gap-1.5 text-muted-foreground"
         @click="emit('cancel')"
       >
-        <LucideX class="h-3.5 w-3.5" />
+        <Icon name="octicon:x-16" class="h-3.5 w-3.5" />
         Avbryt
       </Button>
 
@@ -70,7 +70,7 @@ const currentStepIndex = computed(() =>
             class="mt-3 gap-1.5"
             @click="emit('retry')"
           >
-            <LucideRefreshCw class="h-3.5 w-3.5" />
+            <Icon name="octicon:sync-16" class="h-3.5 w-3.5" />
             Försök igen
           </Button>
         </div>

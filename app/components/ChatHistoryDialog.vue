@@ -410,14 +410,14 @@ function focusSearch(event: Event) {
       </DialogHeader>
 
       <div class="flex items-center gap-2 border-b px-4 py-2.5">
-        <LucideSearch class="size-4 shrink-0 text-muted-foreground" />
+        <Icon name="octicon:search-16" class="size-4 shrink-0 text-muted-foreground" />
         <input ref="searchInputRef" v-model="searchQuery" type="text" placeholder="Sök bland chattar..."
           class="flex-1 min-w-0 bg-transparent text-sm outline-none placeholder:text-muted-foreground/70" />
         <Button v-if="conversations.length > 0" variant="ghost" size="icon"
           class="size-7 shrink-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
           :disabled="isDeletingAll || isDeletingConversation" aria-label="Radera alla chattar"
           @click="showDeleteAllConfirm = true">
-          <LucideTrash2 class="w-3.5 h-3.5" />
+          <Icon name="octicon:trash-16" class="w-3.5 h-3.5" />
         </Button>
       </div>
 
@@ -471,7 +471,7 @@ function focusSearch(event: Event) {
                 <Button variant="ghost" size="icon"
                   class="size-7 shrink-0 sm:opacity-0 sm:pointer-events-none sm:group-hover:opacity-100 sm:group-hover:pointer-events-auto transition-opacity hover:bg-transparent"
                   :disabled="isDeletingConversation" aria-label="Radera chatt" @click="askDeleteConversation(item)">
-                  <LucideTrash2 class="w-3.5 h-3.5 text-muted-foreground/60 hover:text-destructive" />
+                  <Icon name="octicon:trash-16" class="w-3.5 h-3.5 text-muted-foreground/60 hover:text-destructive" />
                 </Button>
               </div>
             </div>

@@ -9,7 +9,7 @@ defineProps<{
 <template>
   <div class="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border/60 px-6 py-12 text-center">
     <div class="flex size-10 items-center justify-center rounded-full bg-muted/60">
-      <LucideChartColumn class="size-5 text-muted-foreground" />
+      <Icon name="octicon:graph-bar-vertical-16" class="size-5 text-muted-foreground" />
     </div>
     <div>
       <p class="text-sm font-medium text-foreground">{{ title }}</p>

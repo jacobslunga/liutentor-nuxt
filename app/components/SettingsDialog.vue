@@ -8,7 +8,7 @@ const open = defineModel<boolean>("open", { default: false });
   <Dialog v-model:open="open">
     <DialogTrigger v-if="!hideTrigger" as-child>
       <Button variant="ghost" size="icon-sm" aria-label="Inställningar">
-        <LucideSettings />
+        <Icon name="octicon:gear-16" />
       </Button>
     </DialogTrigger>
 

@@ -141,7 +141,7 @@ const iconSize = computed(
 <template>
   <div class="relative" :class="props.class">
     <div class="relative flex items-center">
-      <LucideSearch class="absolute left-3 pointer-events-none z-10 transition-colors" :class="[
+      <Icon name="octicon:search-16" class="absolute left-3 pointer-events-none z-10 transition-colors" :class="[
         iconSize,
         isFocused ? 'text-primary' : 'text-muted-foreground',
       ]" />
@@ -158,7 +158,7 @@ const iconSize = computed(
       </div>
       <Button v-else variant="ghost" size="icon-xs" class="absolute right-3 top-1/2 -translate-y-1/2 z-10"
         aria-label="Rensa" @click="courseCode = ''">
-        <LucideX :class="iconSize" />
+        <Icon name="octicon:x-16" :class="iconSize" />
       </button>
     </div>
 

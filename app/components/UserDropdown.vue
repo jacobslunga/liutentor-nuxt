@@ -85,7 +85,7 @@ const gotoProfile = () => {
           COLOR_BORDER_MAP[avatarColor],
         ]"
       >
-        <LucideLoader2
+        <Icon name="octicon:sync-16"
           v-if="isPending || (avatarUrl && isImageLoading)"
           class="w-4 h-4 animate-spin absolute z-10"
         />
@@ -119,7 +119,7 @@ const gotoProfile = () => {
       </div>
       <DropdownMenuSeparator />
       <DropdownMenuItem class="cursor-pointer" @click="gotoProfile">
-        <LucideUser class="w-4 h-4" />
+        <Icon name="octicon:person-16" class="w-4 h-4" />
         Profil
       </DropdownMenuItem>
       <DropdownMenuSeparator />
@@ -128,7 +128,7 @@ const gotoProfile = () => {
         @click="signOut"
         variant="destructive"
       >
-        <LucideLogOut class="w-4 h-4" />
+        <Icon name="octicon:sign-out-16" class="w-4 h-4" />
         Logga ut
       </DropdownMenuItem>
     </DropdownMenuContent>

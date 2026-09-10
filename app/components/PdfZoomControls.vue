@@ -21,13 +21,13 @@ const canZoomOut = computed(() => currentZoom.value > MIN_ZOOM + EPSILON);
     <button type="button" aria-label="Zooma in" :disabled="!canZoomIn"
       class="flex size-10 items-center justify-center text-muted-foreground transition-colors active:bg-secondary disabled:opacity-35 disabled:active:bg-transparent"
       @click="zoom?.zoomIn()">
-      <LucidePlus class="size-4" />
+      <Icon name="octicon:plus-16" class="size-4" />
     </button>
     <div class="h-px bg-border" />
     <button type="button" aria-label="Zooma ut" :disabled="!canZoomOut"
       class="flex size-10 items-center justify-center text-muted-foreground transition-colors active:bg-secondary disabled:opacity-35 disabled:active:bg-transparent"
       @click="zoom?.zoomOut()">
-      <LucideMinus class="size-4" />
+      <Icon name="octicon:dash-16" class="size-4" />
     </button>
   </div>
 </template>

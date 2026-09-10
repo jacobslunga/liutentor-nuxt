@@ -192,13 +192,13 @@ async function handleSignup() {
       <TabsContent value="logga-in" class="mt-6">
         <div v-if="loginSuccess" class="flex flex-col items-center space-y-3 py-6 text-center">
           <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-            <LucideCheck class="w-6 h-6 text-primary" />
+            <Icon name="octicon:check-16" class="w-6 h-6 text-primary" />
           </div>
           <p class="font-medium">Inloggad!</p>
           <p class="text-sm text-muted-foreground">
             Loggar in dig, tar dig till första sidan...
           </p>
-          <LucideLoader2 class="w-4 h-4 animate-spin text-muted-foreground mt-1" />
+          <Icon name="octicon:sync-16" class="w-4 h-4 animate-spin text-muted-foreground mt-1" />
         </div>
 
         <form v-else @submit.prevent="handleLogin" class="flex flex-col space-y-4">
@@ -219,8 +219,8 @@ async function handleSignup() {
                   " />
               <Button variant="ghost" size="icon-xs" class="absolute right-3 top-1/2 -translate-y-1/2"
                 @click="showLoginPassword = !showLoginPassword">
-                <LucideEye v-if="!showLoginPassword" class="w-4 h-4" />
-                <LucideEyeOff v-else class="w-4 h-4" />
+                <Icon name="octicon:eye-16" v-if="!showLoginPassword" class="w-4 h-4" />
+                <Icon name="octicon:eye-closed-16" v-else class="w-4 h-4" />
               </Button>
             </div>
             <p v-if="loginErrors.password" class="text-xs text-destructive">
@@ -233,7 +233,7 @@ async function handleSignup() {
           </p>
 
           <Button type="submit" class="w-full" :disabled="loginLoading">
-            <LucideLoader2 v-if="loginLoading" class="w-4 h-4 animate-spin" />
+            <Icon name="octicon:sync-16" v-if="loginLoading" class="w-4 h-4 animate-spin" />
             <span v-else>Logga in</span>
           </Button>
 
@@ -250,7 +250,7 @@ async function handleSignup() {
       <TabsContent value="skapa-konto" class="mt-6">
         <div v-if="signupSuccess" class="flex flex-col items-center space-y-3 py-6 text-center">
           <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-            <LucideMailCheck class="w-6 h-6 text-primary" />
+            <Icon name="octicon:mail-16" class="w-6 h-6 text-primary" />
           </div>
           <p class="font-medium">Konto skapat!</p>
           <p class="text-sm text-muted-foreground">
@@ -310,8 +310,8 @@ async function handleSignup() {
                   " />
               <Button variant="ghost" size="icon-xs" class="absolute right-3 top-1/2 -translate-y-1/2"
                 @click="showSignupPassword = !showSignupPassword">
-                <LucideEye v-if="!showSignupPassword" class="w-4 h-4" />
-                <LucideEyeOff v-else class="w-4 h-4" />
+                <Icon name="octicon:eye-16" v-if="!showSignupPassword" class="w-4 h-4" />
+                <Icon name="octicon:eye-closed-16" v-else class="w-4 h-4" />
               </Button>
             </div>
             <p v-if="signupErrors.password" class="text-xs text-destructive">
@@ -331,8 +331,8 @@ async function handleSignup() {
                   " />
               <Button variant="ghost" size="icon-xs" class="absolute right-3 top-1/2 -translate-y-1/2"
                 @click="showSignupConfirm = !showSignupConfirm">
-                <LucideEye v-if="!showSignupConfirm" class="w-4 h-4" />
-                <LucideEyeOff v-else class="w-4 h-4" />
+                <Icon name="octicon:eye-16" v-if="!showSignupConfirm" class="w-4 h-4" />
+                <Icon name="octicon:eye-closed-16" v-else class="w-4 h-4" />
               </Button>
             </div>
             <p v-if="signupErrors.confirmPassword" class="text-xs text-destructive">
@@ -345,7 +345,7 @@ async function handleSignup() {
           </p>
 
           <Button type="submit" class="w-full" :disabled="signupLoading">
-            <LucideLoader2 v-if="signupLoading" class="w-4 h-4 animate-spin" />
+            <Icon name="octicon:sync-16" v-if="signupLoading" class="w-4 h-4 animate-spin" />
             <span v-else>Skapa konto</span>
           </Button>
 

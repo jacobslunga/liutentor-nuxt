@@ -4,15 +4,15 @@
     <div class="flex flex-wrap items-center gap-2">
       <TabsList>
         <TabsTrigger value="exams" class="h-full font-medium text-xs gap-2">
-          <LucideScrollText class="w-4 h-4" />
+          <Icon name="octicon:file-16" class="w-4 h-4" />
           Tentor
         </TabsTrigger>
         <TabsTrigger value="stats" class="h-full font-medium text-xs gap-2">
-          <LucideChartSpline class="w-4 h-4" />
+          <Icon name="octicon:graph-16" class="w-4 h-4" />
           Statistik
         </TabsTrigger>
         <TabsTrigger value="quiz" class="h-full font-medium text-xs gap-2">
-          <LucideLayers class="w-4 h-4" />
+          <Icon name="octicon:stack-16" class="w-4 h-4" />
           Quiz
         </TabsTrigger>
       </TabsList>

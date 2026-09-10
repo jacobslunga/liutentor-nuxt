@@ -306,17 +306,17 @@ async function handleSignOut() {
                             v-if="avatarUploading"
                             class="absolute inset-0 flex items-center justify-center z-10"
                         >
-                            <LucideLoader2
+                            <Icon name="octicon:sync-16"
                                 class="h-7 w-7 text-white animate-spin" />
                         </div>
 
                         <div
                             class="absolute bottom-1 right-1 h-8 w-8 rounded-full bg-background border border-border flex items-center justify-center z-10"
                         >
-                            <LucideLoader2
+                            <Icon name="octicon:sync-16"
                                 v-if="avatarUploading"
                                 class="h-4 w-4 animate-spin text-muted-foreground" />
-                            <LucidePlus
+                            <Icon name="octicon:plus-16"
                                 v-else
                                 class="h-4 w-4 text-foreground" />
                         </div>
@@ -448,10 +448,10 @@ async function handleSignOut() {
                                 :disabled="profileSaving || !hasChanges"
                                 @click="saveProfile"
                             >
-                                <LucideLoader2
+                                <Icon name="octicon:sync-16"
                                     v-if="profileSaving"
                                     class="w-4 h-4 animate-spin" />
-                                <LucideCheck
+                                <Icon name="octicon:check-16"
                                     v-else-if="profileSaved"
                                     class="w-4 h-4" />
                                 <span>{{
@@ -536,10 +536,10 @@ async function handleSignOut() {
                                 :disabled="signOutLoading"
                                 @click="handleSignOut"
                             >
-                                <LucideLoader2
+                                <Icon name="octicon:sync-16"
                                     v-if="signOutLoading"
                                     class="w-4 h-4 animate-spin" />
-                                <LucideLogOut v-else class="w-4 h-4" />
+                                <Icon name="octicon:sign-out-16" v-else class="w-4 h-4" />
                                 <span v-if="!signOutLoading">Logga ut</span>
                             </Button>
                         </div>

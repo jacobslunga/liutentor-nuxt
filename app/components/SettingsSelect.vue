@@ -18,7 +18,7 @@ function select(value: unknown) {
       <Button variant="outline" size="sm" class="gap-1.5">
         <slot name="icon" />
         {{ options.find((o) => o.value === model)?.label ?? "" }}
-        <LucideChevronDown class="size-3.5 text-muted-foreground" />
+        <Icon name="octicon:chevron-down-16" class="size-3.5 text-muted-foreground" />
       </Button>
     </DropdownMenuTrigger>
     <DropdownMenuContent align="end" :class="contentClass ?? 'w-48'">

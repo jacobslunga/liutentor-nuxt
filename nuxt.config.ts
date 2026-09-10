@@ -8,6 +8,7 @@ export default defineNuxtConfig({
     "@nuxtjs/color-mode",
     "@pinia/nuxt",
     "shadcn-nuxt",
+    "@nuxt/icon",
     "nuxt-lucide-icons",
     "nuxt-gtag",
     "nuxt-shiki",
@@ -106,6 +107,26 @@ export default defineNuxtConfig({
   shadcn: {
     prefix: "",
     componentDir: "./app/components/ui",
+  },
+
+  icon: {
+    // svg-läge krävs: shadcn-varianterna storleksätter ikoner via
+    // `[&_svg:not([class*='size-'])]:size-4`, vilket bara träffar riktiga
+    // <svg>-element (css-läget renderar en <span>).
+    mode: "svg",
+    collections: ["octicon"],
+    serverBundle: { collections: ["octicon"] },
+    clientBundle: {
+      scan: true,
+      // Skill-ikonerna i ChatInput slås upp dynamiskt och hittas inte av scannern.
+      icons: [
+        "octicon:mortar-board-16",
+        "octicon:book-16",
+        "octicon:checklist-16",
+        "octicon:light-bulb-16",
+        "octicon:list-unordered-16",
+      ],
+    },
   },
 
   shiki: {
