@@ -239,7 +239,7 @@ async function handleSignup() {
             {{ loginGeneralError }}
           </p>
 
-          <UButton type="submit" class="w-full" :disabled="loginLoading">
+          <UButton type="submit" block :disabled="loginLoading">
             <UIcon name="i-lucide-loader-circle" v-if="loginLoading" class="w-4 h-4 animate-spin" />
             <span v-else>Logga in</span>
           </UButton>
@@ -346,7 +346,7 @@ async function handleSignup() {
             {{ signupGeneralError }}
           </p>
 
-          <UButton type="submit" class="w-full" :disabled="signupLoading">
+          <UButton type="submit" block :disabled="signupLoading">
             <UIcon name="i-lucide-loader-circle" v-if="signupLoading" class="w-4 h-4 animate-spin" />
             <span v-else>Skapa konto</span>
           </UButton>

@@ -271,7 +271,7 @@ onUnmounted(() => {
             </UButton>
           </div>
         </div>
-        <UButton class="w-full" size="lg" :disabled="!kurskod || loading" @click="handleUpload">
+        <UButton block size="lg" :disabled="!kurskod || loading" @click="handleUpload">
           <UIcon name="i-lucide-loader-circle" v-if="loading" class="h-5 w-5 animate-spin" />
           <span v-else>Ladda upp</span>
         </UButton>
