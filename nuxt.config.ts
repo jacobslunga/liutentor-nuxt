@@ -1,15 +1,10 @@
-import tailwindcss from "@tailwindcss/vite";
-
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
 
   modules: [
     "@nuxtjs/supabase",
-    "@nuxtjs/color-mode",
     "@pinia/nuxt",
-    "shadcn-nuxt",
-    "@nuxt/icon",
-    "nuxt-lucide-icons",
+    "@nuxt/ui",
     "nuxt-gtag",
     "nuxt-shiki",
   ],
@@ -63,9 +58,7 @@ export default defineNuxtConfig({
             "Hitta och plugga på gamla tentor från Linköpings Universitet",
         },
       ],
-      link: [
-        { rel: "manifest", href: "/site.webmanifest" },
-      ],
+      link: [{ rel: "manifest", href: "/site.webmanifest" }],
     },
   },
 
@@ -104,27 +97,20 @@ export default defineNuxtConfig({
     storageKey: "color-mode",
   },
 
-  shadcn: {
-    prefix: "",
-    componentDir: "./app/components/ui",
-  },
-
   icon: {
-    // svg-läge krävs: shadcn-varianterna storleksätter ikoner via
-    // `[&_svg:not([class*='size-'])]:size-4`, vilket bara träffar riktiga
-    // <svg>-element (css-läget renderar en <span>).
-    mode: "svg",
-    collections: ["octicon"],
-    serverBundle: { collections: ["octicon"] },
+    // Lucide är Nuxt UI:s standarduppsättning, så biblioteket och appens egna
+    // ikoner kommer från samma familj.
+    collections: ["lucide"],
+    serverBundle: { collections: ["lucide"] },
     clientBundle: {
       scan: true,
       // Skill-ikonerna i ChatInput slås upp dynamiskt och hittas inte av scannern.
       icons: [
-        "octicon:mortar-board-16",
-        "octicon:book-16",
-        "octicon:checklist-16",
-        "octicon:light-bulb-16",
-        "octicon:list-unordered-16",
+        "lucide:graduation-cap",
+        "lucide:book-open",
+        "lucide:list-checks",
+        "lucide:lightbulb",
+        "lucide:list",
       ],
     },
   },
@@ -157,17 +143,21 @@ export default defineNuxtConfig({
     compressPublicAssets: true,
 
     prerender: {
-
       autoSubfolderIndex: false,
     },
   },
 
-  css: [
-    "~/assets/css/tailwind.css",
-  ],
+  css: ["~/assets/css/tailwind.css"],
 
-  vite: {
-    plugins: [tailwindcss()],
+  // Public Sans hämtas från Fontsource vid bygget och self-hostas: @nuxt/fonts
+  // laddar ned woff2-filerna till /_fonts, skriver @font-face med unicode-range
+  // per skriftsystem och `font-display: swap`, och lägger `local()` först så att
+  // ett redan installerat snitt används direkt.
+  fonts: {
+    defaults: { weights: [400, 500, 600, 700], styles: ["normal"] },
+    families: [
+      { name: "Public Sans", provider: "fontsource", global: true },
+    ],
   },
 
   imports: {

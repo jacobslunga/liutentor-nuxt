@@ -12,23 +12,24 @@ watch(
 </script>
 
 <template>
-  <div class="flex flex-col min-h-screen bg-background">
+  <div class="flex flex-col min-h-screen bg-default">
     <header class="sticky top-0 z-40 w-full">
       <div
-        class="absolute inset-0 bg-background/80 backdrop-blur-sm -z-10 mask-[linear-gradient(to_bottom,black,transparent)]"
+        class="absolute inset-0 bg-default/80 backdrop-blur-sm -z-10 mask-[linear-gradient(to_bottom,black,transparent)]"
       />
       <div
         class="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between"
       >
-        <Button
+        <UButton
           @click="router.go(-1)"
+          color="neutral"
           variant="ghost"
           size="sm"
-          class="text-muted-foreground"
+          class="text-muted"
         >
-          <Icon name="octicon:arrow-left-16" class="w-4 h-4" />
+          <UIcon name="i-lucide-arrow-left" class="w-4 h-4" />
           Tillbaka
-        </Button>
+        </UButton>
         <NuxtLink
           to="/"
           class="flex items-center gap-2 hover:opacity-80 transition-opacity"

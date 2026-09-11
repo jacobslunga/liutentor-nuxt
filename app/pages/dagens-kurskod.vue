@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { formatPuzzleDate } from "#shared/utils/dailyCourse";
 import { ROW_REVEAL_MS } from "~/lib/daily-timing";
-import { toast } from "vue-sonner";
+
+const toast = useToast();
 
 definePageMeta({ layout: "info" });
 
@@ -63,9 +64,9 @@ async function share() {
 
   try {
     await navigator.clipboard.writeText(text);
-    toast.success("Resultatet kopierat");
+    toast.add({ title: "Resultatet kopierat", color: "success" });
   } catch {
-    toast.error("Kunde inte kopiera resultatet");
+    toast.add({ title: "Kunde inte kopiera resultatet", color: "error" });
   }
 }
 
@@ -78,11 +79,11 @@ onMounted(() => puzzle.load());
   >
     <div class="flex flex-col items-center gap-0.5 text-center">
       <h1
-        class="text-xl font-semibold tracking-tight text-foreground sm:text-2xl"
+        class="text-xl font-semibold tracking-tight text-highlighted sm:text-2xl"
       >
         Dagens kurskod
       </h1>
-      <p class="text-sm text-muted-foreground">
+      <p class="text-sm text-muted">
         <template v-if="date">
           {{ formatPuzzleDate(date) }} · samma kod för alla
         </template>
@@ -90,7 +91,7 @@ onMounted(() => puzzle.load());
       </p>
     </div>
 
-    <div v-if="loading" class="py-20 text-sm text-muted-foreground">
+    <div v-if="loading" class="py-20 text-sm text-muted">
       Laddar dagens kurskod…
     </div>
 
@@ -98,14 +99,14 @@ onMounted(() => puzzle.load());
       v-else-if="failed"
       class="flex flex-col items-center gap-3 py-20 text-center"
     >
-      <p class="text-sm text-muted-foreground">
+      <p class="text-sm text-muted">
         Kunde inte hämta dagens kurskod.
       </p>
-      <Button variant="outline" @click="puzzle.load()">Försök igen</Button>
+      <UButton color="neutral" variant="outline" @click="puzzle.load()">Försök igen</UButton>
     </div>
 
     <template v-else>
-      <p class="h-5 text-center text-sm text-muted-foreground">
+      <p class="h-5 text-center text-sm text-muted">
         {{ message || (showResult ? "" : "Gissa kurskoden på sex försök") }}
       </p>
 

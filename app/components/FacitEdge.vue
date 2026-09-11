@@ -37,7 +37,7 @@ const glowStyle = computed(() => {
   const v = spring.value;
   const s = glowScale.value;
   const mix = (percent: number) =>
-    `color-mix(in oklab, var(--primary) ${(percent * s).toFixed(1)}%, transparent)`;
+    `color-mix(in oklab, var(--ui-primary) ${(percent * s).toFixed(1)}%, transparent)`;
 
   return {
     width: `${150 + v * 90}px`,
@@ -52,7 +52,7 @@ const tabStyle = computed(() => {
   return {
     opacity: 0.68 + v * 0.32,
     transform: `translate(${(10 - v * 27).toFixed(1)}px, -50%)`,
-    borderColor: `color-mix(in oklab, var(--primary) ${(28 + v * 42).toFixed(0)}%, var(--border))`,
+    borderColor: `color-mix(in oklab, var(--ui-primary) ${(28 + v * 42).toFixed(0)}%, var(--ui-border))`,
   };
 });
 
@@ -79,12 +79,13 @@ onUnmounted(() => {
       class="absolute right-0 top-1/2 flex h-10 items-center gap-2 whitespace-nowrap pr-4 will-change-[transform,opacity]"
       :style="tabStyle">
       <template v-if="facitPdfUrl">
-        <Icon name="octicon:chevron-left-16" class="size-4 shrink-0 text-primary will-change-transform" :style="iconStyle" />
+        <UIcon name="i-lucide-chevron-left" class="size-4 shrink-0 text-primary will-change-transform"
+          :style="iconStyle" />
         <span class="text-xs font-semibold text-primary">
           {{ label ?? "Facit" }}
         </span>
       </template>
-      <span v-else class="text-xs text-muted-foreground">Ej tillgängligt</span>
+      <span v-else class="text-xs text-muted">Ej tillgängligt</span>
     </div>
   </div>
 </template>

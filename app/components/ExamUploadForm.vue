@@ -214,19 +214,19 @@ onUnmounted(() => {
 <template>
   <div class="w-full">
     <div v-if="showHeading" class="mb-8">
-      <h1 class="text-3xl font-medium text-foreground mb-2">
+      <h1 class="text-3xl font-medium text-highlighted mb-2">
         Ladda upp tenta
       </h1>
-      <p class="text-sm font-medium text-muted-foreground">
+      <p class="text-sm font-medium text-muted">
         Hjälp andra studenter genom att ladda upp gamla tentor och facit.
       </p>
     </div>
 
     <div class="space-y-6">
       <div v-if="fixedCourseCode" class="space-y-2">
-        <p class="text-sm font-medium text-muted-foreground">Kurskod</p>
-        <div class="flex items-center justify-center gap-2 rounded-md border border-border/60 bg-muted/30 px-4 py-3">
-          <Icon name="octicon:book-16" class="h-4 w-4 text-muted-foreground" />
+        <p class="text-sm font-medium text-muted">Kurskod</p>
+        <div class="flex items-center justify-center gap-2 rounded-md border border-default/60 bg-muted/30 px-4 py-3">
+          <UIcon name="i-lucide-book-open" class="h-4 w-4 text-muted" />
           <span class="font-mono text-lg font-medium tracking-wide">
             {{ kurskod }}
           </span>
@@ -234,23 +234,24 @@ onUnmounted(() => {
       </div>
 
       <div v-else class="space-y-2">
-        <label class="text-sm font-medium text-muted-foreground">Kurskod</label>
+        <label class="text-sm font-medium text-muted">Kurskod</label>
         <input :value="kurskod" :placeholder="kurskod ? '' : typed" :disabled="loading"
-          class="w-full bg-transparent font-medium outline-none border-0 border-b-2 border-foreground/20 text-center text-4xl focus:ring-0 focus:border-primary transition-colors p-2 placeholder:text-muted-foreground/40"
+          class="w-full bg-transparent font-medium outline-none border-0 border-b-2 border-inverted/20 text-center text-4xl focus:ring-0 focus:border-primary transition-colors p-2 placeholder:text-muted/40"
           @input="
             kurskod = ($event.target as HTMLInputElement).value.toUpperCase()
             " />
       </div>
 
       <div ref="dropZoneRef"
-        class="relative border-2 border-dashed rounded-3xl p-8 text-center cursor-pointer transition-colors duration-150 ease-spring" :class="isOverDropZone
-            ? 'border-primary bg-primary/5 scale-[1.02]'
-            : 'border-muted hover:border-primary/50'
+        class="relative border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors duration-150 ease-spring"
+        :class="isOverDropZone
+          ? 'border-primary bg-primary/5 scale-[1.02]'
+          : 'border-muted hover:border-primary/50'
           " :style="loading ? 'opacity: 0.5; pointer-events: none' : ''" @click="fileInputRef?.click()">
         <input ref="fileInputRef" type="file" accept="application/pdf" multiple class="hidden"
           @change="handleFileInput" />
-        <div class="flex flex-col items-center justify-center gap-2 text-muted-foreground">
-          <Icon name="octicon:upload-16" class="h-8 w-8" />
+        <div class="flex flex-col items-center justify-center gap-2 text-muted">
+          <UIcon name="i-lucide-upload" class="h-8 w-8" />
           <p class="font-medium">
             Dra och släpp PDF-filer här, eller klicka för att välja
           </p>
@@ -262,57 +263,37 @@ onUnmounted(() => {
           <div v-for="(file, index) in files" :key="`${file.name}-${index}`"
             class="flex items-center justify-between text-sm p-2 bg-muted/50 rounded-md">
             <div class="flex items-center gap-2 overflow-hidden">
-              <Icon name="octicon:file-16" class="h-4 w-4 shrink-0 text-muted-foreground" />
+              <UIcon name="i-lucide-file-text" class="h-4 w-4 shrink-0 text-muted" />
               <span class="truncate">{{ file.name }}</span>
             </div>
-            <Button variant="ghost" size="icon" class="h-6 w-6" @click.stop="removeFile(index)">
-              <Icon name="octicon:x-16" class="h-4 w-4" />
-            </Button>
+            <UButton color="neutral" variant="ghost" square class="h-6 w-6" @click.stop="removeFile(index)">
+              <UIcon name="i-lucide-x" class="h-4 w-4" />
+            </UButton>
           </div>
         </div>
-        <Button class="w-full" size="lg" :disabled="!kurskod || loading" @click="handleUpload">
-          <Icon name="octicon:sync-16" v-if="loading" class="h-5 w-5 animate-spin" />
+        <UButton class="w-full" size="lg" :disabled="!kurskod || loading" @click="handleUpload">
+          <UIcon name="i-lucide-loader-circle" v-if="loading" class="h-5 w-5 animate-spin" />
           <span v-else>Ladda upp</span>
-        </Button>
+        </UButton>
       </div>
 
       <div class="p-4 bg-muted/50 border rounded-md flex items-start gap-2 text-left">
-        <Icon name="octicon:info-16" class="h-4 w-4 text-muted-foreground shrink-0" />
-        <p class="text-xs text-muted-foreground">
+        <UIcon name="i-lucide-info" class="h-4 w-4 text-muted shrink-0" />
+        <p class="text-xs text-muted">
           Uppladdade tentor granskas innan de blir tillgängliga för andra
           studenter.
         </p>
       </div>
     </div>
 
-    <AlertDialog :open="uploadStatus !== null">
-      <AlertDialogContent>
-        <AlertDialogHeader class="text-center">
-          <div class="flex justify-center mb-2">
-            <Icon name="octicon:check-circle-16" v-if="uploadStatus === 'success'" class="h-12 w-12 text-success" />
-            <Icon name="octicon:alert-16" v-else class="h-12 w-12 text-destructive" />
-          </div>
-          <AlertDialogTitle class="text-xl">
-            {{
-              uploadStatus === "success"
-                ? "Uppladdning lyckades!"
-                : "Något gick fel"
-            }}
-          </AlertDialogTitle>
-          <AlertDialogDescription>
-            {{
-              uploadStatus === "success"
-                ? "Tack! Din tenta har laddats upp och granskas inom kort."
-                : errorMessage || "Ett fel uppstod vid uppladdningen."
-            }}
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogAction class="w-full" @click="uploadStatus = null">
-            OK
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+    <UModal :open="uploadStatus !== null" :dismissible="false" :close="false" :title="uploadStatus === 'success' ? 'Uppladdning lyckades!' : 'Något gick fel'
+      " :description="uploadStatus === 'success'
+        ? 'Tack! Din tenta har laddats upp och granskas inom kort.'
+        : errorMessage || 'Ett fel uppstod vid uppladdningen.'
+        ">
+      <template #footer>
+        <UButton block @click="uploadStatus = null">OK</UButton>
+      </template>
+    </UModal>
   </div>
 </template>

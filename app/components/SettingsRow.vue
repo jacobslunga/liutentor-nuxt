@@ -11,11 +11,11 @@ withDefaults(
 </script>
 
 <template>
-  <div class="border-b border-border/60 py-3.5 last:border-b-0"
+  <div class="border-b border-default/60 py-3.5 last:border-b-0"
     :class="stacked ? 'space-y-3' : 'flex items-start justify-between gap-6'">
     <div class="min-w-0 space-y-0.5">
-      <p class="text-sm font-medium text-foreground">{{ label }}</p>
-      <p v-if="description" class="text-xs leading-relaxed text-muted-foreground">
+      <p class="text-sm font-medium text-highlighted">{{ label }}</p>
+      <p v-if="description" class="text-xs leading-relaxed text-muted">
         {{ description }}
       </p>
     </div>

@@ -22,8 +22,8 @@ const ROWS = [
 ];
 
 const KEY_CLASSES = {
-  correct: "border-transparent bg-success text-success-foreground",
-  present: "border-transparent bg-warning text-warning-foreground",
+  correct: "border-transparent bg-success text-inverted",
+  present: "border-transparent bg-warning text-inverted",
   // Ruled-out keys take the same fill as a ruled-out tile, so the board and the
   // keyboard read as one system.
   absent: "border-transparent bg-tile-absent text-tile-absent-foreground",
@@ -49,43 +49,27 @@ onUnmounted(() => window.removeEventListener("keydown", onKeydown));
 </script>
 
 <template>
-  <div
-    class="flex w-full max-w-140 flex-col items-center gap-1.5 [--key:clamp(2.125rem,5.6vh,2.75rem)]"
-  >
+  <div class="flex w-full max-w-140 flex-col items-center gap-1.5 [--key:clamp(2.125rem,5.6vh,2.75rem)]">
     <div v-for="(row, i) in ROWS" :key="i" class="flex w-full justify-center gap-1">
-      <button
-        v-for="key in row"
-        :key="key"
-        type="button"
-        :disabled="disabled"
-        class="min-w-0 flex-1 rounded-md border border-border bg-secondary/60 font-mono text-sm font-semibold text-foreground transition-colors duration-150 ease-spring active:scale-[0.96] disabled:opacity-50 sm:text-base"
+      <button v-for="key in row" :key="key" type="button" :disabled="disabled"
+        class="min-w-0 flex-1 rounded-md border border-default bg-elevated/60 font-mono text-sm font-semibold text-highlighted transition-colors duration-150 ease-spring active:scale-[0.96] disabled:opacity-50 sm:text-base"
         :style="{ height: 'var(--key)' }"
-        :class="keyStates.get(key) ? KEY_CLASSES[keyStates.get(key)!] : 'hover:bg-secondary'"
-        @click="emit('type', key)"
-      >
+        :class="keyStates.get(key) ? KEY_CLASSES[keyStates.get(key)!] : 'hover:bg-elevated'"
+        @click="emit('type', key)">
         {{ key }}
       </button>
     </div>
 
     <div class="flex w-full justify-center gap-1">
-      <button
-        type="button"
-        :disabled="disabled"
-        class="flex-2 rounded-md border border-border bg-secondary/60 text-xs font-semibold uppercase tracking-wide text-foreground transition-colors duration-150 ease-spring hover:bg-secondary active:scale-[0.96] disabled:opacity-50 sm:text-sm"
-        :style="{ height: 'var(--key)' }"
-        @click="emit('submit')"
-      >
+      <button type="button" :disabled="disabled"
+        class="flex-2 rounded-md border border-default bg-elevated/60 text-xs font-semibold uppercase tracking-wide text-highlighted transition-colors duration-150 ease-spring hover:bg-elevated active:scale-[0.96] disabled:opacity-50 sm:text-sm"
+        :style="{ height: 'var(--key)' }" @click="emit('submit')">
         Gissa
       </button>
-      <button
-        type="button"
-        :disabled="disabled"
-        aria-label="Radera"
-        class="flex flex-1 items-center justify-center rounded-md border border-border bg-secondary/60 text-foreground transition-colors duration-150 ease-spring hover:bg-secondary active:scale-[0.96] disabled:opacity-50"
-        :style="{ height: 'var(--key)' }"
-        @click="emit('backspace')"
-      >
-        <LucideDelete class="size-5" />
+      <button type="button" :disabled="disabled" aria-label="Radera"
+        class="flex flex-1 items-center justify-center rounded-md border border-default bg-elevated/60 text-highlighted transition-colors duration-150 ease-spring hover:bg-elevated active:scale-[0.96] disabled:opacity-50"
+        :style="{ height: 'var(--key)' }" @click="emit('backspace')">
+        <UIcon name="i-lucide-delete" class="size-5" />
       </button>
     </div>
   </div>

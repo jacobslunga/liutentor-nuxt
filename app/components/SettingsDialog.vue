@@ -5,20 +5,22 @@ const open = defineModel<boolean>("open", { default: false });
 </script>
 
 <template>
-  <Dialog v-model:open="open">
-    <DialogTrigger v-if="!hideTrigger" as-child>
-      <Button variant="ghost" size="icon-sm" aria-label="Inställningar">
-        <Icon name="octicon:gear-16" />
-      </Button>
-    </DialogTrigger>
+  <UModal
+    v-model:open="open"
+    title="Inställningar"
+    description="Anpassa hur LiU Tentor beter sig."
+  >
+    <template v-if="!hideTrigger" #default>
+      <UButton
+        color="neutral"
+        variant="ghost"
+        icon="i-lucide-settings"
+        aria-label="Inställningar"
+      />
+    </template>
 
-    <DialogContent class="custom-scrollbar max-h-[80vh] max-w-md overflow-y-auto">
-      <DialogHeader>
-        <DialogTitle>Inställningar</DialogTitle>
-        <DialogDescription>Anpassa hur LiU Tentor beter sig.</DialogDescription>
-      </DialogHeader>
-
+    <template #body>
       <SettingsDialogContent />
-    </DialogContent>
-  </Dialog>
+    </template>
+  </UModal>
 </template>

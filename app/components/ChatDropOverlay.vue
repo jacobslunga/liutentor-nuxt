@@ -1,24 +1,24 @@
 <template>
-  <div class="pointer-events-none absolute inset-0 z-30 bg-background/90" role="status" aria-live="polite">
+  <div class="pointer-events-none absolute inset-0 z-30 bg-default/90" role="status" aria-live="polite">
     <div class="flex h-full flex-col items-center justify-center p-8 text-center">
       <div class="drop-illustration relative mb-7 h-20 w-32" aria-hidden="true">
         <div
-          class="drop-tile-back absolute left-4 top-3 flex size-14 -rotate-12 items-center justify-center rounded-2xl text-primary-foreground shadow-lg">
-          <Icon name="octicon:image-16" class="size-7" />
+          class="drop-tile-back absolute left-4 top-3 flex size-14 -rotate-12 items-center justify-center rounded-2xl text-inverted shadow-lg">
+          <UIcon name="i-lucide-image" class="size-7" />
         </div>
         <div
-          class="drop-tile-middle absolute right-4 top-1 flex size-14 rotate-12 items-center justify-center rounded-2xl text-primary-foreground shadow-lg">
-          <Icon name="octicon:file-16" class="size-7" />
+          class="drop-tile-middle absolute right-4 top-1 flex size-14 rotate-12 items-center justify-center rounded-2xl text-inverted shadow-lg">
+          <UIcon name="i-lucide-file-text" class="size-7" />
         </div>
         <div
-          class="absolute bottom-0 left-1/2 flex size-14 -translate-x-1/2 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-xl">
-          <Icon name="octicon:image-16" class="size-7" />
+          class="absolute bottom-0 left-1/2 flex size-14 -translate-x-1/2 items-center justify-center rounded-2xl bg-primary text-inverted shadow-xl">
+          <UIcon name="i-lucide-image" class="size-7" />
         </div>
       </div>
-      <p class="text-2xl font-semibold tracking-tight text-foreground">
+      <p class="text-2xl font-semibold tracking-tight text-highlighted">
         Lägg till vad som helst
       </p>
-      <p class="mt-2 text-base text-muted-foreground">
+      <p class="mt-2 text-base text-muted">
         Släpp en fil här för att lägga till den i chatten
       </p>
     </div>
@@ -27,11 +27,11 @@
 
 <style scoped>
 .drop-tile-back {
-  background-color: color-mix(in oklab, var(--primary) 68%, white);
+  background-color: color-mix(in oklab, var(--ui-primary) 68%, white);
 }
 
 .drop-tile-middle {
-  background-color: color-mix(in oklab, var(--primary) 84%, white);
+  background-color: color-mix(in oklab, var(--ui-primary) 84%, white);
 }
 
 .drop-overlay-enter-active,

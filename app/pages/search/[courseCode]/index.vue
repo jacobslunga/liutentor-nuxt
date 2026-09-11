@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { DropdownMenuItem } from "@nuxt/ui";
 import type { Exam } from "~/types/exam";
 
 definePageMeta({ layout: "search" });
@@ -39,6 +40,45 @@ function setExamSortBy(value: unknown) {
 function setExamSortDirection(value: unknown) {
   if (value === "asc" || value === "desc") examSortDirection.value = value;
 }
+
+// Två grupper med kryssposter i stället för radiogrupper — dropdownen i
+// Nuxt UI har ingen radiovariant, men bara ett val per grupp sätts åt gången.
+const sortItems = computed<DropdownMenuItem[][]>(() => [
+  [
+    { label: "Sortera efter", type: "label" },
+    ...(
+      [
+        { label: "Datum", value: "date" },
+        { label: "Godkänd", value: "pass-rate" },
+      ] as const
+    ).map((option) => ({
+      label: option.label,
+      type: "checkbox" as const,
+      checked: examSortBy.value === option.value,
+      onUpdateChecked: (checked: boolean) => {
+        if (checked) setExamSortBy(option.value);
+      },
+      onSelect: (event: Event) => event.preventDefault(),
+    })),
+  ],
+  [
+    { label: "Ordning", type: "label" },
+    ...(
+      [
+        { label: "Fallande", value: "desc" },
+        { label: "Stigande", value: "asc" },
+      ] as const
+    ).map((option) => ({
+      label: option.label,
+      type: "checkbox" as const,
+      checked: examSortDirection.value === option.value,
+      onUpdateChecked: (checked: boolean) => {
+        if (checked) setExamSortDirection(option.value);
+      },
+      onSelect: (event: Event) => event.preventDefault(),
+    })),
+  ],
+]);
 
 function tabFromQuery(value: unknown) {
   return typeof value === "string" && COURSE_TABS.includes(value)
@@ -221,76 +261,60 @@ useHead(() => ({
 function passColor(rate: number) {
   if (rate >= 50) return "text-success";
   if (rate >= 30) return "text-warning";
-  return "text-destructive";
+  return "text-error";
 }
 </script>
 
 <template>
   <div class="container mx-auto max-w-3xl px-4 pb-8 pt-2 md:py-8">
-    <div class="sticky top-0 z-30 bg-background h-12 pt-2 mb-4 md:hidden">
+    <div class="sticky top-0 z-30 bg-default h-12 pt-2 mb-4 md:hidden">
       <CourseSearchDropdown size="md" class="mx-auto w-full max-w-xl" />
     </div>
 
-    <div
-      v-if="status === 'pending'"
-      class="flex items-center justify-center min-h-[60vh]"
-    >
-      <Icon name="octicon:sync-16" class="w-6 h-6 animate-spin text-muted-foreground" />
+    <div v-if="status === 'pending'" class="flex items-center justify-center min-h-[60vh]">
+      <UIcon name="i-lucide-loader-circle" class="w-6 h-6 animate-spin text-muted" />
     </div>
 
-    <div
-      v-else-if="status === 'success' && !courseData"
-      class="mx-auto flex min-h-[60vh] w-full max-w-2xl flex-col items-center justify-center gap-8 py-8"
-    >
+    <div v-else-if="status === 'success' && !courseData"
+      class="mx-auto flex min-h-[60vh] w-full max-w-2xl flex-col items-center justify-center gap-8 py-8">
       <div class="max-w-xl text-center">
-        <div
-          class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted"
-        >
-          <Icon name="octicon:inbox-16" class="h-6 w-6 text-muted-foreground" />
+        <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+          <UIcon name="i-lucide-inbox" class="h-6 w-6 text-muted" />
         </div>
-        <h1 class="text-2xl font-medium text-foreground">
+        <h1 class="text-2xl font-medium text-highlighted">
           Vi saknar tentor för {{ courseCode }}
         </h1>
-        <p class="mt-2 text-sm text-muted-foreground">
+        <p class="mt-2 text-sm text-muted">
           Har du en gammal tenta eller ett facit? Ladda upp den här så blir
           nästa student som söker på {{ courseCode }} hjälpt direkt.
         </p>
       </div>
-      <ExamUploadForm
-        :initial-course-code="courseCode"
-        fixed-course-code
-        :show-heading="false"
-      />
+      <ExamUploadForm :initial-course-code="courseCode" fixed-course-code :show-heading="false" />
     </div>
 
     <template v-else-if="courseData">
       <div class="flex justify-center">
         <div class="flex flex-col items-start w-full max-w-4xl gap-8">
           <div class="w-full">
-            <h1
-              class="text-3xl sm:text-4xl font-semibold text-foreground leading-tight w-full wrap-break-word"
-            >
+            <h1 class="text-3xl sm:text-4xl font-semibold text-highlighted leading-tight w-full wrap-break-word">
               {{ courseData.courseName }}
             </h1>
 
-            <p
-              class="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground"
-            >
-              <span class="font-sans text-sm text-muted-foreground"
-                >{{ courseCode }}
+            <p class="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted">
+              <span class="font-sans text-sm text-muted">{{ courseCode }}
               </span>
               <span aria-hidden="true">·</span>
               <span>
-                <span class="font-medium text-foreground">{{
+                <span class="font-medium text-highlighted">{{
                   exams.length
-                }}</span>
+                  }}</span>
                 tentor
               </span>
               <span aria-hidden="true">·</span>
               <span>
-                <span class="font-medium text-foreground">{{
+                <span class="font-medium text-highlighted">{{
                   examsWithSolutions
-                }}</span>
+                  }}</span>
                 med facit
               </span>
               <template v-if="avgPassRate !== null">
@@ -305,95 +329,46 @@ function passColor(rate: number) {
             </p>
           </div>
 
-          <Tabs v-model="activeTab" class="w-full -mt-4">
-            <CourseTabsBar>
+          <div class="flex flex-col gap-2 w-full -mt-4">
+            <CourseTabsBar v-model="activeTab">
               <template #controls>
-                <DropdownMenu v-if="activeTab === 'exams'">
-                  <DropdownMenuTrigger as-child>
-                    <Button variant="outline" aria-label="Sortera tentor">
-                      <Icon name="octicon:arrow-switch-16" class="size-4" />
-                      {{ examSortLabel }}
-                      <Icon name="octicon:arrow-down-16"
-                        v-if="examSortDirection === 'desc'"
-                        class="size-3.5 text-muted-foreground"
-                      />
-                      <Icon name="octicon:arrow-up-16"
-                        v-else
-                        class="size-3.5 text-muted-foreground"
-                      />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" class="w-44">
-                    <DropdownMenuLabel>Sortera efter</DropdownMenuLabel>
-                    <DropdownMenuRadioGroup
-                      :model-value="examSortBy"
-                      @update:model-value="setExamSortBy"
-                    >
-                      <DropdownMenuRadioItem value="date"
-                        >Datum</DropdownMenuRadioItem
-                      >
-                      <DropdownMenuRadioItem value="pass-rate"
-                        >Godkänd</DropdownMenuRadioItem
-                      >
-                    </DropdownMenuRadioGroup>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuLabel>Ordning</DropdownMenuLabel>
-                    <DropdownMenuRadioGroup
-                      :model-value="examSortDirection"
-                      @update:model-value="setExamSortDirection"
-                    >
-                      <DropdownMenuRadioItem value="desc"
-                        >Fallande</DropdownMenuRadioItem
-                      >
-                      <DropdownMenuRadioItem value="asc"
-                        >Stigande</DropdownMenuRadioItem
-                      >
-                    </DropdownMenuRadioGroup>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <UDropdownMenu v-if="activeTab === 'exams'" :items="sortItems" :content="{ align: 'start' }">
+                  <UButton color="neutral" variant="outline" aria-label="Sortera tentor">
+                    <UIcon name="i-lucide-arrow-left-right" class="size-4" />
+                    {{ examSortLabel }}
+                    <UIcon name="i-lucide-arrow-down" v-if="examSortDirection === 'desc'" class="size-3.5 text-muted" />
+                    <UIcon name="i-lucide-arrow-up" v-else class="size-3.5 text-muted" />
+                  </UButton>
+                </UDropdownMenu>
               </template>
               <template #actions>
-                <Button variant="default" @click="openUploadModal(courseCode)">
-                  <Icon name="octicon:upload-16" class="w-4 h-4" />
+                <UButton @click="openUploadModal(courseCode)">
+                  <UIcon name="i-lucide-upload" class="w-4 h-4" />
                   Ladda upp
-                </Button>
+                </UButton>
               </template>
             </CourseTabsBar>
 
             <Transition name="tab-panel" mode="out-in">
-              <TabsContent
-                v-if="activeTab === 'exams'"
-                key="exams"
-                value="exams"
-                class="mt-5"
-              >
-                <CourseExamsTable
-                  :course-code="courseCode"
-                  :exams="exams"
-                  :sort-by="examSortBy"
-                  :sort-direction="examSortDirection"
-                />
-              </TabsContent>
+              <div v-if="activeTab === 'exams'" key="exams" class="mt-5">
+                <CourseExamsTable :course-code="courseCode" :exams="exams" :sort-by="examSortBy"
+                  :sort-direction="examSortDirection" />
+              </div>
 
-              <TabsContent
-                v-else-if="activeTab === 'stats'"
-                key="stats"
-                value="stats"
-                class="mt-5"
-              >
+              <div v-else-if="activeTab === 'stats'" key="stats" class="mt-5">
                 <Suspense>
                   <LazyCourseStats :exams="exams" />
                   <template #fallback>
                     <CourseStatsSkeleton />
                   </template>
                 </Suspense>
-              </TabsContent>
+              </div>
 
-              <TabsContent v-else key="quiz" value="quiz" class="mt-5">
+              <div v-else key="quiz" class="mt-5">
                 <CourseQuizPanel :course-code="courseCode" :exams="exams" />
-              </TabsContent>
+              </div>
             </Transition>
-          </Tabs>
+          </div>
         </div>
       </div>
     </template>

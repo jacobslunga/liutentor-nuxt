@@ -108,10 +108,10 @@ const sections: DocSection[] = [
           title="Kontakta oss"
           body="Har du frågor om din data eller vill utöva dina rättigheter, till exempel radera ditt konto? Hör av dig så hjälper vi dig."
         >
-          <Button size="sm" variant="outline" @click="openMail">
-            <Icon name="octicon:mail-16" class="size-3.5" />
+          <UButton size="sm" color="neutral" variant="outline" @click="openMail">
+            <UIcon name="i-lucide-mail" class="size-3.5" />
             liutentor@gmail.com
-          </Button>
+          </UButton>
         </DocContact>
       </template>
     </LegalDocument>

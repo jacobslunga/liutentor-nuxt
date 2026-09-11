@@ -31,16 +31,6 @@ const logoStyle = computed(() => ({
 </script>
 
 <template>
-  <img
-    :src="lightSrc"
-    alt="Logo"
-    :class="['dark:hidden', logoClass]"
-    :style="logoStyle"
-  />
-  <img
-    :src="darkSrc"
-    alt="Logo"
-    :class="['hidden dark:block', logoClass]"
-    :style="logoStyle"
-  />
+  <img :src="lightSrc" alt="Logo" :class="['dark:hidden', logoClass]" :style="logoStyle" />
+  <img :src="darkSrc" alt="Logo" :class="['hidden dark:block', logoClass]" :style="logoStyle" />
 </template>

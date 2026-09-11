@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import Button from "~/components/ui/button/Button.vue";
 
 useSeoMeta({
   title: "Sök tentor",
@@ -12,7 +11,7 @@ const { open: openUploadModal } = useUploadModal();
 </script>
 
 <template>
-  <div class="relative flex flex-col items-center justify-start w-full min-h-screen p-4 pt-[20vh] bg-background">
+  <div class="relative flex flex-col items-center justify-start w-full min-h-screen p-4 pt-[20vh] bg-default">
     <div class="absolute top-5 left-5">
       <DailyCourseButton />
     </div>
@@ -31,10 +30,10 @@ const { open: openUploadModal } = useUploadModal();
 
       <div class="relative w-full">
         <div
-          class="w-full border border-foreground/20 bg-background flex flex-row items-center justify-center rounded-full transition-colors duration-200 ease-spring text-sm text-foreground/80 outline-none"
+          class="w-full border border-inverted/20 bg-default flex flex-row items-center justify-center rounded-full transition-colors duration-200 ease-spring text-sm text-highlighted/80 outline-none"
           :class="focusInput
             ? 'border-primary ring-1 ring-primary'
-            : 'hover:border-foreground/40'
+            : 'hover:border-inverted/40'
             ">
           <MainInput v-model:focusInput="focusInput" />
         </div>
@@ -42,10 +41,10 @@ const { open: openUploadModal } = useUploadModal();
 
       <RecentSearches />
 
-      <Button variant="outline" @click="openUploadModal()">
-        <Icon name="octicon:upload-16" />
+      <UButton color="neutral" variant="outline" @click="openUploadModal()">
+        <UIcon name="i-lucide-upload" />
         Ladda upp fler tentor
-      </Button>
+      </UButton>
     </div>
   </div>
 </template>

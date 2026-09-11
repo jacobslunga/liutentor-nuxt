@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { TabsItem } from "@nuxt/ui";
+
 definePageMeta({
   layout: "auth",
 });
@@ -8,6 +10,12 @@ const router = useRouter();
 const activeTab = ref(
   route.query.tab === "skapa-konto" ? "skapa-konto" : "logga-in",
 );
+
+// Flikvärdena speglar ?tab=-parametern; `slot` pekar ut respektive formulär.
+const authTabs: TabsItem[] = [
+  { value: "logga-in", label: "Logga in", slot: "login" },
+  { value: "skapa-konto", label: "Skapa konto", slot: "signup" },
+];
 
 const supabase = useSupabaseClient();
 
@@ -183,108 +191,107 @@ async function handleSignup() {
       </NuxtLink>
     </div>
 
-    <Tabs v-model="activeTab" class="w-full">
-      <TabsList class="w-full">
-        <TabsTrigger value="logga-in" class="flex-1">Logga in</TabsTrigger>
-        <TabsTrigger value="skapa-konto" class="flex-1">Skapa konto</TabsTrigger>
-      </TabsList>
-
-      <TabsContent value="logga-in" class="mt-6">
+    <UTabs color="neutral"
+      v-model="activeTab"
+      :items="authTabs"
+      class="w-full"
+      :ui="{ list: 'w-full', trigger: 'flex-1' }"
+    >
+      <template #login>
         <div v-if="loginSuccess" class="flex flex-col items-center space-y-3 py-6 text-center">
           <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-            <Icon name="octicon:check-16" class="w-6 h-6 text-primary" />
+            <UIcon name="i-lucide-check" class="w-6 h-6 text-primary" />
           </div>
           <p class="font-medium">Inloggad!</p>
-          <p class="text-sm text-muted-foreground">
+          <p class="text-sm text-muted">
             Loggar in dig, tar dig till första sidan...
           </p>
-          <Icon name="octicon:sync-16" class="w-4 h-4 animate-spin text-muted-foreground mt-1" />
+          <UIcon name="i-lucide-loader-circle" class="w-4 h-4 animate-spin text-muted mt-1" />
         </div>
 
         <form v-else @submit.prevent="handleLogin" class="flex flex-col space-y-4">
           <div class="flex flex-col space-y-1.5">
             <label class="text-sm font-medium">LiU mail</label>
-            <Input v-model="loginForm.email" type="email" placeholder="abcde123@student.liu.se" autocomplete="email"
-              :aria-invalid="!!loginErrors.email" :class="loginErrors.email ? 'border-destructive' : ''" />
-            <p v-if="loginErrors.email" class="text-xs text-destructive">
+            <UInput v-model="loginForm.email" type="email" placeholder="abcde123@student.liu.se" autocomplete="email"
+              :color="loginErrors.email ? 'error' : undefined" />
+            <p v-if="loginErrors.email" class="text-xs text-error">
               {{ loginErrors.email }}
             </p>
           </div>
 
           <div class="flex flex-col space-y-1.5">
             <label class="text-sm font-medium">Lösenord</label>
-            <div class="relative">
-              <Input v-model="loginForm.password" :type="showLoginPassword ? 'text' : 'password'" placeholder="••••••••"
-                autocomplete="current-password" :aria-invalid="!!loginErrors.password" :class="loginErrors.password ? 'border-destructive pr-10' : 'pr-10'
-                  " />
-              <Button variant="ghost" size="icon-xs" class="absolute right-3 top-1/2 -translate-y-1/2"
-                @click="showLoginPassword = !showLoginPassword">
-                <Icon name="octicon:eye-16" v-if="!showLoginPassword" class="w-4 h-4" />
-                <Icon name="octicon:eye-closed-16" v-else class="w-4 h-4" />
-              </Button>
-            </div>
-            <p v-if="loginErrors.password" class="text-xs text-destructive">
+            <UInput v-model="loginForm.password" :type="showLoginPassword ? 'text' : 'password'" placeholder="••••••••"
+                autocomplete="current-password" :color="loginErrors.password ? 'error' : undefined">
+                <template #trailing>
+                  <UButton color="neutral" variant="link" size="sm"
+                    :icon="showLoginPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+                    :aria-label="showLoginPassword ? 'Dölj lösenord' : 'Visa lösenord'"
+                    @click="showLoginPassword = !showLoginPassword" />
+                </template>
+              </UInput>
+            <p v-if="loginErrors.password" class="text-xs text-error">
               {{ loginErrors.password }}
             </p>
           </div>
 
-          <p v-if="loginGeneralError" class="text-xs text-destructive text-center">
+          <p v-if="loginGeneralError" class="text-xs text-error text-center">
             {{ loginGeneralError }}
           </p>
 
-          <Button type="submit" class="w-full" :disabled="loginLoading">
-            <Icon name="octicon:sync-16" v-if="loginLoading" class="w-4 h-4 animate-spin" />
+          <UButton type="submit" class="w-full" :disabled="loginLoading">
+            <UIcon name="i-lucide-loader-circle" v-if="loginLoading" class="w-4 h-4 animate-spin" />
             <span v-else>Logga in</span>
-          </Button>
+          </UButton>
 
-          <p class="text-xs text-center text-muted-foreground">
+          <p class="text-xs text-center text-muted">
             Inget konto?
-            <Button variant="link" size="sm" class="text-foreground underline-offset-2 hover:text-primary h-auto p-0"
+            <UButton variant="link" size="sm" class="text-highlighted underline-offset-2 hover:text-primary h-auto p-0"
               @click="activeTab = 'skapa-konto'">
               Skapa ett här
-            </Button>
+            </UButton>
           </p>
         </form>
-      </TabsContent>
+      </template>
 
-      <TabsContent value="skapa-konto" class="mt-6">
+      <template #signup>
         <div v-if="signupSuccess" class="flex flex-col items-center space-y-3 py-6 text-center">
           <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-            <Icon name="octicon:mail-16" class="w-6 h-6 text-primary" />
+            <UIcon name="i-lucide-mail" class="w-6 h-6 text-primary" />
           </div>
           <p class="font-medium">Konto skapat!</p>
-          <p class="text-sm text-muted-foreground">
+          <p class="text-sm text-muted">
             Vi har skickat en bekräftelse till
-            <span class="font-medium text-foreground">{{
+            <span class="font-medium text-highlighted">{{
               signupForm.email
               }}</span>. Kontrollera din inkorg.
           </p>
-          <Button size="sm" variant="outline" class="mt-2" @click="
+          <UButton size="sm" color="neutral" variant="outline" class="mt-2" @click="
             () => {
               signupSuccess = false;
               activeTab = 'logga-in';
             }
           ">
             Gå till inloggning
-          </Button>
+          </UButton>
         </div>
 
         <form v-else @submit.prevent="handleSignup" class="flex flex-col space-y-4">
           <div class="flex gap-3">
             <div class="flex flex-col space-y-1.5 flex-1">
               <label class="text-sm font-medium">Förnamn</label>
-              <Input v-model="signupForm.firstName" type="text" placeholder="Förnamn" autocomplete="given-name"
-                :aria-invalid="!!signupErrors.firstName" :class="signupErrors.firstName ? 'border-destructive' : ''" />
-              <p v-if="signupErrors.firstName" class="text-xs text-destructive">
+              <UInput v-model="signupForm.firstName" type="text" placeholder="Förnamn" autocomplete="given-name"
+                :color="signupErrors.firstName ? 'error' : undefined" />
+              <p v-if="signupErrors.firstName" class="text-xs text-error">
                 {{ signupErrors.firstName }}
               </p>
             </div>
 
             <div class="flex flex-col space-y-1.5 flex-1">
               <label class="text-sm font-medium">Efternamn</label>
-              <Input v-model="signupForm.lastName" type="text" placeholder="Efternamn" autocomplete="family-name"
-                :aria-invalid="!!signupErrors.lastName" :class="signupErrors.lastName ? 'border-destructive' : ''" />
-              <p v-if="signupErrors.lastName" class="text-xs text-destructive">
+              <UInput v-model="signupForm.lastName" type="text" placeholder="Efternamn" autocomplete="family-name"
+                :color="signupErrors.lastName ? 'error' : undefined" />
+              <p v-if="signupErrors.lastName" class="text-xs text-error">
                 {{ signupErrors.lastName }}
               </p>
             </div>
@@ -292,72 +299,67 @@ async function handleSignup() {
 
           <div class="flex flex-col space-y-1.5">
             <label class="text-sm font-medium">LiU mail</label>
-            <Input v-model="signupForm.email" type="email" placeholder="abcde123@student.liu.se" autocomplete="email"
-              :aria-invalid="!!signupErrors.email" :class="signupErrors.email ? 'border-destructive' : ''" />
-            <p v-if="signupErrors.email" class="text-xs text-destructive">
+            <UInput v-model="signupForm.email" type="email" placeholder="abcde123@student.liu.se" autocomplete="email"
+              :color="signupErrors.email ? 'error' : undefined" />
+            <p v-if="signupErrors.email" class="text-xs text-error">
               {{ signupErrors.email }}
             </p>
-            <p v-else class="text-xs text-muted-foreground">
+            <p v-else class="text-xs text-muted">
               Måste vara din LiU mail (t.ex. abcde123@student.liu.se)
             </p>
           </div>
 
           <div class="flex flex-col space-y-1.5">
             <label class="text-sm font-medium">Lösenord</label>
-            <div class="relative">
-              <Input v-model="signupForm.password" :type="showSignupPassword ? 'text' : 'password'"
-                placeholder="••••••••" autocomplete="new-password" :aria-invalid="!!signupErrors.password" :class="signupErrors.password ? 'border-destructive pr-10' : 'pr-10'
-                  " />
-              <Button variant="ghost" size="icon-xs" class="absolute right-3 top-1/2 -translate-y-1/2"
-                @click="showSignupPassword = !showSignupPassword">
-                <Icon name="octicon:eye-16" v-if="!showSignupPassword" class="w-4 h-4" />
-                <Icon name="octicon:eye-closed-16" v-else class="w-4 h-4" />
-              </Button>
-            </div>
-            <p v-if="signupErrors.password" class="text-xs text-destructive">
+            <UInput v-model="signupForm.password" :type="showSignupPassword ? 'text' : 'password'"
+                placeholder="••••••••" autocomplete="new-password" :color="signupErrors.password ? 'error' : undefined">
+                <template #trailing>
+                  <UButton color="neutral" variant="link" size="sm"
+                    :icon="showSignupPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+                    :aria-label="showSignupPassword ? 'Dölj lösenord' : 'Visa lösenord'"
+                    @click="showSignupPassword = !showSignupPassword" />
+                </template>
+              </UInput>
+            <p v-if="signupErrors.password" class="text-xs text-error">
               {{ signupErrors.password }}
             </p>
-            <p v-else class="text-xs text-muted-foreground">Minst 8 tecken</p>
+            <p v-else class="text-xs text-muted">Minst 8 tecken</p>
           </div>
 
           <div class="flex flex-col space-y-1.5">
             <label class="text-sm font-medium">Bekräfta lösenord</label>
-            <div class="relative">
-              <Input v-model="signupForm.confirmPassword" :type="showSignupConfirm ? 'text' : 'password'"
-                placeholder="••••••••" autocomplete="new-password" :aria-invalid="!!signupErrors.confirmPassword"
-                :class="signupErrors.confirmPassword
-                    ? 'border-destructive pr-10'
-                    : 'pr-10'
-                  " />
-              <Button variant="ghost" size="icon-xs" class="absolute right-3 top-1/2 -translate-y-1/2"
-                @click="showSignupConfirm = !showSignupConfirm">
-                <Icon name="octicon:eye-16" v-if="!showSignupConfirm" class="w-4 h-4" />
-                <Icon name="octicon:eye-closed-16" v-else class="w-4 h-4" />
-              </Button>
-            </div>
-            <p v-if="signupErrors.confirmPassword" class="text-xs text-destructive">
+            <UInput v-model="signupForm.confirmPassword" :type="showSignupConfirm ? 'text' : 'password'"
+                placeholder="••••••••" autocomplete="new-password" :color="signupErrors.confirmPassword ? 'error' : undefined">
+                <template #trailing>
+                  <UButton color="neutral" variant="link" size="sm"
+                    :icon="showSignupConfirm ? 'i-lucide-eye-off' : 'i-lucide-eye'"
+                    :aria-label="showSignupConfirm ? 'Dölj lösenord' : 'Visa lösenord'"
+                    @click="showSignupConfirm = !showSignupConfirm" />
+                </template>
+              </UInput>
+            <p v-if="signupErrors.confirmPassword" class="text-xs text-error">
               {{ signupErrors.confirmPassword }}
             </p>
           </div>
 
-          <p v-if="signupGeneralError" class="text-xs text-destructive text-center">
+          <p v-if="signupGeneralError" class="text-xs text-error text-center">
             {{ signupGeneralError }}
           </p>
 
-          <Button type="submit" class="w-full" :disabled="signupLoading">
-            <Icon name="octicon:sync-16" v-if="signupLoading" class="w-4 h-4 animate-spin" />
+          <UButton type="submit" class="w-full" :disabled="signupLoading">
+            <UIcon name="i-lucide-loader-circle" v-if="signupLoading" class="w-4 h-4 animate-spin" />
             <span v-else>Skapa konto</span>
-          </Button>
+          </UButton>
 
-          <p class="text-xs text-center text-muted-foreground">
+          <p class="text-xs text-center text-muted">
             Har du redan ett konto?
-            <Button variant="link" size="sm" class="text-foreground underline-offset-2 hover:text-primary h-auto p-0"
+            <UButton variant="link" size="sm" class="text-highlighted underline-offset-2 hover:text-primary h-auto p-0"
               @click="activeTab = 'logga-in'">
               Logga in
-            </Button>
+            </UButton>
           </p>
         </form>
-      </TabsContent>
-    </Tabs>
+      </template>
+    </UTabs>
   </div>
 </template>

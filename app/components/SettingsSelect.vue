@@ -1,38 +1,44 @@
 <script setup lang="ts">
-/** Ett val i inställningarna: shadcns dropdown med en radiogrupp inuti. */
-defineProps<{
+import type { DropdownMenuItem } from "@nuxt/ui";
+
+/** Ett val i inställningarna: Nuxt UI:s dropdown med en kryssgrupp inuti. */
+const props = defineProps<{
   options: readonly { value: string; label: string; hint?: string }[];
-  contentClass?: string;
 }>();
 
 const model = defineModel<string>({ required: true });
 
-function select(value: unknown) {
-  if (typeof value === "string") model.value = value;
-}
+// Dropdownen har ingen radiovariant, så kryssposter används i stället — bara
+// en åt gången är markerad eftersom valet speglar modellen.
+const items = computed<DropdownMenuItem[]>(() =>
+  props.options.map((option) => ({
+    label: option.label,
+    description: option.hint,
+    type: "checkbox",
+    checked: model.value === option.value,
+    onUpdateChecked: (checked: boolean) => {
+      if (checked) model.value = option.value;
+    },
+    onSelect: (event: Event) => event.preventDefault(),
+  })),
+);
+
+const activeLabel = computed(
+  () => props.options.find((o) => o.value === model.value)?.label ?? "",
+);
 </script>
 
 <template>
-  <DropdownMenu>
-    <DropdownMenuTrigger as-child>
-      <Button variant="outline" size="sm" class="gap-1.5">
+  <UDropdownMenu :items="items" :content="{ align: 'end' }">
+    <UButton
+      color="neutral"
+      variant="outline"
+      trailing-icon="i-lucide-chevron-down"
+      :label="activeLabel"
+    >
+      <template v-if="$slots.icon" #leading>
         <slot name="icon" />
-        {{ options.find((o) => o.value === model)?.label ?? "" }}
-        <Icon name="octicon:chevron-down-16" class="size-3.5 text-muted-foreground" />
-      </Button>
-    </DropdownMenuTrigger>
-    <DropdownMenuContent align="end" :class="contentClass ?? 'w-48'">
-      <DropdownMenuRadioGroup :model-value="model" @update:model-value="select">
-        <DropdownMenuRadioItem v-for="option in options" :key="option.value" :value="option.value"
-          class="cursor-pointer" :class="option.hint ? 'items-start' : ''">
-          <span class="flex min-w-0 flex-col gap-0.5">
-            <span class="text-sm">{{ option.label }}</span>
-            <span v-if="option.hint" class="text-2xs leading-snug text-muted-foreground">
-              {{ option.hint }}
-            </span>
-          </span>
-        </DropdownMenuRadioItem>
-      </DropdownMenuRadioGroup>
-    </DropdownMenuContent>
-  </DropdownMenu>
+      </template>
+    </UButton>
+  </UDropdownMenu>
 </template>

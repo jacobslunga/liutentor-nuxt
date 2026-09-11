@@ -11,23 +11,15 @@ const emit = defineEmits<{ reply: [] }>();
 <template>
   <Teleport to="body">
     <Transition name="popover-fade">
-      <div
-        v-if="visible"
-        class="fixed z-45"
-        :style="{
-          left: `${x}px`,
-          top: `${y}px`,
-          transform: 'translate(-50%, calc(-100% - 8px))',
-        }"
-      >
-        <Button
-          size="sm"
-          variant="secondary"
-          @mousedown.prevent.stop="emit('reply')"
-        >
+      <div v-if="visible" class="fixed z-45" :style="{
+        left: `${x}px`,
+        top: `${y}px`,
+        transform: 'translate(-50%, calc(-100% - 8px))',
+      }">
+        <UButton color="neutral" variant="outline" @mousedown.prevent.stop="emit('reply')">
           Svara
-          <Icon name="octicon:reply-16" class="w-3.5 h-3.5" />
-        </Button>
+          <UIcon name="i-lucide-reply" class="w-3.5 h-3.5" />
+        </UButton>
       </div>
     </Transition>
   </Teleport>

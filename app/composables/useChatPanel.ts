@@ -31,6 +31,7 @@ export interface ChatInputApi {
 
 export interface ChatTranscriptApi {
   scrollToBottom: (behavior?: ScrollBehavior) => void;
+  scrollUserMessageToTop?: () => void;
   restoreScroll: () => void;
   persistScrollPosition: () => void;
   resetScrollState: () => void;
@@ -87,7 +88,7 @@ export function useChatPanel(opts: ChatPanelOptions) {
     attachments: ChatAttachment[] = [],
     skill?: string | null,
   ) {
-    nextTick(() => opts.transcript.value?.scrollToBottom("smooth"));
+    nextTick(() => opts.transcript.value?.scrollUserMessageToTop?.());
 
     await send(text, attachments, {
       modelId: opts.fixedModelId ?? selectedModelId.value,
@@ -165,10 +166,15 @@ export function useChatPanel(opts: ChatPanelOptions) {
 
   watch(
     () => chatStore.currentConversationId,
-    () => {
+    (newId) => {
       chatStore.draftAttachments = [];
       opts.input.value?.discardAttachments();
-      nextTick(() => opts.transcript.value?.scrollToBottom("auto"));
+      if (newId && !isLoading.value) {
+        nextTick(() => {
+          opts.transcript.value?.scrollToBottom("auto");
+          requestAnimationFrame(() => opts.transcript.value?.scrollToBottom("auto"));
+        });
+      }
     },
   );
 

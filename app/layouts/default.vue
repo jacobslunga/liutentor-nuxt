@@ -3,7 +3,7 @@ const { hideFooter, isExamMode } = useDefaultAppShell();
 </script>
 
 <template>
-  <div class="flex flex-col max-w-full min-h-screen bg-background">
+  <div class="flex flex-col max-w-full min-h-screen bg-default">
     <main class="grow">
       <slot />
     </main>

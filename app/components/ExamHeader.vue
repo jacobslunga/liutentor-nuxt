@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { DropdownMenuItem, TabsItem } from "@nuxt/ui";
 import type { Exam } from "~/types/exam";
 import { useChatStore } from "@/stores/chat";
 import { useLayoutStore } from "~/stores/layout";
@@ -51,10 +52,6 @@ const THEME_OPTIONS = [
   { value: "system", label: "System" },
 ] as const;
 
-const themeLabel = computed(
-  () => THEME_OPTIONS.find((o) => o.value === theme.value)?.label ?? "System",
-);
-
 function setTheme(value: unknown) {
   if (typeof value === "string") colorMode.preference = value;
 }
@@ -77,31 +74,15 @@ function formatPassRate(exam: Exam) {
 }
 
 function passColor(exam: Exam) {
-  if (!hasPassRate(exam)) return "text-muted-foreground/50";
+  if (!hasPassRate(exam)) return "text-muted/50";
   if (exam.pass_rate >= 50) return "text-success";
   if (exam.pass_rate >= 30) return "text-warning";
-  return "text-destructive";
+  return "text-error";
 }
 
 const sortLabel = computed(() =>
   sortBy.value === "date" ? "Datum" : "Godkänd",
 );
-
-// The sub-menu opens on hover by default (reka-ui). Swallow the hover pointer
-// events in the capture phase before they reach the trigger so hovering never
-// opens it. reka's own click handler still opens it; we only handle closing on
-// a repeat click via recordSortState/handleSortTriggerClick.
-function blockSortHover(event: Event) {
-  event.stopPropagation();
-}
-
-let sortWasOpen = false;
-function recordSortState() {
-  sortWasOpen = isSortMenuOpen.value;
-}
-function handleSortTriggerClick() {
-  if (sortWasOpen) isSortMenuOpen.value = false;
-}
 
 function setSortBy(value: unknown) {
   if (value === "date" || value === "pass-rate") {
@@ -116,6 +97,43 @@ function setSortDirection(value: unknown) {
     isSortMenuOpen.value = false;
   }
 }
+
+// Kryssposter i två grupper — Nuxt UI:s dropdown har ingen radiovariant, men
+// bara ett val per grupp är markerat åt gången.
+const sortItems = computed<DropdownMenuItem[][]>(() => [
+  [
+    { label: "Sortera efter", type: "label" },
+    ...(
+      [
+        { label: "Datum", value: "date" },
+        { label: "Godkänd", value: "pass-rate" },
+      ] as const
+    ).map((option) => ({
+      label: option.label,
+      type: "checkbox" as const,
+      checked: sortBy.value === option.value,
+      onUpdateChecked: (checked: boolean) => {
+        if (checked) setSortBy(option.value);
+      },
+    })),
+  ],
+  [
+    { label: "Ordning", type: "label" },
+    ...(
+      [
+        { label: "Fallande", value: "desc" },
+        { label: "Stigande", value: "asc" },
+      ] as const
+    ).map((option) => ({
+      label: option.label,
+      type: "checkbox" as const,
+      checked: sortDirection.value === option.value,
+      onUpdateChecked: (checked: boolean) => {
+        if (checked) setSortDirection(option.value);
+      },
+    })),
+  ],
+]);
 
 const sortedExams = computed(() =>
   [...props.exams].sort((a, b) => {
@@ -161,6 +179,22 @@ const hasDownload = computed(
 const selectedDurationLabel = computed(
   () => TIME_OPTIONS.find((o) => o.value === lockInDuration.value)?.label ?? "",
 );
+
+// Flikarna visar bara ikoner, så varje trigger får sitt tillgängliga namn
+// från en sr-only-etikett i leading-slotten.
+// Flikarna visar bara ikoner, så namnet kommer från en sr-only-etikett.
+const layoutTabs = [
+  {
+    value: "exam-with-facit",
+    icon: "i-lucide-columns-2",
+    ariaLabel: "Visa tenta och facit",
+  },
+  {
+    value: "exam-only",
+    icon: "i-lucide-panel-left-close",
+    ariaLabel: "Visa endast tentan",
+  },
+] satisfies TabsItem[];
 
 function switchLayout(val: string | number) {
   if (val !== "exam-with-facit" && val !== "exam-only") return;
@@ -212,6 +246,86 @@ function selectLockInDuration(value: string) {
   showLockInConfirm.value = true;
 }
 
+const actionItems = computed<DropdownMenuItem[][]>(() => [
+  [
+    {
+      label: props.focusMode ? "Avsluta fokusläge" : "Fokusläge",
+      icon: props.focusMode
+        ? "i-lucide-minimize"
+        : "i-lucide-maximize",
+      kbds: ["F"],
+      onSelect: () => emit("toggleFocusMode"),
+    },
+    {
+      label: "Tema",
+      icon:
+        theme.value === "light"
+          ? "i-lucide-sun"
+          : theme.value === "dark"
+            ? "i-lucide-moon"
+            : "i-lucide-monitor",
+      children: THEME_OPTIONS.map((option) => ({
+        label: option.label,
+        type: "checkbox" as const,
+        checked: theme.value === option.value,
+        onUpdateChecked: (checked: boolean) => {
+          if (checked) setTheme(option.value);
+        },
+        onSelect: (event: Event) => event.preventDefault(),
+      })),
+    },
+    {
+      label: "Inställningar",
+      icon: "i-lucide-settings",
+      onSelect: () => (isSettingsOpen.value = true),
+    },
+    {
+      label: "Ladda upp tenta/facit",
+      icon: "i-lucide-upload",
+      onSelect: () => openUploadModal(props.courseCode),
+    },
+  ],
+  [
+    {
+      label: "Ladda ned",
+      icon: "i-lucide-download",
+      disabled: !hasDownload.value,
+      children: [
+        {
+          label: "Tenta",
+          icon: "i-lucide-file-text",
+          disabled: !selectedExam.value?.pdf_url,
+          onSelect: () =>
+            downloadFile(
+              selectedExam.value!.pdf_url,
+              `${selectedExam.value!.course_code}_${selectedExam.value!.exam_date}_EXAM.pdf`,
+            ),
+        },
+        {
+          label: "Facit",
+          icon: "i-lucide-file-check",
+          disabled: !props.solutionPdfUrl,
+          onSelect: () =>
+            downloadFile(
+              props.solutionPdfUrl!,
+              `${selectedExam.value?.course_code}_${selectedExam.value?.exam_date}_SOLUTION.pdf`,
+            ),
+        },
+      ],
+    },
+    {
+      label: "Lock in",
+      icon: "i-lucide-lock",
+      disabled: !selectedExam.value,
+      children: TIME_OPTIONS.map((opt) => ({
+        label: opt.label,
+        icon: "i-lucide-timer",
+        onSelect: () => selectLockInDuration(opt.value),
+      })),
+    },
+  ],
+]);
+
 function confirmLockIn() {
   if (!selectedExam.value || !lockInDuration.value) return;
   const session = startSession(
@@ -226,333 +340,111 @@ function confirmLockIn() {
 </script>
 
 <template>
-  <div
-    class="pointer-events-none relative isolate hidden h-12 w-full items-center justify-between px-3 lg:flex"
-  >
-    <ButtonGroup class="pointer-events-auto overflow-hidden rounded-md">
-      <Button
-        size="sm"
-        variant="secondary"
-        aria-label="Tillbaka till kursen"
-        @click="router.push(`/search/${courseCode}`)"
-      >
-        <Icon name="octicon:arrow-left-16" />
-      </Button>
+  <div class="pointer-events-none relative isolate hidden h-12 w-full items-center justify-between px-3 lg:flex">
+    <UFieldGroup class="pointer-events-auto overflow-hidden rounded-md">
+      <UButton color="neutral" variant="subtle" size="lg" aria-label="Tillbaka till kursen"
+        @click="router.push(`/search/${courseCode}`)">
+        <UIcon name="i-lucide-arrow-left" />
+      </UButton>
 
-      <DropdownMenu v-if="selectedExam" v-model:open="isDropdownOpen">
-        <DropdownMenuTrigger as-child>
-          <Button variant="secondary" size="sm" class="gap-1.5">
-            <div class="flex flex-row items-baseline gap-1.5 leading-none">
-              <span class="text-sm font-semibold">{{
-                selectedExam.exam_date
+      <UPopover v-if="selectedExam" v-model:open="isDropdownOpen" :content="{ align: 'start', sideOffset: 8 }"
+        :ui="{ content: 'overflow-hidden' }">
+        <UButton color="neutral" variant="subtle" size="lg" class="gap-1.5">
+          <div class="flex flex-row items-baseline gap-1.5 leading-none">
+            <span class="font-bold">{{
+              selectedExam.exam_date
               }}</span>
-            </div>
-            <Icon name="octicon:chevron-down-16"
-              class="size-4 text-muted-foreground transition-transform duration-200"
-              :class="{ 'rotate-180': isDropdownOpen }"
-            />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent
-          align="start"
-          :side-offset="8"
-          class="p-0 overflow-hidden"
-        >
-          <div
-            class="px-3 py-2 flex items-center justify-between gap-3 border-b"
-          >
-            <span class="text-xs font-semibold text-foreground"
-              >Alla tentor</span
-            >
+          </div>
+          <UIcon name="i-lucide-chevron-down" class="size-4 text-muted transition-transform duration-200"
+            :class="{ 'rotate-180': isDropdownOpen }" />
+        </UButton>
+
+        <template #content>
+          <div class="px-3 py-2 flex items-center justify-between gap-3 border-b">
+            <span class="text-xs font-semibold text-highlighted">Alla tentor</span>
             <div class="flex items-center gap-1.5">
-              <DropdownMenuSub v-model:open="isSortMenuOpen">
-                <div
-                  class="contents"
-                  @pointermove.capture="blockSortHover"
-                  @pointerover.capture="blockSortHover"
-                >
-                  <DropdownMenuSubTrigger
-                    class="h-7 border px-2 py-1 text-xs"
-                    aria-label="Sortera tentor"
-                    @pointerdown.capture="recordSortState"
-                    @click="handleSortTriggerClick"
-                  >
-                    <Icon name="octicon:arrow-down-16"
-                      v-if="sortDirection === 'desc'"
-                      class="size-3.5"
-                    />
-                    <Icon name="octicon:arrow-up-16" v-else class="size-3.5" />
-                    {{ sortLabel }}
-                  </DropdownMenuSubTrigger>
-                </div>
-                <DropdownMenuSubContent class="w-44">
-                  <DropdownMenuLabel>Sortera efter</DropdownMenuLabel>
-                  <DropdownMenuRadioGroup
-                    :model-value="sortBy"
-                    @update:model-value="setSortBy"
-                  >
-                    <DropdownMenuRadioItem value="date" @select.prevent
-                      >Datum</DropdownMenuRadioItem
-                    >
-                    <DropdownMenuRadioItem value="pass-rate" @select.prevent
-                      >Godkänd</DropdownMenuRadioItem
-                    >
-                  </DropdownMenuRadioGroup>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuLabel>Ordning</DropdownMenuLabel>
-                  <DropdownMenuRadioGroup
-                    :model-value="sortDirection"
-                    @update:model-value="setSortDirection"
-                  >
-                    <DropdownMenuRadioItem value="desc" @select.prevent
-                      >Fallande</DropdownMenuRadioItem
-                    >
-                    <DropdownMenuRadioItem value="asc" @select.prevent
-                      >Stigande</DropdownMenuRadioItem
-                    >
-                  </DropdownMenuRadioGroup>
-                </DropdownMenuSubContent>
-              </DropdownMenuSub>
-              <span
-                class="text-xs font-mono px-2 py-0.5 rounded-sm bg-muted text-muted-foreground font-medium"
-              >
+              <UDropdownMenu v-model:open="isSortMenuOpen" :items="sortItems">
+                <UButton color="neutral" variant="outline" size="xs" :icon="sortDirection === 'desc'
+                  ? 'i-lucide-arrow-down'
+                  : 'i-lucide-arrow-up'
+                  " :label="sortLabel" aria-label="Sortera tentor" />
+              </UDropdownMenu>
+              <span class="text-xs font-mono px-2 py-0.5 rounded-sm bg-muted text-muted font-medium">
                 {{ sortedExams.length }} st
               </span>
             </div>
           </div>
-          <div
-            ref="scrollRef"
-            class="max-h-80 overflow-y-auto p-1.5 space-y-0.5 custom-scrollbar"
-          >
-            <button
-              v-for="e in sortedExams"
-              :key="e.id"
-              :data-current="e.id.toString() === examId"
+          <div ref="scrollRef" class="max-h-80 overflow-y-auto p-1.5 space-y-0.5 custom-scrollbar">
+            <button v-for="e in sortedExams" :key="e.id" :data-current="e.id.toString() === examId"
               class="grid w-full grid-cols-[3.25rem_6.75rem_3.75rem_3.5rem_1rem] items-center gap-x-2 rounded-sm px-3 py-2 text-left transition-colors duration-150 cursor-pointer group"
-              :class="
-                e.id.toString() === examId
-                  ? 'bg-accent font-semibold text-accent-foreground'
-                  : 'hover:bg-foreground/5 text-foreground/90 hover:text-foreground'
-              "
-              @click="changeExam(e)"
-            >
-              <span class="truncate text-sm font-normal text-foreground">
+              :class="e.id.toString() === examId
+                ? 'bg-accented font-semibold text-highlighted'
+                : 'hover:bg-inverted/5 text-highlighted/90 hover:text-highlighted'
+                " @click="changeExam(e)">
+              <span class="truncate text-sm font-normal text-highlighted">
                 {{ getExamPrefix(e) }}
               </span>
               <span class="text-sm font-semibold tabular-nums">
                 {{ e.exam_date }}
               </span>
-              <Badge
-                v-if="e.has_solution"
-                variant="outline"
-                class="col-start-3 justify-self-start text-2xs px-1.5 py-0.5 rounded-sm font-medium border-success/30 bg-success/10 text-success"
-              >
-                Facit
-              </Badge>
-              <span
-                class="col-start-4 justify-self-end font-mono text-xs tabular-nums"
-                :class="passColor(e)"
-              >
+              <UBadge v-if="e.has_solution" color="success" variant="subtle" size="sm" label="Facit"
+                class="col-start-3 justify-self-start" />
+              <span class="col-start-4 justify-self-end font-mono text-xs tabular-nums" :class="passColor(e)">
                 {{ formatPassRate(e) }}
               </span>
-              <Icon name="octicon:check-16"
-                v-if="e.id.toString() === examId"
-                class="col-start-5 size-4 text-primary"
-              />
+              <UIcon name="i-lucide-check" v-if="e.id.toString() === examId" class="col-start-5 size-4 text-primary" />
               <span v-else class="col-start-5 size-4" aria-hidden="true" />
             </button>
           </div>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </ButtonGroup>
+        </template>
+      </UPopover>
+    </UFieldGroup>
 
     <div class="pointer-events-auto flex items-center gap-2">
-      <Button size="sm" @click="chatStore.toggle()">
-        <Icon name="octicon:sync-16"
-          v-if="chatStore.isLoading"
-          class="size-3.5 animate-spin"
-        />
-        <Icon name="octicon:comment-16" v-else class="size-3.5" />
-        <span class="text-xs">{{ chatStore.isOpen ? "Stäng" : "Chatt" }}</span>
-      </Button>
+      <UButton @click="chatStore.toggle()">
+        <UIcon name="i-lucide-loader-circle" v-if="chatStore.isLoading" class="animate-spin" />
+        <UIcon name="i-lucide-message-circle" v-else />
+        <span>{{ chatStore.isOpen ? "Stäng" : "Chatt" }}</span>
+      </UButton>
 
-      <div
-        class="flex items-center gap-1.5 transition-opacity duration-200 hover:opacity-100 focus-within:opacity-100"
-      >
-        <Tabs :model-value="layoutMode" @update:model-value="switchLayout">
-          <TabsList class="h-7">
-            <TabsTrigger
-              value="exam-with-facit"
-              class="h-full px-2.5"
-              aria-label="Visa tenta och facit"
-              title="Tenta och facit"
-            >
-              <Icon name="octicon:split-view-16" class="size-4" />
-            </TabsTrigger>
-            <TabsTrigger
-              value="exam-only"
-              class="h-full px-2.5"
-              aria-label="Visa endast tentan"
-              title="Endast tenta"
-            >
-              <Icon name="octicon:sidebar-collapse-16" class="size-4" />
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
+      <div class="flex items-center gap-1.5 transition-opacity duration-200 hover:opacity-100 focus-within:opacity-100">
+        <UTabs
+          color="neutral"
+          :model-value="layoutMode"
+          :items="layoutTabs"
+          :content="false"
+          size="sm"
+          class="w-auto"
+          :ui="{
+            root: 'w-auto inline-flex',
+            list: 'w-auto inline-flex items-center',
+            trigger: 'h-7 w-9.5 shrink-0 p-0 px-0 py-0 flex items-center justify-center',
+            leadingIcon: 'size-4 shrink-0',
+          }"
+          @update:model-value="switchLayout"
+        >
+          <template #leading="{ item }">
+            <UIcon :name="item.icon" :aria-label="item.ariaLabel" :title="item.ariaLabel" class="size-4 shrink-0" />
+          </template>
+        </UTabs>
 
-        <DropdownMenu v-model:open="isActionsOpen">
-          <DropdownMenuTrigger as-child>
-            <Button
-              variant="ghost"
-              size="sm"
-              class="h-7 w-7 shrink-0 p-0 text-muted-foreground hover:text-foreground"
-              aria-label="Fler åtgärder"
-            >
-              <Icon name="octicon:kebab-horizontal-16" class="size-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" :side-offset="8" class="w-52">
-            <DropdownMenuItem
-              class="cursor-pointer"
-              @click="emit('toggleFocusMode')"
-            >
-              <Icon name="octicon:screen-full-16" v-if="!focusMode" class="size-4" />
-              <Icon name="octicon:screen-normal-16" v-else class="size-4" />
-              {{ focusMode ? "Avsluta fokusläge" : "Fokusläge" }}
-              <DropdownMenuShortcut>F</DropdownMenuShortcut>
-            </DropdownMenuItem>
-
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger>
-                <Icon name="octicon:sun-16" v-if="theme === 'light'" class="size-4" />
-                <Icon name="octicon:moon-16" v-else-if="theme === 'dark'" class="size-4" />
-                <Icon name="octicon:device-desktop-16" v-else class="size-4" />
-                Tema
-                <span class="ml-auto pl-3 text-xs text-muted-foreground">{{
-                  themeLabel
-                }}</span>
-              </DropdownMenuSubTrigger>
-              <DropdownMenuSubContent class="w-40">
-                <DropdownMenuRadioGroup
-                  :model-value="theme"
-                  @update:model-value="setTheme"
-                >
-                  <DropdownMenuRadioItem
-                    v-for="option in THEME_OPTIONS"
-                    :key="option.value"
-                    :value="option.value"
-                    class="cursor-pointer"
-                    @select.prevent
-                  >
-                    {{ option.label }}
-                  </DropdownMenuRadioItem>
-                </DropdownMenuRadioGroup>
-              </DropdownMenuSubContent>
-            </DropdownMenuSub>
-
-            <DropdownMenuItem
-              class="cursor-pointer"
-              @click="isSettingsOpen = true"
-            >
-              <Icon name="octicon:gear-16" class="size-4" />
-              Inställningar
-            </DropdownMenuItem>
-
-            <DropdownMenuItem
-              class="cursor-pointer"
-              @click="openUploadModal(courseCode)"
-            >
-              <Icon name="octicon:upload-16" class="size-4" />
-              Ladda upp tenta/facit
-            </DropdownMenuItem>
-
-            <DropdownMenuSeparator />
-
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger :disabled="!hasDownload">
-                <Icon name="octicon:download-16" class="size-4" />
-                Ladda ned
-              </DropdownMenuSubTrigger>
-              <DropdownMenuSubContent class="w-48">
-                <DropdownMenuItem
-                  class="cursor-pointer"
-                  :disabled="!selectedExam?.pdf_url"
-                  @click="
-                    downloadFile(
-                      selectedExam!.pdf_url,
-                      `${selectedExam!.course_code}_${selectedExam!.exam_date}_EXAM.pdf`,
-                    )
-                  "
-                >
-                  <Icon name="octicon:file-16" class="size-4" />
-                  Tenta
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  class="cursor-pointer"
-                  :disabled="!solutionPdfUrl"
-                  @click="
-                    downloadFile(
-                      solutionPdfUrl!,
-                      `${selectedExam?.course_code}_${selectedExam?.exam_date}_SOLUTION.pdf`,
-                    )
-                  "
-                >
-                  <Icon name="octicon:file-check-16" class="size-4" />
-                  Facit
-                </DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuSub>
-
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger :disabled="!selectedExam">
-                <Icon name="octicon:lock-16" class="size-4" />
-                Lock in
-              </DropdownMenuSubTrigger>
-              <DropdownMenuSubContent class="w-44">
-                <DropdownMenuItem
-                  v-for="opt in TIME_OPTIONS"
-                  :key="opt.value"
-                  class="cursor-pointer"
-                  @click="selectLockInDuration(opt.value)"
-                >
-                  <Icon name="octicon:stopwatch-16" class="size-3.5 opacity-70" />
-                  {{ opt.label }}
-                </DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuSub>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <UDropdownMenu v-model:open="isActionsOpen" :items="actionItems" :content="{ align: 'end', sideOffset: 8 }">
+          <UButton color="neutral" variant="ghost" size="sm" icon="i-lucide-ellipsis" aria-label="Fler åtgärder" />
+        </UDropdownMenu>
       </div>
     </div>
   </div>
 
   <SettingsDialog v-model:open="isSettingsOpen" hide-trigger />
 
-  <AlertDialog
-    :open="showLockInConfirm"
-    @update:open="showLockInConfirm = $event"
-  >
-    <AlertDialogContent>
-      <AlertDialogHeader>
-        <AlertDialogTitle
-          >Är du säker på att du vill locka in?</AlertDialogTitle
-        >
-        <AlertDialogDescription>
-          Du startar en session på {{ selectedDurationLabel }}. Du kommer inte
-          kunna se lösningar under denna tid.
-        </AlertDialogDescription>
-      </AlertDialogHeader>
-      <AlertDialogFooter>
-        <AlertDialogCancel @click="showLockInConfirm = false"
-          >Avbryt</AlertDialogCancel
-        >
-        <AlertDialogAction
-          class="bg-destructive text-white hover:bg-destructive/90"
-          @click="confirmLockIn"
-        >
-          Starta timer
-        </AlertDialogAction>
-      </AlertDialogFooter>
-    </AlertDialogContent>
-  </AlertDialog>
+  <UModal :open="showLockInConfirm" :dismissible="false" :close="false" title="Är du säker på att du vill locka in?"
+    :description="`Du startar en session på ${selectedDurationLabel}. Du kommer inte kunna se lösningar under denna tid.`"
+    @update:open="showLockInConfirm = $event">
+    <template #footer>
+      <UButton color="neutral" variant="outline" @click="showLockInConfirm = false">
+        Avbryt
+      </UButton>
+      <UButton color="error" @click="confirmLockIn">Starta timer</UButton>
+    </template>
+  </UModal>
 </template>

@@ -11,8 +11,8 @@ const props = defineProps<{
 }>();
 
 const TILE_CLASSES = {
-  correct: "border-transparent bg-success text-success-foreground",
-  present: "border-transparent bg-warning text-warning-foreground",
+  correct: "border-transparent bg-success text-inverted",
+  present: "border-transparent bg-warning text-inverted",
   absent: "border-transparent bg-tile-absent text-tile-absent-foreground",
 } as const;
 
@@ -85,35 +85,25 @@ const board = computed(() =>
 <template>
   <!-- Tiles are sized off the viewport so the board, keyboard and header all
        fit on a laptop screen without the page scrolling. -->
-  <div
-    class="flex flex-col items-center gap-1.5 [--tile:clamp(2rem,min(11vw,6.6vh),3rem)]"
-  >
-    <div
-      v-for="(row, rowIndex) in board"
-      :key="rowIndex"
-      class="flex flex-row gap-1.5"
-    >
-      <div
-        v-for="tile in row"
-        :key="tile.key"
+  <div class="flex flex-col items-center gap-1.5 [--tile:clamp(2rem,min(11vw,6.6vh),3rem)]">
+    <div v-for="(row, rowIndex) in board" :key="rowIndex" class="flex flex-row gap-1.5">
+      <div v-for="tile in row" :key="tile.key"
         class="flex items-center justify-center rounded-lg border-2 font-mono font-semibold uppercase transition-colors duration-75 ease-spring"
         :class="[
           tile.state
             ? TILE_CLASSES[tile.state]
             : tile.filled
-              ? 'border-foreground/40 bg-background text-foreground'
-              : 'border-border bg-background text-foreground',
+              ? 'border-inverted/40 bg-default text-highlighted'
+              : 'border-default bg-default text-highlighted',
           tile.revealing ? 'daily-tile-flip' : '',
           tile.filled ? 'daily-tile-pop' : '',
           tile.shake ? 'daily-row-shake' : '',
-        ]"
-        :style="{
+        ]" :style="{
           width: 'var(--tile)',
           height: 'var(--tile)',
           fontSize: 'calc(var(--tile) * 0.42)',
           ...(tile.delay ? { animationDelay: `${tile.delay}ms` } : {}),
-        }"
-      >
+        }">
         {{ tile.char }}
       </div>
     </div>
@@ -125,9 +115,11 @@ const board = computed(() =>
   0% {
     transform: rotateX(0deg);
   }
+
   50% {
     transform: rotateX(90deg);
   }
+
   100% {
     transform: rotateX(0deg);
   }
@@ -137,25 +129,31 @@ const board = computed(() =>
   0% {
     transform: scale(0.9);
   }
+
   100% {
     transform: scale(1);
   }
 }
 
 @keyframes daily-shake {
+
   0%,
   100% {
     transform: translateX(0);
   }
+
   20% {
     transform: translateX(-6px);
   }
+
   40% {
     transform: translateX(6px);
   }
+
   60% {
     transform: translateX(-4px);
   }
+
   80% {
     transform: translateX(4px);
   }
@@ -174,6 +172,7 @@ const board = computed(() =>
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .daily-tile-flip,
   .daily-tile-pop,
   .daily-row-shake {

@@ -328,7 +328,7 @@ onUnmounted(() => {
 
 <template>
   <ClientOnly>
-    <div class="relative flex h-screen w-full flex-col overflow-hidden bg-background">
+    <div class="relative flex h-screen w-full flex-col overflow-hidden bg-default">
       <Transition enter-active-class="transition-all duration-200 ease-spring"
         enter-from-class="-translate-y-2 opacity-0" leave-active-class="transition-all duration-150 ease-spring"
         leave-to-class="-translate-y-2 opacity-0">
@@ -340,26 +340,26 @@ onUnmounted(() => {
 
       <div class="relative min-h-0 flex-1">
         <div v-if="isLoading" class="flex h-full items-center justify-center flex-col gap-2">
-          <Icon name="octicon:sync-16" class="w-8 h-8 animate-spin text-muted-foreground" />
-          <p class="text-sm text-muted-foreground">Laddar tenta...</p>
+          <UIcon name="i-lucide-loader-circle" class="w-8 h-8 animate-spin text-muted" />
+          <p class="text-sm text-muted">Laddar tenta...</p>
         </div>
 
         <div v-else-if="isError" class="flex h-full items-center justify-center flex-col gap-2">
-          <p class="text-2xl text-foreground/80">Något gick fel!</p>
-          <p class="text-sm text-muted-foreground">
+          <p class="text-2xl text-highlighted/80">Något gick fel!</p>
+          <p class="text-sm text-muted">
             Ibland fungerar det att bara ladda om sidan :)
           </p>
-          <Button variant="secondary" @click="refreshNuxtData()">Ladda om</Button>
+          <UButton color="neutral" variant="soft" @click="refreshNuxtData()">Ladda om</UButton>
         </div>
 
         <template v-else-if="exam">
-          <MobilePdfView v-if="isMobile" v-show="!chatStore.isOpen" class="bg-background" :exam-pdf-url="exam.pdf_url"
+          <MobilePdfView v-if="isMobile" v-show="!chatStore.isOpen" class="bg-default" :exam-pdf-url="exam.pdf_url"
             :solution-pdf-url="solutionPdfUrl" :course-code="courseCode" :exam-date="exam.exam_date"
             :explain-enabled="showExplainPopover" @explain="explainSelection" />
 
           <div v-else ref="splitRow" class="h-full flex flex-row overflow-hidden"
             :class="{ 'select-none': isResizing || isOverlayResizing }">
-            <div class="relative isolate h-full overflow-hidden bg-background" :style="isExamOnly ? { width: '100%' } : { width: `${splitPercent}%` }
+            <div class="relative isolate h-full overflow-hidden bg-default" :style="isExamOnly ? { width: '100%' } : { width: `${splitPercent}%` }
               ">
               <LazyPdfRenderer :pdf-url="exam.pdf_url" :layout-mode="layoutMode" :top-inset="64"
                 :explain-enabled="showExplainPopover" @explain="explainSelection" />
@@ -374,7 +374,7 @@ onUnmounted(() => {
                 <ResizeHandle :is-resizing="isResizing" @start-resize="startSplitResize" />
               </div>
 
-              <div class="relative isolate h-full flex-1 min-w-0 overflow-hidden bg-background">
+              <div class="relative isolate h-full flex-1 min-w-0 overflow-hidden bg-default">
                 <div class="absolute inset-0 h-full w-full flex flex-col">
                   <div v-if="solution" class="h-full relative" @mouseenter="solutionBlurred = false"
                     @mouseleave="solutionBlurred = blurFacitUntilHover">
@@ -382,11 +382,11 @@ onUnmounted(() => {
                       :explain-enabled="showExplainPopover" @explain="explainSelection" />
                     <Transition name="fade">
                       <div v-if="solutionBlurred"
-                        class="absolute inset-0 z-20 backdrop-blur-sm bg-background/30 flex flex-col gap-2 items-center justify-center pointer-events-none">
-                        <p class="text-sm font-normal text-muted-foreground">
+                        class="absolute inset-0 z-20 backdrop-blur-sm bg-default/30 flex flex-col gap-2 items-center justify-center pointer-events-none">
+                        <p class="text-sm font-normal text-muted">
                           Håll muspekaren för att visa facit
                         </p>
-                        <LucideMousePointerClick class="text-muted-foreground animate-in" />
+                        <UIcon name="i-lucide-mouse-pointer-click" class="size-6 text-muted animate-in" />
                       </div>
                     </Transition>
                   </div>
@@ -394,27 +394,27 @@ onUnmounted(() => {
                   <div v-else class="flex h-full items-center justify-center p-6">
                     <div class="group relative w-full max-w-sm">
                       <div
-                        class="rounded-md border-2 border-dashed border-border/60 px-8 py-10 transition-colors group-hover:border-primary/30">
+                        class="rounded-md border-2 border-dashed border-default/60 px-8 py-10 transition-colors group-hover:border-primary/30">
                         <div class="flex flex-col items-center text-center gap-4">
                           <div
                             class="flex size-12 items-center justify-center rounded-md bg-muted/60 group-hover:bg-primary/10 transition-colors">
-                            <Icon name="octicon:upload-16"
-                              class="size-6 text-muted-foreground group-hover:text-primary transition-colors" />
+                            <UIcon name="i-lucide-upload"
+                              class="size-6 text-muted group-hover:text-primary transition-colors" />
                           </div>
                           <div>
-                            <p class="font-medium text-foreground/80">
+                            <p class="font-medium text-highlighted/80">
                               Inget facit tillgängligt
                             </p>
-                            <p class="mt-1 text-xs text-muted-foreground/70 max-w-55 leading-relaxed">
+                            <p class="mt-1 text-xs text-muted/70 max-w-55 leading-relaxed">
                               Hjälp andra studenter genom att ladda upp facit till
                               denna tenta.
                             </p>
                           </div>
                           <NuxtLink to="/upload-exams">
-                            <Button size="sm" variant="outline">
-                              <Icon name="octicon:upload-16" class="size-3.5" />
+                            <UButton size="sm" color="neutral" variant="outline">
+                              <UIcon name="i-lucide-upload" class="size-3.5" />
                               Ladda upp
-                            </Button>
+                            </UButton>
                           </NuxtLink>
                         </div>
                       </div>
@@ -431,7 +431,7 @@ onUnmounted(() => {
               leave-active-class="transition-all duration-200 ease-spring"
               leave-from-class="translate-x-0 opacity-100 blur-0" leave-to-class="translate-x-full opacity-0 blur-sm">
               <div v-if="!isMobile && isExamOnly && hasFacit" v-show="isFacitVisible && !chatStore.isOpen"
-                class="fixed right-0 bottom-0 z-30 flex h-screen border-l border-canvas-border bg-background shadow-xl dark:shadow-none"
+                class="fixed right-0 bottom-0 z-30 flex h-screen border-l border-default bg-default shadow-xl dark:shadow-none"
                 :class="{ 'select-none': isOverlayResizing }" :style="{ width: `${overlayWidth}px` }">
                 <div class="relative z-10 w-0 shrink-0">
                   <ResizeHandle :is-resizing="isOverlayResizing" @start-resize="startOverlayResize" />
@@ -451,7 +451,7 @@ onUnmounted(() => {
               leave-active-class="transition-all duration-200 ease-spring"
               leave-from-class="translate-x-0 opacity-100 blur-0" leave-to-class="translate-x-full opacity-0 blur-sm">
               <div v-if="!isMobile && chatHasBeenOpened" v-show="chatStore.isOpen"
-                class="fixed right-0 bottom-0 z-40 flex h-screen border-l border-canvas-border bg-background shadow-xl dark:shadow-none"
+                class="fixed right-0 bottom-0 z-40 flex h-screen border-l border-default bg-default shadow-xl dark:shadow-none"
                 :class="{ 'select-none': isOverlayResizing }" :style="{ width: `${overlayWidth}px` }">
                 <div class="relative z-10 w-0 shrink-0">
                   <ResizeHandle :is-resizing="isOverlayResizing" @start-resize="startOverlayResize" />

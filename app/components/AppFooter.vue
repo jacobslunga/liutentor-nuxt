@@ -29,7 +29,7 @@ const groupedLinks = [
 </script>
 
 <template>
-  <footer class="relative z-10 mt-24 w-full border-t bg-background">
+  <footer class="relative z-10 mt-24 w-full border-t bg-default">
     <div class="mx-auto max-w-6xl px-5 py-14 sm:px-8 sm:py-16">
       <div class="grid grid-cols-1 gap-12 md:grid-cols-4">
         <div class="space-y-4 md:col-span-1">
@@ -40,21 +40,21 @@ const groupedLinks = [
             <LogoIcon class="size-7 text-primary" />
             <span class="font-logo text-xl font-medium tracking-tighter">LiU Tentor</span>
           </NuxtLink>
-          <p class="max-w-56 text-sm leading-relaxed text-muted-foreground">
+          <p class="max-w-56 text-sm leading-relaxed text-muted">
             Studentdrivet tentaarkiv för Linköpings universitet.
           </p>
         </div>
 
         <div class="grid grid-cols-2 gap-8 sm:grid-cols-3 md:col-span-3">
           <div v-for="section in groupedLinks" :key="section.title">
-            <h4 class="text-sm font-medium text-foreground">
+            <h4 class="text-sm font-medium text-highlighted">
               {{ section.title }}
             </h4>
             <ul class="mt-4 space-y-2.5">
               <li v-for="link in section.links" :key="link.href">
                 <NuxtLink
                   :to="link.href"
-                  class="text-sm text-foreground/70 transition-colors duration-150 ease-spring hover:text-foreground"
+                  class="text-sm text-highlighted/70 transition-colors duration-150 ease-spring hover:text-highlighted"
                 >
                   {{ link.name }}
                 </NuxtLink>
@@ -67,13 +67,13 @@ const groupedLinks = [
       <div
         class="mt-14 flex flex-col items-start justify-between gap-4 border-t pt-8 sm:flex-row sm:items-center"
       >
-        <p class="text-xs text-muted-foreground">
+        <p class="text-xs text-muted">
           &copy; {{ year }} LiU Tentor. Inte affilierad med Linköpings universitet.
         </p>
         <div class="flex items-center gap-5">
           <a
             href="mailto:liutentor@gmail.com"
-            class="text-xs text-muted-foreground transition-colors duration-150 ease-spring hover:text-foreground"
+            class="text-xs text-muted transition-colors duration-150 ease-spring hover:text-highlighted"
           >
             liutentor@gmail.com
           </a>

@@ -82,10 +82,10 @@ const sections: DocSection[] = [
           title="Begär borttagning"
           body="Anser du att vi publicerat material som kränker din upphovsrätt eller dina personuppgifter? Kontakta oss så hanterar vi ditt ärende inom 48 timmar."
         >
-          <Button size="sm" variant="outline" @click="openMail">
-            <Icon name="octicon:mail-16" class="size-3.5" />
+          <UButton size="sm" color="neutral" variant="outline" @click="openMail">
+            <UIcon name="i-lucide-mail" class="size-3.5" />
             Skicka borttagningsbegäran
-          </Button>
+          </UButton>
         </DocContact>
       </template>
     </LegalDocument>

@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import type { Exam, QuizDifficulty } from "@/types/quiz";
 import { DEFAULT_QUIZ_DIFFICULTY, QUIZ_DIFFICULTIES } from "@/types/quiz";
-import { toast } from "vue-sonner";
 import { useQuizStore } from "@/stores/quiz";
 import { useQuizHistory } from "@/composables/useQuizHistory";
+
+const toast = useToast();
 
 const props = defineProps<{
   courseCode: string;
@@ -67,11 +68,8 @@ async function deleteFromHistory(id: string) {
   if (quiz.activeQuizId === id) quiz.reset();
 
   const ok = await remove(id);
-  if (ok) toast.success("Quizet raderades", { position: "top-center" });
-  else
-    toast.error("Kunde inte radera quizet", {
-      position: "top-center",
-    });
+  if (ok) toast.add({ title: "Quizet raderades", color: "success" });
+  else toast.add({ title: "Kunde inte radera quizet", color: "error" });
 }
 
 watch(courseCode, () => quiz.reset());
@@ -92,59 +90,27 @@ onUnmounted(() => quiz.abort());
 
 <template>
   <div class="w-full">
-    <Transition
-      enter-active-class="transition-opacity duration-200"
-      enter-from-class="opacity-0"
-      leave-active-class="transition-opacity duration-150"
-      leave-to-class="opacity-0"
-      mode="out-in"
-    >
+    <Transition enter-active-class="transition-opacity duration-200" enter-from-class="opacity-0"
+      leave-active-class="transition-opacity duration-150" leave-to-class="opacity-0" mode="out-in">
       <div v-if="quiz.stage === 'setup'">
-        <QuizStart
-          v-model:difficulty="difficulty"
-          :is-loading="quiz.isGenerating"
-          :can-start="canStart"
-          @start="startQuiz"
-        />
+        <QuizStart v-model:difficulty="difficulty" :is-loading="quiz.isGenerating" :can-start="canStart"
+          @start="startQuiz" />
 
-        <QuizHistoryList
-          :history="courseHistory"
-          :history-enabled="historyEnabled"
-          :active-quiz-id="quiz.activeQuizId"
-          @load-history="loadFromHistory"
-          @delete-history="deleteFromHistory"
-        />
+        <QuizHistoryList :history="courseHistory" :history-enabled="historyEnabled" :active-quiz-id="quiz.activeQuizId"
+          @load-history="loadFromHistory" @delete-history="deleteFromHistory" />
       </div>
 
-      <QuizGenerating
-        v-else-if="quiz.stage === 'generating'"
+      <QuizGenerating v-else-if="quiz.stage === 'generating'"
         :status-message="quiz.generationStatus?.message ?? 'Förbereder quiz...'"
-        :status-step="quiz.generationStatus?.step ?? null"
-        :error="quiz.generationError"
-        @retry="quiz.reset()"
-        @cancel="quiz.reset()"
-      />
+        :status-step="quiz.generationStatus?.step ?? null" :error="quiz.generationError" @retry="quiz.reset()"
+        @cancel="quiz.reset()" />
 
-      <QuizAnswering
-        v-else-if="quiz.stage === 'answering' && quiz.quizData"
-        :key="quiz.sessionKey"
-        :quiz-data="quiz.quizData"
-        :current-index="quiz.currentIndex"
-        :answers="quiz.answers"
-        @answer="quiz.setAnswer"
-        @next="quiz.next"
-        @previous="quiz.previous"
-        @complete="quiz.complete"
-        @exit="quiz.reset()"
-      />
+      <QuizAnswering v-else-if="quiz.stage === 'answering' && quiz.quizData" :key="quiz.sessionKey"
+        :quiz-data="quiz.quizData" :current-index="quiz.currentIndex" :answers="quiz.answers" @answer="quiz.setAnswer"
+        @next="quiz.next" @previous="quiz.previous" @complete="quiz.complete" @exit="quiz.reset()" />
 
-      <QuizResults
-        v-else-if="quiz.stage === 'results' && quiz.quizData"
-        :quiz-data="quiz.quizData"
-        :answers="quiz.answers"
-        @retake="quiz.retake()"
-        @new-quiz="quiz.reset()"
-      />
+      <QuizResults v-else-if="quiz.stage === 'results' && quiz.quizData" :quiz-data="quiz.quizData"
+        :answers="quiz.answers" @retake="quiz.retake()" @new-quiz="quiz.reset()" />
     </Transition>
   </div>
 </template>
