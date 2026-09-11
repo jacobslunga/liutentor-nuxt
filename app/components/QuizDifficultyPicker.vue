@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import type { TabsItem } from "@nuxt/ui";
 import type { QuizDifficulty } from "@/types/quiz";
 import { QUIZ_DIFFICULTIES } from "@/types/quiz";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const props = defineProps<{
   modelValue: QuizDifficulty;
@@ -29,7 +29,15 @@ const OPTIONS: Record<QuizDifficulty, { label: string; hint: string }> = {
 
 const activeHint = computed(() => OPTIONS[props.modelValue].hint);
 
-// TabsRoot arbetar med string; svårighetsgraden är en sluten union, så värdet
+const items = computed<TabsItem[]>(() =>
+  QUIZ_DIFFICULTIES.map((level) => ({
+    value: level,
+    label: OPTIONS[level].label,
+    disabled: props.disabled,
+  })),
+);
+
+// Flikarna arbetar med string; svårighetsgraden är en sluten union, så värdet
 // valideras mot listan i stället för att castas blint.
 function onUpdate(value: string | number) {
   if (props.disabled) return;
@@ -39,24 +47,13 @@ function onUpdate(value: string | number) {
 </script>
 
 <template>
-  <div class="w-full">
-    <p class="text-xs font-medium text-muted-foreground">Svårighetsgrad</p>
+  <div class="w-[80%] flex flex-col items-center justify-center">
+    <p class="text-xs font-medium text-muted">Svårighetsgrad</p>
 
-    <Tabs :model-value="modelValue" class="mt-2" @update:model-value="onUpdate">
-      <TabsList aria-label="Svårighetsgrad" class="w-fit">
-        <TabsTrigger
-          v-for="level in QUIZ_DIFFICULTIES"
-          :key="level"
-          :value="level"
-          :disabled="disabled"
-          class="h-full px-4 text-xs font-medium"
-        >
-          {{ OPTIONS[level].label }}
-        </TabsTrigger>
-      </TabsList>
-    </Tabs>
+    <UTabs color="neutral" :model-value="modelValue" :items="items" :content="false" class="mt-2 w-full"
+      aria-label="Svårighetsgrad" @update:model-value="onUpdate" />
 
-    <p class="mt-2 text-xs leading-relaxed text-muted-foreground">
+    <p class="mt-2 text-xs leading-relaxed text-muted">
       {{ activeHint }}
     </p>
   </div>

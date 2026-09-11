@@ -70,106 +70,68 @@ function confirmExit() {
 <template>
   <div class="w-full">
     <div class="mb-6 flex items-center justify-start gap-3">
-      <Button
-        variant="ghost"
-        size="sm"
-        class="shrink-0 gap-1.5 text-muted-foreground"
-        @click="requestExit"
-      >
-        <Icon name="octicon:arrow-left-16" class="h-3.5 w-3.5" />
+      <UButton color="neutral" variant="ghost" size="sm" class="shrink-0 gap-1.5 text-muted"
+        @click="requestExit">
+        <UIcon name="i-lucide-arrow-left" class="h-3.5 w-3.5" />
         Avsluta
-      </Button>
+      </UButton>
     </div>
 
     <div class="mb-8">
       <div class="mb-2 flex items-center justify-between">
-        <span class="text-xs text-muted-foreground">
+        <span class="text-xs text-muted">
           Fråga
-          <span class="font-medium text-foreground">{{
+          <span class="font-medium text-highlighted">{{
             currentIndex + 1
-          }}</span>
+            }}</span>
           / {{ questionCount }}
         </span>
-        <span class="text-xs text-muted-foreground">
+        <span class="text-xs text-muted">
           {{ answeredCount }}/{{ questionCount }} besvarade
         </span>
       </div>
       <div class="h-1 w-full overflow-hidden rounded-full bg-muted">
-        <div
-          class="h-full rounded-full bg-primary transition-[width] duration-200 ease-spring"
-          :style="{ width: `${progress}%` }"
-        />
+        <div class="h-full rounded-full bg-primary transition-[width] duration-200 ease-spring"
+          :style="{ width: `${progress}%` }" />
       </div>
     </div>
 
-    <QuizQuestion
-      v-if="currentQuestion"
-      :key="currentQuestion.id"
-      :question="currentQuestion"
-      :selected-answer="answers[currentQuestion.id]"
-      @answer="onAnswer"
-    />
+    <QuizQuestion v-if="currentQuestion" :key="currentQuestion.id" :question="currentQuestion"
+      :selected-answer="answers[currentQuestion.id]" @answer="onAnswer" />
 
-    <div
-      class="sticky bottom-0 mt-8 border-t border-border/60 bg-background/80 py-4 backdrop-blur-sm"
-    >
+    <div class="sticky bottom-0 mt-8 border-t border-default/60 bg-default/80 py-4 backdrop-blur-sm">
       <div class="flex items-center justify-end gap-3">
-        <span
-          v-if="!hasAnsweredCurrent && !isLastQuestion"
-          class="text-2xs text-muted-foreground/60"
-        >
+        <span v-if="!hasAnsweredCurrent && !isLastQuestion" class="text-2xs text-muted/60">
           Svara för att fortsätta
         </span>
-        <ButtonGroup>
-          <Button
-            variant="outline"
-            size="sm"
-            :disabled="currentIndex === 0"
-            class="gap-1.5 border-border"
-            @click="emit('previous')"
-          >
-            <Icon name="octicon:arrow-left-16" class="h-3.5 w-3.5" />
+        <UFieldGroup>
+          <UButton color="neutral" variant="outline" size="sm" :disabled="currentIndex === 0"
+            class="gap-1.5 border-default" @click="emit('previous')">
+            <UIcon name="i-lucide-arrow-left" class="h-3.5 w-3.5" />
             Förra
-          </Button>
-          <Button
-            v-if="!isLastQuestion"
-            variant="outline"
-            size="sm"
-            :disabled="!hasAnsweredCurrent"
-            class="gap-1.5 border-border"
-            @click="emit('next', hasAnsweredCurrent)"
-          >
+          </UButton>
+          <UButton v-if="!isLastQuestion" color="neutral" variant="outline" size="sm" :disabled="!hasAnsweredCurrent"
+            class="gap-1.5 border-default" @click="emit('next', hasAnsweredCurrent)">
             Nästa
-            <Icon name="octicon:arrow-right-16" class="h-3.5 w-3.5" />
-          </Button>
-          <Button
-            v-else
-            size="sm"
-            :disabled="!canSubmit"
-            class="gap-1.5"
-            @click="submit"
-          >
-            <Icon name="octicon:check-circle-16" class="h-3.5 w-3.5" />
+            <UIcon name="i-lucide-arrow-right" class="h-3.5 w-3.5" />
+          </UButton>
+          <UButton v-else size="sm" :disabled="!canSubmit" class="gap-1.5" @click="submit">
+            <UIcon name="i-lucide-circle-check" class="h-3.5 w-3.5" />
             Rätta quiz
-          </Button>
-        </ButtonGroup>
+          </UButton>
+        </UFieldGroup>
       </div>
     </div>
 
-    <AlertDialog v-model:open="isExitDialogOpen">
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Avsluta quizet?</AlertDialogTitle>
-          <AlertDialogDescription>
-            Du har svarat på {{ answeredCount }} av {{ questionCount }} frågor.
-            Dina svar försvinner.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Fortsätt quizet</AlertDialogCancel>
-          <AlertDialogAction @click="confirmExit">Avsluta</AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+    <UModal v-model:open="isExitDialogOpen" :dismissible="false" :close="false"
+      title="Avsluta quizet?"
+      :description="`Du har svarat på ${answeredCount} av ${questionCount} frågor. Dina svar försvinner.`">
+      <template #footer="{ close }">
+        <UButton color="neutral" variant="outline" @click="close()">
+          Fortsätt quizet
+        </UButton>
+        <UButton @click="confirmExit">Avsluta</UButton>
+      </template>
+    </UModal>
   </div>
 </template>

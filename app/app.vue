@@ -1,19 +1,19 @@
 <template>
   <div>
     <AppLoadingIndicator color="var(--primary)" :height="2" :throttle="80" :hide-delay="150" />
-    <TooltipProvider :delay-duration="200" :ignore-non-keyboard-focus="true">
+    <UApp
+      :tooltip="{ delayDuration: 200, ignoreNonKeyboardFocus: true }"
+      :toaster="{ position: 'top-center', duration: 4000 }"
+    >
       <NuxtLayout>
         <NuxtPage />
       </NuxtLayout>
-    </TooltipProvider>
-    <Toaster />
-    <ExamUploadDialog />
+      <ExamUploadDialog />
+    </UApp>
   </div>
 </template>
 
 <script setup lang="ts">
-import "vue-sonner/style.css";
-import { Toaster } from "@/components/ui/sonner";
 import logoFontUrl from "~/assets/fonts/gt-super-text-bold.woff2?url&no-inline";
 
 const colorMode = useColorMode();

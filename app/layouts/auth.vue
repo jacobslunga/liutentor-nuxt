@@ -15,17 +15,18 @@ watch(
 </script>
 
 <template>
-  <div class="flex flex-col max-w-full min-h-screen bg-background">
+  <div class="flex flex-col max-w-full min-h-screen bg-default">
     <main class="grow flex items-start justify-center py-5 px-4">
-      <Button
+      <UButton
         @click="router.go(-1)"
         class="absolute top-5 left-5"
+        color="neutral"
         variant="ghost"
         size="sm"
       >
-        <Icon name="octicon:arrow-left-16" class="w-4 h-4" />
+        <UIcon name="i-lucide-arrow-left" class="w-4 h-4" />
         Tillbaka
-      </Button>
+      </UButton>
       <slot />
     </main>
   </div>

@@ -15,13 +15,13 @@ const emit = defineEmits<{
     <div class="absolute inset-y-0 w-px group-hover:w-0.5 transition-colors duration-200"
       :class="isResizing ? 'bg-primary' : 'bg-border group-hover:bg-primary/50'" />
     <div
-      class="relative flex shadow-md h-8 w-4 items-center justify-center rounded-sm border transition-colors duration-200 ease-spring bg-background dark:bg-secondary"
+      class="relative flex shadow-md h-8 w-4 items-center justify-center rounded-[6px] border transition-colors duration-200 ease-spring bg-default dark:bg-elevated"
       :class="isResizing
         ? 'border-primary scale-110'
-        : 'border-border group-hover:border-primary/50'
+        : 'border-default group-hover:border-primary/50'
         ">
-      <Icon name="octicon:grabber-16" class="size-3.5 transition-colors"
-        :class="isResizing ? 'text-primary' : 'text-muted-foreground'" />
+      <UIcon name="i-lucide-grip-vertical" class="size-3.5 transition-colors"
+        :class="isResizing ? 'text-primary' : 'text-muted'" />
     </div>
   </div>
 </template>

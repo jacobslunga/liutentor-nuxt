@@ -1,6 +1,6 @@
 @import "tailwindcss";
+@import "@nuxt/ui";
 
-@plugin "tailwindcss-animate";
 @plugin "@tailwindcss/typography";
 
 @font-face {
@@ -18,18 +18,9 @@
   --duration-fast: 150ms;
   --duration-base: 200ms;
 
-  /* Skills are interactive labels and use the one intentional brand color. */
-  --color-skill: var(--primary);
-
-  /* Stora skärmar (≥1920px). Definierad i px, inte rem, så root-font-bumpen
-     nedan inte flyttar brytpunkten under sina egna fötter. */
   --breakpoint-3xl: 1920px;
 }
 
-/* På riktigt stora skärmar räcker det inte att bredda ytorna — själva
-   innehållet ska växa. Root-em höjs stegvis så att allt som är uttryckt i rem
-   (typografi, spacing, radier) skalar med. Ligger över alla standardbrytpunkter
-   så ingen layout tippar över när skalan ändras. */
 @media (min-width: 1920px) {
   :root {
     font-size: 17px;
@@ -49,29 +40,17 @@
 }
 
 ::-webkit-scrollbar-track {
-  background-color: color-mix(
-    in srgb,
-    var(--muted-foreground),
-    transparent 94%
-  );
+  background-color: color-mix(in srgb, var(--ui-text-muted), transparent 94%);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: color-mix(
-    in srgb,
-    var(--muted-foreground),
-    transparent 58%
-  );
+  background-color: color-mix(in srgb, var(--ui-text-muted), transparent 58%);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: color-mix(
-    in srgb,
-    var(--muted-foreground),
-    transparent 36%
-  );
+  background-color: color-mix(in srgb, var(--ui-text-muted), transparent 36%);
 }
 
 ::-webkit-scrollbar-corner {
@@ -80,7 +59,7 @@
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: color-mix(in srgb, var(--muted-foreground), transparent 58%)
+  scrollbar-color: color-mix(in srgb, var(--ui-text-muted), transparent 58%)
     transparent;
 }
 
@@ -94,8 +73,8 @@
   --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
 
   --font-sans:
-    system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, sans-serif;
+    "Public Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, sans-serif;
 
   --text-2xs: 0.6875rem;
 }
@@ -106,58 +85,16 @@ body {
 }
 
 ::selection {
-  background: color-mix(in oklch, var(--primary) 35%, transparent);
+  background: color-mix(in oklch, var(--ui-primary) 35%, transparent);
 }
 
 ::-moz-selection {
-  background: color-mix(in oklch, var(--primary) 35%, transparent);
+  background: color-mix(in oklch, var(--ui-primary) 35%, transparent);
 }
 
 @custom-variant dark (&:where(.dark, .dark *, .dim, .dim *));
 
 @theme inline {
-  /* Skalan är multiplar av --radius, inte fasta steg: små ytor får små hörn och
-     stora ytor stora, och proportionerna håller när basen ändras. Basen är
-     kontrollradien — knappar, fält och menyer sitter på den. */
-  --radius-xs: calc(var(--radius) * 0.5); /* 4px  — brickor, färgprickar, kbd */
-  --radius-sm: calc(
-    var(--radius) * 0.75
-  ); /* 6px  — menyrader, listrader, chips */
-  --radius-md: var(--radius); /* 8px  — knappar, fält, menyytor, flikar */
-  --radius-lg: calc(var(--radius) * 1.25); /* 10px — små plattor */
-  --radius-xl: calc(var(--radius) * 1.5); /* 12px — dialoger, kort */
-  --radius-2xl: calc(
-    var(--radius) * 2
-  ); /* 16px — chattfältet, större paneler */
-  --radius-3xl: calc(var(--radius) * 2.5); /* 20px — sheets */
-
-  --color-background: var(--background);
-  --color-surface: var(--surface);
-  --color-canvas: var(--canvas);
-  --color-canvas-border: var(--canvas-border);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-primary-container: var(--primary-container);
-  --color-primary-container-foreground: var(--primary-container-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-success: var(--success);
-  --color-success-foreground: var(--success-foreground);
-  --color-warning: var(--warning);
-  --color-warning-foreground: var(--warning-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
@@ -169,152 +106,62 @@ body {
   --color-grade-fail: var(--grade-fail);
   --color-tile-absent: var(--tile-absent);
   --color-tile-absent-foreground: var(--tile-absent-foreground);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --font-heading: var(--font-sans);
+}
+
+:root,
+.dark,
+.dim {
+  /* Toningen mot chattfältet behöver bakgrunden med noll alfa. */
+  --background-0: oklch(from var(--ui-bg) l c h / 0);
+
+  --grade-fail: var(--ui-error);
 }
 
 :root {
-  /* En ratt för hela radieskalan. Allt i @theme är en multipel av den här. */
-  --radius: 0.5rem;
+  --ui-primary: oklch(0.6193 0.1154 172.06);
+  --ui-radius: 0.45rem;
 
-  --primary: oklch(0.6193 0.1154 172.06);
-  --primary-foreground: oklch(0.985 0 0);
-  --primary-container: oklch(from var(--primary) 0.9 0.055 h);
-  --primary-container-foreground: oklch(from var(--primary) 0.3 0.06 h);
+  --chart-1: oklch(from var(--ui-primary) 0.911 0.0453 h);
+  --chart-2: oklch(from var(--ui-primary) 0.8072 0.1109 h);
+  --chart-3: oklch(from var(--ui-primary) 0.7521 0.1557 h);
+  --chart-4: oklch(from var(--ui-primary) 0.6506 0.138 h);
+  --chart-5: oklch(from var(--ui-primary) 0.5382 0.1159 h);
 
-  --foreground: oklch(0.245 0 0);
-
-  --background: oklch(from var(--foreground) 0.99 0 h);
-  --surface: oklch(1 0 0);
-  --canvas: oklch(from var(--foreground) 0.955 0 h);
-  --canvas-border: oklch(from var(--foreground) 0.905 0 h);
-
-  --background-0: oklch(from var(--background) l c h / 0);
-  --background-soft: oklch(from var(--background) l c h / 0.7);
-
-  --card: oklch(from var(--foreground) 0.96 0 h);
-  --card-foreground: oklch(from var(--foreground) 0.145 0 h);
-
-  --popover: var(--background);
-  --popover-foreground: var(--foreground);
-  --secondary: oklch(0.9427 0 0);
-  --secondary-foreground: oklch(from var(--foreground) 0.2 0 h);
-  --muted: oklch(0.9627 0 0);
-  --muted-foreground: oklch(from var(--foreground) 0.48 0 h);
-  --accent: oklch(0.9227 0 0);
-  --accent-foreground: oklch(from var(--foreground) 0.2 0 h);
-
-  --destructive: oklch(0.577 0.245 27.325);
-  --success: oklch(70.9% 0.17602 148.766);
-  --success-foreground: oklch(0.2 0 0);
-  --warning: oklch(81.007% 0.16264 90.418);
-  --warning-foreground: oklch(0.2 0 0);
-
-  --border: oklch(0.927 00 0);
-  --input: oklch(from var(--foreground) 0.89 0 h);
-  --ring: oklch(from var(--foreground) 0.7 0 h);
-
-  --chart-1: oklch(from var(--primary) 0.911 0.0453 h);
-  --chart-2: oklch(from var(--primary) 0.8072 0.1109 h);
-  --chart-3: oklch(from var(--primary) 0.7521 0.1557 h);
-  --chart-4: oklch(from var(--primary) 0.6506 0.138 h);
-  --chart-5: oklch(from var(--primary) 0.5382 0.1159 h);
-
-  --grade-low: oklch(from var(--primary) 0.755 0.155 h);
-  --grade-mid: oklch(from var(--primary) 0.6 0.145 h);
-  --grade-high: oklch(from var(--primary) 0.46 0.11 h);
-  --grade-fail: var(--destructive);
-  --tile-absent: oklch(from var(--foreground) 0.72 0 h);
-  --tile-absent-foreground: oklch(from var(--foreground) 0.99 0 h);
-
-  --sidebar: oklch(from var(--foreground) 0.975 0 h);
-  --sidebar-foreground: oklch(from var(--foreground) 0.145 0 h);
-  --sidebar-primary: var(--primary);
-  --sidebar-primary-foreground: var(--primary-foreground);
-  --sidebar-accent: oklch(from var(--foreground) 0.93 0 h);
-  --sidebar-accent-foreground: oklch(from var(--foreground) 0.2 0 h);
-  --sidebar-border: oklch(from var(--foreground) 0.905 0 h);
-  --sidebar-ring: oklch(from var(--foreground) 0.7 0 h);
+  --grade-low: oklch(from var(--ui-primary) 0.755 0.155 h);
+  --grade-mid: oklch(from var(--ui-primary) 0.6 0.145 h);
+  --grade-high: oklch(from var(--ui-primary) 0.46 0.11 h);
+  --tile-absent: oklch(from var(--ui-text-highlighted) 0.72 0 h);
+  --tile-absent-foreground: oklch(from var(--ui-text-highlighted) 0.99 0 h);
 }
 
 .dark,
 .dim {
   color-scheme: dark;
 
-  --primary: oklch(0.8332 0.088 144.73);
-  --primary-foreground: #1a1a19;
-  --primary-container: oklch(from var(--primary) 0.38 0.05 h);
-  --primary-container-foreground: oklch(from var(--primary) 0.88 0.07 h);
-
-  --foreground: oklch(0.94 0 0);
-
-  --background: oklch(0.1957 0 0);
-  --surface: oklch(from var(--foreground) 0.265 0 h);
-  --canvas: oklch(from var(--foreground) 0.165 0 h);
-  --canvas-border: oklch(from var(--foreground) 0.285 0 h);
-  --background-0: oklch(from var(--background) l c h / 0);
-  --background-soft: oklch(from var(--background) l c h / 0.7);
-
-  --card: oklch(from var(--foreground) 0.265 0 h);
-  --card-foreground: oklch(from var(--foreground) 0.94 0 h);
-  --popover: oklch(0.2431 0.0019 106.54);
-  --popover-foreground: var(--foreground);
-  --secondary: oklch(0.2478 0 0);
-  --secondary-foreground: oklch(from var(--foreground) 0.94 0 h);
-  --muted: oklch(0.261 0.0019 106.54);
-  --muted-foreground: oklch(from var(--foreground) 0.65 0 h);
-  --accent: oklch(from var(--foreground) 0.34 0 h);
-  --accent-foreground: oklch(from var(--foreground) 0.94 0 h);
-
-  --destructive: oklch(0.704 0.191 22.216);
-  --success: oklch(0.78 0.13 150);
-  --success-foreground: oklch(0.2 0 0);
-  --warning: oklch(0.82 0.14 80);
-  --warning-foreground: oklch(0.2 0 0);
-
-  --border: oklch(from var(--foreground) 0.285 0 h);
-  --input: oklch(from var(--foreground) 0.3 0 h);
-  --ring: oklch(from var(--foreground) 0.42 0 h);
+  --ui-primary: oklch(0.8332 0.088 144.73);
 
   /* Egen ramp för mörkt tema — 1 = dovast, 5 = ljusast, så "5 är starkast"
      stämmer i båda teman. */
-  --chart-1: oklch(from var(--primary) 0.42 0.05 h);
-  --chart-2: oklch(from var(--primary) 0.53 0.07 h);
-  --chart-3: oklch(from var(--primary) 0.65 0.085 h);
-  --chart-4: oklch(from var(--primary) 0.75 0.09 h);
-  --chart-5: oklch(from var(--primary) 0.86 0.085 h);
+  --chart-1: oklch(from var(--ui-primary) 0.42 0.05 h);
+  --chart-2: oklch(from var(--ui-primary) 0.53 0.07 h);
+  --chart-3: oklch(from var(--ui-primary) 0.65 0.085 h);
+  --chart-4: oklch(from var(--ui-primary) 0.75 0.09 h);
+  --chart-5: oklch(from var(--ui-primary) 0.86 0.085 h);
 
-  --grade-low: oklch(from var(--primary) 0.55 0.12 h);
-  --grade-mid: oklch(from var(--primary) 0.68 0.145 h);
-  --grade-high: oklch(from var(--primary) 0.83 0.13 h);
-  --grade-fail: var(--destructive);
-  --tile-absent: oklch(from var(--foreground) 0.235 0 h);
-  --tile-absent-foreground: oklch(from var(--foreground) 0.52 0 h);
-
-  --sidebar: oklch(from var(--foreground) 0.13 0 h);
-  --sidebar-foreground: oklch(from var(--foreground) 0.94 0 h);
-  --sidebar-primary: var(--primary);
-  --sidebar-primary-foreground: var(--primary-foreground);
-  --sidebar-accent: oklch(from var(--foreground) 0.24 0 h);
-  --sidebar-accent-foreground: oklch(from var(--foreground) 0.94 0 h);
-  --sidebar-border: oklch(from var(--foreground) 0.285 0 h);
-  --sidebar-ring: oklch(from var(--foreground) 0.42 0 h);
+  --grade-low: oklch(from var(--ui-primary) 0.55 0.12 h);
+  --grade-mid: oklch(from var(--ui-primary) 0.68 0.145 h);
+  --grade-high: oklch(from var(--ui-primary) 0.83 0.13 h);
+  --tile-absent: oklch(from var(--ui-text-highlighted) 0.235 0 h);
+  --tile-absent-foreground: oklch(from var(--ui-text-highlighted) 0.52 0 h);
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-default outline-primary/50;
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-default text-highlighted;
   }
 
   /* Tailwinds preflight sätter cursor: default på knappar. Allt som är
@@ -343,7 +190,7 @@ body {
   transform-origin: center;
   width: 16px;
   height: 16px;
-  color: var(--muted-foreground);
+  color: var(--ui-text-muted);
 }
 
 @keyframes variable-spin {
@@ -399,11 +246,11 @@ body {
 .shimmer-text {
   background: linear-gradient(
     90deg,
-    color-mix(in srgb, var(--muted-foreground), transparent 40%) 0%,
-    color-mix(in srgb, var(--muted-foreground), transparent 40%) 35%,
-    var(--foreground) 50%,
-    color-mix(in srgb, var(--muted-foreground), transparent 40%) 65%,
-    color-mix(in srgb, var(--muted-foreground), transparent 40%) 100%
+    color-mix(in srgb, var(--ui-text-muted), transparent 40%) 0%,
+    color-mix(in srgb, var(--ui-text-muted), transparent 40%) 35%,
+    var(--ui-text-highlighted) 50%,
+    color-mix(in srgb, var(--ui-text-muted), transparent 40%) 65%,
+    color-mix(in srgb, var(--ui-text-muted), transparent 40%) 100%
   );
   background-size: 200% 100%;
   background-clip: text;
@@ -429,12 +276,12 @@ body {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: color-mix(in oklch, var(--muted-foreground) 30%, transparent);
+  background: color-mix(in oklch, var(--ui-text-muted) 30%, transparent);
   border-radius: 9999px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: color-mix(in oklch, var(--muted-foreground) 50%, transparent);
+  background: color-mix(in oklch, var(--ui-text-muted) 50%, transparent);
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
@@ -443,7 +290,7 @@ body {
 
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: color-mix(in oklch, var(--muted-foreground) 30%, transparent)
+  scrollbar-color: color-mix(in oklch, var(--ui-text-muted) 30%, transparent)
     transparent;
 }
 
@@ -452,34 +299,34 @@ body {
 
   --vis-axis-font-family: var(--font-sans);
   --vis-axis-tick-label-font-size: 11px;
-  --vis-axis-tick-label-color: var(--muted-foreground);
+  --vis-axis-tick-label-color: var(--ui-text-muted);
   --vis-axis-tick-color: transparent;
   --vis-axis-domain-color: transparent;
-  --vis-axis-grid-color: var(--border);
+  --vis-axis-grid-color: var(--ui-border);
   --vis-axis-grid-line-width: 1;
-  --vis-axis-label-color: var(--muted-foreground);
+  --vis-axis-label-color: var(--ui-text-muted);
   --vis-axis-label-font-size: 11px;
 
-  --vis-crosshair-line-stroke-color: var(--muted-foreground);
+  --vis-crosshair-line-stroke-color: var(--ui-text-muted);
   --vis-crosshair-line-stroke-opacity: 0.35;
   --vis-crosshair-line-stroke-width: 1;
-  --vis-crosshair-circle-stroke-color: var(--background);
+  --vis-crosshair-circle-stroke-color: var(--ui-bg);
   --vis-crosshair-circle-stroke-width: 2;
 
-  --vis-tooltip-background-color: var(--popover);
-  --vis-tooltip-border-color: var(--border);
-  --vis-tooltip-text-color: var(--popover-foreground);
+  --vis-tooltip-background-color: var(--ui-bg);
+  --vis-tooltip-border-color: var(--ui-border);
+  --vis-tooltip-text-color: var(--ui-text);
   --vis-tooltip-border-radius: var(--radius-md);
   --vis-tooltip-padding: 0;
   --vis-tooltip-shadow-color: oklch(0 0 0 / 0.1);
   --vis-tooltip-backdrop-filter: none;
 
-  --vis-donut-segment-stroke-color: var(--background);
+  --vis-donut-segment-stroke-color: var(--ui-bg);
   --vis-donut-segment-stroke-width: 2;
   --vis-donut-central-label-font-family: var(--font-sans);
-  --vis-donut-central-label-text-color: var(--foreground);
+  --vis-donut-central-label-text-color: var(--ui-text-highlighted);
   --vis-donut-central-sub-label-font-family: var(--font-sans);
-  --vis-donut-central-sub-label-text-color: var(--muted-foreground);
+  --vis-donut-central-sub-label-text-color: var(--ui-text-muted);
 }
 
 .vis-chart .vis-tooltip-container {
@@ -490,11 +337,7 @@ body {
    fältet — resten är solid bakgrund — så att fältet ligger och flyter ovanpå
    toningen i stället för att sitta fast i dess kant. */
 .fade-to-background {
-  background-image: linear-gradient(
-    to top,
-    var(--background),
-    var(--background-0)
-  );
+  background-image: linear-gradient(to top, var(--ui-bg), var(--background-0));
 }
 
 .step-dot-active {
@@ -523,7 +366,16 @@ body {
   .shimmer-text {
     animation: none;
     background: none;
-    color: var(--muted-foreground);
-    -webkit-text-fill-color: var(--muted-foreground);
+    color: var(--ui-text-muted);
+    -webkit-text-fill-color: var(--ui-text-muted);
   }
+}
+
+body > [data-reka-popper-content-wrapper] {
+  z-index: 50 !important;
+}
+
+body > [data-slot="overlay"],
+body > [data-slot="content"] {
+  z-index: 50;
 }

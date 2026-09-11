@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { toast } from "vue-sonner";
 import {
     COLORS,
     COLOR_BG_MAP,
     COLOR_BORDER_MAP,
 } from "@/constants/avatarColors";
+
+const toast = useToast();
 
 definePageMeta({
     layout: "profile",
@@ -171,8 +172,10 @@ async function saveProfile() {
     profileSaving.value = false;
 
     if (error) {
-        toast.error("Kunde inte spara profilen", {
+        toast.add({
+            title: "Kunde inte spara profilen",
             description: "Försök igen om en stund.",
+            color: "error",
         });
         return;
     }
@@ -181,7 +184,7 @@ async function saveProfile() {
     lastName.value = lastNameInput.value.trim();
     profileSaved.value = true;
     setTimeout(() => (profileSaved.value = false), 2000);
-    toast.success("Profilen sparad!");
+    toast.add({ title: "Profilen sparad!", color: "success" });
 }
 
 async function handleAvatarClick() {
@@ -206,8 +209,10 @@ async function handleFileChange(event: Event) {
 
     if (uploadError) {
         avatarUploading.value = false;
-        toast.error("Kunde inte ladda upp bilden", {
+        toast.add({
+            title: "Kunde inte ladda upp bilden",
             description: "Försök igen om en stund.",
+            color: "error",
         });
         return;
     }
@@ -225,7 +230,7 @@ async function handleFileChange(event: Event) {
         .eq("id", currentUserId.value);
 
     avatarUploading.value = false;
-    toast.success("Profilbild uppdaterad!");
+    toast.add({ title: "Profilbild uppdaterad!", color: "success" });
 }
 
 async function handleSignOut() {
@@ -240,7 +245,7 @@ async function handleSignOut() {
     <div class="flex flex-col gap-8">
         <template v-if="profileLoading">
             <section
-                class="relative overflow-hidden rounded-3xl bg-card p-8"
+                class="relative overflow-hidden rounded-3xl bg-elevated p-8"
             >
                 <div class="h-8 w-40 rounded-md bg-muted animate-pulse mx-auto" />
                 <div
@@ -306,19 +311,19 @@ async function handleSignOut() {
                             v-if="avatarUploading"
                             class="absolute inset-0 flex items-center justify-center z-10"
                         >
-                            <Icon name="octicon:sync-16"
+                            <UIcon name="i-lucide-loader-circle"
                                 class="h-7 w-7 text-white animate-spin" />
                         </div>
 
                         <div
-                            class="absolute bottom-1 right-1 h-8 w-8 rounded-full bg-background border border-border flex items-center justify-center z-10"
+                            class="absolute bottom-1 right-1 h-8 w-8 rounded-full bg-default border border-default flex items-center justify-center z-10"
                         >
-                            <Icon name="octicon:sync-16"
+                            <UIcon name="i-lucide-loader-circle"
                                 v-if="avatarUploading"
-                                class="h-4 w-4 animate-spin text-muted-foreground" />
-                            <Icon name="octicon:plus-16"
+                                class="h-4 w-4 animate-spin text-muted" />
+                            <UIcon name="i-lucide-plus"
                                 v-else
-                                class="h-4 w-4 text-foreground" />
+                                class="h-4 w-4 text-highlighted" />
                         </div>
                     </button>
 
@@ -337,23 +342,23 @@ async function handleSignOut() {
                         }}
                     </h1>
 
-                    <p class="mt-2 text-sm text-muted-foreground">
+                    <p class="mt-2 text-sm text-muted">
                         {{ user?.email }}
                     </p>
-                    <p class="text-xs text-muted-foreground/80">
+                    <p class="text-xs text-muted/80">
                         Medlem sedan {{ memberSince }}
                     </p>
 
                     <div class="mt-6 w-full max-w-2xl">
                         <div
-                            class="rounded-md border border-border bg-card p-5 sm:p-6"
+                            class="rounded-md border border-default bg-elevated p-5 sm:p-6"
                         >
                             <div class="grid grid-cols-3 gap-2 sm:gap-3">
                                 <div
-                                    class="rounded-md border border-border bg-background/70 p-3 sm:p-4"
+                                    class="rounded-md border border-default bg-default/70 p-3 sm:p-4"
                                 >
                                     <p
-                                        class="text-2xs text-muted-foreground"
+                                        class="text-2xs text-muted"
                                     >
                                         Quiz
                                     </p>
@@ -366,10 +371,10 @@ async function handleSignOut() {
                                     </p>
                                 </div>
                                 <div
-                                    class="rounded-md border border-border bg-background/70 p-3 sm:p-4"
+                                    class="rounded-md border border-default bg-default/70 p-3 sm:p-4"
                                 >
                                     <p
-                                        class="text-2xs text-muted-foreground"
+                                        class="text-2xs text-muted"
                                     >
                                         AI Chattar
                                     </p>
@@ -384,10 +389,10 @@ async function handleSignOut() {
                                     </p>
                                 </div>
                                 <div
-                                    class="rounded-md border border-border bg-background/70 p-3 sm:p-4"
+                                    class="rounded-md border border-default bg-default/70 p-3 sm:p-4"
                                 >
                                     <p
-                                        class="text-2xs text-muted-foreground"
+                                        class="text-2xs text-muted"
                                     >
                                         Meddelanden
                                     </p>
@@ -409,60 +414,60 @@ async function handleSignOut() {
 
             <section class="flex flex-col gap-3">
                 <h2
-                    class="text-xs font-medium text-muted-foreground uppercase tracking-wide"
+                    class="text-xs font-medium text-muted uppercase tracking-wide"
                 >
                     Inställningar
                 </h2>
 
                 <div class="grid grid-cols-1 xl:grid-cols-2 gap-4">
-                    <div class="rounded-md border border-border bg-card p-5">
+                    <div class="rounded-md border border-default bg-elevated p-5">
                         <p class="text-sm font-medium mb-3">Namn</p>
                         <div class="space-y-3">
                             <div class="flex flex-col gap-1.5">
-                                <label class="text-xs text-muted-foreground"
+                                <label class="text-xs text-muted"
                                     >Förnamn</label
                                 >
                                 <input
                                     v-model="firstNameInput"
                                     type="text"
                                     placeholder="Ditt förnamn"
-                                    class="h-10 rounded-md border border-border bg-background px-3 text-sm outline-none focus:border-foreground/30"
+                                    class="h-10 rounded-md border border-default bg-default px-3 text-sm outline-none focus:border-inverted/30"
                                 />
                             </div>
                             <div class="flex flex-col gap-1.5">
-                                <label class="text-xs text-muted-foreground"
+                                <label class="text-xs text-muted"
                                     >Efternamn</label
                                 >
                                 <input
                                     v-model="lastNameInput"
                                     type="text"
                                     placeholder="Ditt efternamn"
-                                    class="h-10 rounded-md border border-border bg-background px-3 text-sm outline-none focus:border-foreground/30"
+                                    class="h-10 rounded-md border border-default bg-default px-3 text-sm outline-none focus:border-inverted/30"
                                 />
                             </div>
                         </div>
 
                         <div class="mt-4 flex justify-end">
-                            <Button
+                            <UButton
                                 size="sm"
                                 :disabled="profileSaving || !hasChanges"
                                 @click="saveProfile"
                             >
-                                <Icon name="octicon:sync-16"
+                                <UIcon name="i-lucide-loader-circle"
                                     v-if="profileSaving"
                                     class="w-4 h-4 animate-spin" />
-                                <Icon name="octicon:check-16"
+                                <UIcon name="i-lucide-check"
                                     v-else-if="profileSaved"
                                     class="w-4 h-4" />
                                 <span>{{
                                     profileSaved ? "Sparat!" : "Spara"
                                 }}</span>
-                            </Button>
+                            </UButton>
                         </div>
                     </div>
 
                     <div
-                        class="rounded-md border border-border bg-card divide-y divide-border/60"
+                        class="rounded-md border border-default bg-elevated divide-y divide-default/60"
                     >
                         <div class="p-5">
                             <p class="text-sm font-medium mb-3">
@@ -472,7 +477,7 @@ async function handleSignOut() {
                                 <p
                                     class="flex items-center justify-between gap-3"
                                 >
-                                    <span class="text-muted-foreground"
+                                    <span class="text-muted"
                                         >E-post</span
                                     >
                                     <span class="font-medium truncate">{{
@@ -482,7 +487,7 @@ async function handleSignOut() {
                                 <p
                                     class="flex items-center justify-between gap-3"
                                 >
-                                    <span class="text-muted-foreground"
+                                    <span class="text-muted"
                                         >Registrerad</span
                                     >
                                     <span class="font-medium">{{
@@ -492,7 +497,7 @@ async function handleSignOut() {
                                 <p
                                     class="flex items-center justify-between gap-3"
                                 >
-                                    <span class="text-muted-foreground"
+                                    <span class="text-muted"
                                         >Kontostatus</span
                                     >
                                     <span
@@ -513,7 +518,7 @@ async function handleSignOut() {
                                         'w-6 h-6 rounded-full cursor-pointer transition-colors duration-150 ease-spring',
                                         COLOR_BG_MAP[color],
                                         colorCookie === color
-                                            ? 'ring-2 ring-offset-2 ring-offset-background ring-foreground scale-110'
+                                            ? 'ring-2 ring-offset-2 ring-offset-background ring-inverted scale-110'
                                             : 'opacity-60 hover:opacity-100',
                                     ]"
                                     @click="setColor(color)"
@@ -526,22 +531,23 @@ async function handleSignOut() {
                         >
                             <div>
                                 <p class="text-sm font-medium">Logga ut</p>
-                                <p class="text-xs text-muted-foreground">
+                                <p class="text-xs text-muted">
                                     Avsluta din nuvarande session
                                 </p>
                             </div>
-                            <Button
+                            <UButton
+                                color="neutral"
                                 variant="outline"
                                 size="sm"
                                 :disabled="signOutLoading"
                                 @click="handleSignOut"
                             >
-                                <Icon name="octicon:sync-16"
+                                <UIcon name="i-lucide-loader-circle"
                                     v-if="signOutLoading"
                                     class="w-4 h-4 animate-spin" />
-                                <Icon name="octicon:sign-out-16" v-else class="w-4 h-4" />
+                                <UIcon name="i-lucide-log-out" v-else class="w-4 h-4" />
                                 <span v-if="!signOutLoading">Logga ut</span>
-                            </Button>
+                            </UButton>
                         </div>
                     </div>
                 </div>

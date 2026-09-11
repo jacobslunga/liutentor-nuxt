@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { DropdownMenuItem } from "@nuxt/ui";
 import { COLOR_BORDER_MAP, COLORS } from "@/constants/avatarColors";
 
 const user = useSupabaseUser();
@@ -73,64 +74,46 @@ const signOut = async () => {
 const gotoProfile = () => {
   navigateTo("/me");
 };
+
+const menuItems = computed<DropdownMenuItem[][]>(() => [
+  [{ label: "Profil", icon: "i-lucide-user", onSelect: gotoProfile }],
+  [
+    {
+      label: "Logga ut",
+      icon: "i-lucide-log-out",
+      color: "error",
+      onSelect: signOut,
+    },
+  ],
+]);
 </script>
 
 <template>
-  <DropdownMenu>
-    <DropdownMenuTrigger as-child>
-      <button
-        :class="[
-          'w-10 h-10 rounded-full border overflow-hidden flex items-center justify-center text-white text-sm font-medium cursor-pointer transition-opacity hover:opacity-80 relative',
-          (!avatarUrl || isImageLoading) && `bg-${avatarColor}`,
-          COLOR_BORDER_MAP[avatarColor],
-        ]"
-      >
-        <Icon name="octicon:sync-16"
-          v-if="isPending || (avatarUrl && isImageLoading)"
-          class="w-4 h-4 animate-spin absolute z-10"
-        />
+  <UDropdownMenu :items="menuItems" :content="{ align: 'end' }">
+    <button :class="[
+      'w-10 h-10 rounded-full border overflow-hidden flex items-center justify-center text-white text-sm font-medium cursor-pointer transition-opacity hover:opacity-80 relative',
+      (!avatarUrl || isImageLoading) && `bg-${avatarColor}`,
+      COLOR_BORDER_MAP[avatarColor],
+    ]">
+      <UIcon name="i-lucide-loader-circle" v-if="isPending || (avatarUrl && isImageLoading)"
+        class="w-4 h-4 animate-spin absolute z-10" />
 
-        <img
-          v-if="avatarUrl"
-          :src="avatarUrl"
-          alt="Avatar"
-          :class="[
-            'w-full h-full object-cover transition-opacity duration-200',
-            isImageLoading ? 'opacity-0' : 'opacity-100',
-          ]"
-          @load="isImageLoading = false"
-          @error="isImageLoading = false"
-        />
+      <img v-if="avatarUrl" :src="avatarUrl" alt="Avatar" :class="[
+        'w-full h-full object-cover transition-opacity duration-200',
+        isImageLoading ? 'opacity-0' : 'opacity-100',
+      ]" @load="isImageLoading = false" @error="isImageLoading = false" />
 
-        <span v-else-if="!isPending">{{ initial }}</span>
-      </button>
-    </DropdownMenuTrigger>
+      <span v-else-if="!isPending">{{ initial }}</span>
+    </button>
 
-    <DropdownMenuContent align="end" class="w-56">
-      <div class="px-2 py-1.5 mb-1">
+    <template #content-top>
+      <div class="p-2">
         <p class="text-sm font-medium truncate">{{ displayName }}</p>
-        <p
-          v-if="firstName || lastName"
-          class="text-xs text-muted-foreground truncate"
-        >
+        <p v-if="firstName || lastName" class="text-xs text-muted truncate">
           {{ user?.email }}
         </p>
-        <p v-else class="text-xs text-muted-foreground">Inloggad</p>
+        <p v-else class="text-xs text-muted">Inloggad</p>
       </div>
-      <DropdownMenuSeparator />
-      <DropdownMenuItem class="cursor-pointer" @click="gotoProfile">
-        <Icon name="octicon:person-16" class="w-4 h-4" />
-        Profil
-      </DropdownMenuItem>
-      <DropdownMenuSeparator />
-      <DropdownMenuItem
-        class="cursor-pointer"
-        @click="signOut"
-        variant="destructive"
-      >
-        <Icon name="octicon:sign-out-16" class="w-4 h-4" />
-        Logga ut
-      </DropdownMenuItem>
-    </DropdownMenuContent>
-  </DropdownMenu>
+    </template>
+  </UDropdownMenu>
 </template>

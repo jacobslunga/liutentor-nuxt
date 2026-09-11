@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { ref, computed, watch, nextTick, onMounted, onUnmounted } from "vue";
-import { useResizeObserver } from "@vueuse/core";
 import type { Message, MessageSource } from "@/stores/chat";
 import {
   initChatMarkdown,
+  isChatMarkdownReady,
   renderChatMarkdown,
   renderCachedChatMarkdown,
 } from "@/lib/chat-markdown";
@@ -13,23 +12,19 @@ const props = withDefaults(
   defineProps<{
     messages: Message[];
     isLoading: boolean;
-    assistantClass?: string;
     contentClass?: string;
     enableSelectionPopover?: boolean;
-    hideEmptyState?: boolean;
   }>(),
-  { assistantClass: "", contentClass: "", enableSelectionPopover: true },
+  { contentClass: "", enableSelectionPopover: true },
 );
 
 const emit = defineEmits<{
   replyToSelection: [text: string];
-  "update:showScrollButton": [value: boolean];
-  "update:contentBottom": [value: number];
 }>();
 
 const chatStore = useChatStore();
 
-const mdReady = ref(false);
+const mdReady = ref(isChatMarkdownReady());
 
 initChatMarkdown()
   .catch((error) => {
@@ -39,23 +34,16 @@ initChatMarkdown()
     // Unblock rendering either way: on failure renderChatMarkdown falls back to
     // the raw message text, which beats leaving every reply blank.
     mdReady.value = true;
+    if (
+      chatStore.savedScrollPosition === 0 &&
+      props.messages.length > 0 &&
+      !props.isLoading
+    ) {
+      nextTick(() => scrollToBottom("auto"));
+    }
   });
 
-const messagesContainer = ref<HTMLDivElement | null>(null);
-const messagesList = ref<HTMLDivElement | null>(null);
-const contentEndMarker = ref<HTMLDivElement | null>(null);
-
-function reportContentBottom() {
-  emit(
-    "update:contentBottom",
-    contentEndMarker.value?.getBoundingClientRect().top ??
-    Number.NEGATIVE_INFINITY,
-  );
-}
-
-useResizeObserver(messagesContainer, reportContentBottom);
-useResizeObserver(messagesList, reportContentBottom);
-
+const rootRef = ref<HTMLElement | null>(null);
 const selectionPopover = ref({ visible: false, x: 0, y: 0 });
 const selectionPopoverScrollAnchor = ref(0);
 
@@ -74,6 +62,43 @@ const loadingPhrases = [
 ];
 
 const loadingPhrase = ref(loadingPhrases[0]);
+
+const isMounted = ref(false);
+
+/**
+ * UChatMessages arbetar med AI SDK:ns meddelandeform. Butiken har en egen, så
+ * varje meddelande får ett stabilt id och en text-part — resten av innehållet
+ * ritas i slottarna nedan och läses direkt från originalmeddelandet.
+ */
+const uiMessages = computed(() =>
+  props.messages
+    .map((message, index) => ({
+      id: `msg-${index}`,
+      role: message.role,
+      parts:
+        message.role === "user"
+          ? [{ type: "text" as const, text: message.content || " " }]
+          : message.content
+            ? [{ type: "text" as const, text: message.content }]
+            : [],
+      original: message,
+      index,
+    }))
+    // useChat lägger till ett tomt assistentsvar redan när turen startar. Tas
+    // det med blir det sista meddelandet aldrig användarens, och UChatMessages
+    // hoppar då över rullningen som ger plats åt svaret.
+    .filter((message, i, all) => message.parts.length || i !== all.length - 1),
+);
+
+/** Status i AI SDK:ns termer, vilket styr autoscroll och skrivindikatorn. */
+const status = computed(() => {
+  if (!isMounted.value || !props.isLoading) return "ready" as const;
+  const last = props.messages.at(-1);
+  if (last?.role === "user" || (last?.role === "assistant" && !last.content)) {
+    return "submitted" as const;
+  }
+  return "streaming" as const;
+});
 
 /**
  * A bare hostname reads better in a chip than a page title that will be clipped
@@ -121,13 +146,24 @@ function handleCodeCopy(e: MouseEvent) {
   copyTimers.set(btn, t);
 }
 
-function handleMessageMouseUp(_: MouseEvent) {
+/** Rullningsytan ägs av UChatPalette, så den slås upp från rot-elementet. */
+function scrollParent(): HTMLElement | null {
+  const root = (rootRef.value as any)?.$el ?? rootRef.value;
+  let el = (root instanceof HTMLElement ? root.parentElement : null) ?? null;
+  while (el) {
+    if (/auto|scroll/.test(getComputedStyle(el).overflowY)) return el;
+    el = el.parentElement;
+  }
+  return null;
+}
+
+function handleMessageMouseUp() {
   if (!props.enableSelectionPopover) return;
   setTimeout(() => {
     const selection = window.getSelection();
     const text = selection?.toString().trim();
 
-    if (!text || !selection?.rangeCount || !messagesContainer.value) {
+    if (!text || !selection?.rangeCount) {
       selectionPopover.value.visible = false;
       return;
     }
@@ -144,8 +180,7 @@ function handleMessageMouseUp(_: MouseEvent) {
     }
 
     const rect = range.getBoundingClientRect();
-    selectionPopoverScrollAnchor.value =
-      messagesContainer.value?.scrollTop ?? 0;
+    selectionPopoverScrollAnchor.value = scrollParent()?.scrollTop ?? 0;
     selectionPopover.value = {
       visible: true,
       x: rect.left + rect.width / 2,
@@ -187,49 +222,41 @@ const renderedAssistantHtml = computed<string[]>(() => {
 });
 
 function scrollToBottom(behavior: ScrollBehavior = "smooth") {
-  const container = messagesContainer.value;
-  if (!container) return;
-  container.scrollTo({ top: container.scrollHeight, behavior });
+  const el = scrollParent();
+  if (!el) return;
+  if (behavior === "auto") {
+    el.scrollTop = el.scrollHeight;
+  } else {
+    el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+  }
 }
 
-let latestScrollTop = 0;
-
 function persistScrollPosition() {
-  chatStore.savedScrollPosition = latestScrollTop;
+  chatStore.savedScrollPosition = scrollParent()?.scrollTop ?? 0;
 }
 
 function handleScroll() {
-  const el = messagesContainer.value;
+  if (!selectionPopover.value.visible) return;
+  const el = scrollParent();
   if (!el) return;
-  const distFromBottom = Math.ceil(
-    el.scrollHeight - el.scrollTop - el.clientHeight,
-  );
-  emit("update:showScrollButton", distFromBottom > 200);
-  latestScrollTop = el.scrollTop;
-  reportContentBottom();
-
-  if (selectionPopover.value.visible) {
-    const delta = Math.abs(el.scrollTop - selectionPopoverScrollAnchor.value);
-    if (delta > 80) {
-      selectionPopover.value.visible = false;
-    }
+  if (Math.abs(el.scrollTop - selectionPopoverScrollAnchor.value) > 80) {
+    selectionPopover.value.visible = false;
   }
 }
 
 function restoreScroll() {
-  const el = messagesContainer.value;
+  const el = scrollParent();
   if (!el) return;
   if (chatStore.savedScrollPosition > 0) {
     el.scrollTop = chatStore.savedScrollPosition;
-    handleScroll();
   } else {
     scrollToBottom("auto");
+    requestAnimationFrame(() => scrollToBottom("auto"));
   }
 }
 
 function resetScrollState() {
-  latestScrollTop = 0;
-  emit("update:showScrollButton", false);
+  chatStore.savedScrollPosition = 0;
 }
 
 watch(
@@ -243,16 +270,64 @@ watch(
   { immediate: true },
 );
 
-watch(
-  [() => props.messages.length, () => props.messages.at(-1)?.content, mdReady],
-  () => nextTick(reportContentBottom),
-  { flush: "post" },
-);
+function updateLastMessageHeight() {
+  const root = (rootRef.value as any)?.$el ?? rootRef.value;
+  const parent = scrollParent();
+  if (!root || !parent) return;
+  const userArticles = root.querySelectorAll('article[data-role="user"]');
+  const lastUserArticle = userArticles[userArticles.length - 1] as HTMLElement | undefined;
+  if (!lastUserArticle) return;
+
+  const parentHeight = parent.clientHeight;
+  const userHeight = lastUserArticle.offsetHeight;
+  const rootStyle = window.getComputedStyle(root);
+  const gap = Number.parseFloat(rootStyle.rowGap) || Number.parseFloat(rootStyle.gap) || 0;
+  const lastMessageHeight = Math.max(parentHeight - userHeight - gap - 40, 0);
+  root.style.setProperty("--last-message-height", `${lastMessageHeight}px`);
+}
+
+function scrollUserMessageToTop() {
+  const userMessages = props.messages.filter((m) => m.role === "user");
+  if (userMessages.length <= 1) {
+    const parent = scrollParent();
+    if (parent) {
+      parent.scrollTop = 0;
+    }
+    return;
+  }
+
+  nextTick(() => {
+    updateLastMessageHeight();
+    const root = (rootRef.value as any)?.$el ?? rootRef.value;
+    if (!root) return;
+    const userArticles = root.querySelectorAll('article[data-role="user"]');
+    const lastUserArticle = userArticles[userArticles.length - 1] as HTMLElement | undefined;
+    if (lastUserArticle) {
+      lastUserArticle.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  });
+}
+
+let detachScroll: (() => void) | undefined;
 
 onMounted(() => {
-  nextTick(reportContentBottom);
   if (props.enableSelectionPopover) {
     document.addEventListener("selectionchange", handleSelectionChange);
+  }
+  const el = scrollParent();
+  el?.addEventListener("scroll", handleScroll, { passive: true });
+  detachScroll = () => el?.removeEventListener("scroll", handleScroll);
+
+  nextTick(() => {
+    isMounted.value = true;
+  });
+
+  if (props.isLoading) {
+    nextTick(() => {
+      scrollUserMessageToTop();
+    });
+  } else if (props.messages.length > 0) {
+    restoreScroll();
   }
 });
 
@@ -260,11 +335,13 @@ onUnmounted(() => {
   if (props.enableSelectionPopover) {
     document.removeEventListener("selectionchange", handleSelectionChange);
   }
+  detachScroll?.();
   persistScrollPosition();
 });
 
 defineExpose({
   scrollToBottom,
+  scrollUserMessageToTop,
   restoreScroll,
   persistScrollPosition,
   resetScrollState,
@@ -272,99 +349,165 @@ defineExpose({
 </script>
 
 <template>
-  <div ref="messagesContainer"
-    class="h-full w-full overflow-y-auto overflow-x-hidden overscroll-contain px-4 custom-scrollbar"
-    :class="contentClass" @scroll="handleScroll" @mouseup="handleMessageMouseUp" @click="handleCodeCopy">
-    <div class="min-h-full flex flex-col items-center justify-center px-4 py-8 text-center"
-      v-if="messages.length === 0 && !hideEmptyState">
-      <ChatMascot class="w-16 h-16 mb-5 shrink-0" />
-      <h2 class="text-2xl font-semibold text-foreground">
-        Vad kan jag hjälpa till med?
-      </h2>
-    </div>
+  <UChatMessages
+    ref="rootRef"
+    :messages="uiMessages"
+    :status="status"
+    :auto-scroll="false"
+    :should-scroll-to-bottom="false"
+    :ui="{
+      root: 'w-full min-w-0 max-w-full flex flex-col gap-1 flex-1 px-2.5 [&>article]:last-of-type:min-h-(--last-message-height)',
+      viewport: 'hidden',
+    }"
+    :user="{
+      side: 'right',
+      variant: 'naked',
+      ui: {
+        root: 'scroll-mt-20 sm:scroll-mt-20 min-w-0 max-w-full',
+        container: 'justify-end ms-auto max-w-[85%] sm:max-w-[75%] min-w-0',
+      },
+    }"
+    :assistant="{
+      side: 'left',
+      variant: 'naked',
+      ui: {
+        root: 'min-w-0 max-w-full overflow-hidden',
+        container: 'w-full pb-8 min-w-0 max-w-full overflow-hidden',
+        body: 'w-full min-w-0 max-w-full overflow-hidden',
+        content: 'w-full min-w-0 max-w-full overflow-hidden',
+      },
+    }"
+    :class="contentClass"
+    class="mx-auto w-full max-w-2xl 3xl:max-w-3xl min-w-0"
+    @mouseup="handleMessageMouseUp"
+    @click="handleCodeCopy"
+  >
+    <template #content="{ message }">
+      <div
+        v-if="message.role === 'user'"
+        class="flex flex-col items-start gap-2 rounded-2xl bg-elevated px-4 py-3 text-highlighted shadow-xs"
+      >
+        <div
+          v-if="message.original.selectionContext"
+          class="border-l-2 border-inverted/30 pl-3 text-sm italic text-muted line-clamp-3"
+        >
+          "{{ message.original.selectionContext }}"
+        </div>
 
-    <div ref="messagesList" v-else class="mx-auto w-full max-w-2xl 3xl:max-w-3xl space-y-6 pt-2">
-      <div v-for="(msg, i) in messages" :key="i" :class="msg.role === 'user' ? 'flex justify-end' : ''" v-memo="[
-        msg.role,
-        msg.content,
-        msg.selectionContext,
-        msg.skill,
-        msg.attachments
-          ?.map((attachment) => `${attachment.id}:${attachment.active}`)
-          .join(','),
-        msg.status?.message,
-        msg.sources?.length,
-        isLoading && i === messages.length - 1,
-        mdReady,
-      ]">
-        <div v-if="msg.role === 'user'" class="flex flex-col items-end gap-1.5 max-w-[85%]">
-          <div v-if="msg.selectionContext"
-            class="border-l-2 border-muted-foreground/30 pl-3 text-sm text-muted-foreground italic line-clamp-3 text-right">
-            "{{ msg.selectionContext }}"
-          </div>
-          <div v-if="msg.attachments?.length" class="flex flex-wrap justify-end gap-1.5">
-            <div v-for="attachment in msg.attachments" :key="attachment.id"
-              class="attachment-context-item flex min-w-0 max-w-full items-center gap-1.5 rounded-sm border px-2.5 py-1.5 text-xs"
-              :class="attachment.active
-                ? 'bg-background'
-                : 'bg-muted/40 text-muted-foreground opacity-70'
-                ">
-              <Icon name="octicon:file-16" v-if="attachment.mediaType === 'application/pdf'" class="size-3.5 shrink-0" />
-              <img v-else-if="attachment.previewUrl" :src="attachment.previewUrl" alt=""
-                class="size-16 shrink-0 rounded-sm object-cover" />
-              <Icon name="octicon:image-16" v-else class="size-3.5 shrink-0" />
-              <span class="max-w-20 truncate" :title="attachment.name">{{
-                attachment.name
-              }}</span>
-              <span class="shrink-0 text-muted-foreground">{{
-                formatFileSize(attachment.size)
-              }}</span>
-            </div>
-          </div>
-          <div v-if="msg.skill" class="w-fit rounded-sm bg-skill px-1.5 py-0.5 text-xs font-medium text-white">
-            {{ getSkillById(msg.skill)?.label }}
-          </div>
-          <div v-if="msg.content" class="w-fit rounded-2xl bg-secondary px-4 py-2 text-secondary-foreground">
-            <p class="text-[0.9375rem] leading-relaxed whitespace-pre-wrap">
-              {{ msg.content }}
-            </p>
+        <div
+          v-if="message.original.attachments?.length"
+          class="flex flex-wrap gap-1.5"
+        >
+          <div
+            v-for="attachment in message.original.attachments"
+            :key="attachment.id"
+            class="attachment-context-item flex min-w-0 max-w-full items-center gap-1.5 rounded-lg border border-default bg-default px-2.5 py-1.5 text-xs"
+            :class="attachment.active
+              ? ''
+              : 'text-muted opacity-70'"
+          >
+            <UIcon
+              v-if="attachment.mediaType === 'application/pdf'"
+              name="i-lucide-file-text"
+              class="size-3.5 shrink-0 text-muted"
+            />
+            <img
+              v-else-if="attachment.previewUrl"
+              :src="attachment.previewUrl"
+              alt=""
+              class="size-14 shrink-0 rounded-md object-cover"
+            />
+            <UIcon v-else name="i-lucide-image" class="size-3.5 shrink-0 text-muted" />
+            <span class="max-w-28 truncate" :title="attachment.name">
+              {{ attachment.name }}
+            </span>
+            <span class="shrink-0 text-muted">
+              {{ formatFileSize(attachment.size) }}
+            </span>
           </div>
         </div>
 
-        <div v-else class="w-full min-w-0 px-1 py-2 overflow-hidden" :class="assistantClass" data-role="assistant"
-          :data-streaming="isLoading && i === messages.length - 1 ? 'true' : undefined
-            ">
-          <div v-if="
-            msg.status?.message ||
-            (!msg.content && isLoading && i === messages.length - 1)
-          " class="flex items-center gap-2 h-6" :class="msg.content ? 'mb-2' : ''">
-            <Icon name="octicon:sync-16" class="variable-spin w-4 h-4 text-muted-foreground" />
-            <span class="shimmer-text font-sans text-sm">{{
-              msg.status?.message || loadingPhrase
-            }}</span>
-          </div>
-          <div v-if="renderedAssistantHtml[i]"
-            class="prose 3xl:prose-lg max-w-full min-w-0 prose-headings:font-semibold prose-strong:font-semibold dark:prose-invert marker:text-foreground marker:font-semibold"
-            v-html="renderedAssistantHtml[i]" />
+        <UBadge
+          v-if="message.original.skill"
+          color="primary"
+          variant="solid"
+          size="sm"
+          :label="getSkillById(message.original.skill)?.label"
+        />
 
-          <div v-if="msg.sources?.length" class="mt-3 flex flex-wrap gap-1.5">
-            <a v-for="source in msg.sources" :key="source.url" :href="source.url" :title="source.title" target="_blank"
-              rel="noopener noreferrer"
-              class="inline-flex max-w-56 items-center gap-1.5 rounded-sm border bg-background px-2.5 py-1 text-xs text-muted-foreground transition-colors hover:bg-accent/70 hover:text-foreground">
-              <Icon name="octicon:globe-16" class="size-3 shrink-0" />
-              <span class="truncate">{{ sourceLabel(source) }}</span>
-            </a>
-          </div>
-        </div>
+        <p
+          v-if="message.original.content"
+          class="whitespace-pre-wrap text-[0.9375rem] leading-relaxed text-highlighted"
+        >
+          {{ message.original.content }}
+        </p>
       </div>
 
-      <div ref="contentEndMarker" class="h-px w-full" />
-      <div class="h-32 w-full shrink-0" />
-    </div>
+      <div v-else data-role="assistant" class="w-full min-w-0">
+        <div
+          v-if="
+            message.original.status?.message ||
+            (!message.original.content && isLoading && message.index === messages.length - 1)
+          "
+          class="mb-2 flex h-6 items-center gap-2"
+        >
+          <UIcon
+            name="i-lucide-loader-circle"
+            class="variable-spin size-4 text-muted"
+          />
+          <span class="shimmer-text text-sm">
+            {{ message.original.status?.message || loadingPhrase }}
+          </span>
+        </div>
 
-    <SelectionPopover v-if="enableSelectionPopover" :visible="selectionPopover.visible" :x="selectionPopover.x"
-      :y="selectionPopover.y" @reply="handleReplyToSelection" />
-  </div>
+        <div
+          v-if="renderedAssistantHtml[message.index]"
+          class="prose 3xl:prose-lg min-w-0 max-w-none w-full prose-headings:font-semibold prose-strong:font-semibold dark:prose-invert marker:font-semibold marker:text-highlighted"
+          v-html="renderedAssistantHtml[message.index]"
+        />
+
+        <div
+          v-if="message.original.sources?.length"
+          class="mt-3 flex flex-wrap gap-1.5"
+        >
+          <UButton
+            v-for="source in message.original.sources"
+            :key="source.url"
+            :to="source.url"
+            target="_blank"
+            rel="noopener noreferrer"
+            :title="source.title"
+            color="neutral"
+            variant="outline"
+            size="xs"
+            icon="i-lucide-globe"
+            :label="sourceLabel(source)"
+            class="max-w-56"
+          />
+        </div>
+      </div>
+    </template>
+
+    <template #indicator>
+      <div class="flex h-6 items-center gap-2">
+        <UIcon
+          name="i-lucide-loader-circle"
+          class="variable-spin size-4 text-muted"
+        />
+        <span class="shimmer-text text-sm">
+          {{ messages.at(-1)?.status?.message || loadingPhrase }}
+        </span>
+      </div>
+    </template>
+  </UChatMessages>
+
+  <SelectionPopover
+    v-if="enableSelectionPopover"
+    :visible="selectionPopover.visible"
+    :x="selectionPopover.x"
+    :y="selectionPopover.y"
+    @reply="handleReplyToSelection"
+  />
 </template>
 
 <style>
@@ -373,38 +516,42 @@ defineExpose({
 
 <style scoped>
 .prose {
-  --tw-prose-body: var(--foreground);
-  --tw-prose-headings: var(--foreground);
-  --tw-prose-lead: var(--foreground);
-  --tw-prose-links: var(--foreground);
-  --tw-prose-bold: var(--foreground);
-  --tw-prose-counters: var(--foreground);
-  --tw-prose-bullets: var(--foreground);
-  --tw-prose-quotes: var(--foreground);
-  --tw-prose-captions: var(--foreground);
-  --tw-prose-kbd: var(--foreground);
-  --tw-prose-code: var(--foreground);
-  --tw-prose-pre-code: var(--foreground);
-  --tw-prose-hr: var(--border);
-  --tw-prose-quote-borders: var(--border);
-  --tw-prose-th-borders: var(--border);
-  --tw-prose-td-borders: var(--border);
-  --tw-prose-invert-body: var(--foreground);
-  --tw-prose-invert-headings: var(--foreground);
-  --tw-prose-invert-lead: var(--foreground);
-  --tw-prose-invert-links: var(--foreground);
-  --tw-prose-invert-bold: var(--foreground);
-  --tw-prose-invert-counters: var(--foreground);
-  --tw-prose-invert-bullets: var(--foreground);
-  --tw-prose-invert-quotes: var(--foreground);
-  --tw-prose-invert-captions: var(--foreground);
-  --tw-prose-invert-kbd: var(--foreground);
-  --tw-prose-invert-code: var(--foreground);
-  --tw-prose-invert-pre-code: var(--foreground);
-  --tw-prose-invert-hr: var(--border);
-  --tw-prose-invert-quote-borders: var(--border);
-  --tw-prose-invert-th-borders: var(--border);
-  --tw-prose-invert-td-borders: var(--border);
+  --tw-prose-body: var(--ui-text);
+  --tw-prose-headings: var(--ui-text-highlighted);
+  --tw-prose-lead: var(--ui-text-toned);
+  --tw-prose-links: var(--ui-text-highlighted);
+  --tw-prose-bold: var(--ui-text-highlighted);
+  --tw-prose-counters: var(--ui-text-muted);
+  --tw-prose-bullets: var(--ui-text-muted);
+  --tw-prose-quotes: var(--ui-text-highlighted);
+  --tw-prose-quote-borders: var(--ui-border-accented);
+  --tw-prose-captions: var(--ui-text-muted);
+  --tw-prose-kbd: var(--ui-text-highlighted);
+  --tw-prose-kbd-shadows: var(--ui-border);
+  --tw-prose-code: var(--ui-text-highlighted);
+  --tw-prose-pre-code: var(--ui-text);
+  --tw-prose-pre-bg: var(--ui-bg-muted);
+  --tw-prose-hr: var(--ui-border);
+  --tw-prose-th-borders: var(--ui-border);
+  --tw-prose-td-borders: var(--ui-border);
+  --tw-prose-invert-body: var(--ui-text);
+  --tw-prose-invert-headings: var(--ui-text-highlighted);
+  --tw-prose-invert-lead: var(--ui-text-toned);
+  --tw-prose-invert-links: var(--ui-text-highlighted);
+  --tw-prose-invert-bold: var(--ui-text-highlighted);
+  --tw-prose-invert-counters: var(--ui-text-muted);
+  --tw-prose-invert-bullets: var(--ui-text-muted);
+  --tw-prose-invert-quotes: var(--ui-text-highlighted);
+  --tw-prose-invert-quote-borders: var(--ui-border-accented);
+  --tw-prose-invert-captions: var(--ui-text-muted);
+  --tw-prose-invert-kbd: var(--ui-text-highlighted);
+  --tw-prose-invert-kbd-shadows: var(--ui-border);
+  --tw-prose-invert-code: var(--ui-text-highlighted);
+  --tw-prose-invert-pre-code: var(--ui-text);
+  --tw-prose-invert-pre-bg: var(--ui-bg-muted);
+  --tw-prose-invert-hr: var(--ui-border);
+  --tw-prose-invert-th-borders: var(--ui-border);
+  --tw-prose-invert-td-borders: var(--ui-border);
 }
 
 .prose :deep(.katex-display) {
@@ -426,6 +573,29 @@ defineExpose({
 .prose :deep(.katex) {
   max-width: 100%;
   white-space: nowrap;
+}
+
+/*
+ * Inline math (`$…$`) lands in an <eq> inside the paragraph. KaTeX never wraps
+ * it, so a long expression would push the whole chat sideways. inline-flex
+ * keeps the text baseline (inline-block would drop it to the bottom edge once
+ * overflow is set) while giving the expression its own horizontal scroll.
+ */
+.prose :deep(eq) {
+  display: inline-flex;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+
+.prose :deep(eq)::-webkit-scrollbar {
+  display: none;
+}
+
+.prose :deep(eq > .katex) {
+  flex: none;
 }
 
 .prose :deep(p),
@@ -476,7 +646,7 @@ defineExpose({
 }
 
 .prose :deep(.table-scroll)::-webkit-scrollbar-thumb {
-  background: color-mix(in oklch, var(--muted-foreground) 30%, transparent);
+  background: color-mix(in oklch, var(--ui-text-muted) 30%, transparent);
   border-radius: 2px;
 }
 
@@ -496,7 +666,7 @@ defineExpose({
 }
 
 .prose :deep(.katex-display)::-webkit-scrollbar-thumb {
-  background: color-mix(in oklch, var(--muted-foreground) 30%, transparent);
+  background: color-mix(in oklch, var(--ui-text-muted) 30%, transparent);
   border-radius: 2px;
 }
 
@@ -506,7 +676,7 @@ defineExpose({
 
 .prose :deep(.code-block) {
   margin: 1.25rem 0;
-  border: 1px solid color-mix(in oklch, var(--foreground) 10%, transparent);
+  border: 1px solid var(--ui-border);
   border-radius: 1.25rem;
   overflow: hidden;
 }
@@ -516,24 +686,24 @@ defineExpose({
   align-items: center;
   justify-content: space-between;
   padding: 0.4rem 0.75rem 0.4rem 1rem;
-  background-color: color-mix(in oklch, var(--secondary) 60%, transparent);
-  border-bottom: 1px solid color-mix(in oklch, var(--foreground) 8%, transparent);
+  background-color: var(--ui-bg-muted);
+  border-bottom: 1px solid var(--ui-border);
 }
 
 .prose :deep(.code-lang) {
   font-family: var(--font-mono);
   font-size: 0.7rem;
   letter-spacing: 0.04em;
-  color: var(--muted-foreground);
+  color: var(--ui-text-muted);
 }
 
 .prose :deep(.code-copy:hover) {
-  background-color: color-mix(in oklch, var(--foreground) 6%, transparent);
-  color: var(--foreground);
+  background-color: var(--ui-bg-elevated);
+  color: var(--ui-text-highlighted);
 }
 
 .prose :deep(.code-copy.copied) {
-  color: var(--primary);
+  color: var(--ui-primary);
 }
 
 .prose :deep(.code-block pre.shiki) {
@@ -586,7 +756,7 @@ defineExpose({
   font-size: 0.72rem;
   padding: 0.2rem 0.55rem;
   border-radius: 99px;
-  color: var(--muted-foreground);
+  color: var(--ui-text-muted);
   background: transparent;
   border: 1px solid transparent;
   cursor: pointer;

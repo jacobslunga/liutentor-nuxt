@@ -68,19 +68,19 @@ const sections: DocSection[] = [
     <LegalDocument :sections="sections">
       <template #footer>
         <div class="grid gap-x-12 gap-y-5 border-t py-14 lg:grid-cols-[13rem_minmax(0,1fr)] lg:py-20">
-          <h2 class="font-serif text-lg font-medium text-foreground">
+          <h2 class="font-serif text-lg font-medium text-highlighted">
             Använd AI med omdöme
           </h2>
           <div class="max-w-2xl">
-            <p class="text-[0.9375rem] leading-[1.75] text-foreground/75">
+            <p class="text-[0.9375rem] leading-[1.75] text-highlighted/75">
               AI:n är en assistent, inte en ersättare för ditt eget kritiska tänkande. Genom att
               använda LiU Tentor godkänner du att du förstår teknikens begränsningar.
             </p>
-            <p class="mt-6 text-sm text-muted-foreground">
+            <p class="mt-6 text-sm text-muted">
               Har du sett AI:n svara ovanligt märkligt?
               <button
                 type="button"
-                class="text-foreground underline underline-offset-2 transition-colors duration-150 ease-spring hover:text-primary"
+                class="text-highlighted underline underline-offset-2 transition-colors duration-150 ease-spring hover:text-primary"
                 @click="openMail"
               >
                 Rapportera det till oss.

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { DropdownMenuItem } from "@nuxt/ui";
 import { useChatStore, type ChatAttachment } from "@/stores/chat";
 import {
   matchSkills,
@@ -7,9 +8,9 @@ import {
   type ChatSkillId,
 } from "@/lib/chat-skills";
 import { onClickOutside, useResizeObserver } from "@vueuse/core";
-import { toast } from "vue-sonner";
 
 const { availableModels } = useSelectedModel();
+const toast = useToast();
 
 const MAX_ATTACHMENTS = 5;
 const MAX_ATTACHMENT_SIZE = 5 * 1024 * 1024;
@@ -38,7 +39,6 @@ const props = withDefaults(
     isLoading: boolean;
     selectedModelId: string;
     webSearch?: boolean;
-    showScrollButton: boolean;
     courseCode?: string;
     hasSolution?: boolean;
     selectionContext?: string;
@@ -49,15 +49,12 @@ const props = withDefaults(
     submitOnEnter?: boolean;
 
     autoResize?: boolean;
-
-    reactiveInput?: boolean;
   }>(),
   {
     autofocus: true,
     initialAttachments: () => [],
     submitOnEnter: true,
     autoResize: true,
-    reactiveInput: true,
     showDisclaimer: false,
     webSearch: false,
   },
@@ -66,34 +63,39 @@ const props = withDefaults(
 const emit = defineEmits<{
   send: [];
   cancel: [];
-  scrollToBottom: [];
   "update:selectedModelId": [value: string];
   "update:webSearch": [value: boolean];
   clearSelectionContext: [];
 }>();
 
+const shellRef = ref<HTMLElement | null>(null);
 const textareaRef = ref<HTMLTextAreaElement | null>(null);
-const chatShellRef = ref<HTMLDivElement | null>(null);
+
 const fileInputRef = ref<HTMLInputElement | null>(null);
 const text = ref(props.initialText ?? "");
 const pendingAttachments = ref<ChatAttachment[]>([...props.initialAttachments]);
 const chatStore = useChatStore();
 const MAX_LENGTH = 4000;
-const nonReactiveCanSend = ref(
-  !!props.initialText?.trim() && props.initialText.length <= MAX_LENGTH,
-);
-const nonReactiveTooLong = ref((props.initialText?.length ?? 0) > MAX_LENGTH);
-const isMultiline = ref(false);
 
-const canSend = computed(() => {
-  const hasContent = props.reactiveInput
-    ? !!text.value.trim() || pendingAttachments.value.length > 0
-    : nonReactiveCanSend.value || pendingAttachments.value.length > 0;
-  const tooLong = props.reactiveInput
-    ? text.value.length > MAX_LENGTH
-    : nonReactiveTooLong.value;
-  return hasContent && !tooLong;
-});
+// Fältet börjar på en rad och växer med innehållet upp till ett tak.
+const MIN_ROWS = 1;
+const MAX_HEIGHT = 220;
+
+function autoResize() {
+  const el = textareaRef.value;
+  if (!el || !props.autoResize) return;
+  el.style.height = "auto";
+  const height = Math.min(el.scrollHeight, MAX_HEIGHT);
+  el.style.height = `${height}px`;
+  el.style.overflowY = el.scrollHeight > MAX_HEIGHT ? "auto" : "hidden";
+}
+
+watch(() => text.value, () => nextTick(autoResize));
+const canSend = computed(
+  () =>
+    (!!text.value.trim() || pendingAttachments.value.length > 0) &&
+    text.value.length <= MAX_LENGTH,
+);
 
 const activeAttachments = computed(() => chatStore.getActiveAttachments());
 const activeAttachmentBytes = computed(() =>
@@ -102,13 +104,13 @@ const activeAttachmentBytes = computed(() =>
 const attachmentCapacityReached = computed(
   () =>
     activeAttachments.value.length + pendingAttachments.value.length >=
-      MAX_ATTACHMENTS ||
+    MAX_ATTACHMENTS ||
     activeAttachmentBytes.value +
-      pendingAttachments.value.reduce(
-        (sum, attachment) => sum + attachment.size,
-        0,
-      ) >=
-      MAX_ATTACHMENTS_TOTAL_SIZE,
+    pendingAttachments.value.reduce(
+      (sum, attachment) => sum + attachment.size,
+      0,
+    ) >=
+    MAX_ATTACHMENTS_TOTAL_SIZE,
 );
 
 const selectedModelLabel = computed(
@@ -117,45 +119,24 @@ const selectedModelLabel = computed(
     availableModels.value[0]!.label,
 );
 
-const isExpanded = computed(
-  () =>
-    isMultiline.value ||
-    !!activeSkill.value ||
-    pendingAttachments.value.length > 0,
-);
+const modelMenuOpen = ref(false);
 
-const SINGLE_LINE_HEIGHT = 24;
-const MAX_HEIGHT = 180;
-
-const measureContentHeight = (el: HTMLTextAreaElement) => {
-  const previous = el.style.height;
-  el.style.height = "auto";
-  const measured = el.scrollHeight;
-  el.style.height = previous;
-  return measured;
-};
-
-const applyHeight = (allowShrink = false) => {
-  const el = textareaRef.value;
-  if (!el) return;
-
-  const contentHeight = allowShrink
-    ? measureContentHeight(el)
-    : el.scrollHeight;
-  const height = `${Math.min(contentHeight, MAX_HEIGHT)}px`;
-  const overflowY = contentHeight > MAX_HEIGHT ? "auto" : "hidden";
-
-  if (el.style.height !== height) el.style.height = height;
-  if (el.style.overflowY !== overflowY) el.style.overflowY = overflowY;
-
-  isMultiline.value = contentHeight > SINGLE_LINE_HEIGHT + 2;
-};
-
-const updateHeight = (event?: Event) => {
-  if (!props.autoResize) return;
-  const inputType = event instanceof InputEvent ? event.inputType : "";
-  applyHeight(!event || inputType.startsWith("delete"));
-};
+// Kryssposter markerar den valda nivån; hint blir postens description.
+const modelItems = computed<DropdownMenuItem[][]>(() => [
+  [
+    { label: "Tankenivå", type: "label" },
+    ...availableModels.value.map((model) => ({
+      label: model.label,
+      description: model.hint,
+      type: "checkbox" as const,
+      checked: model.id === props.selectedModelId,
+      onSelect: () => {
+        emit("update:selectedModelId", model.id);
+        modelMenuOpen.value = false;
+      },
+    })),
+  ],
+]);
 
 const activeSkill = ref<ChatSkill | null>(null);
 const menuOpen = ref(false);
@@ -193,11 +174,11 @@ function selectSkill(skill: ChatSkill | undefined) {
 }
 
 const SKILL_ICONS: Record<ChatSkillId, string> = {
-  explain: "octicon:mortar-board-16",
-  theory: "octicon:book-16",
-  solution: "octicon:checklist-16",
-  hint: "octicon:light-bulb-16",
-  summary: "octicon:list-unordered-16",
+  explain: "i-lucide-graduation-cap",
+  theory: "i-lucide-book-open",
+  solution: "i-lucide-list-checks",
+  hint: "i-lucide-lightbulb",
+  summary: "i-lucide-list",
 };
 
 function clearSkill() {
@@ -207,20 +188,10 @@ function clearSkill() {
 }
 
 const handleInput = (event: Event) => {
-  const value = (event.target as HTMLTextAreaElement).value;
-  syncSlashMenu(value);
-
-  if (props.reactiveInput) {
-    text.value = value;
-    updateHeight(event);
-    return;
-  }
-
-  const nextCanSend = !!value.trim() && value.length <= MAX_LENGTH;
-  nonReactiveTooLong.value = value.length > MAX_LENGTH;
-  if (nonReactiveCanSend.value !== nextCanSend) {
-    nonReactiveCanSend.value = nextCanSend;
-  }
+  const el = event.target as HTMLTextAreaElement;
+  text.value = el.value;
+  syncSlashMenu(el.value);
+  autoResize();
 };
 
 const handleKeyDown = (e: KeyboardEvent) => {
@@ -266,11 +237,7 @@ const handleKeyDown = (e: KeyboardEvent) => {
 };
 
 function setText(value: string) {
-  if (props.reactiveInput) text.value = value;
-  if (textareaRef.value) textareaRef.value.value = value;
-  nonReactiveCanSend.value = !!value.trim() && value.length <= MAX_LENGTH;
-  nonReactiveTooLong.value = value.length > MAX_LENGTH;
-  if (props.autoResize) nextTick(() => applyHeight(true));
+  text.value = value;
 }
 
 function formatFileSize(bytes: number): string {
@@ -360,7 +327,7 @@ function addFiles(files: File[]) {
     totalSize += file.size;
   }
 
-  for (const error of errors) toast.error(error, { position: "top-center" });
+  for (const error of errors) toast.add({ title: error, color: "error" });
 }
 
 function handleFileInput(event: Event) {
@@ -378,14 +345,14 @@ function removePendingAttachment(id: string) {
 }
 
 onMounted(() => {
-  if (props.autoResize) applyHeight(true);
+  autoResize();
   if (props.autofocus) textareaRef.value?.focus();
 });
 
 defineExpose({
   focus: () => textareaRef.value?.focus(),
-  getShellTop: () => chatShellRef.value?.getBoundingClientRect().top ?? null,
-  getText: () => textareaRef.value?.value ?? text.value,
+  getShellTop: () => shellRef.value?.getBoundingClientRect().top ?? null,
+  getText: () => text.value,
   setText,
   getSkill: () => activeSkill.value?.id ?? null,
   setSkill: (id: string | null) => {
@@ -417,324 +384,100 @@ defineExpose({
 </script>
 
 <template>
-  <div
-    class="relative z-10 w-full bg-transparent px-3 pointer-events-auto sm:px-4"
-  >
-    <div class="relative mx-auto max-w-2xl 3xl:max-w-3xl">
-      <div>
-        <div
-          ref="chatShellRef"
-          class="chat-shell relative rounded-3xl border bg-surface shadow-xs"
-        >
-          <Transition name="fade-up">
-            <div
-              v-if="showScrollButton"
-              class="pointer-events-none absolute -top-12 right-3 z-20"
-            >
-              <Button
-                variant="outline"
-                size="icon"
-                class="pointer-events-auto rounded-full"
-                @click="emit('scrollToBottom')"
-              >
-                <Icon name="octicon:arrow-down-16" class="w-4 h-4" />
-              </Button>
-            </div>
-          </Transition>
-
-          <Transition name="context-chip">
-            <div
-              v-if="selectionContext"
-              class="flex items-center gap-2 w-full border-b border-border/60 px-5 py-2.5"
-            >
-              <Icon name="octicon:reply-16"
-                class="w-3.5 h-3.5 shrink-0 text-muted-foreground"
-              />
-              <span
-                class="flex-1 min-w-0 text-sm italic text-muted-foreground truncate"
-                >"{{ selectionContext }}"</span
-              >
-              <Button
-                variant="ghost"
-                size="icon-xs"
-                class="shrink-0"
-                @click.prevent="emit('clearSelectionContext')"
-              >
-                <Icon name="octicon:x-16" class="w-3.5 h-3.5" />
-              </Button>
-            </div>
-          </Transition>
-
-          <TransitionGroup
-            v-if="pendingAttachments.length"
-            name="attachment-chip"
-            tag="div"
-            appear
-            class="relative flex flex-wrap gap-2 border-b border-border/60 px-4 py-2.5"
-          >
-            <div
-              v-for="attachment in pendingAttachments"
-              :key="attachment.id"
-              class="flex min-w-0 max-w-full items-center gap-2 rounded-sm bg-secondary/60 px-2.5 py-1.5 text-xs"
-            >
-              <Icon name="octicon:file-16"
-                v-if="attachment.mediaType === 'application/pdf'"
-                class="size-3.5 shrink-0 text-muted-foreground"
-              />
-              <img
-                v-else-if="attachment.previewUrl"
-                :src="attachment.previewUrl"
-                alt=""
-                class="size-10 shrink-0 rounded-sm object-cover"
-              />
-              <Icon name="octicon:image-16"
-                v-else
-                class="size-3.5 shrink-0 text-muted-foreground"
-              />
-              <span class="max-w-20 truncate" :title="attachment.name">{{
-                attachment.name
-              }}</span>
-              <span class="shrink-0 text-muted-foreground">{{
-                formatFileSize(attachment.size)
-              }}</span>
-              <button
-                type="button"
-                class="shrink-0 cursor-pointer rounded-sm text-muted-foreground hover:text-foreground"
-                :aria-label="`Ta bort ${attachment.name}`"
-                @click="removePendingAttachment(attachment.id)"
-              >
-                <Icon name="octicon:x-16" class="size-3.5" />
-              </button>
-            </div>
-          </TransitionGroup>
-
-          <Transition name="fade-up">
-            <div
-              v-if="menuOpen"
-              id="chat-skill-menu"
-              ref="skillMenuRef"
-              role="listbox"
-              aria-label="Skills"
-              class="absolute bottom-full left-0 right-0 z-30 mb-2 overflow-hidden rounded-md border border-border bg-popover p-1.5 shadow-lg"
-            >
-              <div
-                class="px-2.5 pb-1 pt-1 text-2xs font-normal text-muted-foreground"
-              >
-                Skills
-              </div>
-              <button
-                v-for="(skill, index) in filteredSkills"
-                :id="`chat-skill-${skill.id}`"
-                :key="skill.id"
-                type="button"
-                role="option"
-                :aria-selected="index === highlightedIndex"
-                class="flex w-full cursor-pointer items-start gap-2.5 rounded-sm px-2.5 py-1.5 text-left"
-                :class="index === highlightedIndex ? 'bg-accent' : ''"
-                @mouseenter="highlightedIndex = index"
-                @mousedown.prevent="selectSkill(skill)"
-              >
-                <Icon
-                  :name="SKILL_ICONS[skill.id]"
-                  class="mt-0.5 size-3.5 shrink-0 text-muted-foreground"
-                />
-                <span class="flex min-w-0 flex-col gap-0.5">
-                  <span class="flex items-baseline gap-1.5">
-                    <span class="text-xs font-medium text-foreground">{{
-                      skill.label
-                    }}</span>
-                    <span class="text-2xs text-muted-foreground"
-                      >/{{ skill.command }}</span
-                    >
-                  </span>
-                  <span class="text-2xs leading-snug text-muted-foreground">{{
-                    skill.description
-                  }}</span>
-                </span>
-              </button>
-            </div>
-          </Transition>
-
-          <div
-            class="composer flex flex-wrap items-center gap-1 p-2"
-            :class="{ 'is-expanded': isExpanded }"
-          >
-            <div class="composer-field relative min-w-0 px-2 py-1.5">
-              <span
-                v-if="activeSkill"
-                ref="skillPillRef"
-                class="pointer-events-auto absolute left-2 top-1.5 inline-flex items-center gap-1 rounded-full bg-skill px-2 py-0.5 text-[0.8125rem] font-medium leading-relaxed text-white"
-              >
-                {{ activeSkill.label }}
-                <button
-                  type="button"
-                  class="opacity-70 hover:opacity-100"
-                  :aria-label="`Ta bort ${activeSkill.label}`"
-                  @mousedown.prevent="clearSkill()"
-                >
-                  <Icon name="octicon:x-16" class="size-3" />
-                </button>
+  <div class="pointer-events-auto w-full px-3 sm:px-4">
+    <div ref="shellRef"
+      class="chat-shell relative mx-auto max-w-2xl cursor-text rounded-xl border border-default bg-default shadow-sm 3xl:max-w-3xl"
+      @click="textareaRef?.focus()">
+      <Transition name="fade-up">
+        <div v-if="menuOpen" id="chat-skill-menu" ref="skillMenuRef" role="listbox" aria-label="Skills"
+          class="absolute inset-x-0 bottom-full z-30 mb-2 overflow-hidden rounded-lg bg-default p-1 shadow-lg ring ring-default">
+          <p class="px-2 pb-1 pt-1 text-2xs text-muted">Skills</p>
+          <button v-for="(skill, index) in filteredSkills" :id="`chat-skill-${skill.id}`" :key="skill.id" type="button"
+            role="option" :aria-selected="index === highlightedIndex"
+            class="flex w-full cursor-pointer items-start gap-2.5 rounded-md px-2 py-1.5 text-left"
+            :class="index === highlightedIndex ? 'bg-elevated' : ''" @mouseenter="highlightedIndex = index"
+            @mousedown.prevent="selectSkill(skill)">
+            <UIcon :name="SKILL_ICONS[skill.id]" class="mt-0.5 size-3.5 shrink-0 text-muted" />
+            <span class="flex min-w-0 flex-col gap-0.5">
+              <span class="flex items-baseline gap-1.5">
+                <span class="text-xs font-medium text-highlighted">{{ skill.label }}</span>
+                <span class="text-2xs text-muted">/{{ skill.command }}</span>
               </span>
-              <textarea
-                ref="textareaRef"
-                :value="text"
-                rows="1"
-                :placeholder="
-                  activeSkill
-                    ? 'Fråga vad som helst'
-                    : 'Fråga vad som helst, skriv / för skills'
-                "
-                role="combobox"
-                :aria-expanded="menuOpen"
-                aria-controls="chat-skill-menu"
-                :aria-activedescendant="
-                  menuOpen
-                    ? `chat-skill-${filteredSkills[highlightedIndex]?.id}`
-                    : undefined
-                "
-                class="chat-textarea block w-full min-w-0 resize-none border-0 bg-transparent p-0 text-[0.9375rem] font-normal leading-6 outline-none placeholder:text-muted-foreground/65 focus:ring-0"
-                @input="handleInput"
-                @keydown="handleKeyDown"
-              />
-            </div>
+              <span class="text-2xs leading-snug text-muted">{{ skill.description }}</span>
+            </span>
+          </button>
+        </div>
+      </Transition>
 
-            <input
-              ref="fileInputRef"
-              type="file"
-              multiple
-              class="hidden"
-              :accept="FILE_INPUT_ACCEPT"
-              @change="handleFileInput"
-            />
-            <Tooltip>
-              <TooltipTrigger as-child>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  aria-label="Bifoga filer"
-                  class="composer-lead size-8 shrink-0 text-muted-foreground hover:text-foreground"
-                  :disabled="isLoading || attachmentCapacityReached"
-                  @click="fileInputRef?.click()"
-                >
-                  <Icon name="octicon:plus-16" class="size-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>Bifoga filer</TooltipContent>
-            </Tooltip>
-
-            <div
-              class="composer-actions ml-auto flex shrink-0 items-center gap-1"
-            >
-              <Tooltip>
-                <TooltipTrigger as-child>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    type="button"
-                    aria-label="Sök på webben"
-                    :aria-pressed="webSearch"
-                    class="h-8 shrink-0 gap-1.5 px-2.5 text-xs font-normal hover:bg-accent/70"
-                    :class="
-                      webSearch
-                        ? 'bg-accent/70 text-primary hover:text-primary'
-                        : 'text-muted-foreground hover:text-foreground'
-                    "
-                    @click="emit('update:webSearch', !webSearch)"
-                  >
-                    <Icon name="octicon:globe-16" class="size-4" />
-                    <span class="font-medium" v-if="webSearch">Webb</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>{{
-                  webSearch ? "Webbsökning på" : "Sök på webben"
-                }}</TooltipContent>
-              </Tooltip>
-
-              <Transition name="scale" mode="out-in">
-                <Button
-                  v-if="isLoading"
-                  key="stop"
-                  size="icon"
-                  variant="secondary"
-                  class="size-8"
-                  @click="emit('cancel')"
-                >
-                  <Icon name="octicon:square-fill-16" class="size-3.5" />
-                </Button>
-                <Button
-                  v-else
-                  key="send"
-                  size="icon"
-                  class="size-8"
-                  :disabled="!canSend"
-                  @click="emit('send')"
-                >
-                  <Icon name="octicon:arrow-up-16" class="size-4" />
-                </Button>
-              </Transition>
-            </div>
-          </div>
+      <div v-if="selectionContext || pendingAttachments.length || activeSkill"
+        class="flex min-w-0 flex-col gap-2 border-b border-default px-3 py-2.5">
+        <div v-if="selectionContext" class="flex w-full items-center gap-2">
+          <UIcon name="i-lucide-reply" class="size-3.5 shrink-0 text-muted" />
+          <span class="min-w-0 flex-1 truncate text-sm italic text-muted">"{{ selectionContext }}"</span>
+          <UButton color="neutral" variant="ghost" size="xs" icon="i-lucide-x" aria-label="Ta bort citatet"
+            @click.prevent="emit('clearSelectionContext')" />
         </div>
 
-        <div class="mt-2 flex items-center justify-between gap-3 px-1.5">
-          <p
-            v-if="reactiveInput && text.length > MAX_LENGTH * 0.8"
-            class="text-2xs"
-            :class="
-              text.length > MAX_LENGTH
-                ? 'font-medium text-destructive'
-                : 'text-muted-foreground'
-            "
-          >
-            {{ text.length }} / {{ MAX_LENGTH }}
-          </p>
-          <p
-            v-else-if="showDisclaimer"
-            class="min-w-0 truncate text-[0.8125rem] text-muted-foreground/60"
-          >
-            AI kan göra misstag. Kontrollera svaren.
-          </p>
-          <span v-else />
+        <div v-if="activeSkill" class="flex">
+          <UBadge :label="activeSkill.label" color="primary" variant="solid" size="sm" trailing-icon="i-lucide-x"
+            class="cursor-pointer" :aria-label="`Ta bort ${activeSkill.label}`" @mousedown.prevent="clearSkill()" />
+        </div>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger as-child>
-              <Button variant="ghost" size="xs" class="group">
-                <span class="text-muted-foreground group-hover:text-foreground">
-                  Gemini •
-                  {{ selectedModelLabel }}</span
-                >
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" class="w-60 p-1.5">
-              <DropdownMenuLabel
-                class="px-2.5 pb-1 pt-1.5 text-xs font-normal text-muted-foreground"
-              >
-                Tankenivå
-              </DropdownMenuLabel>
-              <DropdownMenuItem
-                v-for="model in availableModels"
-                :key="model.id"
-                class="cursor-pointer items-start justify-between gap-2 rounded-sm px-2.5 py-1.5 focus:bg-accent/70"
-                @click="emit('update:selectedModelId', model.id)"
-              >
-                <span class="flex min-w-0 flex-col gap-0.5">
-                  <span class="text-xs font-medium text-foreground">
-                    {{ model.label }}
-                  </span>
-                  <span class="text-2xs leading-snug text-muted-foreground">
-                    {{ model.hint }}
-                  </span>
-                </span>
-                <Icon name="octicon:check-16"
-                  v-if="model.id === selectedModelId"
-                  class="mt-0.5 size-3.5 shrink-0 text-primary"
-                />
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+        <TransitionGroup v-if="pendingAttachments.length" name="attachment-chip" tag="div" appear
+          class="flex flex-wrap gap-2">
+          <div v-for="attachment in pendingAttachments" :key="attachment.id"
+            class="flex min-w-0 max-w-full items-center gap-2 rounded-sm bg-elevated px-2.5 py-1.5 text-xs">
+            <UIcon v-if="attachment.mediaType === 'application/pdf'" name="i-lucide-file-text"
+              class="size-3.5 shrink-0 text-muted" />
+            <img v-else-if="attachment.previewUrl" :src="attachment.previewUrl" alt=""
+              class="size-10 shrink-0 rounded-sm object-cover" />
+            <UIcon v-else name="i-lucide-image" class="size-3.5 shrink-0 text-muted" />
+            <span class="max-w-20 truncate" :title="attachment.name">{{ attachment.name }}</span>
+            <span class="shrink-0 text-muted">{{ formatFileSize(attachment.size) }}</span>
+            <UButton color="neutral" variant="link" size="xs" icon="i-lucide-x"
+              :aria-label="`Ta bort ${attachment.name}`" @click="removePendingAttachment(attachment.id)" />
+          </div>
+        </TransitionGroup>
+      </div>
+
+      <textarea ref="textareaRef" v-model="text" :rows="MIN_ROWS"
+        :placeholder="activeSkill ? 'Fråga vad som helst' : 'Fråga vad som helst, skriv / för skills'" role="combobox"
+        :aria-expanded="menuOpen" aria-controls="chat-skill-menu"
+        :aria-activedescendant="menuOpen ? `chat-skill-${filteredSkills[highlightedIndex]?.id}` : undefined"
+        class="chat-textarea block w-full resize-none bg-transparent px-4 py-2.5 text-[0.9375rem] leading-6 text-highlighted outline-none placeholder:text-muted sm:py-3"
+        @input="handleInput" @keydown="handleKeyDown" />
+
+      <div class="flex min-w-0 items-center justify-between gap-2 px-2 pb-2">
+        <div class="flex min-w-0 items-center gap-1">
+          <input ref="fileInputRef" type="file" multiple class="hidden" :accept="FILE_INPUT_ACCEPT"
+            @change="handleFileInput" />
+          <UTooltip text="Bifoga filer">
+            <UButton color="neutral" variant="ghost" icon="i-lucide-plus" aria-label="Bifoga filer"
+              :disabled="isLoading || attachmentCapacityReached" @click="fileInputRef?.click()" />
+          </UTooltip>
+          <UTooltip :text="webSearch ? 'Webbsökning på' : 'Sök på webben'">
+            <UButton :color="webSearch ? 'primary' : 'neutral'" :variant="webSearch ? 'soft' : 'ghost'"
+              icon="i-lucide-globe" :label="webSearch ? 'Webb' : undefined" aria-label="Sök på webben"
+              :aria-pressed="webSearch" @click="emit('update:webSearch', !webSearch)" />
+          </UTooltip>
+          <UDropdownMenu v-model:open="modelMenuOpen" :items="modelItems" :content="{ align: 'start' }">
+            <UButton color="neutral" variant="ghost" :label="`Gemini • ${selectedModelLabel}`" class="min-w-0" />
+          </UDropdownMenu>
+        </div>
+        <div class="flex shrink-0 items-center gap-2">
+          <p v-if="text.length > MAX_LENGTH * 0.8" class="text-2xs"
+            :class="text.length > MAX_LENGTH ? 'font-medium text-error' : 'text-muted'">{{ text.length }} / {{
+              MAX_LENGTH }}</p>
+          <UButton v-if="isLoading" color="neutral" variant="soft" icon="i-lucide-square" aria-label="Avbryt svar"
+            @click="emit('cancel')" />
+          <UButton v-else color="primary" icon="i-lucide-arrow-up" aria-label="Skicka meddelande" :disabled="!canSend"
+            @click="emit('send')" />
         </div>
       </div>
     </div>
+    <p v-if="showDisclaimer" class="pointer-events-auto px-4 pb-2 pt-1 text-center text-2xs text-dimmed">
+      AI kan göra misstag. Kontrollera svaren.
+    </p>
   </div>
 </template>
 
@@ -744,30 +487,9 @@ defineExpose({
 }
 
 .chat-shell:has(.chat-textarea:focus) {
-  border-color: color-mix(in srgb, var(--foreground), transparent 80%);
+  border-color: var(--ui-border-accented);
 }
 
-.composer-lead {
-  order: 1;
-}
-
-.composer-field {
-  order: 2;
-  flex: 1 1 auto;
-}
-
-.composer-actions {
-  order: 3;
-}
-
-.composer.is-expanded .composer-field {
-  order: 0;
-  flex: 1 1 100%;
-}
-
-/* Höjden följer texten mjukt medan man skriver. Radbrytningen till uppfällt
-   läge är däremot ett enda steg i flödeslayouten och sker direkt — det är
-   avsiktligt, väntan där skulle synas som eftersläpning i skrivandet. */
 .chat-textarea {
   transition: height 130ms var(--ease-spring);
   scrollbar-width: none;
@@ -847,6 +569,7 @@ defineExpose({
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   .attachment-chip-enter-active,
   .attachment-chip-leave-active,
   .attachment-chip-move {

@@ -1,180 +1,107 @@
 <script setup lang="ts">
-const props = defineProps<{
-  size?: "sm" | "md" | "lg";
-  class?: string;
-}>();
+const props = withDefaults(
+  defineProps<{
+    size?: "sm" | "md" | "lg";
+    class?: string;
+  }>(),
+  { size: "md", class: "" },
+);
 
 const router = useRouter();
 const route = useRoute();
 const { add } = useRecentSearches();
+const { codes, nameByCode } = useCourseCodes();
 
-const courseCode = ref("");
-const suggestions = ref<string[]>([]);
-const showSuggestions = ref(false);
-const selectedIndex = ref(-1);
-const isFocused = ref(false);
-const inputRef = ref<HTMLInputElement | null>(null);
-const { codes } = useCourseCodes();
-const suggestionsRef = ref<HTMLDivElement | null>(null);
+type CourseItem = { label: string; name: string };
 
-watch(courseCode, (val) => {
-  const q = val.toUpperCase().trim();
-  if (!q) {
-    suggestions.value = [];
-    return;
-  }
-  suggestions.value = codes.value.filter((c) => c.includes(q)).slice(0, 10);
-  showSuggestions.value = true;
-  selectedIndex.value = -1;
+const searchTerm = ref("");
+/**
+ * Fältet är en sökruta, inte ett val: värdet hålls styrt och nollas direkt
+ * efter varje val så att combobox:en aldrig skriver tillbaka kurskoden.
+ */
+const selected = ref<CourseItem | undefined>(undefined);
+const inputMenuRef = useTemplateRef("inputMenuRef");
+
+/**
+ * Filtreringen görs här i stället för i UInputMenu: kurskoder matchas som
+ * versaler och listan ska aldrig växa förbi tio träffar.
+ */
+const items = computed<CourseItem[]>(() => {
+  const q = searchTerm.value.trim().toUpperCase();
+  if (!q) return [];
+  return codes.value
+    .filter((code) => code.includes(q))
+    .slice(0, 10)
+    .map((code) => ({ label: code, name: nameByCode.value.get(code) ?? "" }));
 });
 
-function handleSelectCourse(course: string) {
-  const searchCode = course.trim().toUpperCase();
+function goToCourse(code: string) {
+  const searchCode = code.trim().toUpperCase();
   if (!searchCode) return;
   add(searchCode);
-  courseCode.value = "";
-  showSuggestions.value = false;
-  isFocused.value = false;
-  inputRef.value?.blur();
-  if (route.path.includes("stats")) {
-    router.push(`/search/${searchCode}/stats`);
-  } else {
-    router.push(`/search/${searchCode}`);
-  }
+  searchTerm.value = "";
+  inputMenuRef.value?.inputRef?.blur();
+  router.push(
+    route.path.includes("stats")
+      ? `/search/${searchCode}/stats`
+      : `/search/${searchCode}`,
+  );
 }
 
-function handleKeyDown(e: KeyboardEvent) {
-  if (e.key === "Enter") {
-    e.preventDefault();
-    const suggestion = suggestions.value[selectedIndex.value];
-    if (selectedIndex.value >= 0 && suggestion) {
-      handleSelectCourse(suggestion);
-    } else {
-      handleSelectCourse(courseCode.value);
-    }
-    showSuggestions.value = false;
-  } else if (e.key === "ArrowDown") {
-    e.preventDefault();
-    const newIndex = Math.min(
-      selectedIndex.value + 1,
-      suggestions.value.length - 1,
-    );
-    selectedIndex.value = newIndex;
-    scrollToSuggestion(newIndex);
-  } else if (e.key === "ArrowUp") {
-    e.preventDefault();
-    const newIndex = Math.max(selectedIndex.value - 1, 0);
-    selectedIndex.value = newIndex;
-    scrollToSuggestion(newIndex);
-  } else if (e.key === "Escape") {
-    showSuggestions.value = false;
-    selectedIndex.value = -1;
-    inputRef.value?.blur();
-  }
+function onSelect(item: CourseItem | undefined) {
+  nextTick(() => {
+    selected.value = undefined;
+    searchTerm.value = "";
+  });
+  if (item?.label) goToCourse(item.label);
 }
 
-function scrollToSuggestion(index: number) {
-  if (!suggestionsRef.value) return;
-  const el = suggestionsRef.value.children[index] as HTMLElement | undefined;
-  el?.scrollIntoView({ behavior: "instant", block: "nearest" });
+/**
+ * Enter på en markerad rad hanteras av menyn via onSelect. Väntar ett varv så
+ * att fältet redan är tömt i det fallet och bara fri text söks här.
+ */
+function onEnter() {
+  setTimeout(() => {
+    if (searchTerm.value.trim()) goToCourse(searchTerm.value);
+  }, 0);
 }
 
-function handleFocus() {
-  isFocused.value = true;
-  if (suggestions.value.length > 0 || courseCode.value.trim()) {
-    showSuggestions.value = true;
-  }
-}
-
-function handleBlur() {
-  isFocused.value = false;
-  showSuggestions.value = false;
-  selectedIndex.value = -1;
-}
-
-function handleClickOutside(e: MouseEvent) {
-  if (inputRef.value && !inputRef.value.contains(e.target as Node)) {
-    showSuggestions.value = false;
-  }
-}
-
-onMounted(() => {
-  document.addEventListener("mousedown", handleClickOutside);
-  document.addEventListener("keydown", handleGlobalKeyDown);
+defineShortcuts({
+  "/": () => inputMenuRef.value?.inputRef?.focus(),
 });
-
-onUnmounted(() => {
-  document.removeEventListener("mousedown", handleClickOutside);
-  document.removeEventListener("keydown", handleGlobalKeyDown);
-});
-
-function handleGlobalKeyDown(e: KeyboardEvent) {
-  if (
-    e.key === "/" &&
-    !isFocused.value &&
-    document.activeElement !== inputRef.value
-  ) {
-    e.preventDefault();
-    inputRef.value?.focus();
-  }
-}
-
-const sizeClass = computed(
-  () =>
-    ({
-      sm: "text-xs py-1.5 px-3",
-      md: "text-sm py-2 px-3",
-      lg: "text-base py-2.5 px-3",
-    })[props.size ?? "md"],
-);
-
-const iconSize = computed(
-  () =>
-    ({
-      sm: "w-3 h-3",
-      md: "w-4 h-4",
-      lg: "w-5 h-5",
-    })[props.size ?? "md"],
-);
 </script>
 
 <template>
-  <div class="relative" :class="props.class">
-    <div class="relative flex items-center">
-      <Icon name="octicon:search-16" class="absolute left-3 pointer-events-none z-10 transition-colors" :class="[
-        iconSize,
-        isFocused ? 'text-primary' : 'text-muted-foreground',
-      ]" />
-      <input ref="inputRef" :value="courseCode.toUpperCase()" placeholder="Sök kurskod..."
-        class="w-full rounded-lg border bg-background pl-9 pr-9 text-foreground outline-none placeholder:text-muted-foreground"
-        :class="[sizeClass, isFocused ? 'border-primary' : 'border-border']"
-        @input="courseCode = ($event.target as HTMLInputElement).value" @keydown="handleKeyDown" @focus="handleFocus"
-        @blur="handleBlur" />
-      <div v-if="!courseCode" class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none hidden sm:flex">
-        <kbd
-          class="inline-flex h-5 items-center rounded-sm border border-border bg-background px-1.5 font-mono text-2xs text-muted-foreground">
-          /
-        </kbd>
-      </div>
-      <Button v-else variant="ghost" size="icon-xs" class="absolute right-3 top-1/2 -translate-y-1/2 z-10"
-        aria-label="Rensa" @click="courseCode = ''">
-        <Icon name="octicon:x-16" :class="iconSize" />
-      </button>
-    </div>
+  <UInputMenu
+    ref="inputMenuRef"
+    v-model="selected"
+    v-model:search-term="searchTerm"
+    :items="items"
+    :size="size"
+    :class="props.class"
+    icon="i-lucide-search"
+    placeholder="Sök kurskod..."
+    ignore-filter
+    :trailing-icon="undefined"
+    :ui="{ base: 'uppercase placeholder:normal-case' }"
+    @update:model-value="onSelect"
+    @keydown.enter="onEnter"
+  >
+    <template #trailing>
+      <UKbd value="/" variant="subtle" class="hidden sm:inline-flex" />
+    </template>
 
-    <div v-if="showSuggestions && suggestions.length > 0" ref="suggestionsRef"
-      class="absolute w-full left-0 mt-2 bg-background border border-border rounded-lg z-40 max-h-72 overflow-y-auto text-sm">
-      <div class="px-3 pt-3 pb-1 text-xs text-muted-foreground">
-        Alla kurser
-      </div>
-      <div v-for="(suggestion, index) in suggestions" :key="suggestion"
-        class="flex items-center px-3 py-2 cursor-pointer transition-colors" :class="index === selectedIndex
-          ? 'bg-muted text-foreground'
-          : 'hover:bg-muted/50'
-          " @mousedown="handleSelectCourse(suggestion)">
-        <span class="flex-1 font-normal">{{ suggestion }}</span>
-        <LucideCornerDownLeft class="w-3.5 h-3.5 opacity-40" />
-      </div>
-    </div>
-  </div>
+    <template #item="{ item }">
+      <span class="flex min-w-0 flex-1 items-baseline gap-2">
+        <span class="shrink-0 font-medium text-highlighted">{{ (item as CourseItem).label }}</span>
+        <span class="truncate text-xs text-muted">{{ (item as CourseItem).name }}</span>
+      </span>
+      <UIcon name="i-lucide-corner-down-left" class="size-3.5 shrink-0 text-dimmed" />
+    </template>
+
+    <template #empty>
+      <span v-if="searchTerm.trim()">Ingen kurs matchar "{{ searchTerm.trim().toUpperCase() }}"</span>
+      <span v-else>Skriv en kurskod</span>
+    </template>
+  </UInputMenu>
 </template>

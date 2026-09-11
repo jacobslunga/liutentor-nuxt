@@ -18,8 +18,8 @@ const props = withDefaults(
     hideDelay?: number;
   }>(),
   {
-    color: "var(--primary)",
-    errorColor: "var(--destructive)",
+    color: "var(--ui-primary)",
+    errorColor: "var(--ui-error)",
     height: 2,
     duration: 2000,
     throttle: 80,

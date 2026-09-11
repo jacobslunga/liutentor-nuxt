@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { Message } from "@/stores/chat";
-import { toast } from "vue-sonner";
 import { useChatStore } from "@/stores/chat";
+
+const toast = useToast();
 
 type ConversationItem = {
   id: string;
@@ -21,6 +22,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   "update:open": [value: boolean];
+  select: [id: string];
 }>();
 
 const user = useSupabaseUser();
@@ -36,7 +38,7 @@ const conversationMeta = useState<Record<string, ConversationMeta>>(
   () => ({}),
 );
 const searchQuery = ref("");
-const searchInputRef = ref<HTMLInputElement | null>(null);
+const searchInputRef = useTemplateRef("searchInputRef");
 const isLoading = ref(false);
 const isOpeningConversation = ref(false);
 const isDeletingConversation = ref(false);
@@ -163,7 +165,6 @@ async function loadConversations() {
 
     loadConversationMeta(conversations.value.map((c) => c.id));
   } catch {
-
     if (isInitialLoad) {
       loadError.value = "Kunde inte hämta konversationshistorik.";
       conversations.value = [];
@@ -226,7 +227,7 @@ async function loadConversationMeta(ids: string[]) {
 
     conversationMeta.value = meta;
   } catch {
-
+    // Metadata är bara pynt; listan fungerar utan.
   }
 }
 
@@ -278,6 +279,7 @@ async function openConversation(item: ConversationItem) {
     chatStore.currentConversationTitle = item.title;
     chatStore.savedScrollPosition = 0;
     emit("update:open", false);
+    emit("select", item.id);
   } catch {
     loadError.value = "Kunde inte öppna konversationen.";
   } finally {
@@ -324,7 +326,7 @@ async function confirmDeleteConversation() {
       chatStore.setLoading(false);
     }
 
-    toast.success("Chatten raderades", { position: "top-center" });
+    toast.add({ title: "Chatten raderades", color: "success" });
 
     showDeleteConfirm.value = false;
     pendingDeleteConversation.value = null;
@@ -369,7 +371,7 @@ async function confirmDeleteAllConversations() {
     chatStore.savedScrollPosition = 0;
     chatStore.setLoading(false);
 
-    toast.success("Alla chattar raderades", { position: "top-center" });
+    toast.add({ title: "Alla chattar raderades", color: "success" });
     showDeleteAllConfirm.value = false;
   } catch {
     loadError.value = "Kunde inte radera alla chattar.";
@@ -388,53 +390,41 @@ watch(
   { immediate: true },
 );
 
-function focusSearch(event: Event) {
-  event.preventDefault();
+function focusSearch() {
+  // Autofokus bara på pekdon med hover, annars slår mobiltangentbordet upp.
   if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
-    searchInputRef.value?.focus();
+    searchInputRef.value?.inputRef?.focus();
   }
 }
 </script>
 
 <template>
-  <Dialog :open="open" @update:open="emit('update:open', $event)">
-    <DialogContent
-      class="flex h-[min(32rem,calc(100dvh-2rem))] flex-col gap-0 overflow-hidden p-0 duration-0 data-[state=closed]:!animate-none data-[state=open]:!animate-none sm:h-[32rem] sm:max-w-md"
-      @open-auto-focus="focusSearch"
-    >
-      <DialogHeader class="px-4 pt-4 pb-0">
-        <DialogTitle>Chatthistorik</DialogTitle>
-        <DialogDescription class="sr-only">
-          Sök och öppna tidigare chattar
-        </DialogDescription>
-      </DialogHeader>
-
-      <div class="flex items-center gap-2 border-b px-4 py-2.5">
-        <Icon name="octicon:search-16" class="size-4 shrink-0 text-muted-foreground" />
-        <input ref="searchInputRef" v-model="searchQuery" type="text" placeholder="Sök bland chattar..."
-          class="flex-1 min-w-0 bg-transparent text-sm outline-none placeholder:text-muted-foreground/70" />
-        <Button v-if="conversations.length > 0" variant="ghost" size="icon"
-          class="size-7 shrink-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+  <UModal :open="open" title="Chatthistorik" description="Sök och öppna tidigare chattar"
+    :ui="{ content: 'h-[36rem]', body: 'flex flex-col min-h-0 overflow-hidden' }"
+    @update:open="emit('update:open', $event)" @after:enter="focusSearch">
+    <template #body>
+      <div class="flex shrink-0 items-center gap-2">
+        <UInput ref="searchInputRef" v-model="searchQuery" icon="i-lucide-search" placeholder="Sök bland chattar..."
+          class="flex-1" />
+        <UButton v-if="conversations.length > 0" color="error" variant="ghost" icon="i-lucide-trash-2"
           :disabled="isDeletingAll || isDeletingConversation" aria-label="Radera alla chattar"
-          @click="showDeleteAllConfirm = true">
-          <Icon name="octicon:trash-16" class="w-3.5 h-3.5" />
-        </Button>
+          @click="showDeleteAllConfirm = true" />
       </div>
 
-      <div class="min-h-0 flex-1 overflow-y-auto px-2 py-2 custom-scrollbar">
-        <div v-if="isLoading" class="px-2 py-4 text-sm text-muted-foreground">
+      <div class="mt-3 min-h-0 flex-1 overflow-y-auto overscroll-contain -mx-2 px-2">
+        <div v-if="isLoading" class="px-2 py-4 text-sm text-muted">
           Hämtar historik...
         </div>
 
-        <div v-else-if="loadError" class="px-2 py-4 text-sm text-destructive">
+        <div v-else-if="loadError" class="px-2 py-4 text-sm text-error">
           {{ loadError }}
         </div>
 
-        <div v-else-if="requiresLoginMessage" class="px-2 py-4 text-sm text-muted-foreground">
+        <div v-else-if="requiresLoginMessage" class="px-2 py-4 text-sm text-muted">
           Logga in för att se din chatthistorik.
         </div>
 
-        <div v-else-if="groupedConversations.length === 0" class="px-2 py-4 text-sm text-muted-foreground">
+        <div v-else-if="groupedConversations.length === 0" class="px-2 py-4 text-sm text-muted">
           {{
             searchQuery.trim()
               ? `Inga chattar matchar "${searchQuery.trim()}".`
@@ -444,79 +434,61 @@ function focusSearch(event: Event) {
 
         <div v-else class="space-y-4">
           <section v-for="group in groupedConversations" :key="group.label">
-            <h3 class="px-3 pb-1.5 text-sm font-normal text-muted-foreground/60">
+            <h3 class="px-3 pb-1.5 text-sm font-normal text-muted/60">
               {{ group.label }}
             </h3>
 
             <div class="space-y-0.5">
               <div v-for="item in group.items" :key="item.id"
-                class="group flex items-center gap-1 rounded-md px-1 transition-colors" :class="
-                  item.id === chatStore.currentConversationId
-                    ? 'bg-secondary'
-                    : 'bg-transparent hover:bg-accent'
-                ">
+                class="group flex items-center gap-1 rounded-md px-1 transition-colors" :class="item.id === chatStore.currentConversationId
+                  ? 'bg-elevated'
+                  : 'bg-transparent hover:bg-accented'
+                  ">
                 <button type="button" class="min-w-0 flex-1 cursor-pointer text-left px-2 py-1.5"
                   :disabled="isOpeningConversation || isDeletingConversation" @click="openConversation(item)">
-                  <p class="text-sm truncate text-foreground/90" :class="item.id === chatStore.currentConversationId
+                  <p class="text-sm truncate text-highlighted/90" :class="item.id === chatStore.currentConversationId
                     ? 'font-medium'
                     : 'font-normal'
                     ">
                     {{ item.title || "Ny chatt" }}
                   </p>
-                  <p v-if="metaLabel(item.id)" class="text-xs truncate text-muted-foreground/70">
+                  <p v-if="metaLabel(item.id)" class="text-xs truncate text-muted/70">
                     {{ metaLabel(item.id) }}
                   </p>
                 </button>
 
-                <Button variant="ghost" size="icon"
+                <UButton color="neutral" variant="ghost" square
                   class="size-7 shrink-0 sm:opacity-0 sm:pointer-events-none sm:group-hover:opacity-100 sm:group-hover:pointer-events-auto transition-opacity hover:bg-transparent"
                   :disabled="isDeletingConversation" aria-label="Radera chatt" @click="askDeleteConversation(item)">
-                  <Icon name="octicon:trash-16" class="w-3.5 h-3.5 text-muted-foreground/60 hover:text-destructive" />
-                </Button>
+                  <UIcon name="i-lucide-trash-2" class="w-3.5 h-3.5 text-muted/60 hover:text-error" />
+                </UButton>
               </div>
             </div>
           </section>
         </div>
       </div>
-    </DialogContent>
-  </Dialog>
+    </template>
+  </UModal>
 
-  <AlertDialog v-model:open="showDeleteConfirm">
-    <AlertDialogContent>
-      <AlertDialogHeader>
-        <AlertDialogTitle>Är du säker?</AlertDialogTitle>
-        <AlertDialogDescription>
-          Den här chatten kommer att raderas permanent och kan inte ångras.
-        </AlertDialogDescription>
-      </AlertDialogHeader>
-      <AlertDialogFooter>
-        <AlertDialogCancel :disabled="isDeletingConversation">
-          Avbryt
-        </AlertDialogCancel>
-        <AlertDialogAction class="bg-destructive text-white hover:bg-destructive/90" :disabled="isDeletingConversation"
-          @click="confirmDeleteConversation">
-          {{ isDeletingConversation ? "Raderar..." : "Radera" }}
-        </AlertDialogAction>
-      </AlertDialogFooter>
-    </AlertDialogContent>
-  </AlertDialog>
+  <UModal v-model:open="showDeleteConfirm" :dismissible="false" :close="false" title="Är du säker?"
+    description="Den här chatten kommer att raderas permanent och kan inte ångras.">
+    <template #footer="{ close }">
+      <UButton color="neutral" variant="outline" :disabled="isDeletingConversation" @click="close()">
+        Avbryt
+      </UButton>
+      <UButton color="error" :disabled="isDeletingConversation" @click="confirmDeleteConversation">
+        {{ isDeletingConversation ? "Raderar..." : "Radera" }}
+      </UButton>
+    </template>
+  </UModal>
 
-  <AlertDialog v-model:open="showDeleteAllConfirm">
-    <AlertDialogContent>
-      <AlertDialogHeader>
-        <AlertDialogTitle>Radera all historik?</AlertDialogTitle>
-        <AlertDialogDescription>
-          Alla {{ conversations.length }} chattar kommer att raderas permanent.
-          Det går inte att ångra.
-        </AlertDialogDescription>
-      </AlertDialogHeader>
-      <AlertDialogFooter>
-        <AlertDialogCancel :disabled="isDeletingAll">Avbryt</AlertDialogCancel>
-        <AlertDialogAction class="bg-destructive text-white hover:bg-destructive/90" :disabled="isDeletingAll"
-          @click="confirmDeleteAllConversations">
-          {{ isDeletingAll ? "Raderar..." : `Radera alla` }}
-        </AlertDialogAction>
-      </AlertDialogFooter>
-    </AlertDialogContent>
-  </AlertDialog>
+  <UModal v-model:open="showDeleteAllConfirm" :dismissible="false" :close="false" title="Radera all historik?"
+    :description="`Alla ${conversations.length} chattar kommer att raderas permanent. Det går inte att ångra.`">
+    <template #footer="{ close }">
+      <UButton color="neutral" variant="outline" :disabled="isDeletingAll" @click="close()">Avbryt</UButton>
+      <UButton color="error" :disabled="isDeletingAll" @click="confirmDeleteAllConversations">
+        {{ isDeletingAll ? "Raderar..." : `Radera alla` }}
+      </UButton>
+    </template>
+  </UModal>
 </template>

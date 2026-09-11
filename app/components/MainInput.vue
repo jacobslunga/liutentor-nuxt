@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
-import Button from "./ui/button/Button.vue";
 
 const { codes: courseCodes } = useCourseCodes();
 
@@ -195,12 +194,12 @@ function handleClickOutside(event: MouseEvent) {
 <template>
   <div class="relative w-full">
     <div class="w-full relative flex flex-row items-center justify-center pl-5 pr-2">
-      <Icon name="octicon:search-16" class="size-6 text-muted-foreground" />
+      <UIcon name="i-lucide-search" class="size-6 text-muted" />
 
       <input
         ref="inputRef"
         :value="courseCode.toUpperCase()"
-        class="min-w-0 w-full py-4 pl-3 pr-2 border-none bg-transparent text-md text-foreground/80 outline-none"
+        class="min-w-0 w-full py-4 pl-3 pr-2 border-none bg-transparent text-md text-highlighted/80 outline-none"
         :placeholder="`Sök efter ${typed}`"
         @input="courseCode = ($event.target as HTMLInputElement).value"
         @keydown="handleKeyDown"
@@ -208,23 +207,25 @@ function handleClickOutside(event: MouseEvent) {
         @blur="emit('update:focusInput', false)"
       />
 
-      <Button
+      <UButton
         class="shrink-0"
+        color="neutral"
         variant="outline"
-        size="icon-sm"
+        size="sm"
+        square
         :disabled="!courseCode"
         aria-label="Search"
         @click="handleSelectCourse(courseCode)"
       >
-        <Icon name="octicon:arrow-up-16" class="w-5 h-5" />
-      </Button>
+        <UIcon name="i-lucide-arrow-up" class="w-5 h-5" />
+      </UButton>
     </div>
 
     <div
       v-if="showSuggestions && suggestions.length > 0"
-      class="absolute w-full left-0 mt-2 bg-background rounded-2xl border z-40 max-h-72 overflow-hidden text-sm"
+      class="absolute w-full left-0 mt-2 bg-default rounded-2xl border z-40 max-h-72 overflow-hidden text-sm"
     >
-      <div class="px-3 pt-3 pb-1 text-muted-foreground font-medium">
+      <div class="px-3 pt-3 pb-1 text-muted font-medium">
         Alla kurser
       </div>
 
@@ -246,7 +247,7 @@ function handleClickOutside(event: MouseEvent) {
             :class="[
               'flex items-center px-4 py-2 cursor-pointer transition-colors',
               index === selectedIndex
-                ? 'bg-muted text-foreground'
+                ? 'bg-muted text-highlighted'
                 : 'hover:bg-muted/50',
             ]"
             :style="{

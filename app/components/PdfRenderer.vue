@@ -211,9 +211,9 @@ const plugins = computed(() => {
 </script>
 
 <template>
-  <div class="group/pdf relative isolate h-full w-full overflow-hidden bg-white dark:bg-background">
+  <div class="group/pdf relative isolate h-full w-full overflow-hidden bg-white dark:bg-default">
     <div v-if="isLoading || !engine" class="flex h-full w-full items-center justify-center">
-      <Icon name="octicon:sync-16" class="h-5 w-5 animate-spin text-muted-foreground" />
+      <UIcon name="i-lucide-loader-circle" class="h-5 w-5 animate-spin text-muted" />
     </div>
 
     <EmbedPDF v-else :engine="engine" :plugins="plugins">
@@ -230,11 +230,11 @@ const plugins = computed(() => {
             <template #default="{ isLoaded }">
               <PageLoadingTask :pending="!isLoaded" />
               <div v-if="!isLoaded" class="flex h-full w-full items-center justify-center">
-                <Icon name="octicon:sync-16" class="h-5 w-5 animate-spin text-muted-foreground" />
+                <UIcon name="i-lucide-loader-circle" class="h-5 w-5 animate-spin text-muted" />
               </div>
 
               <Viewport v-else :document-id="activeDocumentId"
-                class="h-full w-full bg-white dark:bg-background pdf-viewport" :style="viewportInsetStyle"
+                class="h-full w-full bg-white dark:bg-default pdf-viewport" :style="viewportInsetStyle"
                 @scroll="handleViewportScroll" @wheel.capture="handleWheelCapture">
                 <template v-if="isMobile">
                   <Scroller :document-id="activeDocumentId">
@@ -246,7 +246,7 @@ const plugins = computed(() => {
                         <PagePointerProvider :document-id="activeDocumentId" :page-index="page.pageIndex"
                           class="pdf-mobile-pointer">
                           <Rotate :document-id="activeDocumentId" :page-index="page.pageIndex"
-                            class="bg-white dark:bg-background" :style="{
+                            class="bg-white dark:bg-default" :style="{
                               width: `${page.width}px`,
                               height: `${page.height}px`,
                             }">
@@ -286,7 +286,7 @@ const plugins = computed(() => {
                           }" class="relative mx-auto my-4 pdf-page-shell">
                             <PagePointerProvider :document-id="activeDocumentId" :page-index="page.pageIndex">
                               <Rotate :document-id="activeDocumentId" :page-index="page.pageIndex"
-                                class="bg-white dark:bg-background" :style="{
+                                class="bg-white dark:bg-default" :style="{
                                   width: `${page.width}px`,
                                   height: `${page.height}px`,
                                 }">

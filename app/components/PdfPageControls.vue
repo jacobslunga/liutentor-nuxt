@@ -70,30 +70,30 @@ function cancel() {
 
 <template>
   <div
-    class="pointer-events-auto flex items-center gap-0.5 rounded-full border border-border bg-background/80 p-0.5 opacity-20 shadow-sm backdrop-blur-sm transition-opacity duration-200 group-hover/pdf:opacity-70 hover:opacity-100 has-[:focus-visible]:opacity-100">
+    class="pointer-events-auto flex items-center gap-0.5 rounded-full border border-default bg-default/80 p-0.5 opacity-20 shadow-sm backdrop-blur-sm transition-opacity duration-200 group-hover/pdf:opacity-70 hover:opacity-100 has-[:focus-visible]:opacity-100">
     <button type="button" aria-label="Zooma ut" :disabled="!canZoomOut"
-      class="flex size-8 cursor-pointer items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground disabled:cursor-default disabled:opacity-35 disabled:hover:bg-transparent"
+      class="flex size-8 cursor-pointer items-center justify-center rounded-full text-muted transition-colors hover:bg-elevated hover:text-highlighted disabled:cursor-default disabled:opacity-35 disabled:hover:bg-transparent"
       @click="zoom?.zoomOut()">
-      <Icon name="octicon:dash-16" class="size-3.5" />
+      <UIcon name="i-lucide-minus" class="size-3.5" />
     </button>
 
     <input ref="inputEl" :value="displayValue" type="text" inputmode="numeric" aria-label="Zoomnivå i procent"
-      class="w-12 rounded-full bg-transparent py-1 text-center text-xs tabular-nums text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus:bg-secondary focus:text-foreground focus:outline-none"
+      class="w-12 rounded-full bg-transparent py-1 text-center text-xs tabular-nums text-muted transition-colors hover:bg-elevated hover:text-highlighted focus:bg-elevated focus:text-highlighted focus:outline-none"
       @focus="startEditing" @input="draft = ($event.target as HTMLInputElement).value" @blur="commit"
       @keydown.enter="inputEl?.blur()" @keydown.esc="cancel" />
 
     <button type="button" aria-label="Zooma in" :disabled="!canZoomIn"
-      class="flex size-8 cursor-pointer items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground disabled:cursor-default disabled:opacity-35 disabled:hover:bg-transparent"
+      class="flex size-8 cursor-pointer items-center justify-center rounded-full text-muted transition-colors hover:bg-elevated hover:text-highlighted disabled:cursor-default disabled:opacity-35 disabled:hover:bg-transparent"
       @click="zoom?.zoomIn()">
-      <Icon name="octicon:plus-16" class="size-3.5" />
+      <UIcon name="i-lucide-plus" class="size-3.5" />
     </button>
 
     <div class="mx-0.5 h-5 w-px bg-border" />
 
     <button type="button" aria-label="Rotera medurs"
-      class="flex size-8 cursor-pointer items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+      class="flex size-8 cursor-pointer items-center justify-center rounded-full text-muted transition-colors hover:bg-elevated hover:text-highlighted"
       @click="rotate?.rotateForward()">
-      <Icon name="octicon:sync-16" class="size-3.5" />
+      <UIcon name="i-lucide-rotate-cw" class="size-3.5" />
     </button>
   </div>
 </template>

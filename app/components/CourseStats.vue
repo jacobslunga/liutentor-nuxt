@@ -25,10 +25,10 @@ const average = computed(() => overallPassRate.value ?? 0);
   <div v-else class="flex w-full flex-col gap-12">
     <section class="flex flex-col gap-5">
       <header>
-        <h2 class="text-xs font-semibold text-muted-foreground">
+        <h2 class="text-xs font-semibold text-muted">
           Godkända över tid
         </h2>
-        <p class="mt-1.5 text-sm text-muted-foreground">
+        <p class="mt-1.5 text-sm text-muted">
           Andel godkända per tentatillfälle
         </p>
       </header>
@@ -45,10 +45,10 @@ const average = computed(() => overallPassRate.value ?? 0);
 
     <section class="flex flex-col gap-5">
       <header>
-        <h2 class="text-xs font-semibold text-muted-foreground">
+        <h2 class="text-xs font-semibold text-muted">
           Betygsfördelning
         </h2>
-        <p class="mt-1.5 text-sm text-muted-foreground">
+        <p class="mt-1.5 text-sm text-muted">
           Alla registrerade betyg på kursens tentor
         </p>
       </header>
