@@ -73,8 +73,8 @@
   --font-serif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
 
   --font-sans:
-    "Public Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    Roboto, "Helvetica Neue", Arial, sans-serif;
+    system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
 
   --text-2xs: 0.6875rem;
 }
@@ -119,7 +119,7 @@ body {
 
 :root {
   --ui-primary: oklch(0.6193 0.1154 172.06);
-  --ui-radius: 0.45rem;
+  --ui-radius: 0.75rem;
 
   --chart-1: oklch(from var(--ui-primary) 0.911 0.0453 h);
   --chart-2: oklch(from var(--ui-primary) 0.8072 0.1109 h);

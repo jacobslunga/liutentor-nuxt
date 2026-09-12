@@ -18,20 +18,20 @@ export default defineAppConfig({
     },
     tabs: {
       slots: {
-        list: "p-0.5 gap-0.5 bg-neutral-200/60 dark:bg-neutral-900/90 border border-default/60 rounded-lg",
+        list: "p-1 gap-0 bg-neutral-100 dark:bg-neutral-900 border-0 rounded-full",
         indicator:
-          "transition-[translate,width] duration-200 ease-out motion-reduce:transition-none !bg-default dark:!bg-neutral-700 !text-highlighted shadow-xs ring-1 ring-default/60 dark:ring-white/15 rounded-md inset-y-0.5",
+          "transition-[translate,width] duration-200 ease-out motion-reduce:transition-none !bg-white dark:!bg-neutral-700 !text-highlighted shadow-[0_1px_4px_rgb(0_0_0/0.08)] ring-1 ring-black/5 dark:ring-white/10 rounded-full inset-y-1",
         trigger:
-          "data-[state=active]:!text-highlighted data-[state=inactive]:!bg-transparent text-muted hover:text-highlighted rounded-sm transition-colors",
+          "data-[state=active]:!text-highlighted data-[state=inactive]:!bg-transparent text-muted hover:text-highlighted rounded-full transition-colors",
       },
       variants: {
         variant: {
           pill: {
-            list: "bg-neutral-200/60 dark:bg-neutral-900/90 border border-default/60 rounded-lg",
+            list: "bg-neutral-100 dark:bg-neutral-900 border-0 rounded-full",
             indicator:
-              "!bg-default dark:!bg-neutral-700 !text-highlighted shadow-xs ring-1 ring-default/60 dark:ring-white/15 rounded-md",
+              "!bg-white dark:!bg-neutral-700 !text-highlighted shadow-[0_1px_4px_rgb(0_0_0/0.08)] ring-1 ring-black/5 dark:ring-white/10 rounded-full",
             trigger:
-              "data-[state=active]:!text-highlighted data-[state=inactive]:!bg-transparent text-muted hover:text-highlighted",
+              "data-[state=active]:!text-highlighted data-[state=inactive]:!bg-transparent text-muted hover:text-highlighted rounded-full",
           },
         },
       },
@@ -41,10 +41,10 @@ export default defineAppConfig({
           variant: "pill",
           class: {
             indicator:
-              "!bg-default dark:!bg-neutral-700 shadow-xs ring-1 ring-default/60 dark:ring-white/15",
+              "!bg-white dark:!bg-neutral-700 shadow-[0_1px_4px_rgb(0_0_0/0.08)] ring-1 ring-black/5 dark:ring-white/10 rounded-full",
             trigger: [
               "data-[state=active]:!text-highlighted",
-              "in-[[data-slot=list]:not(:has([data-slot=indicator]))]:data-[state=active]:before:!bg-default dark:in-[[data-slot=list]:not(:has([data-slot=indicator]))]:data-[state=active]:before:!bg-neutral-700",
+              "in-[[data-slot=list]:not(:has([data-slot=indicator]))]:data-[state=active]:before:!bg-white dark:in-[[data-slot=list]:not(:has([data-slot=indicator]))]:data-[state=active]:before:!bg-neutral-700",
             ],
           },
         },

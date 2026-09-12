@@ -90,7 +90,10 @@ function autoResize() {
   el.style.overflowY = el.scrollHeight > MAX_HEIGHT ? "auto" : "hidden";
 }
 
-watch(() => text.value, () => nextTick(autoResize));
+watch(
+  () => text.value,
+  () => nextTick(autoResize),
+);
 const canSend = computed(
   () =>
     (!!text.value.trim() || pendingAttachments.value.length > 0) &&
@@ -104,13 +107,13 @@ const activeAttachmentBytes = computed(() =>
 const attachmentCapacityReached = computed(
   () =>
     activeAttachments.value.length + pendingAttachments.value.length >=
-    MAX_ATTACHMENTS ||
+      MAX_ATTACHMENTS ||
     activeAttachmentBytes.value +
-    pendingAttachments.value.reduce(
-      (sum, attachment) => sum + attachment.size,
-      0,
-    ) >=
-    MAX_ATTACHMENTS_TOTAL_SIZE,
+      pendingAttachments.value.reduce(
+        (sum, attachment) => sum + attachment.size,
+        0,
+      ) >=
+      MAX_ATTACHMENTS_TOTAL_SIZE,
 );
 
 const selectedModelLabel = computed(
@@ -385,97 +388,229 @@ defineExpose({
 
 <template>
   <div class="pointer-events-auto w-full px-3 sm:px-4">
-    <div ref="shellRef"
-      class="chat-shell relative mx-auto max-w-2xl cursor-text rounded-xl border border-default bg-default shadow-sm 3xl:max-w-3xl"
-      @click="textareaRef?.focus()">
+    <div
+      ref="shellRef"
+      class="chat-shell relative mx-auto max-w-2xl cursor-text rounded-[1.625rem] border bg-default 3xl:max-w-3xl"
+      @click="textareaRef?.focus()"
+    >
       <Transition name="fade-up">
-        <div v-if="menuOpen" id="chat-skill-menu" ref="skillMenuRef" role="listbox" aria-label="Skills"
-          class="absolute inset-x-0 bottom-full z-30 mb-2 overflow-hidden rounded-lg bg-default p-1 shadow-lg ring ring-default">
+        <div
+          v-if="menuOpen"
+          id="chat-skill-menu"
+          ref="skillMenuRef"
+          role="listbox"
+          aria-label="Skills"
+          class="absolute inset-x-0 bottom-full z-30 mb-2 overflow-hidden rounded-lg bg-default p-1 shadow-lg ring ring-default"
+        >
           <p class="px-2 pb-1 pt-1 text-2xs text-muted">Skills</p>
-          <button v-for="(skill, index) in filteredSkills" :id="`chat-skill-${skill.id}`" :key="skill.id" type="button"
-            role="option" :aria-selected="index === highlightedIndex"
+          <button
+            v-for="(skill, index) in filteredSkills"
+            :id="`chat-skill-${skill.id}`"
+            :key="skill.id"
+            type="button"
+            role="option"
+            :aria-selected="index === highlightedIndex"
             class="flex w-full cursor-pointer items-start gap-2.5 rounded-md px-2 py-1.5 text-left"
-            :class="index === highlightedIndex ? 'bg-elevated' : ''" @mouseenter="highlightedIndex = index"
-            @mousedown.prevent="selectSkill(skill)">
-            <UIcon :name="SKILL_ICONS[skill.id]" class="mt-0.5 size-3.5 shrink-0 text-muted" />
+            :class="index === highlightedIndex ? 'bg-elevated' : ''"
+            @mouseenter="highlightedIndex = index"
+            @mousedown.prevent="selectSkill(skill)"
+          >
+            <UIcon
+              :name="SKILL_ICONS[skill.id]"
+              class="mt-0.5 size-3.5 shrink-0 text-muted"
+            />
             <span class="flex min-w-0 flex-col gap-0.5">
               <span class="flex items-baseline gap-1.5">
-                <span class="text-xs font-medium text-highlighted">{{ skill.label }}</span>
+                <span class="text-xs font-medium text-highlighted">{{
+                  skill.label
+                }}</span>
                 <span class="text-2xs text-muted">/{{ skill.command }}</span>
               </span>
-              <span class="text-2xs leading-snug text-muted">{{ skill.description }}</span>
+              <span class="text-2xs leading-snug text-muted">{{
+                skill.description
+              }}</span>
             </span>
           </button>
         </div>
       </Transition>
 
-      <div v-if="selectionContext || pendingAttachments.length || activeSkill"
-        class="flex min-w-0 flex-col gap-2 border-b border-default px-3 py-2.5">
+      <div
+        v-if="selectionContext || pendingAttachments.length || activeSkill"
+        class="flex min-w-0 flex-col gap-2 border-b border-default px-3 py-2.5"
+      >
         <div v-if="selectionContext" class="flex w-full items-center gap-2">
           <UIcon name="i-lucide-reply" class="size-3.5 shrink-0 text-muted" />
-          <span class="min-w-0 flex-1 truncate text-sm italic text-muted">"{{ selectionContext }}"</span>
-          <UButton color="neutral" variant="ghost" size="xs" icon="i-lucide-x" aria-label="Ta bort citatet"
-            @click.prevent="emit('clearSelectionContext')" />
+          <span class="min-w-0 flex-1 truncate text-sm italic text-muted"
+            >"{{ selectionContext }}"</span
+          >
+          <UButton
+            color="neutral"
+            variant="ghost"
+            size="xs"
+            icon="i-lucide-x"
+            aria-label="Ta bort citatet"
+            @click.prevent="emit('clearSelectionContext')"
+          />
         </div>
 
         <div v-if="activeSkill" class="flex">
-          <UBadge :label="activeSkill.label" color="primary" variant="solid" size="sm" trailing-icon="i-lucide-x"
-            class="cursor-pointer" :aria-label="`Ta bort ${activeSkill.label}`" @mousedown.prevent="clearSkill()" />
+          <UBadge
+            :label="activeSkill.label"
+            color="primary"
+            variant="solid"
+            size="sm"
+            trailing-icon="i-lucide-x"
+            class="cursor-pointer"
+            :aria-label="`Ta bort ${activeSkill.label}`"
+            @mousedown.prevent="clearSkill()"
+          />
         </div>
 
-        <TransitionGroup v-if="pendingAttachments.length" name="attachment-chip" tag="div" appear
-          class="flex flex-wrap gap-2">
-          <div v-for="attachment in pendingAttachments" :key="attachment.id"
-            class="flex min-w-0 max-w-full items-center gap-2 rounded-sm bg-elevated px-2.5 py-1.5 text-xs">
-            <UIcon v-if="attachment.mediaType === 'application/pdf'" name="i-lucide-file-text"
-              class="size-3.5 shrink-0 text-muted" />
-            <img v-else-if="attachment.previewUrl" :src="attachment.previewUrl" alt=""
-              class="size-10 shrink-0 rounded-sm object-cover" />
-            <UIcon v-else name="i-lucide-image" class="size-3.5 shrink-0 text-muted" />
-            <span class="max-w-20 truncate" :title="attachment.name">{{ attachment.name }}</span>
-            <span class="shrink-0 text-muted">{{ formatFileSize(attachment.size) }}</span>
-            <UButton color="neutral" variant="link" size="xs" icon="i-lucide-x"
-              :aria-label="`Ta bort ${attachment.name}`" @click="removePendingAttachment(attachment.id)" />
+        <TransitionGroup
+          v-if="pendingAttachments.length"
+          name="attachment-chip"
+          tag="div"
+          appear
+          class="flex flex-wrap gap-2"
+        >
+          <div
+            v-for="attachment in pendingAttachments"
+            :key="attachment.id"
+            class="flex min-w-0 max-w-full items-center gap-2 rounded-xl bg-elevated px-2.5 py-1.5 text-xs"
+          >
+            <UIcon
+              v-if="attachment.mediaType === 'application/pdf'"
+              name="i-lucide-file-text"
+              class="size-3.5 shrink-0 text-muted"
+            />
+            <img
+              v-else-if="attachment.previewUrl"
+              :src="attachment.previewUrl"
+              alt=""
+              class="size-10 shrink-0 rounded-lg object-cover"
+            />
+            <UIcon
+              v-else
+              name="i-lucide-image"
+              class="size-3.5 shrink-0 text-muted"
+            />
+            <span class="max-w-20 truncate" :title="attachment.name">{{
+              attachment.name
+            }}</span>
+            <span class="shrink-0 text-muted">{{
+              formatFileSize(attachment.size)
+            }}</span>
+            <UButton
+              color="neutral"
+              variant="link"
+              size="xs"
+              icon="i-lucide-x"
+              :aria-label="`Ta bort ${attachment.name}`"
+              @click="removePendingAttachment(attachment.id)"
+            />
           </div>
         </TransitionGroup>
       </div>
 
-      <textarea ref="textareaRef" v-model="text" :rows="MIN_ROWS"
-        :placeholder="activeSkill ? 'Fråga vad som helst' : 'Fråga vad som helst, skriv / för skills'" role="combobox"
-        :aria-expanded="menuOpen" aria-controls="chat-skill-menu"
-        :aria-activedescendant="menuOpen ? `chat-skill-${filteredSkills[highlightedIndex]?.id}` : undefined"
+      <textarea
+        ref="textareaRef"
+        v-model="text"
+        :rows="MIN_ROWS"
+        :placeholder="
+          activeSkill
+            ? 'Fråga vad som helst'
+            : 'Fråga vad som helst, skriv / för skills'
+        "
+        role="combobox"
+        :aria-expanded="menuOpen"
+        aria-controls="chat-skill-menu"
+        :aria-activedescendant="
+          menuOpen
+            ? `chat-skill-${filteredSkills[highlightedIndex]?.id}`
+            : undefined
+        "
         class="chat-textarea block w-full resize-none bg-transparent px-4 py-2.5 text-[0.9375rem] leading-6 text-highlighted outline-none placeholder:text-muted sm:py-3"
-        @input="handleInput" @keydown="handleKeyDown" />
+        @input="handleInput"
+        @keydown="handleKeyDown"
+      />
 
       <div class="flex min-w-0 items-center justify-between gap-2 px-2 pb-2">
         <div class="flex min-w-0 items-center gap-1">
-          <input ref="fileInputRef" type="file" multiple class="hidden" :accept="FILE_INPUT_ACCEPT"
-            @change="handleFileInput" />
+          <input
+            ref="fileInputRef"
+            type="file"
+            multiple
+            class="hidden"
+            :accept="FILE_INPUT_ACCEPT"
+            @change="handleFileInput"
+          />
           <UTooltip text="Bifoga filer">
-            <UButton color="neutral" variant="ghost" icon="i-lucide-plus" aria-label="Bifoga filer"
-              :disabled="isLoading || attachmentCapacityReached" @click="fileInputRef?.click()" />
+            <UButton
+              color="neutral"
+              variant="ghost"
+              icon="i-lucide-plus"
+              aria-label="Bifoga filer"
+              :disabled="isLoading || attachmentCapacityReached"
+              @click="fileInputRef?.click()"
+            />
           </UTooltip>
           <UTooltip :text="webSearch ? 'Webbsökning på' : 'Sök på webben'">
-            <UButton :color="webSearch ? 'primary' : 'neutral'" :variant="webSearch ? 'soft' : 'ghost'"
-              icon="i-lucide-globe" :label="webSearch ? 'Webb' : undefined" aria-label="Sök på webben"
-              :aria-pressed="webSearch" @click="emit('update:webSearch', !webSearch)" />
+            <UButton
+              :color="webSearch ? 'primary' : 'neutral'"
+              :variant="webSearch ? 'soft' : 'ghost'"
+              icon="i-lucide-globe"
+              :label="webSearch ? 'Webb' : undefined"
+              aria-label="Sök på webben"
+              :aria-pressed="webSearch"
+              @click="emit('update:webSearch', !webSearch)"
+            />
           </UTooltip>
-          <UDropdownMenu v-model:open="modelMenuOpen" :items="modelItems" :content="{ align: 'start' }">
-            <UButton color="neutral" variant="ghost" :label="`Gemini • ${selectedModelLabel}`" class="min-w-0" />
+          <UDropdownMenu
+            v-model:open="modelMenuOpen"
+            :items="modelItems"
+            :content="{ align: 'start' }"
+          >
+            <UButton
+              color="neutral"
+              variant="ghost"
+              :label="`Gemini • ${selectedModelLabel}`"
+              class="min-w-0"
+            />
           </UDropdownMenu>
         </div>
         <div class="flex shrink-0 items-center gap-2">
-          <p v-if="text.length > MAX_LENGTH * 0.8" class="text-2xs"
-            :class="text.length > MAX_LENGTH ? 'font-medium text-error' : 'text-muted'">{{ text.length }} / {{
-              MAX_LENGTH }}</p>
-          <UButton v-if="isLoading" color="neutral" variant="soft" icon="i-lucide-square" aria-label="Avbryt svar"
-            @click="emit('cancel')" />
-          <UButton v-else color="primary" icon="i-lucide-arrow-up" aria-label="Skicka meddelande" :disabled="!canSend"
-            @click="emit('send')" />
+          <p
+            v-if="text.length > MAX_LENGTH * 0.8"
+            class="text-2xs"
+            :class="
+              text.length > MAX_LENGTH ? 'font-medium text-error' : 'text-muted'
+            "
+          >
+            {{ text.length }} / {{ MAX_LENGTH }}
+          </p>
+          <UButton
+            v-if="isLoading"
+            color="neutral"
+            variant="soft"
+            icon="i-lucide-square"
+            aria-label="Avbryt svar"
+            @click="emit('cancel')"
+          />
+          <UButton
+            v-else
+            color="primary"
+            icon="i-lucide-arrow-up"
+            aria-label="Skicka meddelande"
+            :disabled="!canSend"
+            @click="emit('send')"
+          />
         </div>
       </div>
     </div>
-    <p v-if="showDisclaimer" class="pointer-events-auto px-4 pb-2 pt-1 text-center text-2xs text-dimmed">
+    <p
+      v-if="showDisclaimer"
+      class="pointer-events-auto px-4 pb-2 pt-1 text-center text-2xs text-dimmed"
+    >
       AI kan göra misstag. Kontrollera svaren.
     </p>
   </div>
@@ -483,11 +618,27 @@ defineExpose({
 
 <style scoped>
 .chat-shell {
-  transition: border-color var(--duration-fast) ease;
+  border-color: color-mix(in srgb, var(--ui-text-highlighted) 9%, transparent);
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.025),
+    0 4px 14px rgb(0 0 0 / 0.035);
+  transition:
+    border-color var(--duration-fast) ease,
+    box-shadow var(--duration-fast) ease;
 }
 
 .chat-shell:has(.chat-textarea:focus) {
-  border-color: var(--ui-border-accented);
+  border-color: color-mix(in srgb, var(--ui-text-highlighted) 14%, transparent);
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.03),
+    0 5px 16px rgb(0 0 0 / 0.045);
+}
+
+:global(.dark) .chat-shell,
+:global(.dim) .chat-shell {
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.12),
+    0 5px 18px rgb(0 0 0 / 0.12);
 }
 
 .chat-textarea {
@@ -569,7 +720,6 @@ defineExpose({
 }
 
 @media (prefers-reduced-motion: reduce) {
-
   .attachment-chip-enter-active,
   .attachment-chip-leave-active,
   .attachment-chip-move {

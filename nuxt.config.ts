@@ -149,17 +149,6 @@ export default defineNuxtConfig({
 
   css: ["~/assets/css/tailwind.css"],
 
-  // Public Sans hämtas från Fontsource vid bygget och self-hostas: @nuxt/fonts
-  // laddar ned woff2-filerna till /_fonts, skriver @font-face med unicode-range
-  // per skriftsystem och `font-display: swap`, och lägger `local()` först så att
-  // ett redan installerat snitt används direkt.
-  fonts: {
-    defaults: { weights: [400, 500, 600, 700], styles: ["normal"] },
-    families: [
-      { name: "Public Sans", provider: "fontsource", global: true },
-    ],
-  },
-
   imports: {
     autoImport: true,
   },
