@@ -1,5 +1,3 @@
-
-
 const EXPLAIN_POPOVER_KEY = "liutentor_show_explain_popover";
 const BLUR_FACIT_KEY = "liutentor_blur_facit";
 

@@ -71,16 +71,24 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="pointer-events-none absolute inset-y-0 right-0 w-64 overflow-hidden">
-    <div class="absolute right-0 top-1/2 h-[min(34rem,62vh)] origin-right will-change-[width,transform,opacity]"
-      :style="glowStyle" />
+  <div
+    class="pointer-events-none absolute inset-y-0 right-0 w-64 overflow-hidden"
+  >
+    <div
+      class="absolute right-0 top-1/2 h-[min(34rem,62vh)] origin-right will-change-[width,transform,opacity]"
+      :style="glowStyle"
+    />
 
     <div
       class="absolute right-0 top-1/2 flex h-10 items-center gap-2 whitespace-nowrap pr-4 will-change-[transform,opacity]"
-      :style="tabStyle">
+      :style="tabStyle"
+    >
       <template v-if="facitPdfUrl">
-        <UIcon name="i-lucide-chevron-left" class="size-4 shrink-0 text-primary will-change-transform"
-          :style="iconStyle" />
+        <UIcon
+          name="i-lucide-chevron-left"
+          class="size-4 shrink-0 text-primary will-change-transform"
+          :style="iconStyle"
+        />
         <span class="text-xs font-semibold text-primary">
           {{ label ?? "Facit" }}
         </span>

@@ -9,6 +9,12 @@ const open = defineModel<boolean>("open", { default: false });
     v-model:open="open"
     title="Inställningar"
     description="Anpassa hur LiU Tentor beter sig."
+    :ui="{
+      content: 'sm:max-h-[calc(100dvh-8rem)]',
+      wrapper: 'flex flex-col gap-0.5',
+      description: '!mt-0',
+      body: 'min-h-0 overflow-y-auto px-4 py-4 sm:px-6',
+    }"
   >
     <template v-if="!hideTrigger" #default>
       <UButton

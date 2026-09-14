@@ -93,14 +93,23 @@ defineShortcuts({
 
     <template #item="{ item }">
       <span class="flex min-w-0 flex-1 items-baseline gap-2">
-        <span class="shrink-0 font-medium text-highlighted">{{ (item as CourseItem).label }}</span>
-        <span class="truncate text-xs text-muted">{{ (item as CourseItem).name }}</span>
+        <span class="shrink-0 font-medium text-highlighted">{{
+          (item as CourseItem).label
+        }}</span>
+        <span class="truncate text-xs text-muted">{{
+          (item as CourseItem).name
+        }}</span>
       </span>
-      <UIcon name="i-lucide-corner-down-left" class="size-3.5 shrink-0 text-dimmed" />
+      <UIcon
+        name="i-lucide-corner-down-left"
+        class="size-3.5 shrink-0 text-dimmed"
+      />
     </template>
 
     <template #empty>
-      <span v-if="searchTerm.trim()">Ingen kurs matchar "{{ searchTerm.trim().toUpperCase() }}"</span>
+      <span v-if="searchTerm.trim()"
+        >Ingen kurs matchar "{{ searchTerm.trim().toUpperCase() }}"</span
+      >
       <span v-else>Skriv en kurskod</span>
     </template>
   </UInputMenu>

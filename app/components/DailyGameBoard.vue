@@ -1,5 +1,9 @@
 <script setup lang="ts">
-import { MAX_GUESSES, WORD_LENGTH, type GuessRow } from "#shared/utils/dailyCourse";
+import {
+  MAX_GUESSES,
+  WORD_LENGTH,
+  type GuessRow,
+} from "#shared/utils/dailyCourse";
 import { FLIP_MS, STAGGER_MS } from "~/lib/daily-timing";
 
 const props = defineProps<{
@@ -72,7 +76,10 @@ const board = computed(() =>
       key: `${rowIndex}-${col}`,
       char: row ? row.guess[col] : isCurrent ? (props.current[col] ?? "") : "",
       // Hold the colour back until this tile is edge-on.
-      state: !revealing || col < revealedCols.value ? (row?.result[col] ?? null) : null,
+      state:
+        !revealing || col < revealedCols.value
+          ? (row?.result[col] ?? null)
+          : null,
       revealing,
       delay: revealing ? col * STAGGER_MS : 0,
       filled: isCurrent && col < props.current.length,
@@ -85,9 +92,17 @@ const board = computed(() =>
 <template>
   <!-- Tiles are sized off the viewport so the board, keyboard and header all
        fit on a laptop screen without the page scrolling. -->
-  <div class="flex flex-col items-center gap-1.5 [--tile:clamp(2rem,min(11vw,6.6vh),3rem)]">
-    <div v-for="(row, rowIndex) in board" :key="rowIndex" class="flex flex-row gap-1.5">
-      <div v-for="tile in row" :key="tile.key"
+  <div
+    class="flex flex-col items-center gap-1.5 [--tile:clamp(2rem,min(11vw,6.6vh),3rem)]"
+  >
+    <div
+      v-for="(row, rowIndex) in board"
+      :key="rowIndex"
+      class="flex flex-row gap-1.5"
+    >
+      <div
+        v-for="tile in row"
+        :key="tile.key"
         class="flex items-center justify-center rounded-lg border-2 font-mono font-semibold uppercase transition-colors duration-75 ease-spring"
         :class="[
           tile.state
@@ -98,12 +113,14 @@ const board = computed(() =>
           tile.revealing ? 'daily-tile-flip' : '',
           tile.filled ? 'daily-tile-pop' : '',
           tile.shake ? 'daily-row-shake' : '',
-        ]" :style="{
+        ]"
+        :style="{
           width: 'var(--tile)',
           height: 'var(--tile)',
           fontSize: 'calc(var(--tile) * 0.42)',
           ...(tile.delay ? { animationDelay: `${tile.delay}ms` } : {}),
-        }">
+        }"
+      >
         {{ tile.char }}
       </div>
     </div>
@@ -136,7 +153,6 @@ const board = computed(() =>
 }
 
 @keyframes daily-shake {
-
   0%,
   100% {
     transform: translateX(0);
@@ -172,7 +188,6 @@ const board = computed(() =>
 }
 
 @media (prefers-reduced-motion: reduce) {
-
   .daily-tile-flip,
   .daily-tile-pop,
   .daily-row-shake {

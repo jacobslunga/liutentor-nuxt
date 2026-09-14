@@ -130,7 +130,7 @@ function handleCodeCopy(e: MouseEvent) {
   const code = pre?.textContent ?? "";
   if (!code) return;
 
-  navigator.clipboard.writeText(code).catch(() => { });
+  navigator.clipboard.writeText(code).catch(() => {});
 
   const label = btn.querySelector(".code-copy-label");
   if (label) label.textContent = "Kopierad";
@@ -275,13 +275,17 @@ function updateLastMessageHeight() {
   const parent = scrollParent();
   if (!root || !parent) return;
   const userArticles = root.querySelectorAll('article[data-role="user"]');
-  const lastUserArticle = userArticles[userArticles.length - 1] as HTMLElement | undefined;
+  const lastUserArticle = userArticles[userArticles.length - 1] as
+    HTMLElement | undefined;
   if (!lastUserArticle) return;
 
   const parentHeight = parent.clientHeight;
   const userHeight = lastUserArticle.offsetHeight;
   const rootStyle = window.getComputedStyle(root);
-  const gap = Number.parseFloat(rootStyle.rowGap) || Number.parseFloat(rootStyle.gap) || 0;
+  const gap =
+    Number.parseFloat(rootStyle.rowGap) ||
+    Number.parseFloat(rootStyle.gap) ||
+    0;
   const lastMessageHeight = Math.max(parentHeight - userHeight - gap - 40, 0);
   root.style.setProperty("--last-message-height", `${lastMessageHeight}px`);
 }
@@ -301,7 +305,8 @@ function scrollUserMessageToTop() {
     const root = (rootRef.value as any)?.$el ?? rootRef.value;
     if (!root) return;
     const userArticles = root.querySelectorAll('article[data-role="user"]');
-    const lastUserArticle = userArticles[userArticles.length - 1] as HTMLElement | undefined;
+    const lastUserArticle = userArticles[userArticles.length - 1] as
+      HTMLElement | undefined;
     if (lastUserArticle) {
       lastUserArticle.scrollIntoView({ behavior: "smooth", block: "start" });
     }
@@ -402,9 +407,7 @@ defineExpose({
             v-for="attachment in message.original.attachments"
             :key="attachment.id"
             class="attachment-context-item flex min-w-0 max-w-full items-center gap-1.5 rounded-lg border border-default bg-default px-2.5 py-1.5 text-xs"
-            :class="attachment.active
-              ? ''
-              : 'text-muted opacity-70'"
+            :class="attachment.active ? '' : 'text-muted opacity-70'"
           >
             <UIcon
               v-if="attachment.mediaType === 'application/pdf'"
@@ -417,7 +420,11 @@ defineExpose({
               alt=""
               class="size-14 shrink-0 rounded-md object-cover"
             />
-            <UIcon v-else name="i-lucide-image" class="size-3.5 shrink-0 text-muted" />
+            <UIcon
+              v-else
+              name="i-lucide-image"
+              class="size-3.5 shrink-0 text-muted"
+            />
             <span class="max-w-28 truncate" :title="attachment.name">
               {{ attachment.name }}
             </span>
@@ -447,7 +454,9 @@ defineExpose({
         <div
           v-if="
             message.original.status?.message ||
-            (!message.original.content && isLoading && message.index === messages.length - 1)
+            (!message.original.content &&
+              isLoading &&
+              message.index === messages.length - 1)
           "
           class="mb-2 flex h-6 items-center gap-2"
         >
@@ -564,7 +573,7 @@ defineExpose({
   margin: 0.75rem 0;
 }
 
-.prose :deep(.katex-display)>.katex {
+.prose :deep(.katex-display) > .katex {
   width: max-content;
   min-width: 100%;
   max-width: none;

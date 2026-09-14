@@ -14,7 +14,12 @@ import {
 describe("scoreGuess", () => {
   it("marks an exact match all correct", () => {
     expect(scoreGuess("TATA24", "TATA24")).toEqual([
-      "correct", "correct", "correct", "correct", "correct", "correct",
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+      "correct",
     ]);
   });
 
@@ -23,7 +28,12 @@ describe("scoreGuess", () => {
     // position 5 but does have one in position 6, so the guessed 4 is present.
     // The guessed 3 is absent entirely.
     expect(scoreGuess("TATA43", "TATA24")).toEqual([
-      "correct", "correct", "correct", "correct", "present", "absent",
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+      "present",
+      "absent",
     ]);
   });
 
@@ -31,7 +41,12 @@ describe("scoreGuess", () => {
     // The answer holds a single A, at position 2, and the guess matches it
     // exactly. Its leading A has nothing left to claim, so it must be absent.
     expect(scoreGuess("AAB123", "CAB123")).toEqual([
-      "absent", "correct", "correct", "correct", "correct", "correct",
+      "absent",
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+      "correct",
     ]);
   });
 
@@ -40,7 +55,12 @@ describe("scoreGuess", () => {
     // one A and one T unclaimed — so the guess's leading T and trailing A are
     // both present. Scoring left to right in one pass gets this wrong.
     expect(scoreGuess("TAAAAA", "AAAAAT")).toEqual([
-      "present", "correct", "correct", "correct", "correct", "present",
+      "present",
+      "correct",
+      "correct",
+      "correct",
+      "correct",
+      "present",
     ]);
   });
 
@@ -152,7 +172,17 @@ describe("statusFor", () => {
 
 describe("buildShareText", () => {
   const rows = [
-    { guess: "TDDD86", result: ["absent", "present", "absent", "absent", "absent", "correct"] as const },
+    {
+      guess: "TDDD86",
+      result: [
+        "absent",
+        "present",
+        "absent",
+        "absent",
+        "absent",
+        "correct",
+      ] as const,
+    },
     { guess: "TATA24", result: Array(6).fill("correct" as const) },
   ];
 

@@ -125,8 +125,13 @@ export function scoreGuess(guess: string, answer: string): TileState[] {
   return result;
 }
 
-export function statusFor(rows: GuessRow[], maxGuesses = MAX_GUESSES): GameStatus {
-  const won = rows.some((row) => row.result.every((tile) => tile === "correct"));
+export function statusFor(
+  rows: GuessRow[],
+  maxGuesses = MAX_GUESSES,
+): GameStatus {
+  const won = rows.some((row) =>
+    row.result.every((tile) => tile === "correct"),
+  );
   if (won) return "won";
   return rows.length >= maxGuesses ? "lost" : "playing";
 }
@@ -146,7 +151,8 @@ export function buildShareText(
   status: GameStatus,
   url = "https://liutentor.se/dagens-kurskod",
 ): string {
-  const score = status === "won" ? `${rows.length}/${MAX_GUESSES}` : `X/${MAX_GUESSES}`;
+  const score =
+    status === "won" ? `${rows.length}/${MAX_GUESSES}` : `X/${MAX_GUESSES}`;
   const grid = rows
     .map((row) => row.result.map((tile) => SHARE_TILE[tile]).join(""))
     .join("\n");

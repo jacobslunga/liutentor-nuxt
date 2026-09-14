@@ -3,10 +3,7 @@ import type { Exam } from "~/types/exam";
 const GRADE_ORDER = ["VG", "5", "4", "3", "G", "U"] as const;
 
 export type GradeToken =
-  | "grade-fail"
-  | "grade-high"
-  | "grade-low"
-  | "grade-mid";
+  "grade-fail" | "grade-high" | "grade-low" | "grade-mid";
 
 const GRADE_TOKENS: Record<string, GradeToken> = {
   U: "grade-fail",
@@ -57,7 +54,6 @@ export function useCourseStats(exams: MaybeRefOrGetter<Exam[]>) {
     }
 
     return [...byDate].map(([date, group]) => {
-
       // Upstream uses a zero pass rate to represent "not recorded".
       const measured = group.filter((e) => Number(e.pass_rate ?? 0) > 0);
       const students = group.reduce((sum, e) => sum + studentCount(e), 0);
@@ -114,7 +110,9 @@ export function useCourseStats(exams: MaybeRefOrGetter<Exam[]>) {
 
   const hasPassRateData = computed(() => measuredPoints.value.length > 0);
   const hasGradeData = computed(() => totalStudents.value > 0);
-  const hasAnyData = computed(() => hasPassRateData.value || hasGradeData.value);
+  const hasAnyData = computed(
+    () => hasPassRateData.value || hasGradeData.value,
+  );
 
   const overallPassRate = computed(() => {
     if (hasGradeData.value) {

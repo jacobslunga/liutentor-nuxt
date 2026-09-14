@@ -36,12 +36,18 @@ const triggers = {
 
 <template>
   <div class="grid gap-8 md:grid-cols-2 md:items-center md:gap-12">
-
     <ol class="divide-y divide-default/60 rounded-xl border border-default/60">
-      <li v-for="grade in grades" :key="grade.key" class="flex flex-col gap-2 px-4 py-3">
+      <li
+        v-for="grade in grades"
+        :key="grade.key"
+        class="flex flex-col gap-2 px-4 py-3"
+      >
         <div class="flex items-center justify-between gap-4">
           <div class="flex items-center gap-3">
-            <span class="size-2.5 shrink-0 rounded-full" :style="{ background: `var(--${grade.token})` }" />
+            <span
+              class="size-2.5 shrink-0 rounded-full"
+              :style="{ background: `var(--${grade.token})` }"
+            />
             <span class="text-sm font-medium text-highlighted">
               {{ grade.key }}
             </span>
@@ -56,18 +62,29 @@ const triggers = {
           </div>
         </div>
         <div class="h-1 w-full overflow-hidden rounded-full bg-muted">
-          <div class="h-full rounded-full" :style="{
-            width: `${grade.pct}%`,
-            background: `var(--${grade.token})`,
-          }" />
+          <div
+            class="h-full rounded-full"
+            :style="{
+              width: `${grade.pct}%`,
+              background: `var(--${grade.token})`,
+            }"
+          />
         </div>
       </li>
     </ol>
 
     <div class="vis-chart grade-donut mx-auto w-full max-w-xs">
       <VisSingleContainer :data="grades" :height="260">
-        <VisDonut :value="value" :color="color" :arc-width="26" :corner-radius="4" :pad-angle="0.02"
-          :show-background="false" :central-label="totalLabel" central-sub-label="studenter" />
+        <VisDonut
+          :value="value"
+          :color="color"
+          :arc-width="26"
+          :corner-radius="4"
+          :pad-angle="0.02"
+          :show-background="false"
+          :central-label="totalLabel"
+          central-sub-label="studenter"
+        />
         <VisTooltip :triggers="triggers" />
       </VisSingleContainer>
     </div>

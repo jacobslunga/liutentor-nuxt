@@ -191,29 +191,47 @@ async function handleSignup() {
       </NuxtLink>
     </div>
 
-    <UTabs color="neutral"
+    <UTabs
+      color="neutral"
       v-model="activeTab"
       :items="authTabs"
       class="w-full"
       :ui="{ list: 'w-full', trigger: 'flex-1' }"
     >
       <template #login>
-        <div v-if="loginSuccess" class="flex flex-col items-center space-y-3 py-6 text-center">
-          <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+        <div
+          v-if="loginSuccess"
+          class="flex flex-col items-center space-y-3 py-6 text-center"
+        >
+          <div
+            class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center"
+          >
             <UIcon name="i-lucide-check" class="w-6 h-6 text-primary" />
           </div>
           <p class="font-medium">Inloggad!</p>
           <p class="text-sm text-muted">
             Loggar in dig, tar dig till första sidan...
           </p>
-          <UIcon name="i-lucide-loader-circle" class="w-4 h-4 animate-spin text-muted mt-1" />
+          <UIcon
+            name="i-lucide-loader-circle"
+            class="w-4 h-4 animate-spin text-muted mt-1"
+          />
         </div>
 
-        <form v-else @submit.prevent="handleLogin" class="flex flex-col space-y-4">
+        <form
+          v-else
+          @submit.prevent="handleLogin"
+          class="flex flex-col space-y-4"
+        >
           <div class="flex flex-col space-y-1.5">
             <label class="text-sm font-medium">LiU mail</label>
-            <UInput v-model="loginForm.email" type="email" placeholder="abcde123@student.liu.se" autocomplete="email"
-              :color="loginErrors.email ? 'error' : undefined" />
+            <UInput
+              v-model="loginForm.email"
+              type="email"
+              placeholder="abcde123@student.liu.se"
+              autocomplete="email"
+              :color="loginErrors.email ? 'error' : undefined"
+            />
             <p v-if="loginErrors.email" class="text-xs text-error">
               {{ loginErrors.email }}
             </p>
@@ -221,15 +239,28 @@ async function handleSignup() {
 
           <div class="flex flex-col space-y-1.5">
             <label class="text-sm font-medium">Lösenord</label>
-            <UInput v-model="loginForm.password" :type="showLoginPassword ? 'text' : 'password'" placeholder="••••••••"
-                autocomplete="current-password" :color="loginErrors.password ? 'error' : undefined">
-                <template #trailing>
-                  <UButton color="neutral" variant="link" size="sm"
-                    :icon="showLoginPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
-                    :aria-label="showLoginPassword ? 'Dölj lösenord' : 'Visa lösenord'"
-                    @click="showLoginPassword = !showLoginPassword" />
-                </template>
-              </UInput>
+            <UInput
+              v-model="loginForm.password"
+              :type="showLoginPassword ? 'text' : 'password'"
+              placeholder="••••••••"
+              autocomplete="current-password"
+              :color="loginErrors.password ? 'error' : undefined"
+            >
+              <template #trailing>
+                <UButton
+                  color="neutral"
+                  variant="link"
+                  size="sm"
+                  :icon="
+                    showLoginPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'
+                  "
+                  :aria-label="
+                    showLoginPassword ? 'Dölj lösenord' : 'Visa lösenord'
+                  "
+                  @click="showLoginPassword = !showLoginPassword"
+                />
+              </template>
+            </UInput>
             <p v-if="loginErrors.password" class="text-xs text-error">
               {{ loginErrors.password }}
             </p>
@@ -240,14 +271,22 @@ async function handleSignup() {
           </p>
 
           <UButton type="submit" block :disabled="loginLoading">
-            <UIcon name="i-lucide-loader-circle" v-if="loginLoading" class="w-4 h-4 animate-spin" />
+            <UIcon
+              name="i-lucide-loader-circle"
+              v-if="loginLoading"
+              class="w-4 h-4 animate-spin"
+            />
             <span v-else>Logga in</span>
           </UButton>
 
           <p class="text-xs text-center text-muted">
             Inget konto?
-            <UButton variant="link" size="sm" class="text-highlighted underline-offset-2 hover:text-primary h-auto p-0"
-              @click="activeTab = 'skapa-konto'">
+            <UButton
+              variant="link"
+              size="sm"
+              class="text-highlighted underline-offset-2 hover:text-primary h-auto p-0"
+              @click="activeTab = 'skapa-konto'"
+            >
               Skapa ett här
             </UButton>
           </p>
@@ -255,8 +294,13 @@ async function handleSignup() {
       </template>
 
       <template #signup>
-        <div v-if="signupSuccess" class="flex flex-col items-center space-y-3 py-6 text-center">
-          <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+        <div
+          v-if="signupSuccess"
+          class="flex flex-col items-center space-y-3 py-6 text-center"
+        >
+          <div
+            class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center"
+          >
             <UIcon name="i-lucide-mail" class="w-6 h-6 text-primary" />
           </div>
           <p class="font-medium">Konto skapat!</p>
@@ -264,24 +308,40 @@ async function handleSignup() {
             Vi har skickat en bekräftelse till
             <span class="font-medium text-highlighted">{{
               signupForm.email
-              }}</span>. Kontrollera din inkorg.
+            }}</span
+            >. Kontrollera din inkorg.
           </p>
-          <UButton size="sm" color="neutral" variant="outline" class="mt-2" @click="
-            () => {
-              signupSuccess = false;
-              activeTab = 'logga-in';
-            }
-          ">
+          <UButton
+            size="sm"
+            color="neutral"
+            variant="outline"
+            class="mt-2"
+            @click="
+              () => {
+                signupSuccess = false;
+                activeTab = 'logga-in';
+              }
+            "
+          >
             Gå till inloggning
           </UButton>
         </div>
 
-        <form v-else @submit.prevent="handleSignup" class="flex flex-col space-y-4">
+        <form
+          v-else
+          @submit.prevent="handleSignup"
+          class="flex flex-col space-y-4"
+        >
           <div class="flex gap-3">
             <div class="flex flex-col space-y-1.5 flex-1">
               <label class="text-sm font-medium">Förnamn</label>
-              <UInput v-model="signupForm.firstName" type="text" placeholder="Förnamn" autocomplete="given-name"
-                :color="signupErrors.firstName ? 'error' : undefined" />
+              <UInput
+                v-model="signupForm.firstName"
+                type="text"
+                placeholder="Förnamn"
+                autocomplete="given-name"
+                :color="signupErrors.firstName ? 'error' : undefined"
+              />
               <p v-if="signupErrors.firstName" class="text-xs text-error">
                 {{ signupErrors.firstName }}
               </p>
@@ -289,8 +349,13 @@ async function handleSignup() {
 
             <div class="flex flex-col space-y-1.5 flex-1">
               <label class="text-sm font-medium">Efternamn</label>
-              <UInput v-model="signupForm.lastName" type="text" placeholder="Efternamn" autocomplete="family-name"
-                :color="signupErrors.lastName ? 'error' : undefined" />
+              <UInput
+                v-model="signupForm.lastName"
+                type="text"
+                placeholder="Efternamn"
+                autocomplete="family-name"
+                :color="signupErrors.lastName ? 'error' : undefined"
+              />
               <p v-if="signupErrors.lastName" class="text-xs text-error">
                 {{ signupErrors.lastName }}
               </p>
@@ -299,8 +364,13 @@ async function handleSignup() {
 
           <div class="flex flex-col space-y-1.5">
             <label class="text-sm font-medium">LiU mail</label>
-            <UInput v-model="signupForm.email" type="email" placeholder="abcde123@student.liu.se" autocomplete="email"
-              :color="signupErrors.email ? 'error' : undefined" />
+            <UInput
+              v-model="signupForm.email"
+              type="email"
+              placeholder="abcde123@student.liu.se"
+              autocomplete="email"
+              :color="signupErrors.email ? 'error' : undefined"
+            />
             <p v-if="signupErrors.email" class="text-xs text-error">
               {{ signupErrors.email }}
             </p>
@@ -311,15 +381,28 @@ async function handleSignup() {
 
           <div class="flex flex-col space-y-1.5">
             <label class="text-sm font-medium">Lösenord</label>
-            <UInput v-model="signupForm.password" :type="showSignupPassword ? 'text' : 'password'"
-                placeholder="••••••••" autocomplete="new-password" :color="signupErrors.password ? 'error' : undefined">
-                <template #trailing>
-                  <UButton color="neutral" variant="link" size="sm"
-                    :icon="showSignupPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'"
-                    :aria-label="showSignupPassword ? 'Dölj lösenord' : 'Visa lösenord'"
-                    @click="showSignupPassword = !showSignupPassword" />
-                </template>
-              </UInput>
+            <UInput
+              v-model="signupForm.password"
+              :type="showSignupPassword ? 'text' : 'password'"
+              placeholder="••••••••"
+              autocomplete="new-password"
+              :color="signupErrors.password ? 'error' : undefined"
+            >
+              <template #trailing>
+                <UButton
+                  color="neutral"
+                  variant="link"
+                  size="sm"
+                  :icon="
+                    showSignupPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'
+                  "
+                  :aria-label="
+                    showSignupPassword ? 'Dölj lösenord' : 'Visa lösenord'
+                  "
+                  @click="showSignupPassword = !showSignupPassword"
+                />
+              </template>
+            </UInput>
             <p v-if="signupErrors.password" class="text-xs text-error">
               {{ signupErrors.password }}
             </p>
@@ -328,15 +411,28 @@ async function handleSignup() {
 
           <div class="flex flex-col space-y-1.5">
             <label class="text-sm font-medium">Bekräfta lösenord</label>
-            <UInput v-model="signupForm.confirmPassword" :type="showSignupConfirm ? 'text' : 'password'"
-                placeholder="••••••••" autocomplete="new-password" :color="signupErrors.confirmPassword ? 'error' : undefined">
-                <template #trailing>
-                  <UButton color="neutral" variant="link" size="sm"
-                    :icon="showSignupConfirm ? 'i-lucide-eye-off' : 'i-lucide-eye'"
-                    :aria-label="showSignupConfirm ? 'Dölj lösenord' : 'Visa lösenord'"
-                    @click="showSignupConfirm = !showSignupConfirm" />
-                </template>
-              </UInput>
+            <UInput
+              v-model="signupForm.confirmPassword"
+              :type="showSignupConfirm ? 'text' : 'password'"
+              placeholder="••••••••"
+              autocomplete="new-password"
+              :color="signupErrors.confirmPassword ? 'error' : undefined"
+            >
+              <template #trailing>
+                <UButton
+                  color="neutral"
+                  variant="link"
+                  size="sm"
+                  :icon="
+                    showSignupConfirm ? 'i-lucide-eye-off' : 'i-lucide-eye'
+                  "
+                  :aria-label="
+                    showSignupConfirm ? 'Dölj lösenord' : 'Visa lösenord'
+                  "
+                  @click="showSignupConfirm = !showSignupConfirm"
+                />
+              </template>
+            </UInput>
             <p v-if="signupErrors.confirmPassword" class="text-xs text-error">
               {{ signupErrors.confirmPassword }}
             </p>
@@ -347,14 +443,22 @@ async function handleSignup() {
           </p>
 
           <UButton type="submit" block :disabled="signupLoading">
-            <UIcon name="i-lucide-loader-circle" v-if="signupLoading" class="w-4 h-4 animate-spin" />
+            <UIcon
+              name="i-lucide-loader-circle"
+              v-if="signupLoading"
+              class="w-4 h-4 animate-spin"
+            />
             <span v-else>Skapa konto</span>
           </UButton>
 
           <p class="text-xs text-center text-muted">
             Har du redan ett konto?
-            <UButton variant="link" size="sm" class="text-highlighted underline-offset-2 hover:text-primary h-auto p-0"
-              @click="activeTab = 'logga-in'">
+            <UButton
+              variant="link"
+              size="sm"
+              class="text-highlighted underline-offset-2 hover:text-primary h-auto p-0"
+              @click="activeTab = 'logga-in'"
+            >
               Logga in
             </UButton>
           </p>

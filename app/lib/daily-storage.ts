@@ -1,4 +1,8 @@
-import { MAX_GUESSES, type GameStatus, type GuessRow } from "#shared/utils/dailyCourse";
+import {
+  MAX_GUESSES,
+  type GameStatus,
+  type GuessRow,
+} from "#shared/utils/dailyCourse";
 
 const BOARD_KEY = "liutentor_daily_v1";
 const STATS_KEY = "liutentor_daily_stats_v1";

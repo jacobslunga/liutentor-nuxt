@@ -173,30 +173,76 @@ const averageLabel = computed(() => `Snitt ${Math.round(props.average)}%`);
 
 <template>
   <div class="vis-chart pass-rate-chart relative w-full">
-    <VisXYContainer :data="measured" :height="300" :x-scale="xScale" :x-domain="xDomain" :y-domain="[0, 100]"
-      :margin="{ top: 16, right: 12, bottom: 0, left: 0 }" :duration="200" :on-render-complete="onRenderComplete">
+    <VisXYContainer
+      :data="measured"
+      :height="300"
+      :x-scale="xScale"
+      :x-domain="xDomain"
+      :y-domain="[0, 100]"
+      :margin="{ top: 16, right: 12, bottom: 0, left: 0 }"
+      :duration="200"
+      :on-render-complete="onRenderComplete"
+    >
+      <VisPlotline
+        v-for="boundary in yearBoundaries"
+        :key="`year-${boundary}`"
+        :value="boundary"
+        axis="x"
+        color="var(--vis-year-separator-color)"
+        :line-width="1"
+        :duration="0"
+      />
 
-      <VisPlotline v-for="boundary in yearBoundaries" :key="`year-${boundary}`" :value="boundary" axis="x"
-        color="var(--vis-year-separator-color)" :line-width="1" :duration="0" />
+      <VisStackedBar
+        :x="x"
+        :y="y"
+        :color="barColor"
+        :dataStep="1"
+        :barMaxWidth="34"
+        :barPadding="0.25"
+        :roundedCorners="4"
+        :barMinHeight1Px="true"
+      />
 
-      <VisStackedBar :x="x" :y="y" :color="barColor" :dataStep="1" :barMaxWidth="34" :barPadding="0.25"
-        :roundedCorners="4" :barMinHeight1Px="true" />
+      <VisPlotline
+        :value="average"
+        axis="y"
+        :line-width="1"
+        :line-style="[5, 4]"
+      />
 
-      <VisPlotline :value="average" axis="y" :line-width="1" :line-style="[5, 4]" />
+      <VisAxis
+        type="x"
+        :position="Position.Bottom"
+        :grid-line="false"
+        :tick-line="false"
+        :domain-line="false"
+        :tick-values="yearTicks"
+        :tick-text-hide-overlapping="true"
+        :tick-format="(t: number | Date) => yearLabels.get(Number(t)) ?? ''"
+      />
+      <VisAxis
+        type="y"
+        :position="Position.Left"
+        :tick-values="yTicks"
+        :tick-line="false"
+        :domain-line="false"
+        :tick-format="(v: number | Date) => `${v}%`"
+      />
 
-      <VisAxis type="x" :position="Position.Bottom" :grid-line="false" :tick-line="false" :domain-line="false"
-        :tick-values="yearTicks" :tick-text-hide-overlapping="true"
-        :tick-format="(t: number | Date) => yearLabels.get(Number(t)) ?? ''" />
-      <VisAxis type="y" :position="Position.Left" :tick-values="yTicks" :tick-line="false" :domain-line="false"
-        :tick-format="(v: number | Date) => `${v}%`" />
-
-      <VisCrosshair :x="x" :y="y" :circle-radius="0" :template="tooltipTemplate" />
+      <VisCrosshair
+        :x="x"
+        :y="y"
+        :circle-radius="0"
+        :template="tooltipTemplate"
+      />
       <VisTooltip />
     </VisXYContainer>
 
     <span
       class="pointer-events-none absolute -translate-y-1/2 rounded-sm border border-default/60 bg-default/70 px-2 py-0.5 text-[11px] font-medium text-muted backdrop-blur-[2px]"
-      :style="averageStyle">
+      :style="averageStyle"
+    >
       {{ averageLabel }}
     </span>
   </div>
@@ -204,9 +250,11 @@ const averageLabel = computed(() => `Snitt ${Math.round(props.average)}%`);
 
 <style scoped>
 .pass-rate-chart {
-  --vis-year-separator-color: color-mix(in oklch,
-      var(--ui-border) 70%,
-      transparent);
+  --vis-year-separator-color: color-mix(
+    in oklch,
+    var(--ui-border) 70%,
+    transparent
+  );
 
   --vis-plotline-color: color-mix(in oklch, var(--ui-text) 45%, transparent);
   --vis-plotline-label-font-size: 11px;

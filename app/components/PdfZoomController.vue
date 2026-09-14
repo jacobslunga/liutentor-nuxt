@@ -32,7 +32,9 @@ function contentWidth(): number | null {
   const sc = scroll.value;
   if (!sc) return null;
 
-  const spreads = sc.forDocument(props.documentId).getSpreadPagesWithRotatedSize();
+  const spreads = sc
+    .forDocument(props.documentId)
+    .getSpreadPagesWithRotatedSize();
   if (!spreads?.length) return null;
 
   const pageGap = sc.getPageGap();
@@ -65,7 +67,6 @@ function apply() {
 
   const content = contentWidth();
   if (!content) {
-
     lastApplied = 0;
     scope.requestZoom(ZoomMode.FitWidth);
     return;

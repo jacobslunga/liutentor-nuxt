@@ -19,15 +19,16 @@ const average = computed(() => overallPassRate.value ?? 0);
 </script>
 
 <template>
-  <CourseStatsEmpty v-if="!hasAnyData" title="Ingen statistik för den här kursen"
-    body="Vi har inga betygsfördelningar eller godkändprocent för kursens tentor. Statistiken hämtas från Y-Sektionen och saknas för en del kurser." />
+  <CourseStatsEmpty
+    v-if="!hasAnyData"
+    title="Ingen statistik för den här kursen"
+    body="Vi har inga betygsfördelningar eller godkändprocent för kursens tentor. Statistiken hämtas från Y-Sektionen och saknas för en del kurser."
+  />
 
   <div v-else class="flex w-full flex-col gap-12">
     <section class="flex flex-col gap-5">
       <header>
-        <h2 class="text-xs font-semibold text-muted">
-          Godkända över tid
-        </h2>
+        <h2 class="text-xs font-semibold text-muted">Godkända över tid</h2>
         <p class="mt-1.5 text-sm text-muted">
           Andel godkända per tentatillfälle
         </p>
@@ -39,15 +40,16 @@ const average = computed(() => overallPassRate.value ?? 0);
           <CourseStatsLoading class="h-75" />
         </template>
       </ClientOnly>
-      <CourseStatsEmpty v-else title="Ingen godkändprocent registrerad"
-        body="Vi saknar godkändprocent för kursens tentor." />
+      <CourseStatsEmpty
+        v-else
+        title="Ingen godkändprocent registrerad"
+        body="Vi saknar godkändprocent för kursens tentor."
+      />
     </section>
 
     <section class="flex flex-col gap-5">
       <header>
-        <h2 class="text-xs font-semibold text-muted">
-          Betygsfördelning
-        </h2>
+        <h2 class="text-xs font-semibold text-muted">Betygsfördelning</h2>
         <p class="mt-1.5 text-sm text-muted">
           Alla registrerade betyg på kursens tentor
         </p>
@@ -59,8 +61,11 @@ const average = computed(() => overallPassRate.value ?? 0);
           <CourseStatsLoading variant="distribution" />
         </template>
       </ClientOnly>
-      <CourseStatsEmpty v-else title="Ingen betygsfördelning registrerad"
-        body="Vi saknar betygsfördelning för kursens tentor." />
+      <CourseStatsEmpty
+        v-else
+        title="Ingen betygsfördelning registrerad"
+        body="Vi saknar betygsfördelning för kursens tentor."
+      />
     </section>
   </div>
 </template>

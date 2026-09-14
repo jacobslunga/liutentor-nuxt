@@ -77,7 +77,11 @@ watch(courseCode, () => quiz.reset());
 watch(
   () => quiz.stage,
   async (stage, prev) => {
-    if (stage === "answering" && prev === "generating" && historyEnabled.value) {
+    if (
+      stage === "answering" &&
+      prev === "generating" &&
+      historyEnabled.value
+    ) {
       await refresh();
       const latest = courseHistory.value[0];
       if (latest) quiz.activeQuizId = latest.id;
@@ -90,27 +94,59 @@ onUnmounted(() => quiz.abort());
 
 <template>
   <div class="w-full">
-    <Transition enter-active-class="transition-opacity duration-200" enter-from-class="opacity-0"
-      leave-active-class="transition-opacity duration-150" leave-to-class="opacity-0" mode="out-in">
+    <Transition
+      enter-active-class="transition-opacity duration-200"
+      enter-from-class="opacity-0"
+      leave-active-class="transition-opacity duration-150"
+      leave-to-class="opacity-0"
+      mode="out-in"
+    >
       <div v-if="quiz.stage === 'setup'">
-        <QuizStart v-model:difficulty="difficulty" :is-loading="quiz.isGenerating" :can-start="canStart"
-          @start="startQuiz" />
+        <QuizStart
+          v-model:difficulty="difficulty"
+          :is-loading="quiz.isGenerating"
+          :can-start="canStart"
+          @start="startQuiz"
+        />
 
-        <QuizHistoryList :history="courseHistory" :history-enabled="historyEnabled" :active-quiz-id="quiz.activeQuizId"
-          @load-history="loadFromHistory" @delete-history="deleteFromHistory" />
+        <QuizHistoryList
+          :history="courseHistory"
+          :history-enabled="historyEnabled"
+          :active-quiz-id="quiz.activeQuizId"
+          @load-history="loadFromHistory"
+          @delete-history="deleteFromHistory"
+        />
       </div>
 
-      <QuizGenerating v-else-if="quiz.stage === 'generating'"
+      <QuizGenerating
+        v-else-if="quiz.stage === 'generating'"
         :status-message="quiz.generationStatus?.message ?? 'Förbereder quiz...'"
-        :status-step="quiz.generationStatus?.step ?? null" :error="quiz.generationError" @retry="quiz.reset()"
-        @cancel="quiz.reset()" />
+        :status-step="quiz.generationStatus?.step ?? null"
+        :error="quiz.generationError"
+        @retry="quiz.reset()"
+        @cancel="quiz.reset()"
+      />
 
-      <QuizAnswering v-else-if="quiz.stage === 'answering' && quiz.quizData" :key="quiz.sessionKey"
-        :quiz-data="quiz.quizData" :current-index="quiz.currentIndex" :answers="quiz.answers" @answer="quiz.setAnswer"
-        @next="quiz.next" @previous="quiz.previous" @complete="quiz.complete" @exit="quiz.reset()" />
+      <QuizAnswering
+        v-else-if="quiz.stage === 'answering' && quiz.quizData"
+        :key="quiz.sessionKey"
+        :quiz-data="quiz.quizData"
+        :current-index="quiz.currentIndex"
+        :answers="quiz.answers"
+        @answer="quiz.setAnswer"
+        @next="quiz.next"
+        @previous="quiz.previous"
+        @complete="quiz.complete"
+        @exit="quiz.reset()"
+      />
 
-      <QuizResults v-else-if="quiz.stage === 'results' && quiz.quizData" :quiz-data="quiz.quizData"
-        :answers="quiz.answers" @retake="quiz.retake()" @new-quiz="quiz.reset()" />
+      <QuizResults
+        v-else-if="quiz.stage === 'results' && quiz.quizData"
+        :quiz-data="quiz.quizData"
+        :answers="quiz.answers"
+        @retake="quiz.retake()"
+        @new-quiz="quiz.reset()"
+      />
     </Transition>
   </div>
 </template>

@@ -32,9 +32,7 @@ function normalizePreference(value: unknown): ExamSortPreference {
   };
 }
 
-export function useExamSortPreference(
-  scope: keyof typeof COOKIE_NAMES,
-) {
+export function useExamSortPreference(scope: keyof typeof COOKIE_NAMES) {
   const cookie = useCookie<ExamSortPreference>(COOKIE_NAMES[scope], {
     default: () => ({ ...DEFAULT_PREFERENCE }),
     maxAge: 60 * 60 * 24 * 365,

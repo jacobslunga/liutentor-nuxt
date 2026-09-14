@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 defineProps<{
   title: string;
   body: string;
@@ -8,8 +7,11 @@ defineProps<{
 
 <template>
   <div
-    class="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-default/60 px-6 py-12 text-center">
-    <div class="flex size-10 items-center justify-center rounded-full bg-muted/60">
+    class="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-default/60 px-6 py-12 text-center"
+  >
+    <div
+      class="flex size-10 items-center justify-center rounded-full bg-muted/60"
+    >
       <UIcon name="i-lucide-chart-column" class="size-5 text-muted" />
     </div>
     <div>

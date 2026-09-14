@@ -46,7 +46,10 @@ async function fetchPuzzle(): Promise<GoPuzzle> {
 }
 
 export async function getDailyPuzzle(): Promise<DailyPuzzle> {
-  const [puzzle, courses] = await Promise.all([fetchPuzzle(), getCourseIndex()]);
+  const [puzzle, courses] = await Promise.all([
+    fetchPuzzle(),
+    getCourseIndex(),
+  ]);
 
   // Any real course code is a legal guess, whether or not it could be today's
   // answer — the answer pool is much narrower than the set of things a player

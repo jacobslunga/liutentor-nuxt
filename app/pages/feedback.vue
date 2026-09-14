@@ -78,14 +78,23 @@ async function handleSubmit() {
     />
 
     <div class="mx-auto max-w-6xl px-5 sm:px-8">
-      <div class="grid gap-x-12 gap-y-8 py-12 lg:grid-cols-[13rem_minmax(0,1fr)] lg:py-16">
-        <p class="text-sm font-medium text-muted lg:sticky lg:top-24 lg:self-start">
+      <div
+        class="grid gap-x-12 gap-y-8 py-12 lg:grid-cols-[13rem_minmax(0,1fr)] lg:py-16"
+      >
+        <p
+          class="text-sm font-medium text-muted lg:sticky lg:top-24 lg:self-start"
+        >
           Formulär
         </p>
 
         <div class="max-w-xl">
-          <div v-if="isSuccess === true" class="flex flex-col items-start gap-4">
-            <div class="flex size-10 items-center justify-center rounded-full bg-success/10 dark:bg-success/15">
+          <div
+            v-if="isSuccess === true"
+            class="flex flex-col items-start gap-4"
+          >
+            <div
+              class="flex size-10 items-center justify-center rounded-full bg-success/10 dark:bg-success/15"
+            >
               <UIcon name="i-lucide-check" class="size-5 text-success" />
             </div>
             <div>
@@ -99,8 +108,13 @@ async function handleSubmit() {
             </UButton>
           </div>
 
-          <div v-else-if="isSuccess === false" class="flex flex-col items-start gap-4">
-            <div class="flex size-10 items-center justify-center rounded-full bg-error/10 dark:bg-error/15">
+          <div
+            v-else-if="isSuccess === false"
+            class="flex flex-col items-start gap-4"
+          >
+            <div
+              class="flex size-10 items-center justify-center rounded-full bg-error/10 dark:bg-error/15"
+            >
               <UIcon name="i-lucide-triangle-alert" class="size-5 text-error" />
             </div>
             <div>
@@ -109,7 +123,13 @@ async function handleSubmit() {
                 Försök igen eller kontakta oss direkt på liutentor@gmail.com
               </p>
             </div>
-            <UButton size="sm" color="neutral" variant="outline" @click="isSuccess = null">Försök igen</UButton>
+            <UButton
+              size="sm"
+              color="neutral"
+              variant="outline"
+              @click="isSuccess = null"
+              >Försök igen</UButton
+            >
           </div>
 
           <form v-else class="space-y-6" @submit.prevent="handleSubmit">
@@ -118,12 +138,19 @@ async function handleSubmit() {
                 <label for="fb-name" class="text-sm font-medium">Namn</label>
                 <span class="text-xs text-muted">Valfritt</span>
               </div>
-              <input id="fb-name" v-model="form.name" placeholder="Ditt namn" :class="fieldClass" />
+              <input
+                id="fb-name"
+                v-model="form.name"
+                placeholder="Ditt namn"
+                :class="fieldClass"
+              />
             </div>
 
             <div>
               <div class="mb-2 flex items-baseline justify-between">
-                <label for="fb-mail" class="text-sm font-medium">LiU-mail</label>
+                <label for="fb-mail" class="text-sm font-medium"
+                  >LiU-mail</label
+                >
                 <span class="text-xs text-muted">Obligatoriskt</span>
               </div>
               <input
@@ -142,7 +169,9 @@ async function handleSubmit() {
 
             <div>
               <div class="mb-2 flex items-baseline justify-between">
-                <label for="fb-part" class="text-sm font-medium">Del av hemsidan</label>
+                <label for="fb-part" class="text-sm font-medium"
+                  >Del av hemsidan</label
+                >
                 <span class="text-xs text-muted">Valfritt</span>
               </div>
               <input
@@ -155,7 +184,9 @@ async function handleSubmit() {
 
             <div>
               <div class="mb-2 flex items-baseline justify-between">
-                <label for="fb-message" class="text-sm font-medium">Meddelande</label>
+                <label for="fb-message" class="text-sm font-medium"
+                  >Meddelande</label
+                >
                 <span class="text-xs text-muted">Obligatoriskt</span>
               </div>
               <textarea
@@ -177,7 +208,11 @@ async function handleSubmit() {
                 Vi använder din mail bara för att kunna svara.
               </p>
               <UButton type="submit" size="sm" :disabled="isSubmitting">
-                <UIcon name="i-lucide-loader-circle" v-if="isSubmitting" class="size-3.5 animate-spin" />
+                <UIcon
+                  name="i-lucide-loader-circle"
+                  v-if="isSubmitting"
+                  class="size-3.5 animate-spin"
+                />
                 Skicka
               </UButton>
             </div>

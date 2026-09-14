@@ -83,8 +83,14 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <svg ref="svgRef" class="mascot text-primary" :class="{ 'is-blinking': blinking }" viewBox="0 0 100 100"
-    aria-hidden="true" focusable="false">
+  <svg
+    ref="svgRef"
+    class="mascot text-primary"
+    :class="{ 'is-blinking': blinking }"
+    viewBox="0 0 100 100"
+    aria-hidden="true"
+    focusable="false"
+  >
     <circle cx="50" cy="50" r="46" fill="currentColor" />
     <g :transform="`translate(${eyeX.toFixed(3)} ${eyeY.toFixed(3)})`">
       <rect class="eye" x="29.5" y="39" width="10" height="16" rx="1.5" />
@@ -95,7 +101,6 @@ onUnmounted(() => {
 
 <style scoped>
 .mascot {
-
   --mascot-eye: color-mix(in oklch, var(--primary) 45%, #000);
 }
 

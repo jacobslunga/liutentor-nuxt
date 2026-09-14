@@ -10,15 +10,17 @@ interface ExamDetailResponse {
   [key: string]: unknown;
 }
 
-export default defineEventHandler(async (event): Promise<ExamDetailResponse> => {
-  const examId = getRouterParam(event, "examId");
+export default defineEventHandler(
+  async (event): Promise<ExamDetailResponse> => {
+    const examId = getRouterParam(event, "examId");
 
-  const data = await $fetch<ExamDetailResponse>(
-    `${GO_API_URL}/v1/exams/${examId}`,
-  );
+    const data = await $fetch<ExamDetailResponse>(
+      `${GO_API_URL}/v1/exams/${examId}`,
+    );
 
-  const code = data?.data?.exam?.course_code ?? data?.data?.course_code;
-  if (code) setCdnCache(event, [courseTag(String(code))]);
+    const code = data?.data?.exam?.course_code ?? data?.data?.course_code;
+    if (code) setCdnCache(event, [courseTag(String(code))]);
 
-  return data;
-});
+    return data;
+  },
+);

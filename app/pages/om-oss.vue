@@ -51,28 +51,37 @@ const principles = [
 
 <template>
   <div>
-    <PageIntro eyebrow="Om oss" title="Tentaplugget borde inte börja med en filjakt."
-      lead="LiU Tentor är ett studentdrivet, fristående projekt. Vår mission är att göra tentaplugg så smidigt och tillgängligt som möjligt för alla vid Linköpings universitet." />
+    <PageIntro
+      eyebrow="Om oss"
+      title="Tentaplugget borde inte börja med en filjakt."
+      lead="LiU Tentor är ett studentdrivet, fristående projekt. Vår mission är att göra tentaplugg så smidigt och tillgängligt som möjligt för alla vid Linköpings universitet."
+    />
 
     <div class="mx-auto max-w-6xl px-5 sm:px-8">
-      <section v-for="(block, i) in story" :key="block.heading"
+      <section
+        v-for="(block, i) in story"
+        :key="block.heading"
         class="grid gap-x-12 gap-y-5 py-10 lg:grid-cols-[13rem_minmax(0,1fr)] lg:py-14"
-        :class="i > 0 ? 'border-t' : ''">
-        <h2 class="font-serif text-lg font-medium leading-snug text-highlighted lg:sticky lg:top-24 lg:self-start">
+        :class="i > 0 ? 'border-t' : ''"
+      >
+        <h2
+          class="font-serif text-lg font-medium leading-snug text-highlighted lg:sticky lg:top-24 lg:self-start"
+        >
           {{ block.heading }}
         </h2>
         <div class="max-w-2xl space-y-4">
-          <p v-for="(paragraph, j) in block.paragraphs" :key="j"
-            class="text-[0.9375rem] leading-[1.75] text-highlighted/75">
+          <p
+            v-for="(paragraph, j) in block.paragraphs"
+            :key="j"
+            class="text-[0.9375rem] leading-[1.75] text-highlighted/75"
+          >
             {{ paragraph }}
           </p>
         </div>
       </section>
 
       <section class="border-t py-14 lg:py-20">
-        <p class="text-sm font-medium text-muted">
-          Tre saker vi står för
-        </p>
+        <p class="text-sm font-medium text-muted">Tre saker vi står för</p>
         <div class="mt-10 grid gap-10 sm:grid-cols-3 sm:gap-8">
           <div v-for="(principle, i) in principles" :key="principle.title">
             <span class="text-3xl font-medium leading-none text-primary">
@@ -88,12 +97,16 @@ const principles = [
         </div>
       </section>
 
-      <section class="grid gap-x-12 gap-y-6 border-t py-14 lg:grid-cols-[13rem_minmax(0,1fr)] lg:py-20">
-        <h2 class="font-serif text-lg font-medium text-highlighted">Hjälp till</h2>
+      <section
+        class="grid gap-x-12 gap-y-6 border-t py-14 lg:grid-cols-[13rem_minmax(0,1fr)] lg:py-20"
+      >
+        <h2 class="font-serif text-lg font-medium text-highlighted">
+          Hjälp till
+        </h2>
         <div class="max-w-2xl">
           <p class="text-[0.9375rem] leading-[1.75] text-highlighted/75">
-            Arkivet växer när studenter delar med sig. Ligger det tentor på din dator som saknas
-            här, tar uppladdningen under en minut.
+            Arkivet växer när studenter delar med sig. Ligger det tentor på din
+            dator som saknas här, tar uppladdningen under en minut.
           </p>
           <div class="mt-7 flex flex-wrap items-center gap-3">
             <UButton size="sm" @click="openUploadModal()">

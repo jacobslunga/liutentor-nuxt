@@ -44,17 +44,25 @@ const TILE_CLASSES: Record<TileState, string> = {
 </script>
 
 <template>
-  <NuxtLink to="/dagens-kurskod"
-    class="group inline-flex h-8 items-center gap-2 rounded-full border border-default bg-elevated/40 pr-3 pl-2 text-xs text-muted transition-colors duration-150 ease-spring hover:border-inverted/40 hover:text-highlighted active:scale-[0.98]">
+  <NuxtLink
+    to="/dagens-kurskod"
+    class="group inline-flex h-8 items-center gap-2 rounded-full border border-default bg-elevated/40 pr-3 pl-2 text-xs text-muted transition-colors duration-150 ease-spring hover:border-inverted/40 hover:text-highlighted active:scale-[0.98]"
+  >
     <span class="flex flex-row gap-[2px]" aria-hidden="true">
-      <span v-for="(tile, i) in tiles" :key="i" class="size-2 rounded-[2px] transition-colors duration-150 ease-spring"
-        :class="isMounted && tile ? TILE_CLASSES[tile] : 'bg-inverted/15'" />
+      <span
+        v-for="(tile, i) in tiles"
+        :key="i"
+        class="size-2 rounded-[2px] transition-colors duration-150 ease-spring"
+        :class="isMounted && tile ? TILE_CLASSES[tile] : 'bg-inverted/15'"
+      />
     </span>
 
     <span>Dagens kurskod</span>
 
-    <span v-if="isMounted && finished"
-      class="rounded-sm bg-primary/10 px-1.5 font-mono text-2xs font-semibold text-primary">
+    <span
+      v-if="isMounted && finished"
+      class="rounded-sm bg-primary/10 px-1.5 font-mono text-2xs font-semibold text-primary"
+    >
       {{ status === "won" ? `${attempts}/${MAX_GUESSES}` : `X/${MAX_GUESSES}` }}
     </span>
   </NuxtLink>

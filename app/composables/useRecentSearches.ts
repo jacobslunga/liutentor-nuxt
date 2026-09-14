@@ -6,17 +6,19 @@ interface RecentSearch {
 }
 
 export function useRecentSearches() {
-
   const legacyCookie = useCookie("recentSearches");
   if (legacyCookie.value !== null && legacyCookie.value !== undefined) {
     legacyCookie.value = null;
   }
 
-  const cookie = useCookie<RecentSearch[] | undefined>("liu_recent_searches_v2", {
-    path: "/",
-    sameSite: "lax",
-    maxAge: 60 * 60 * 24 * 30,
-  });
+  const cookie = useCookie<RecentSearch[] | undefined>(
+    "liu_recent_searches_v2",
+    {
+      path: "/",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 30,
+    },
+  );
 
   function add(courseCode: string) {
     if (!courseCode) return;
@@ -44,9 +46,7 @@ export function useRecentSearches() {
     if (!Array.isArray(cookie.value) || cookie.value.length === 0) return [];
     return cookie.value
       .map((item) =>
-        typeof item === "string"
-          ? { courseCode: item, timestamp: 0 }
-          : item,
+        typeof item === "string" ? { courseCode: item, timestamp: 0 } : item,
       )
       .filter((item) => item?.courseCode)
       .sort((a, b) => b.timestamp - a.timestamp)

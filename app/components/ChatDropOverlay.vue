@@ -1,17 +1,26 @@
 <template>
-  <div class="pointer-events-none absolute inset-0 z-30 bg-default/90" role="status" aria-live="polite">
-    <div class="flex h-full flex-col items-center justify-center p-8 text-center">
+  <div
+    class="pointer-events-none absolute inset-0 z-30 bg-default/90"
+    role="status"
+    aria-live="polite"
+  >
+    <div
+      class="flex h-full flex-col items-center justify-center p-8 text-center"
+    >
       <div class="drop-illustration relative mb-7 h-20 w-32" aria-hidden="true">
         <div
-          class="drop-tile-back absolute left-4 top-3 flex size-14 -rotate-12 items-center justify-center rounded-2xl text-inverted shadow-lg">
+          class="drop-tile-back absolute left-4 top-3 flex size-14 -rotate-12 items-center justify-center rounded-2xl text-inverted shadow-lg"
+        >
           <UIcon name="i-lucide-image" class="size-7" />
         </div>
         <div
-          class="drop-tile-middle absolute right-4 top-1 flex size-14 rotate-12 items-center justify-center rounded-2xl text-inverted shadow-lg">
+          class="drop-tile-middle absolute right-4 top-1 flex size-14 rotate-12 items-center justify-center rounded-2xl text-inverted shadow-lg"
+        >
           <UIcon name="i-lucide-file-text" class="size-7" />
         </div>
         <div
-          class="absolute bottom-0 left-1/2 flex size-14 -translate-x-1/2 items-center justify-center rounded-2xl bg-primary text-inverted shadow-xl">
+          class="absolute bottom-0 left-1/2 flex size-14 -translate-x-1/2 items-center justify-center rounded-2xl bg-primary text-inverted shadow-xl"
+        >
           <UIcon name="i-lucide-image" class="size-7" />
         </div>
       </div>

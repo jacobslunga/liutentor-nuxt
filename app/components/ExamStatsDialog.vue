@@ -25,9 +25,9 @@ const gradeColors: Record<string, string> = {
   "3": "var(--chart-3)",
   "4": "var(--chart-4)",
   "5": "var(--chart-5)",
-  "G": "var(--chart-2)",
-  "VG": "var(--chart-1)",
-  "U": "var(--chart-1)",
+  G: "var(--chart-2)",
+  VG: "var(--chart-1)",
+  U: "var(--chart-1)",
 };
 
 const maxCount = computed(() =>
@@ -42,13 +42,23 @@ function passColor(rate: number) {
 </script>
 
 <template>
+  <UIcon
+    name="i-lucide-minus"
+    v-if="total === 0"
+    class="w-4 h-4 text-muted/30"
+  />
 
-  <UIcon name="i-lucide-minus" v-if="total === 0" class="w-4 h-4 text-muted/30" />
-
-  <UModal v-else title="Tentastatistik" :description="`Betygsfördelning ${date}`">
-    <button type="button"
+  <UModal
+    v-else
+    title="Tentastatistik"
+    :description="`Betygsfördelning ${date}`"
+  >
+    <button
+      type="button"
       class="text-sm cursor-pointer px-2 py-1 rounded-sm hover:bg-primary/10 transition-colors duration-150"
-      :class="passColor(passRate)" @click.prevent.stop>
+      :class="passColor(passRate)"
+      @click.prevent.stop
+    >
       {{ passRate.toFixed(1) }}%
     </button>
 
@@ -64,23 +74,35 @@ function passColor(rate: number) {
 
           <div class="border border-default rounded-md p-3">
             <div class="flex items-end gap-2 h-32">
-              <div v-for="{ grade, count, color } in chartData" :key="grade"
-                class="flex-1 flex flex-col items-center gap-1">
+              <div
+                v-for="{ grade, count, color } in chartData"
+                :key="grade"
+                class="flex-1 flex flex-col items-center gap-1"
+              >
                 <span class="text-2xs text-muted">{{ count }}</span>
-                <div class="w-full rounded-t-sm" :style="{
-                  height: `${(count / maxCount) * 88}px`,
-                  backgroundColor: color,
-                }" />
+                <div
+                  class="w-full rounded-t-sm"
+                  :style="{
+                    height: `${(count / maxCount) * 88}px`,
+                    backgroundColor: color,
+                  }"
+                />
                 <span class="text-2xs text-muted">{{ grade }}</span>
               </div>
             </div>
           </div>
 
           <div class="space-y-2">
-            <div v-for="{ grade, count, color } in chartData" :key="grade"
-              class="flex items-center justify-between text-sm">
+            <div
+              v-for="{ grade, count, color } in chartData"
+              :key="grade"
+              class="flex items-center justify-between text-sm"
+            >
               <div class="flex items-center gap-2">
-                <div class="w-2 h-2 rounded-md" :style="{ backgroundColor: color }" />
+                <div
+                  class="w-2 h-2 rounded-md"
+                  :style="{ backgroundColor: color }"
+                />
                 <span class="text-highlighted">Betyg {{ grade }}</span>
               </div>
               <span class="text-muted">
@@ -90,15 +112,24 @@ function passColor(rate: number) {
           </div>
         </div>
 
-        <div class="flex items-center justify-between pt-2 border-t border-default/60 text-xs text-muted">
+        <div
+          class="flex items-center justify-between pt-2 border-t border-default/60 text-xs text-muted"
+        >
           <span>
             Data från
-            <a href="https://ysektionen.se/student/tentastatistik/" target="_blank"
-              class="text-primary hover:underline">
+            <a
+              href="https://ysektionen.se/student/tentastatistik/"
+              target="_blank"
+              class="text-primary hover:underline"
+            >
               Y-Sektionen
             </a>
           </span>
-          <button type="button" class="hover:text-highlighted transition-colors cursor-pointer" @click="close()">
+          <button
+            type="button"
+            class="hover:text-highlighted transition-colors cursor-pointer"
+            @click="close()"
+          >
             Stäng
           </button>
         </div>

@@ -69,8 +69,7 @@ export function useChatPanel(opts: ChatPanelOptions) {
   const currentUserId = computed(
     () =>
       ((user.value as any)?.id ?? (user.value as any)?.sub ?? null) as
-        | string
-        | null,
+        string | null,
   );
 
   const chatHeaderTitle = computed(() => {
@@ -172,7 +171,9 @@ export function useChatPanel(opts: ChatPanelOptions) {
       if (newId && !isLoading.value) {
         nextTick(() => {
           opts.transcript.value?.scrollToBottom("auto");
-          requestAnimationFrame(() => opts.transcript.value?.scrollToBottom("auto"));
+          requestAnimationFrame(() =>
+            opts.transcript.value?.scrollToBottom("auto"),
+          );
         });
       }
     },

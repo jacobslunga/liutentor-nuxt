@@ -51,7 +51,11 @@ export function useDailyPuzzle() {
 
   /** Best result seen per character, for tinting the keyboard. */
   const keyStates = computed(() => {
-    const rank: Record<TileState, number> = { absent: 0, present: 1, correct: 2 };
+    const rank: Record<TileState, number> = {
+      absent: 0,
+      present: 1,
+      correct: 2,
+    };
     const best = new Map<string, TileState>();
 
     for (const [index, row] of rows.value.entries()) {

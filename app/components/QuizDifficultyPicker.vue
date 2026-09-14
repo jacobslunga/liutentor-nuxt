@@ -50,8 +50,15 @@ function onUpdate(value: string | number) {
   <div class="w-[80%] flex flex-col items-center justify-center">
     <p class="text-xs font-medium text-muted">Svårighetsgrad</p>
 
-    <UTabs color="neutral" :model-value="modelValue" :items="items" :content="false" class="mt-2 w-full"
-      aria-label="Svårighetsgrad" @update:model-value="onUpdate" />
+    <UTabs
+      color="neutral"
+      :model-value="modelValue"
+      :items="items"
+      :content="false"
+      class="mt-2 w-full"
+      aria-label="Svårighetsgrad"
+      @update:model-value="onUpdate"
+    />
 
     <p class="mt-2 text-xs leading-relaxed text-muted">
       {{ activeHint }}

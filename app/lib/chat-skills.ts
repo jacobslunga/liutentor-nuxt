@@ -9,11 +9,7 @@
  * filerna; `id` är kontraktet mellan repona.
  */
 export type ChatSkillId =
-  | "explain"
-  | "theory"
-  | "solution"
-  | "hint"
-  | "summary";
+  "explain" | "theory" | "solution" | "hint" | "summary";
 
 export interface ChatSkill {
   id: ChatSkillId;
@@ -37,14 +33,16 @@ export const CHAT_SKILLS: ChatSkill[] = [
     command: "teori",
     aliases: [],
     label: "Teori",
-    description: "Djupdykning i definitioner och satser – utan att lösa uppgiften.",
+    description:
+      "Djupdykning i definitioner och satser – utan att lösa uppgiften.",
   },
   {
     id: "solution",
     command: "lösning",
     aliases: ["losning"],
     label: "Fullständig lösning",
-    description: "Hela uträkningen med alla mellansteg, kontroll och tydligt svar.",
+    description:
+      "Hela uträkningen med alla mellansteg, kontroll och tydligt svar.",
   },
   {
     id: "hint",
@@ -58,7 +56,8 @@ export const CHAT_SKILLS: ChatSkill[] = [
     command: "sammanfatta",
     aliases: [],
     label: "Sammanfattning",
-    description: "Komprimerad punktlista med nyckelbegrepp, formler och villkor.",
+    description:
+      "Komprimerad punktlista med nyckelbegrepp, formler och villkor.",
   },
 ];
 

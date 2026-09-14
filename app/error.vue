@@ -26,11 +26,11 @@ const retry = () => clearError();
 </script>
 
 <template>
-  <div class="min-h-screen bg-default text-highlighted flex items-center justify-center px-6">
+  <div
+    class="min-h-screen bg-default text-highlighted flex items-center justify-center px-6"
+  >
     <div class="w-full max-w-xl text-center space-y-5">
-      <p class="text-xs font-mono text-muted">
-        FEL {{ statusCode }}
-      </p>
+      <p class="text-xs font-mono text-muted">FEL {{ statusCode }}</p>
       <h1 class="text-3xl md:text-4xl font-medium">
         {{ statusMessage }}
       </h1>
@@ -40,7 +40,9 @@ const retry = () => clearError();
 
       <div class="flex items-center justify-center gap-3 pt-2">
         <UButton @click="goHome">Till startsidan</UButton>
-        <UButton color="neutral" variant="outline" @click="retry">Försök igen</UButton>
+        <UButton color="neutral" variant="outline" @click="retry"
+          >Försök igen</UButton
+        >
       </div>
     </div>
   </div>

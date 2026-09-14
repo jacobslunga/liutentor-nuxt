@@ -225,7 +225,9 @@ onUnmounted(() => {
     <div class="space-y-6">
       <div v-if="fixedCourseCode" class="space-y-2">
         <p class="text-sm font-medium text-muted">Kurskod</p>
-        <div class="flex items-center justify-center gap-2 rounded-md border border-default/60 bg-muted/30 px-4 py-3">
+        <div
+          class="flex items-center justify-center gap-2 rounded-md border border-default/60 bg-muted/30 px-4 py-3"
+        >
           <UIcon name="i-lucide-book-open" class="h-4 w-4 text-muted" />
           <span class="font-mono text-lg font-medium tracking-wide">
             {{ kurskod }}
@@ -235,21 +237,36 @@ onUnmounted(() => {
 
       <div v-else class="space-y-2">
         <label class="text-sm font-medium text-muted">Kurskod</label>
-        <input :value="kurskod" :placeholder="kurskod ? '' : typed" :disabled="loading"
+        <input
+          :value="kurskod"
+          :placeholder="kurskod ? '' : typed"
+          :disabled="loading"
           class="w-full bg-transparent font-medium outline-none border-0 border-b-2 border-inverted/20 text-center text-4xl focus:ring-0 focus:border-primary transition-colors p-2 placeholder:text-muted/40"
           @input="
             kurskod = ($event.target as HTMLInputElement).value.toUpperCase()
-            " />
+          "
+        />
       </div>
 
-      <div ref="dropZoneRef"
+      <div
+        ref="dropZoneRef"
         class="relative border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors duration-150 ease-spring"
-        :class="isOverDropZone
-          ? 'border-primary bg-primary/5 scale-[1.02]'
-          : 'border-muted hover:border-primary/50'
-          " :style="loading ? 'opacity: 0.5; pointer-events: none' : ''" @click="fileInputRef?.click()">
-        <input ref="fileInputRef" type="file" accept="application/pdf" multiple class="hidden"
-          @change="handleFileInput" />
+        :class="
+          isOverDropZone
+            ? 'border-primary bg-primary/5 scale-[1.02]'
+            : 'border-muted hover:border-primary/50'
+        "
+        :style="loading ? 'opacity: 0.5; pointer-events: none' : ''"
+        @click="fileInputRef?.click()"
+      >
+        <input
+          ref="fileInputRef"
+          type="file"
+          accept="application/pdf"
+          multiple
+          class="hidden"
+          @change="handleFileInput"
+        />
         <div class="flex flex-col items-center justify-center gap-2 text-muted">
           <UIcon name="i-lucide-upload" class="h-8 w-8" />
           <p class="font-medium">
@@ -260,24 +277,47 @@ onUnmounted(() => {
 
       <div v-if="files.length > 0" class="space-y-3">
         <div class="space-y-2 rounded-md border p-2">
-          <div v-for="(file, index) in files" :key="`${file.name}-${index}`"
-            class="flex items-center justify-between text-sm p-2 bg-muted/50 rounded-md">
+          <div
+            v-for="(file, index) in files"
+            :key="`${file.name}-${index}`"
+            class="flex items-center justify-between text-sm p-2 bg-muted/50 rounded-md"
+          >
             <div class="flex items-center gap-2 overflow-hidden">
-              <UIcon name="i-lucide-file-text" class="h-4 w-4 shrink-0 text-muted" />
+              <UIcon
+                name="i-lucide-file-text"
+                class="h-4 w-4 shrink-0 text-muted"
+              />
               <span class="truncate">{{ file.name }}</span>
             </div>
-            <UButton color="neutral" variant="ghost" square class="h-6 w-6" @click.stop="removeFile(index)">
+            <UButton
+              color="neutral"
+              variant="ghost"
+              square
+              class="h-6 w-6"
+              @click.stop="removeFile(index)"
+            >
               <UIcon name="i-lucide-x" class="h-4 w-4" />
             </UButton>
           </div>
         </div>
-        <UButton block size="lg" :disabled="!kurskod || loading" @click="handleUpload">
-          <UIcon name="i-lucide-loader-circle" v-if="loading" class="h-5 w-5 animate-spin" />
+        <UButton
+          block
+          size="lg"
+          :disabled="!kurskod || loading"
+          @click="handleUpload"
+        >
+          <UIcon
+            name="i-lucide-loader-circle"
+            v-if="loading"
+            class="h-5 w-5 animate-spin"
+          />
           <span v-else>Ladda upp</span>
         </UButton>
       </div>
 
-      <div class="p-4 bg-muted/50 border rounded-md flex items-start gap-2 text-left">
+      <div
+        class="p-4 bg-muted/50 border rounded-md flex items-start gap-2 text-left"
+      >
         <UIcon name="i-lucide-info" class="h-4 w-4 text-muted shrink-0" />
         <p class="text-xs text-muted">
           Uppladdade tentor granskas innan de blir tillgängliga för andra
@@ -286,11 +326,19 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <UModal :open="uploadStatus !== null" :dismissible="false" :close="false" :title="uploadStatus === 'success' ? 'Uppladdning lyckades!' : 'Något gick fel'
-      " :description="uploadStatus === 'success'
-        ? 'Tack! Din tenta har laddats upp och granskas inom kort.'
-        : errorMessage || 'Ett fel uppstod vid uppladdningen.'
-        ">
+    <UModal
+      :open="uploadStatus !== null"
+      :dismissible="false"
+      :close="false"
+      :title="
+        uploadStatus === 'success' ? 'Uppladdning lyckades!' : 'Något gick fel'
+      "
+      :description="
+        uploadStatus === 'success'
+          ? 'Tack! Din tenta har laddats upp och granskas inom kort.'
+          : errorMessage || 'Ett fel uppstod vid uppladdningen.'
+      "
+    >
       <template #footer>
         <UButton block @click="uploadStatus = null">OK</UButton>
       </template>

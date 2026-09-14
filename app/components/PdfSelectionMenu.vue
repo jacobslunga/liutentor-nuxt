@@ -38,9 +38,15 @@ async function explain() {
 
 <template>
   <Transition name="menu-fade" appear>
-    <UButton size="sm" color="neutral" variant="soft" :disabled="isResolving"
+    <UButton
+      size="sm"
+      color="neutral"
+      variant="soft"
+      :disabled="isResolving"
       class="pointer-events-auto absolute left-1/2 -translate-x-1/2 whitespace-nowrap shadow-sm"
-      :class="above ? 'bottom-full mb-2' : 'top-full mt-2'" @click.stop="explain">
+      :class="above ? 'bottom-full mb-2' : 'top-full mt-2'"
+      @click.stop="explain"
+    >
       Förklara
       <UIcon name="i-lucide-arrow-up-right" class="w-3.5 h-3.5" />
     </UButton>

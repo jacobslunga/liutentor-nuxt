@@ -39,7 +39,6 @@ export interface ChatAttachment {
 }
 
 export interface PendingSelection {
-
   prompt: string;
 
   context: string;

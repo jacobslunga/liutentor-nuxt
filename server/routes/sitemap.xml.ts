@@ -51,7 +51,6 @@ export default defineEventHandler(async (event) => {
   try {
     lastmods = await fetchCourseLastmods(event);
   } catch {
-
     lastmods = new Map();
   }
 

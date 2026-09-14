@@ -20,7 +20,6 @@ const STEP_ORDER = [
 const currentStepIndex = computed(() =>
   props.statusStep ? STEP_ORDER.indexOf(props.statusStep) : -1,
 );
-
 </script>
 
 <template>
@@ -33,9 +32,7 @@ const currentStepIndex = computed(() =>
           class="rounded-full transition-all duration-300 ease-spring"
           :class="[
             i < currentStepIndex ? 'h-1.5 w-1.5 bg-inverted' : '',
-            i === currentStepIndex
-              ? 'h-2 w-2 bg-inverted step-dot-active'
-              : '',
+            i === currentStepIndex ? 'h-2 w-2 bg-inverted step-dot-active' : '',
             i > currentStepIndex ? 'h-1.5 w-1.5 bg-inverted/20' : '',
           ]"
         />

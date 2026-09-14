@@ -38,7 +38,9 @@ const groupedLinks = [
             class="flex items-center gap-2 transition-opacity duration-150 ease-spring hover:opacity-70"
           >
             <LogoIcon class="size-7 text-primary" />
-            <span class="font-logo text-xl font-medium tracking-tighter">LiU Tentor</span>
+            <span class="font-logo text-xl font-medium tracking-tighter"
+              >LiU Tentor</span
+            >
           </NuxtLink>
           <p class="max-w-56 text-sm leading-relaxed text-muted">
             Studentdrivet tentaarkiv för Linköpings universitet.
@@ -68,7 +70,8 @@ const groupedLinks = [
         class="mt-14 flex flex-col items-start justify-between gap-4 border-t pt-8 sm:flex-row sm:items-center"
       >
         <p class="text-xs text-muted">
-          &copy; {{ year }} LiU Tentor. Inte affilierad med Linköpings universitet.
+          &copy; {{ year }} LiU Tentor. Inte affilierad med Linköpings
+          universitet.
         </p>
         <div class="flex items-center gap-5">
           <a

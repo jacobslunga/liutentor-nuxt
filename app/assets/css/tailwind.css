@@ -119,7 +119,7 @@ body {
 
 :root {
   --ui-primary: oklch(0.6193 0.1154 172.06);
-  --ui-radius: 0.75rem;
+  --ui-radius: 0.5rem;
 
   --chart-1: oklch(from var(--ui-primary) 0.911 0.0453 h);
   --chart-2: oklch(from var(--ui-primary) 0.8072 0.1109 h);

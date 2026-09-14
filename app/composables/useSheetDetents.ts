@@ -104,10 +104,8 @@ export function useSheetDetents() {
     let next = startOffset + delta;
 
     if (next < 0) {
-
       next = -Math.pow(-next, RUBBER_BAND_EXPONENT);
     } else if (next > maxOffset.value) {
-
       next = maxOffset.value;
     }
 
@@ -129,7 +127,6 @@ export function useSheetDetents() {
     let target = nearestDetent(current + velocity * VELOCITY_PROJECTION_MS);
 
     if (Math.abs(velocity) > FLING_VELOCITY) {
-
       const direction = velocity > 0 ? -1 : 1;
       const floorIndex = clamp(
         DETENT_ORDER.indexOf(startDetent) + direction,

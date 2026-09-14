@@ -199,9 +199,9 @@ function handleMouseMove(e: MouseEvent) {
   facitProximity.value =
     e.clientX > proximityStart && !inSafeZone
       ? Math.min(
-        Math.max((e.clientX - proximityStart) / (w - proximityStart), 0),
-        1,
-      )
+          Math.max((e.clientX - proximityStart) / (w - proximityStart), 0),
+          1,
+        )
       : 0;
 
   if (inSafeZone && !isFacitVisible.value) return;
@@ -252,7 +252,7 @@ function handleKeyDown(e: KeyboardEvent) {
     e.preventDefault();
     splitPercent.value = clampSplit(
       splitPercent.value +
-      (e.key === "ArrowRight" ? SPLIT_KEY_STEP : -SPLIT_KEY_STEP),
+        (e.key === "ArrowRight" ? SPLIT_KEY_STEP : -SPLIT_KEY_STEP),
     );
     return;
   }
@@ -328,90 +328,175 @@ onUnmounted(() => {
 
 <template>
   <ClientOnly>
-    <div class="relative flex h-screen w-full flex-col overflow-hidden bg-default">
-      <Transition enter-active-class="transition-all duration-200 ease-spring"
-        enter-from-class="-translate-y-2 opacity-0" leave-active-class="transition-all duration-150 ease-spring"
-        leave-to-class="-translate-y-2 opacity-0">
-        <div v-if="exam && isHeaderMounted" class="absolute inset-x-0 top-0 z-30 hidden lg:block">
-          <ExamHeader :exams="exams" :exam-id="examId" :course-code="courseCode" :solution-pdf-url="solutionPdfUrl"
-            :active="isHeaderActive" :focus-mode="focusMode" @toggle-focus-mode="toggleFocusMode" />
+    <div
+      class="relative flex h-screen w-full flex-col overflow-hidden bg-default"
+    >
+      <Transition
+        enter-active-class="transition-all duration-200 ease-spring"
+        enter-from-class="-translate-y-2 opacity-0"
+        leave-active-class="transition-all duration-150 ease-spring"
+        leave-to-class="-translate-y-2 opacity-0"
+      >
+        <div
+          v-if="exam && isHeaderMounted"
+          class="absolute inset-x-0 top-0 z-30 hidden lg:block"
+        >
+          <ExamHeader
+            :exams="exams"
+            :exam-id="examId"
+            :course-code="courseCode"
+            :solution-pdf-url="solutionPdfUrl"
+            :active="isHeaderActive"
+            :focus-mode="focusMode"
+            @toggle-focus-mode="toggleFocusMode"
+          />
         </div>
       </Transition>
 
       <div class="relative min-h-0 flex-1">
-        <div v-if="isLoading" class="flex h-full items-center justify-center flex-col gap-2">
-          <UIcon name="i-lucide-loader-circle" class="w-8 h-8 animate-spin text-muted" />
+        <div
+          v-if="isLoading"
+          class="flex h-full items-center justify-center flex-col gap-2"
+        >
+          <UIcon
+            name="i-lucide-loader-circle"
+            class="w-8 h-8 animate-spin text-muted"
+          />
           <p class="text-sm text-muted">Laddar tenta...</p>
         </div>
 
-        <div v-else-if="isError" class="flex h-full items-center justify-center flex-col gap-2">
+        <div
+          v-else-if="isError"
+          class="flex h-full items-center justify-center flex-col gap-2"
+        >
           <p class="text-2xl text-highlighted/80">Något gick fel!</p>
           <p class="text-sm text-muted">
             Ibland fungerar det att bara ladda om sidan :)
           </p>
-          <UButton color="neutral" variant="soft" @click="refreshNuxtData()">Ladda om</UButton>
+          <UButton color="neutral" variant="soft" @click="refreshNuxtData()"
+            >Ladda om</UButton
+          >
         </div>
 
         <template v-else-if="exam">
-          <MobilePdfView v-if="isMobile" v-show="!chatStore.isOpen" class="bg-default" :exam-pdf-url="exam.pdf_url"
-            :solution-pdf-url="solutionPdfUrl" :course-code="courseCode" :exam-date="exam.exam_date"
-            :explain-enabled="showExplainPopover" @explain="explainSelection" />
+          <MobilePdfView
+            v-if="isMobile"
+            v-show="!chatStore.isOpen"
+            class="bg-default"
+            :exam-pdf-url="exam.pdf_url"
+            :solution-pdf-url="solutionPdfUrl"
+            :course-code="courseCode"
+            :exam-date="exam.exam_date"
+            :explain-enabled="showExplainPopover"
+            @explain="explainSelection"
+          />
 
-          <div v-else ref="splitRow" class="h-full flex flex-row overflow-hidden"
-            :class="{ 'select-none': isResizing || isOverlayResizing }">
-            <div class="relative isolate h-full overflow-hidden bg-default" :style="isExamOnly ? { width: '100%' } : { width: `${splitPercent}%` }
-              ">
-              <LazyPdfRenderer :pdf-url="exam.pdf_url" :layout-mode="layoutMode" :top-inset="64"
-                :explain-enabled="showExplainPopover" @explain="explainSelection" />
+          <div
+            v-else
+            ref="splitRow"
+            class="h-full flex flex-row overflow-hidden"
+            :class="{ 'select-none': isResizing || isOverlayResizing }"
+          >
+            <div
+              class="relative isolate h-full overflow-hidden bg-default"
+              :style="
+                isExamOnly ? { width: '100%' } : { width: `${splitPercent}%` }
+              "
+            >
+              <LazyPdfRenderer
+                :pdf-url="exam.pdf_url"
+                :layout-mode="layoutMode"
+                :top-inset="64"
+                :explain-enabled="showExplainPopover"
+                @explain="explainSelection"
+              />
 
-              <FacitEdge v-if="
-                isExamOnly && hasFacit && !isFacitVisible && !chatStore.isOpen
-              " :facit-pdf-url="solutionPdfUrl" :intensity="facitProximity" />
+              <FacitEdge
+                v-if="
+                  isExamOnly && hasFacit && !isFacitVisible && !chatStore.isOpen
+                "
+                :facit-pdf-url="solutionPdfUrl"
+                :intensity="facitProximity"
+              />
             </div>
 
             <template v-if="!isExamOnly">
               <div class="relative z-20 w-0 shrink-0">
-                <ResizeHandle :is-resizing="isResizing" @start-resize="startSplitResize" />
+                <ResizeHandle
+                  :is-resizing="isResizing"
+                  @start-resize="startSplitResize"
+                />
               </div>
 
-              <div class="relative isolate h-full flex-1 min-w-0 overflow-hidden bg-default">
+              <div
+                class="relative isolate h-full flex-1 min-w-0 overflow-hidden bg-default"
+              >
                 <div class="absolute inset-0 h-full w-full flex flex-col">
-                  <div v-if="solution" class="h-full relative" @mouseenter="solutionBlurred = false"
-                    @mouseleave="solutionBlurred = blurFacitUntilHover">
-                    <LazyPdfRenderer :pdf-url="solution.pdf_url" layout-mode="exam-with-facit" :top-inset="64"
-                      :explain-enabled="showExplainPopover" @explain="explainSelection" />
+                  <div
+                    v-if="solution"
+                    class="h-full relative"
+                    @mouseenter="solutionBlurred = false"
+                    @mouseleave="solutionBlurred = blurFacitUntilHover"
+                  >
+                    <LazyPdfRenderer
+                      :pdf-url="solution.pdf_url"
+                      layout-mode="exam-with-facit"
+                      :top-inset="64"
+                      :explain-enabled="showExplainPopover"
+                      @explain="explainSelection"
+                    />
                     <Transition name="fade">
-                      <div v-if="solutionBlurred"
-                        class="absolute inset-0 z-20 backdrop-blur-sm bg-default/30 flex flex-col gap-2 items-center justify-center pointer-events-none">
+                      <div
+                        v-if="solutionBlurred"
+                        class="absolute inset-0 z-20 backdrop-blur-sm bg-default/30 flex flex-col gap-2 items-center justify-center pointer-events-none"
+                      >
                         <p class="text-sm font-normal text-muted">
                           Håll muspekaren för att visa facit
                         </p>
-                        <UIcon name="i-lucide-mouse-pointer-click" class="size-6 text-muted animate-in" />
+                        <UIcon
+                          name="i-lucide-mouse-pointer-click"
+                          class="size-6 text-muted animate-in"
+                        />
                       </div>
                     </Transition>
                   </div>
 
-                  <div v-else class="flex h-full items-center justify-center p-6">
+                  <div
+                    v-else
+                    class="flex h-full items-center justify-center p-6"
+                  >
                     <div class="group relative w-full max-w-sm">
                       <div
-                        class="rounded-md border-2 border-dashed border-default/60 px-8 py-10 transition-colors group-hover:border-primary/30">
-                        <div class="flex flex-col items-center text-center gap-4">
+                        class="rounded-md border-2 border-dashed border-default/60 px-8 py-10 transition-colors group-hover:border-primary/30"
+                      >
+                        <div
+                          class="flex flex-col items-center text-center gap-4"
+                        >
                           <div
-                            class="flex size-12 items-center justify-center rounded-md bg-muted/60 group-hover:bg-primary/10 transition-colors">
-                            <UIcon name="i-lucide-upload"
-                              class="size-6 text-muted group-hover:text-primary transition-colors" />
+                            class="flex size-12 items-center justify-center rounded-md bg-muted/60 group-hover:bg-primary/10 transition-colors"
+                          >
+                            <UIcon
+                              name="i-lucide-upload"
+                              class="size-6 text-muted group-hover:text-primary transition-colors"
+                            />
                           </div>
                           <div>
                             <p class="font-medium text-highlighted/80">
                               Inget facit tillgängligt
                             </p>
-                            <p class="mt-1 text-xs text-muted/70 max-w-55 leading-relaxed">
-                              Hjälp andra studenter genom att ladda upp facit till
-                              denna tenta.
+                            <p
+                              class="mt-1 text-xs text-muted/70 max-w-55 leading-relaxed"
+                            >
+                              Hjälp andra studenter genom att ladda upp facit
+                              till denna tenta.
                             </p>
                           </div>
                           <NuxtLink to="/upload-exams">
-                            <UButton size="sm" color="neutral" variant="outline">
+                            <UButton
+                              size="sm"
+                              color="neutral"
+                              variant="outline"
+                            >
                               <UIcon name="i-lucide-upload" class="size-3.5" />
                               Ladda upp
                             </UButton>
@@ -426,40 +511,80 @@ onUnmounted(() => {
           </div>
 
           <Teleport to="body">
-            <Transition enter-active-class="transition-all duration-200 ease-spring"
-              enter-from-class="translate-x-full opacity-0" enter-to-class="translate-x-0 opacity-100 blur-0"
+            <Transition
+              enter-active-class="transition-all duration-200 ease-spring"
+              enter-from-class="translate-x-full opacity-0"
+              enter-to-class="translate-x-0 opacity-100 blur-0"
               leave-active-class="transition-all duration-200 ease-spring"
-              leave-from-class="translate-x-0 opacity-100 blur-0" leave-to-class="translate-x-full opacity-0 blur-sm">
-              <div v-if="!isMobile && isExamOnly && hasFacit" v-show="isFacitVisible && !chatStore.isOpen"
+              leave-from-class="translate-x-0 opacity-100 blur-0"
+              leave-to-class="translate-x-full opacity-0 blur-sm"
+            >
+              <div
+                v-if="!isMobile && isExamOnly && hasFacit"
+                v-show="isFacitVisible && !chatStore.isOpen"
                 class="fixed right-0 bottom-0 z-30 flex h-screen border-l border-default bg-default shadow-xl dark:shadow-none"
-                :class="{ 'select-none': isOverlayResizing }" :style="{ width: `${overlayWidth}px` }">
+                :class="{ 'select-none': isOverlayResizing }"
+                :style="{ width: `${overlayWidth}px` }"
+              >
                 <div class="relative z-10 w-0 shrink-0">
-                  <ResizeHandle :is-resizing="isOverlayResizing" @start-resize="startOverlayResize" />
+                  <ResizeHandle
+                    :is-resizing="isOverlayResizing"
+                    @start-resize="startOverlayResize"
+                  />
                 </div>
                 <div class="flex-1 overflow-hidden">
-                  <LazyPdfRenderer :pdf-url="solutionPdfUrl!" layout-mode="exam-only"
-                    :explain-enabled="showExplainPopover" @explain="explainSelection" />
+                  <LazyPdfRenderer
+                    :pdf-url="solutionPdfUrl!"
+                    layout-mode="exam-only"
+                    :explain-enabled="showExplainPopover"
+                    @explain="explainSelection"
+                  />
                 </div>
               </div>
             </Transition>
 
-            <LazyMobileChatSheet v-if="isMobile" :key="examId" :exam-id="examId" :exam-url="exam.pdf_url"
-              :course-code="courseCode" :solution-url="solutionPdfUrl" :has-solution="hasFacit" />
+            <LazyMobileChatSheet
+              v-if="isMobile"
+              :key="examId"
+              :exam-id="examId"
+              :exam-url="exam.pdf_url"
+              :course-code="courseCode"
+              :solution-url="solutionPdfUrl"
+              :has-solution="hasFacit"
+            />
 
-            <Transition enter-active-class="transition-all duration-200 ease-spring"
-              enter-from-class="translate-x-full opacity-0" enter-to-class="translate-x-0 opacity-100 blur-0"
+            <Transition
+              enter-active-class="transition-all duration-200 ease-spring"
+              enter-from-class="translate-x-full opacity-0"
+              enter-to-class="translate-x-0 opacity-100 blur-0"
               leave-active-class="transition-all duration-200 ease-spring"
-              leave-from-class="translate-x-0 opacity-100 blur-0" leave-to-class="translate-x-full opacity-0 blur-sm">
-              <div v-if="!isMobile && chatHasBeenOpened" v-show="chatStore.isOpen"
+              leave-from-class="translate-x-0 opacity-100 blur-0"
+              leave-to-class="translate-x-full opacity-0 blur-sm"
+            >
+              <div
+                v-if="!isMobile && chatHasBeenOpened"
+                v-show="chatStore.isOpen"
                 class="fixed right-0 bottom-0 z-40 flex h-screen border-l border-default bg-default shadow-xl dark:shadow-none"
-                :class="{ 'select-none': isOverlayResizing }" :style="{ width: `${overlayWidth}px` }">
+                :class="{ 'select-none': isOverlayResizing }"
+                :style="{ width: `${overlayWidth}px` }"
+              >
                 <div class="relative z-10 w-0 shrink-0">
-                  <ResizeHandle :is-resizing="isOverlayResizing" @start-resize="startOverlayResize" />
+                  <ResizeHandle
+                    :is-resizing="isOverlayResizing"
+                    @start-resize="startOverlayResize"
+                  />
                 </div>
                 <div class="flex-1 overflow-hidden">
-                  <LazyChatWindow :key="examId" :exam-id="examId" :exam-url="exam.pdf_url" :course-code="courseCode"
-                    :solution-url="solutionPdfUrl" :has-solution="hasFacit" class="h-full w-full"
-                    @close="chatStore.close()" />
+                  <LazyChatWindow
+                    :key="examId"
+                    :exam-id="examId"
+                    :exam-url="exam.pdf_url"
+                    :course-code="courseCode"
+                    :solution-url="solutionPdfUrl"
+                    :has-solution="hasFacit"
+                    class="h-full w-full"
+                    @close="chatStore.close()"
+                  />
                 </div>
               </div>
             </Transition>

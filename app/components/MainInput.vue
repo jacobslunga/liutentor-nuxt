@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted } from "vue";
-
-const { codes: courseCodes } = useCourseCodes();
+const { codes, nameByCode } = useCourseCodes();
 
 const props = defineProps<{
   focusInput: boolean;
@@ -12,106 +10,52 @@ const emit = defineEmits<{
 }>();
 
 const router = useRouter();
-
-const courseCode = ref("");
-const suggestions = ref<string[]>([]);
-const showSuggestions = ref(false);
-const selectedIndex = ref(-1);
 const { add } = useRecentSearches();
 
-const inputRef = ref<HTMLInputElement | null>(null);
-const listParentRef = ref<HTMLDivElement | null>(null);
+type CourseItem = { label: string; name: string };
 
-watch([courseCode, () => props.focusInput], () => {
-  const q = courseCode.value.toUpperCase().trim();
-  if (!q) {
-    showSuggestions.value = false;
-    return;
-  }
-  if (props.focusInput) showSuggestions.value = true;
-  suggestions.value = courseCodes.value
+const searchTerm = ref("");
+const selected = ref<CourseItem | undefined>(undefined);
+const inputMenuRef = useTemplateRef("inputMenuRef");
+
+// Keep the homepage input lightweight, while using the same result rows as
+// CourseSearchDropdown (course code plus course name).
+const items = computed<CourseItem[]>(() => {
+  const q = searchTerm.value.trim().toUpperCase();
+  if (!q) return [];
+
+  return codes.value
     .filter((code) => code.includes(q))
-    .slice(0, 60);
-  selectedIndex.value = -1;
+    .slice(0, 10)
+    .map((code) => ({ label: code, name: nameByCode.value.get(code) ?? "" }));
 });
 
-const ITEM_HEIGHT = 36;
-const OVERSCAN = 5;
-
-const scrollTop = ref(0);
-
-const virtualItems = computed(() => {
-  const containerHeight = 256;
-  const start = Math.max(
-    0,
-    Math.floor(scrollTop.value / ITEM_HEIGHT) - OVERSCAN,
-  );
-  const end = Math.min(
-    suggestions.value.length - 1,
-    Math.ceil((scrollTop.value + containerHeight) / ITEM_HEIGHT) + OVERSCAN,
-  );
-  return Array.from({ length: end - start + 1 }, (_, i) => ({
-    index: start + i,
-    item: suggestions.value[start + i],
-    top: (start + i) * ITEM_HEIGHT,
-  })).filter(
-    (row): row is { index: number; item: string; top: number } =>
-      row.item !== undefined,
-  );
-});
-
-const totalHeight = computed(() => suggestions.value.length * ITEM_HEIGHT);
-
-function handleScroll(e: Event) {
-  scrollTop.value = (e.target as HTMLDivElement).scrollTop;
-}
-
-function scrollToIndex(index: number) {
-  if (!listParentRef.value) return;
-  const itemTop = index * ITEM_HEIGHT;
-  const itemBottom = itemTop + ITEM_HEIGHT;
-  const { scrollTop: st, clientHeight } = listParentRef.value;
-  if (itemTop < st) listParentRef.value.scrollTop = itemTop;
-  else if (itemBottom > st + clientHeight)
-    listParentRef.value.scrollTop = itemBottom - clientHeight;
-}
-
-function handleSelectCourse(course: string) {
-  const searchCode = course.trim().toUpperCase();
+function goToCourse(code: string) {
+  const searchCode = code.trim().toUpperCase();
   if (!searchCode) return;
+
   add(searchCode);
-  courseCode.value = "";
-  showSuggestions.value = false;
+  searchTerm.value = "";
+  selected.value = undefined;
+  inputMenuRef.value?.inputRef?.blur();
   router.push(`/search/${searchCode}`);
 }
 
-function handleKeyDown(e: KeyboardEvent) {
-  if (e.key === "Enter") {
-    e.preventDefault();
-    const suggestion = suggestions.value[selectedIndex.value];
-    if (selectedIndex.value >= 0 && suggestion) {
-      handleSelectCourse(suggestion);
-    } else {
-      handleSelectCourse(courseCode.value);
-    }
-  } else if (e.key === "ArrowDown") {
-    e.preventDefault();
-    const newIndex = Math.min(
-      selectedIndex.value + 1,
-      suggestions.value.length - 1,
-    );
-    selectedIndex.value = newIndex;
-    scrollToIndex(newIndex);
-  } else if (e.key === "ArrowUp") {
-    e.preventDefault();
-    const newIndex = Math.max(selectedIndex.value - 1, 0);
-    selectedIndex.value = newIndex;
-    scrollToIndex(newIndex);
-  } else if (e.key === "Escape") {
-    showSuggestions.value = false;
-    selectedIndex.value = -1;
-    inputRef.value?.blur();
-  }
+function onSelect(item: CourseItem | undefined) {
+  nextTick(() => {
+    selected.value = undefined;
+    searchTerm.value = "";
+  });
+
+  if (item?.label) goToCourse(item.label);
+}
+
+// A selected menu item triggers onSelect first; defer free-text search so it
+// only runs when Enter was pressed without choosing a result.
+function onEnter() {
+  setTimeout(() => {
+    if (searchTerm.value.trim()) goToCourse(searchTerm.value);
+  }, 0);
 }
 
 const typed = ref("");
@@ -119,16 +63,15 @@ const exIndex = ref(0);
 const charIndex = ref(0);
 const deleting = ref(false);
 let typingTimer: ReturnType<typeof setTimeout> | null = null;
-
-// The codes arrive from /api/courses after mount, so the placeholder animation
-// starts empty and kicks off once the list lands.
 const shuffledExamples = ref<string[]>([]);
 
 function runTyping() {
-  if (courseCode.value) return;
+  if (searchTerm.value) return;
+
   const current =
     shuffledExamples.value[exIndex.value % shuffledExamples.value.length] ?? "";
   if (!current) return;
+
   const doneTyping = charIndex.value === current.length && !deleting.value;
   const doneDeleting = charIndex.value === 0 && deleting.value;
   const speed = deleting.value ? 30 : 55;
@@ -149,7 +92,7 @@ function runTyping() {
 }
 
 watch(
-  courseCodes,
+  codes,
   (list) => {
     if (!list.length || shuffledExamples.value.length) return;
     shuffledExamples.value = [...list].sort(() => Math.random() - 0.5);
@@ -159,111 +102,84 @@ watch(
   { immediate: true },
 );
 
-onMounted(() => {
-  runTyping();
-  document.addEventListener("mousedown", handleClickOutside);
-  inputRef.value?.focus();
-});
-
-onUnmounted(() => {
-  if (typingTimer) clearTimeout(typingTimer);
-  document.removeEventListener("mousedown", handleClickOutside);
-});
-
-watch(courseCode, (val) => {
-  if (val && typingTimer) {
+watch(searchTerm, (value) => {
+  if (value && typingTimer) {
     clearTimeout(typingTimer);
     typingTimer = null;
-  } else if (!val && !typingTimer) {
+  } else if (!value && !typingTimer) {
     runTyping();
   }
 });
 
-function handleClickOutside(event: MouseEvent) {
-  if (
-    listParentRef.value &&
-    !listParentRef.value.contains(event.target as Node) &&
-    inputRef.value &&
-    !inputRef.value.contains(event.target as Node)
-  ) {
-    showSuggestions.value = false;
-  }
-}
+onMounted(() => {
+  runTyping();
+  inputMenuRef.value?.inputRef?.focus();
+});
+
+onUnmounted(() => {
+  if (typingTimer) clearTimeout(typingTimer);
+});
 </script>
 
 <template>
-  <div class="relative w-full">
-    <div class="w-full relative flex flex-row items-center justify-center pl-5 pr-2">
-      <UIcon name="i-lucide-search" class="size-6 text-muted" />
-
-      <input
-        ref="inputRef"
-        :value="courseCode.toUpperCase()"
-        class="min-w-0 w-full py-4 pl-3 pr-2 border-none bg-transparent text-md text-highlighted/80 outline-none"
-        :placeholder="`Sök efter ${typed}`"
-        @input="courseCode = ($event.target as HTMLInputElement).value"
-        @keydown="handleKeyDown"
-        @focus="emit('update:focusInput', true)"
-        @blur="emit('update:focusInput', false)"
-      />
-
+  <UInputMenu
+    ref="inputMenuRef"
+    v-model="selected"
+    v-model:search-term="searchTerm"
+    :items="items"
+    :placeholder="`Sök efter ${typed}`"
+    icon="i-lucide-search"
+    variant="none"
+    :trailing-icon="undefined"
+    ignore-filter
+    :ui="{
+      root: 'w-full',
+      base: 'min-w-0 w-full py-4 ps-14 pe-12 border-none bg-transparent text-md text-highlighted/80 outline-none uppercase placeholder:normal-case',
+      leading: 'pl-5',
+      leadingIcon: 'size-6 text-muted',
+      trailing: 'pr-2',
+    }"
+    @focus="emit('update:focusInput', true)"
+    @blur="emit('update:focusInput', false)"
+    @update:model-value="onSelect"
+    @keydown.enter="onEnter"
+  >
+    <template #trailing>
       <UButton
         class="shrink-0"
         color="neutral"
         variant="outline"
         size="sm"
         square
-        :disabled="!courseCode"
+        :disabled="!searchTerm"
         aria-label="Search"
-        @click="handleSelectCourse(courseCode)"
+        @mousedown.prevent
+        @click.prevent="goToCourse(searchTerm)"
       >
-        <UIcon name="i-lucide-arrow-up" class="w-5 h-5" />
+        <UIcon name="i-lucide-arrow-up" class="size-5" />
       </UButton>
-    </div>
+    </template>
 
-    <div
-      v-if="showSuggestions && suggestions.length > 0"
-      class="absolute w-full left-0 mt-2 bg-default rounded-2xl border z-40 max-h-72 overflow-hidden text-sm"
-    >
-      <div class="px-3 pt-3 pb-1 text-muted font-medium">
-        Alla kurser
-      </div>
+    <template #item="{ item }">
+      <span class="flex min-w-0 flex-1 items-baseline gap-2">
+        <span class="shrink-0 font-medium text-highlighted">
+          {{ (item as CourseItem).label }}
+        </span>
+        <span class="truncate text-xs text-muted">
+          {{ (item as CourseItem).name }}
+        </span>
+      </span>
+      <UIcon
+        name="i-lucide-corner-down-left"
+        class="size-3.5 shrink-0 text-dimmed"
+      />
+    </template>
 
-      <div
-        ref="listParentRef"
-        class="overflow-y-auto max-h-64 scrollbar-hide"
-        @scroll="handleScroll"
-      >
-        <div
-          :style="{
-            height: `${totalHeight}px`,
-            position: 'relative',
-            width: '100%',
-          }"
-        >
-          <div
-            v-for="{ index, item, top } in virtualItems"
-            :key="item"
-            :class="[
-              'flex items-center px-4 py-2 cursor-pointer transition-colors',
-              index === selectedIndex
-                ? 'bg-muted text-highlighted'
-                : 'hover:bg-muted/50',
-            ]"
-            :style="{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: `${ITEM_HEIGHT}px`,
-              transform: `translateY(${top}px)`,
-            }"
-            @mousedown.prevent="handleSelectCourse(item)"
-          >
-            <span class="flex-1 font-normal">{{ item }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+    <template #empty>
+      <span v-if="searchTerm.trim()">
+        Ingen kurs matchar "{{ searchTerm.trim().toUpperCase() }}"
+      </span>
+      <span v-else>Skriv en kurskod</span>
+    </template>
+  </UInputMenu>
 </template>

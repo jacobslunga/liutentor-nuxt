@@ -573,7 +573,7 @@ defineExpose({
             <UButton
               color="neutral"
               variant="ghost"
-              :label="`Gemini • ${selectedModelLabel}`"
+              :label="`${selectedModelLabel}`"
               class="min-w-0"
             />
           </UDropdownMenu>

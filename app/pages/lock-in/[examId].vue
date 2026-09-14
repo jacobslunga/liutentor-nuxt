@@ -112,33 +112,66 @@ function formatTime(ms: number): string {
 </script>
 
 <template>
-  <div class="relative h-screen w-screen overflow-hidden bg-default flex flex-col">
-    <div class="absolute top-0 left-0 right-0 z-40 px-4 py-2 flex items-center justify-center pointer-events-none">
+  <div
+    class="relative h-screen w-screen overflow-hidden bg-default flex flex-col"
+  >
+    <div
+      class="absolute top-0 left-0 right-0 z-40 px-4 py-2 flex items-center justify-center pointer-events-none"
+    >
       <div
-        class="bg-default/80 backdrop-blur-sm border border-default/60 rounded-lg px-4 py-2 flex items-center gap-6 pointer-events-auto">
+        class="bg-default/80 backdrop-blur-sm border border-default/60 rounded-lg px-4 py-2 flex items-center gap-6 pointer-events-auto"
+      >
         <div class="flex items-center gap-3 min-w-30 justify-center">
-          <UIcon name="i-lucide-timer" class="w-5 h-5" :class="timeRemaining < 300000
-            ? 'text-error animate-pulse'
-            : 'text-primary'
-            " />
-          <span class="font-mono text-xl font-medium tracking-widest tabular-nums">
+          <UIcon
+            name="i-lucide-timer"
+            class="w-5 h-5"
+            :class="
+              timeRemaining < 300000
+                ? 'text-error animate-pulse'
+                : 'text-primary'
+            "
+          />
+          <span
+            class="font-mono text-xl font-medium tracking-widest tabular-nums"
+          >
             {{ formatTime(timeRemaining) }}
           </span>
         </div>
 
         <div class="flex items-center gap-2 border-l pl-4">
-          <UButton color="neutral" variant="ghost" square class="h-8 w-8" @click="toggleFullscreen">
-            <UIcon name="i-lucide-minimize" v-if="isFullscreen" class="w-4 h-4" />
+          <UButton
+            color="neutral"
+            variant="ghost"
+            square
+            class="h-8 w-8"
+            @click="toggleFullscreen"
+          >
+            <UIcon
+              name="i-lucide-minimize"
+              v-if="isFullscreen"
+              class="w-4 h-4"
+            />
             <UIcon name="i-lucide-maximize" v-else class="w-4 h-4" />
           </UButton>
 
-          <UButton color="neutral" variant="ghost" square class="h-8 w-8" :class="paused ? 'text-warning bg-warning/10' : ''"
-            @click="handlePauseResume">
+          <UButton
+            color="neutral"
+            variant="ghost"
+            square
+            class="h-8 w-8"
+            :class="paused ? 'text-warning bg-warning/10' : ''"
+            @click="handlePauseResume"
+          >
             <UIcon name="i-lucide-play" v-if="paused" class="w-4 h-4" />
             <UIcon name="i-lucide-pause" v-else class="w-4 h-4" />
           </UButton>
 
-          <UButton color="error" size="sm" class="h-8 px-3 ml-2" @click="showFinishDialog = true">
+          <UButton
+            color="error"
+            size="sm"
+            class="h-8 px-3 ml-2"
+            @click="showFinishDialog = true"
+          >
             Avsluta
           </UButton>
         </div>
@@ -153,11 +186,18 @@ function formatTime(ms: number): string {
       </div>
     </div>
 
-    <Transition enter-active-class="transition-opacity duration-200" enter-from-class="opacity-0"
-      enter-to-class="opacity-100" leave-active-class="transition-opacity duration-200" leave-from-class="opacity-100"
-      leave-to-class="opacity-0">
-      <div v-if="paused"
-        class="absolute inset-0 z-40 bg-default/60 backdrop-blur-sm flex flex-col items-center justify-center gap-6">
+    <Transition
+      enter-active-class="transition-opacity duration-200"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
+      leave-active-class="transition-opacity duration-200"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
+    >
+      <div
+        v-if="paused"
+        class="absolute inset-0 z-40 bg-default/60 backdrop-blur-sm flex flex-col items-center justify-center gap-6"
+      >
         <div class="p-4 rounded-md bg-warning/10 mb-2">
           <UIcon name="i-lucide-pause" class="w-16 h-16 text-warning" />
         </div>
@@ -168,24 +208,43 @@ function formatTime(ms: number): string {
             {{ formatTime(timeRemaining) }} återstår
           </p>
         </div>
-        <UButton size="lg" class=" px-8 h-12 text-lg gap-2 mt-4" @click="handlePauseResume">
+        <UButton
+          size="lg"
+          class="px-8 h-12 text-lg gap-2 mt-4"
+          @click="handlePauseResume"
+        >
           <UIcon name="i-lucide-play" class="w-5 h-5" />
           Återuppta
         </UButton>
       </div>
     </Transition>
 
-    <UModal :open="showFinishDialog" :dismissible="false" :close="false"
-      title="Avsluta Tenta?" description="Är du säker på att du vill lämna in? Du har tid kvar."
-      @update:open="showFinishDialog = $event">
+    <UModal
+      :open="showFinishDialog"
+      :dismissible="false"
+      :close="false"
+      title="Avsluta Tenta?"
+      description="Är du säker på att du vill lämna in? Du har tid kvar."
+      @update:open="showFinishDialog = $event"
+    >
       <template #footer>
-        <UButton color="neutral" variant="outline" @click="showFinishDialog = false">Avbryt</UButton>
+        <UButton
+          color="neutral"
+          variant="outline"
+          @click="showFinishDialog = false"
+          >Avbryt</UButton
+        >
         <UButton color="error" @click="confirmFinish">Avsluta</UButton>
       </template>
     </UModal>
 
-    <UModal :open="showTimeUpDialog" :dismissible="false" :close="false"
-      title="Tiden är ute!" description="Bra jobbat! Din session har avslutats.">
+    <UModal
+      :open="showTimeUpDialog"
+      :dismissible="false"
+      :close="false"
+      title="Tiden är ute!"
+      description="Bra jobbat! Din session har avslutats."
+    >
       <template #footer>
         <UButton @click="handleTimeUp">Till startsidan</UButton>
       </template>

@@ -83,31 +83,44 @@ const groups = [
         </p>
 
         <dl class="max-w-2xl">
-          <div v-for="faq in group.faqs" :key="faq.q" class="border-b py-6 last:border-b-0">
+          <div
+            v-for="faq in group.faqs"
+            :key="faq.q"
+            class="border-b py-6 last:border-b-0"
+          >
             <dt class="text-base font-medium text-highlighted">
               {{ faq.q }}
             </dt>
-            <dd class="mt-2 text-[0.9375rem] leading-[1.75] text-highlighted/70">
+            <dd
+              class="mt-2 text-[0.9375rem] leading-[1.75] text-highlighted/70"
+            >
               {{ faq.a }}
             </dd>
           </div>
         </dl>
       </section>
 
-      <section class="grid gap-x-12 gap-y-6 border-t py-14 lg:grid-cols-[13rem_minmax(0,1fr)] lg:py-20">
+      <section
+        class="grid gap-x-12 gap-y-6 border-t py-14 lg:grid-cols-[13rem_minmax(0,1fr)] lg:py-20"
+      >
         <h2 class="font-serif text-lg font-medium text-highlighted">
           Hittade du inte svaret?
         </h2>
         <div class="max-w-2xl">
           <p class="text-[0.9375rem] leading-[1.75] text-highlighted/75">
-            Skicka en rad till oss så svarar vi – eller fyll luckan direkt genom att ladda upp
-            tentor som saknas.
+            Skicka en rad till oss så svarar vi – eller fyll luckan direkt genom
+            att ladda upp tentor som saknas.
           </p>
           <div class="mt-7 flex flex-wrap items-center gap-3">
             <UButton to="/feedback" size="sm" color="neutral" variant="outline">
               Skicka feedback
             </UButton>
-            <UButton size="sm" color="neutral" variant="outline" @click="openUploadModal()">
+            <UButton
+              size="sm"
+              color="neutral"
+              variant="outline"
+              @click="openUploadModal()"
+            >
               <UIcon name="i-lucide-upload" class="size-3.5" />
               Ladda upp tenta
             </UButton>

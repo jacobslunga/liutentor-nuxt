@@ -99,10 +99,10 @@ onMounted(() => puzzle.load());
       v-else-if="failed"
       class="flex flex-col items-center gap-3 py-20 text-center"
     >
-      <p class="text-sm text-muted">
-        Kunde inte hämta dagens kurskod.
-      </p>
-      <UButton color="neutral" variant="outline" @click="puzzle.load()">Försök igen</UButton>
+      <p class="text-sm text-muted">Kunde inte hämta dagens kurskod.</p>
+      <UButton color="neutral" variant="outline" @click="puzzle.load()"
+        >Försök igen</UButton
+      >
     </div>
 
     <template v-else>

@@ -17,16 +17,25 @@ const canZoomOut = computed(() => currentZoom.value > MIN_ZOOM + EPSILON);
 
 <template>
   <div
-    class="flex flex-col overflow-hidden rounded-l-full border border-r-0 border-default bg-default/95 backdrop-blur-sm shadow-sm">
-    <button type="button" aria-label="Zooma in" :disabled="!canZoomIn"
+    class="flex flex-col overflow-hidden rounded-l-full border border-r-0 border-default bg-default/95 backdrop-blur-sm shadow-sm"
+  >
+    <button
+      type="button"
+      aria-label="Zooma in"
+      :disabled="!canZoomIn"
       class="flex size-10 items-center justify-center text-muted transition-colors active:bg-elevated disabled:opacity-35 disabled:active:bg-transparent"
-      @click="zoom?.zoomIn()">
+      @click="zoom?.zoomIn()"
+    >
       <UIcon name="i-lucide-plus" class="size-4" />
     </button>
     <div class="h-px bg-border" />
-    <button type="button" aria-label="Zooma ut" :disabled="!canZoomOut"
+    <button
+      type="button"
+      aria-label="Zooma ut"
+      :disabled="!canZoomOut"
       class="flex size-10 items-center justify-center text-muted transition-colors active:bg-elevated disabled:opacity-35 disabled:active:bg-transparent"
-      @click="zoom?.zoomOut()">
+      @click="zoom?.zoomOut()"
+    >
       <UIcon name="i-lucide-minus" class="size-4" />
     </button>
   </div>

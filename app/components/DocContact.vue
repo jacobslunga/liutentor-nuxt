@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 defineProps<{
   title: string;
   body: string;
@@ -7,7 +6,9 @@ defineProps<{
 </script>
 
 <template>
-  <div class="grid gap-x-12 gap-y-5 border-t py-14 lg:grid-cols-[13rem_minmax(0,1fr)] lg:py-20">
+  <div
+    class="grid gap-x-12 gap-y-5 border-t py-14 lg:grid-cols-[13rem_minmax(0,1fr)] lg:py-20"
+  >
     <h2 class="text-lg font-medium text-highlighted">
       {{ title }}
     </h2>

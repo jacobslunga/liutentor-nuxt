@@ -70,8 +70,13 @@ function confirmExit() {
 <template>
   <div class="w-full">
     <div class="mb-6 flex items-center justify-start gap-3">
-      <UButton color="neutral" variant="ghost" size="sm" class="shrink-0 gap-1.5 text-muted"
-        @click="requestExit">
+      <UButton
+        color="neutral"
+        variant="ghost"
+        size="sm"
+        class="shrink-0 gap-1.5 text-muted"
+        @click="requestExit"
+      >
         <UIcon name="i-lucide-arrow-left" class="h-3.5 w-3.5" />
         Avsluta
       </UButton>
@@ -83,7 +88,7 @@ function confirmExit() {
           Fråga
           <span class="font-medium text-highlighted">{{
             currentIndex + 1
-            }}</span>
+          }}</span>
           / {{ questionCount }}
         </span>
         <span class="text-xs text-muted">
@@ -91,31 +96,62 @@ function confirmExit() {
         </span>
       </div>
       <div class="h-1 w-full overflow-hidden rounded-full bg-muted">
-        <div class="h-full rounded-full bg-primary transition-[width] duration-200 ease-spring"
-          :style="{ width: `${progress}%` }" />
+        <div
+          class="h-full rounded-full bg-primary transition-[width] duration-200 ease-spring"
+          :style="{ width: `${progress}%` }"
+        />
       </div>
     </div>
 
-    <QuizQuestion v-if="currentQuestion" :key="currentQuestion.id" :question="currentQuestion"
-      :selected-answer="answers[currentQuestion.id]" @answer="onAnswer" />
+    <QuizQuestion
+      v-if="currentQuestion"
+      :key="currentQuestion.id"
+      :question="currentQuestion"
+      :selected-answer="answers[currentQuestion.id]"
+      @answer="onAnswer"
+    />
 
-    <div class="sticky bottom-0 mt-8 border-t border-default/60 bg-default/80 py-4 backdrop-blur-sm">
+    <div
+      class="sticky bottom-0 mt-8 border-t border-default/60 bg-default/80 py-4 backdrop-blur-sm"
+    >
       <div class="flex items-center justify-end gap-3">
-        <span v-if="!hasAnsweredCurrent && !isLastQuestion" class="text-2xs text-muted/60">
+        <span
+          v-if="!hasAnsweredCurrent && !isLastQuestion"
+          class="text-2xs text-muted/60"
+        >
           Svara för att fortsätta
         </span>
         <UFieldGroup>
-          <UButton color="neutral" variant="outline" size="sm" :disabled="currentIndex === 0"
-            class="gap-1.5 border-default" @click="emit('previous')">
+          <UButton
+            color="neutral"
+            variant="outline"
+            size="sm"
+            :disabled="currentIndex === 0"
+            class="gap-1.5 border-default"
+            @click="emit('previous')"
+          >
             <UIcon name="i-lucide-arrow-left" class="h-3.5 w-3.5" />
             Förra
           </UButton>
-          <UButton v-if="!isLastQuestion" color="neutral" variant="outline" size="sm" :disabled="!hasAnsweredCurrent"
-            class="gap-1.5 border-default" @click="emit('next', hasAnsweredCurrent)">
+          <UButton
+            v-if="!isLastQuestion"
+            color="neutral"
+            variant="outline"
+            size="sm"
+            :disabled="!hasAnsweredCurrent"
+            class="gap-1.5 border-default"
+            @click="emit('next', hasAnsweredCurrent)"
+          >
             Nästa
             <UIcon name="i-lucide-arrow-right" class="h-3.5 w-3.5" />
           </UButton>
-          <UButton v-else size="sm" :disabled="!canSubmit" class="gap-1.5" @click="submit">
+          <UButton
+            v-else
+            size="sm"
+            :disabled="!canSubmit"
+            class="gap-1.5"
+            @click="submit"
+          >
             <UIcon name="i-lucide-circle-check" class="h-3.5 w-3.5" />
             Rätta quiz
           </UButton>
@@ -123,9 +159,13 @@ function confirmExit() {
       </div>
     </div>
 
-    <UModal v-model:open="isExitDialogOpen" :dismissible="false" :close="false"
+    <UModal
+      v-model:open="isExitDialogOpen"
+      :dismissible="false"
+      :close="false"
       title="Avsluta quizet?"
-      :description="`Du har svarat på ${answeredCount} av ${questionCount} frågor. Dina svar försvinner.`">
+      :description="`Du har svarat på ${answeredCount} av ${questionCount} frågor. Dina svar försvinner.`"
+    >
       <template #footer="{ close }">
         <UButton color="neutral" variant="outline" @click="close()">
           Fortsätt quizet

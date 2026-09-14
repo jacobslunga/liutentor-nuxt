@@ -90,18 +90,30 @@ const menuItems = computed<DropdownMenuItem[][]>(() => [
 
 <template>
   <UDropdownMenu :items="menuItems" :content="{ align: 'end' }">
-    <button :class="[
-      'w-10 h-10 rounded-full border overflow-hidden flex items-center justify-center text-white text-sm font-medium cursor-pointer transition-opacity hover:opacity-80 relative',
-      (!avatarUrl || isImageLoading) && `bg-${avatarColor}`,
-      COLOR_BORDER_MAP[avatarColor],
-    ]">
-      <UIcon name="i-lucide-loader-circle" v-if="isPending || (avatarUrl && isImageLoading)"
-        class="w-4 h-4 animate-spin absolute z-10" />
+    <button
+      :class="[
+        'w-10 h-10 rounded-full border overflow-hidden flex items-center justify-center text-white text-sm font-medium cursor-pointer transition-opacity hover:opacity-80 relative',
+        (!avatarUrl || isImageLoading) && `bg-${avatarColor}`,
+        COLOR_BORDER_MAP[avatarColor],
+      ]"
+    >
+      <UIcon
+        name="i-lucide-loader-circle"
+        v-if="isPending || (avatarUrl && isImageLoading)"
+        class="w-4 h-4 animate-spin absolute z-10"
+      />
 
-      <img v-if="avatarUrl" :src="avatarUrl" alt="Avatar" :class="[
-        'w-full h-full object-cover transition-opacity duration-200',
-        isImageLoading ? 'opacity-0' : 'opacity-100',
-      ]" @load="isImageLoading = false" @error="isImageLoading = false" />
+      <img
+        v-if="avatarUrl"
+        :src="avatarUrl"
+        alt="Avatar"
+        :class="[
+          'w-full h-full object-cover transition-opacity duration-200',
+          isImageLoading ? 'opacity-0' : 'opacity-100',
+        ]"
+        @load="isImageLoading = false"
+        @error="isImageLoading = false"
+      />
 
       <span v-else-if="!isPending">{{ initial }}</span>
     </button>

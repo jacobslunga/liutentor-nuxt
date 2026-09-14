@@ -1,6 +1,11 @@
 <template>
   <div>
-    <AppLoadingIndicator color="var(--primary)" :height="2" :throttle="80" :hide-delay="150" />
+    <AppLoadingIndicator
+      color="var(--primary)"
+      :height="2"
+      :throttle="80"
+      :hide-delay="150"
+    />
     <UApp
       :tooltip="{ delayDuration: 200, ignoreNonKeyboardFocus: true }"
       :toaster="{ position: 'top-center', duration: 4000 }"

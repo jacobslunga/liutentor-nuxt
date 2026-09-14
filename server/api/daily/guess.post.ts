@@ -32,7 +32,9 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, message: "Too many guesses" });
   }
 
-  const guesses = body.guesses.map((value) => normalizeGuess(String(value ?? "")));
+  const guesses = body.guesses.map((value) =>
+    normalizeGuess(String(value ?? "")),
+  );
 
   const puzzle = await getDailyPuzzle();
 

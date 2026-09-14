@@ -68,7 +68,10 @@ let isPinningBottom = false;
 let pinBottomTimers: ReturnType<typeof setTimeout>[] = [];
 
 function getContentScrollEl(): HTMLElement | null {
-  return dropZoneRef.value?.querySelector<HTMLElement>('[data-slot="content"]') ?? null;
+  return (
+    dropZoneRef.value?.querySelector<HTMLElement>('[data-slot="content"]') ??
+    null
+  );
 }
 
 function scrollToBottomImmediate() {
@@ -168,7 +171,11 @@ watch(isOpen, (open) => {
 });
 
 watch(transcriptRef, (transcript) => {
-  if (transcript && chatStore.savedScrollPosition === 0 && !chatStore.isLoading) {
+  if (
+    transcript &&
+    chatStore.savedScrollPosition === 0 &&
+    !chatStore.isLoading
+  ) {
     scrollToBottomRightAway();
   } else if (transcript) {
     nextTick(() => transcript.restoreScroll());
@@ -193,54 +200,93 @@ onUnmounted(() => {
 <template>
   <Teleport to="body">
     <Transition name="mobile-chat-launcher">
-      <button v-if="!isOpen" type="button"
+      <button
+        v-if="!isOpen"
+        type="button"
         class="fixed inset-x-3 bottom-[calc(0.75rem+env(safe-area-inset-bottom,0px))] z-40 flex h-14 items-center gap-2.5 rounded-2xl border border-default bg-default px-3 shadow-lg"
-        aria-label="Öppna chatten" @click="openChat">
+        aria-label="Öppna chatten"
+        @click="openChat"
+      >
         <ChatMascot class="size-7 shrink-0" />
         <span
-          class="flex h-10 min-w-0 flex-1 items-center rounded-lg bg-elevated/40 px-4 text-left text-base text-muted/80">
+          class="flex h-10 min-w-0 flex-1 items-center rounded-lg bg-elevated/40 px-4 text-left text-base text-muted/80"
+        >
           Fråga vad som helst
         </span>
       </button>
     </Transition>
 
     <Transition name="mobile-chat-dialog">
-      <div v-if="isOpen" ref="dropZoneRef"
-        class="fixed inset-0 z-40 flex h-dvh w-screen flex-col overflow-hidden bg-default" role="dialog"
-        aria-modal="true" aria-label="Chatt">
+      <div
+        v-if="isOpen"
+        ref="dropZoneRef"
+        class="fixed inset-0 z-40 flex h-dvh w-screen flex-col overflow-hidden bg-default"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Chatt"
+      >
         <Transition name="drop-overlay">
           <ChatDropOverlay v-if="isOverDropZone && !isLoading" />
         </Transition>
 
-        <header class="shrink-0 border-b border-default bg-default pt-[env(safe-area-inset-top,0px)]">
+        <header
+          class="shrink-0 border-b border-default bg-default pt-[env(safe-area-inset-top,0px)]"
+        >
           <div class="flex h-14 items-center gap-1 px-2">
-            <UButton color="neutral" variant="ghost" icon="i-lucide-x" class="shrink-0" aria-label="Stäng chatten"
-              @click="closeChat" />
+            <UButton
+              color="neutral"
+              variant="ghost"
+              icon="i-lucide-x"
+              class="shrink-0"
+              aria-label="Stäng chatten"
+              @click="closeChat"
+            />
 
-            <p class="min-w-0 flex-1 truncate text-sm font-semibold text-highlighted">
+            <p
+              class="min-w-0 flex-1 truncate text-sm font-semibold text-highlighted"
+            >
               {{ chatHeaderTitle }}
             </p>
 
-            <UButton color="neutral" variant="ghost" icon="i-lucide-plus" aria-label="Ny chatt"
-              @click="startNewChat" />
-            <UButton color="neutral" variant="ghost" icon="i-lucide-history" aria-label="Historik"
-              @click="toggleHistory" />
+            <UButton
+              color="neutral"
+              variant="ghost"
+              icon="i-lucide-plus"
+              aria-label="Ny chatt"
+              @click="startNewChat"
+            />
+            <UButton
+              color="neutral"
+              variant="ghost"
+              icon="i-lucide-history"
+              aria-label="Historik"
+              @click="toggleHistory"
+            />
           </div>
         </header>
 
         <UChatPalette
           :ui="{
             root: 'relative flex-1 min-h-0 min-w-0 overflow-hidden',
-            content: 'h-full overflow-y-auto overflow-x-hidden overscroll-y-contain py-0',
+            content:
+              'h-full overflow-y-auto overflow-x-hidden overscroll-y-contain py-0',
             prompt: 'border-t-0 p-0',
           }"
           @scroll.capture.passive="handleContentScroll"
         >
-          <LazyChatMessages ref="transcriptRef" :messages="messages" :is-loading="isLoading" content-class="pt-4 pb-36"
-            :enable-selection-popover="false" @reply-to-selection="handleReplyToSelection" />
+          <LazyChatMessages
+            ref="transcriptRef"
+            :messages="messages"
+            :is-loading="isLoading"
+            content-class="pt-4 pb-36"
+            :enable-selection-popover="false"
+            @reply-to-selection="handleReplyToSelection"
+          />
 
           <template #prompt>
-            <div class="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex flex-col items-center bg-gradient-to-t from-default via-default/85 to-transparent pt-8 pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)]">
+            <div
+              class="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex flex-col items-center bg-gradient-to-t from-default via-default/85 to-transparent pt-8 pb-[calc(env(safe-area-inset-bottom,0px)+0.75rem)]"
+            >
               <Transition name="fade-up">
                 <UButton
                   v-if="showScrollBottom"
@@ -251,19 +297,35 @@ onUnmounted(() => {
                 />
               </Transition>
 
-              <ChatInput ref="chatInputRef" class="pointer-events-auto mx-auto w-full max-w-2xl" :initial-text="chatStore.draftInput"
-                :initial-attachments="chatStore.draftAttachments" :is-loading="isLoading"
-                :selected-model-id="selectedModelId" :web-search="webSearch" :course-code="courseCode"
-                :has-solution="hasSolution" :selection-context="selectionContext" show-disclaimer :autofocus="false"
-                @send="handleSend" @cancel="handleCancel" @clear-selection-context="selectionContext = ''"
-                @update:selected-model-id="selectedModelId = $event" @update:web-search="webSearch = $event" />
+              <ChatInput
+                ref="chatInputRef"
+                class="pointer-events-auto mx-auto w-full max-w-2xl"
+                :initial-text="chatStore.draftInput"
+                :initial-attachments="chatStore.draftAttachments"
+                :is-loading="isLoading"
+                :selected-model-id="selectedModelId"
+                :web-search="webSearch"
+                :course-code="courseCode"
+                :has-solution="hasSolution"
+                :selection-context="selectionContext"
+                show-disclaimer
+                :autofocus="false"
+                @send="handleSend"
+                @cancel="handleCancel"
+                @clear-selection-context="selectionContext = ''"
+                @update:selected-model-id="selectedModelId = $event"
+                @update:web-search="webSearch = $event"
+              />
             </div>
           </template>
         </UChatPalette>
       </div>
     </Transition>
 
-    <ChatHistoryDialog v-model:open="isHistoryOpen" @select="scrollToBottomRightAway" />
+    <ChatHistoryDialog
+      v-model:open="isHistoryOpen"
+      @select="scrollToBottomRightAway"
+    />
   </Teleport>
 </template>
 
@@ -284,7 +346,9 @@ onUnmounted(() => {
 
 .fade-up-enter-active,
 .fade-up-leave-active {
-  transition: opacity 150ms ease, transform 150ms ease;
+  transition:
+    opacity 150ms ease,
+    transform 150ms ease;
 }
 
 .fade-up-enter-from,

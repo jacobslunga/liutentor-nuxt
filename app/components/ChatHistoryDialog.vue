@@ -51,8 +51,7 @@ const pendingDeleteConversation = ref<ConversationItem | null>(null);
 const userId = computed(
   () =>
     ((user.value as any)?.id ?? (user.value as any)?.sub ?? null) as
-    | string
-    | null,
+      string | null,
 );
 
 const requiresLoginMessage = computed(
@@ -399,19 +398,40 @@ function focusSearch() {
 </script>
 
 <template>
-  <UModal :open="open" title="Chatthistorik" description="Sök och öppna tidigare chattar"
-    :ui="{ content: 'h-[36rem]', body: 'flex flex-col min-h-0 overflow-hidden' }"
-    @update:open="emit('update:open', $event)" @after:enter="focusSearch">
+  <UModal
+    :open="open"
+    title="Chatthistorik"
+    description="Sök och öppna tidigare chattar"
+    :ui="{
+      content: 'h-[36rem]',
+      body: 'flex flex-col min-h-0 overflow-hidden',
+    }"
+    @update:open="emit('update:open', $event)"
+    @after:enter="focusSearch"
+  >
     <template #body>
       <div class="flex shrink-0 items-center gap-2">
-        <UInput ref="searchInputRef" v-model="searchQuery" icon="i-lucide-search" placeholder="Sök bland chattar..."
-          class="flex-1" />
-        <UButton v-if="conversations.length > 0" color="error" variant="ghost" icon="i-lucide-trash-2"
-          :disabled="isDeletingAll || isDeletingConversation" aria-label="Radera alla chattar"
-          @click="showDeleteAllConfirm = true" />
+        <UInput
+          ref="searchInputRef"
+          v-model="searchQuery"
+          icon="i-lucide-search"
+          placeholder="Sök bland chattar..."
+          class="flex-1"
+        />
+        <UButton
+          v-if="conversations.length > 0"
+          color="error"
+          variant="ghost"
+          icon="i-lucide-trash-2"
+          :disabled="isDeletingAll || isDeletingConversation"
+          aria-label="Radera alla chattar"
+          @click="showDeleteAllConfirm = true"
+        />
       </div>
 
-      <div class="mt-3 min-h-0 flex-1 overflow-y-auto overscroll-contain -mx-2 px-2">
+      <div
+        class="mt-3 min-h-0 flex-1 overflow-y-auto overscroll-contain -mx-2 px-2"
+      >
         <div v-if="isLoading" class="px-2 py-4 text-sm text-muted">
           Hämtar historik...
         </div>
@@ -420,11 +440,17 @@ function focusSearch() {
           {{ loadError }}
         </div>
 
-        <div v-else-if="requiresLoginMessage" class="px-2 py-4 text-sm text-muted">
+        <div
+          v-else-if="requiresLoginMessage"
+          class="px-2 py-4 text-sm text-muted"
+        >
           Logga in för att se din chatthistorik.
         </div>
 
-        <div v-else-if="groupedConversations.length === 0" class="px-2 py-4 text-sm text-muted">
+        <div
+          v-else-if="groupedConversations.length === 0"
+          class="px-2 py-4 text-sm text-muted"
+        >
           {{
             searchQuery.trim()
               ? `Inga chattar matchar "${searchQuery.trim()}".`
@@ -439,28 +465,53 @@ function focusSearch() {
             </h3>
 
             <div class="space-y-0.5">
-              <div v-for="item in group.items" :key="item.id"
-                class="group flex items-center gap-1 rounded-md px-1 transition-colors" :class="item.id === chatStore.currentConversationId
-                  ? 'bg-elevated'
-                  : 'bg-transparent hover:bg-accented'
-                  ">
-                <button type="button" class="min-w-0 flex-1 cursor-pointer text-left px-2 py-1.5"
-                  :disabled="isOpeningConversation || isDeletingConversation" @click="openConversation(item)">
-                  <p class="text-sm truncate text-highlighted/90" :class="item.id === chatStore.currentConversationId
-                    ? 'font-medium'
-                    : 'font-normal'
-                    ">
+              <div
+                v-for="item in group.items"
+                :key="item.id"
+                class="group flex items-center gap-1 rounded-md px-1 transition-colors"
+                :class="
+                  item.id === chatStore.currentConversationId
+                    ? 'bg-elevated'
+                    : 'bg-transparent hover:bg-accented'
+                "
+              >
+                <button
+                  type="button"
+                  class="min-w-0 flex-1 cursor-pointer text-left px-2 py-1.5"
+                  :disabled="isOpeningConversation || isDeletingConversation"
+                  @click="openConversation(item)"
+                >
+                  <p
+                    class="text-sm truncate text-highlighted/90"
+                    :class="
+                      item.id === chatStore.currentConversationId
+                        ? 'font-medium'
+                        : 'font-normal'
+                    "
+                  >
                     {{ item.title || "Ny chatt" }}
                   </p>
-                  <p v-if="metaLabel(item.id)" class="text-xs truncate text-muted/70">
+                  <p
+                    v-if="metaLabel(item.id)"
+                    class="text-xs truncate text-muted/70"
+                  >
                     {{ metaLabel(item.id) }}
                   </p>
                 </button>
 
-                <UButton color="neutral" variant="ghost" square
+                <UButton
+                  color="neutral"
+                  variant="ghost"
+                  square
                   class="size-7 shrink-0 sm:opacity-0 sm:pointer-events-none sm:group-hover:opacity-100 sm:group-hover:pointer-events-auto transition-opacity hover:bg-transparent"
-                  :disabled="isDeletingConversation" aria-label="Radera chatt" @click="askDeleteConversation(item)">
-                  <UIcon name="i-lucide-trash-2" class="w-3.5 h-3.5 text-muted/60 hover:text-error" />
+                  :disabled="isDeletingConversation"
+                  aria-label="Radera chatt"
+                  @click="askDeleteConversation(item)"
+                >
+                  <UIcon
+                    name="i-lucide-trash-2"
+                    class="w-3.5 h-3.5 text-muted/60 hover:text-error"
+                  />
                 </UButton>
               </div>
             </div>
@@ -470,23 +521,52 @@ function focusSearch() {
     </template>
   </UModal>
 
-  <UModal v-model:open="showDeleteConfirm" :dismissible="false" :close="false" title="Är du säker?"
-    description="Den här chatten kommer att raderas permanent och kan inte ångras.">
+  <UModal
+    v-model:open="showDeleteConfirm"
+    :dismissible="false"
+    :close="false"
+    title="Är du säker?"
+    description="Den här chatten kommer att raderas permanent och kan inte ångras."
+  >
     <template #footer="{ close }">
-      <UButton color="neutral" variant="outline" :disabled="isDeletingConversation" @click="close()">
+      <UButton
+        color="neutral"
+        variant="outline"
+        :disabled="isDeletingConversation"
+        @click="close()"
+      >
         Avbryt
       </UButton>
-      <UButton color="error" :disabled="isDeletingConversation" @click="confirmDeleteConversation">
+      <UButton
+        color="error"
+        :disabled="isDeletingConversation"
+        @click="confirmDeleteConversation"
+      >
         {{ isDeletingConversation ? "Raderar..." : "Radera" }}
       </UButton>
     </template>
   </UModal>
 
-  <UModal v-model:open="showDeleteAllConfirm" :dismissible="false" :close="false" title="Radera all historik?"
-    :description="`Alla ${conversations.length} chattar kommer att raderas permanent. Det går inte att ångra.`">
+  <UModal
+    v-model:open="showDeleteAllConfirm"
+    :dismissible="false"
+    :close="false"
+    title="Radera all historik?"
+    :description="`Alla ${conversations.length} chattar kommer att raderas permanent. Det går inte att ångra.`"
+  >
     <template #footer="{ close }">
-      <UButton color="neutral" variant="outline" :disabled="isDeletingAll" @click="close()">Avbryt</UButton>
-      <UButton color="error" :disabled="isDeletingAll" @click="confirmDeleteAllConversations">
+      <UButton
+        color="neutral"
+        variant="outline"
+        :disabled="isDeletingAll"
+        @click="close()"
+        >Avbryt</UButton
+      >
+      <UButton
+        color="error"
+        :disabled="isDeletingAll"
+        @click="confirmDeleteAllConversations"
+      >
         {{ isDeletingAll ? "Raderar..." : `Radera alla` }}
       </UButton>
     </template>

@@ -25,10 +25,20 @@ const canClick = computed(() => props.canStart && !props.isLoading);
       Inga tentor hittades med PDF.
     </p>
 
-    <QuizDifficultyPicker v-else class="mt-6" :model-value="difficulty" :disabled="isLoading"
-      @update:model-value="emit('update:difficulty', $event)" />
+    <QuizDifficultyPicker
+      v-else
+      class="mt-6"
+      :model-value="difficulty"
+      :disabled="isLoading"
+      @update:model-value="emit('update:difficulty', $event)"
+    />
 
-    <UButton class="mt-6 gap-1.5" size="xl" :disabled="!canClick" @click="emit('start')">
+    <UButton
+      class="mt-6 gap-1.5"
+      size="xl"
+      :disabled="!canClick"
+      @click="emit('start')"
+    >
       Generera quiz
     </UButton>
   </div>
