@@ -146,6 +146,7 @@ onUnmounted(() => {
   >
     <template #trailing>
       <UButton
+        as="span"
         class="shrink-0"
         color="neutral"
         variant="outline"
