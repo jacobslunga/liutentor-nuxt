@@ -82,7 +82,7 @@ defineShortcuts({
     icon="i-lucide-search"
     placeholder="Sök kurskod..."
     ignore-filter
-    :trailing-icon="undefined"
+    trailing-icon=""
     :ui="{ base: 'uppercase placeholder:normal-case' }"
     @update:model-value="onSelect"
     @keydown.enter="onEnter"

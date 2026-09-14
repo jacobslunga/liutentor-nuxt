@@ -130,7 +130,7 @@ onUnmounted(() => {
     :placeholder="`Sök efter ${typed}`"
     icon="i-lucide-search"
     variant="none"
-    :trailing-icon="undefined"
+    trailing-icon=""
     ignore-filter
     :ui="{
       root: 'w-full',
