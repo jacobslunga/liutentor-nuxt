@@ -291,7 +291,7 @@ onUnmounted(() => {
                 <UButton
                   v-if="showScrollBottom"
                   icon="i-lucide-arrow-down"
-                  class="pointer-events-auto mb-2 shadow-md"
+                  class="pointer-events-auto mb-2 size-10 p-0 shadow-md"
                   aria-label="Rulla till senaste"
                   @click="scrollToBottom"
                 />
@@ -346,14 +346,11 @@ onUnmounted(() => {
 
 .fade-up-enter-active,
 .fade-up-leave-active {
-  transition:
-    opacity 150ms ease,
-    transform 150ms ease;
+  transition: opacity 150ms ease;
 }
 
 .fade-up-enter-from,
 .fade-up-leave-to {
   opacity: 0;
-  transform: translateY(6px);
 }
 </style>

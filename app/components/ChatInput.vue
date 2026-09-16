@@ -434,83 +434,105 @@ defineExpose({
         </div>
       </Transition>
 
-      <div
-        v-if="selectionContext || pendingAttachments.length || activeSkill"
-        class="flex min-w-0 flex-col gap-2 border-b border-default px-3 py-2.5"
-      >
-        <div v-if="selectionContext" class="flex w-full items-center gap-2">
-          <UIcon name="i-lucide-reply" class="size-3.5 shrink-0 text-muted" />
-          <span class="min-w-0 flex-1 truncate text-sm italic text-muted"
-            >"{{ selectionContext }}"</span
-          >
-          <UButton
-            color="neutral"
-            variant="ghost"
-            size="xs"
-            icon="i-lucide-x"
-            aria-label="Ta bort citatet"
-            @click.prevent="emit('clearSelectionContext')"
-          />
-        </div>
-
-        <div v-if="activeSkill" class="flex">
-          <UBadge
-            :label="activeSkill.label"
-            color="primary"
-            variant="solid"
-            size="sm"
-            trailing-icon="i-lucide-x"
-            class="cursor-pointer"
-            :aria-label="`Ta bort ${activeSkill.label}`"
-            @mousedown.prevent="clearSkill()"
-          />
-        </div>
-
-        <TransitionGroup
-          v-if="pendingAttachments.length"
-          name="attachment-chip"
-          tag="div"
-          appear
-          class="flex flex-wrap gap-2"
+      <Transition name="input-panel">
+        <div
+          v-if="selectionContext || pendingAttachments.length || activeSkill"
+          class="input-panel grid"
         >
-          <div
-            v-for="attachment in pendingAttachments"
-            :key="attachment.id"
-            class="flex min-w-0 max-w-full items-center gap-2 rounded-xl bg-elevated px-2.5 py-1.5 text-xs"
-          >
-            <UIcon
-              v-if="attachment.mediaType === 'application/pdf'"
-              name="i-lucide-file-text"
-              class="size-3.5 shrink-0 text-muted"
-            />
-            <img
-              v-else-if="attachment.previewUrl"
-              :src="attachment.previewUrl"
-              alt=""
-              class="size-10 shrink-0 rounded-lg object-cover"
-            />
-            <UIcon
-              v-else
-              name="i-lucide-image"
-              class="size-3.5 shrink-0 text-muted"
-            />
-            <span class="max-w-20 truncate" :title="attachment.name">{{
-              attachment.name
-            }}</span>
-            <span class="shrink-0 text-muted">{{
-              formatFileSize(attachment.size)
-            }}</span>
-            <UButton
-              color="neutral"
-              variant="link"
-              size="xs"
-              icon="i-lucide-x"
-              :aria-label="`Ta bort ${attachment.name}`"
-              @click="removePendingAttachment(attachment.id)"
-            />
+          <div class="min-h-0 overflow-hidden">
+            <TransitionGroup
+              name="input-change"
+              tag="div"
+              class="relative flex min-w-0 flex-col gap-2 border-b border-default px-3 py-2.5"
+            >
+              <div
+                v-if="selectionContext"
+                :key="`context-${selectionContext}`"
+                class="flex w-full items-center gap-2"
+              >
+                <UIcon
+                  name="i-lucide-reply"
+                  class="size-3.5 shrink-0 text-muted"
+                />
+                <span class="min-w-0 flex-1 truncate text-sm italic text-muted"
+                  >"{{ selectionContext }}"</span
+                >
+                <UButton
+                  color="neutral"
+                  variant="ghost"
+                  size="xs"
+                  icon="i-lucide-x"
+                  aria-label="Ta bort citatet"
+                  @click.prevent="emit('clearSelectionContext')"
+                />
+              </div>
+
+              <div
+                v-if="activeSkill"
+                :key="`skill-${activeSkill.id}`"
+                class="flex"
+              >
+                <UBadge
+                  :label="activeSkill.label"
+                  color="primary"
+                  variant="solid"
+                  size="sm"
+                  trailing-icon="i-lucide-x"
+                  class="cursor-pointer"
+                  :aria-label="`Ta bort ${activeSkill.label}`"
+                  @mousedown.prevent="clearSkill()"
+                />
+              </div>
+
+              <TransitionGroup
+                v-if="pendingAttachments.length"
+                key="attachments"
+                name="attachment-chip"
+                tag="div"
+                appear
+                class="flex flex-wrap gap-2"
+              >
+                <div
+                  v-for="attachment in pendingAttachments"
+                  :key="attachment.id"
+                  class="flex min-w-0 max-w-full items-center gap-2 rounded-xl bg-elevated px-2.5 py-1.5 text-xs"
+                >
+                  <UIcon
+                    v-if="attachment.mediaType === 'application/pdf'"
+                    name="i-lucide-file-text"
+                    class="size-3.5 shrink-0 text-muted"
+                  />
+                  <img
+                    v-else-if="attachment.previewUrl"
+                    :src="attachment.previewUrl"
+                    alt=""
+                    class="size-10 shrink-0 rounded-lg object-cover"
+                  />
+                  <UIcon
+                    v-else
+                    name="i-lucide-image"
+                    class="size-3.5 shrink-0 text-muted"
+                  />
+                  <span class="max-w-20 truncate" :title="attachment.name">{{
+                    attachment.name
+                  }}</span>
+                  <span class="shrink-0 text-muted">{{
+                    formatFileSize(attachment.size)
+                  }}</span>
+                  <UButton
+                    color="neutral"
+                    variant="link"
+                    size="xs"
+                    icon="i-lucide-x"
+                    :aria-label="`Ta bort ${attachment.name}`"
+                    @click="removePendingAttachment(attachment.id)"
+                  />
+                </div>
+              </TransitionGroup>
+            </TransitionGroup>
           </div>
-        </TransitionGroup>
-      </div>
+        </div>
+      </Transition>
 
       <textarea
         ref="textareaRef"
@@ -593,17 +615,25 @@ defineExpose({
             color="neutral"
             variant="soft"
             icon="i-lucide-square"
+            class="size-10 p-0"
             aria-label="Avbryt svar"
             @click="emit('cancel')"
           />
           <UButton
             v-else
             color="primary"
-            icon="i-lucide-arrow-up"
+            square
+            class="size-8 items-center justify-center gap-0 p-0"
             aria-label="Skicka meddelande"
             :disabled="!canSend"
             @click="emit('send')"
-          />
+          >
+            <UIcon
+              name="i-lucide-arrow-up"
+              mode="svg"
+              class="block size-5 shrink-0"
+            />
+          </UButton>
         </div>
       </div>
     </div>
@@ -661,13 +691,15 @@ defineExpose({
 .fade-up-leave-active {
   transition:
     opacity var(--duration-base) var(--ease-spring),
-    transform var(--duration-base) var(--ease-spring);
+    transform var(--duration-base) var(--ease-spring),
+    filter var(--duration-base) var(--ease-spring);
 }
 
 .fade-up-enter-from,
 .fade-up-leave-to {
   opacity: 0;
   transform: translateY(4px);
+  filter: blur(4px);
 }
 
 .scale-enter-active,
@@ -705,14 +737,16 @@ defineExpose({
 .attachment-chip-leave-active,
 .attachment-chip-move {
   transition:
-    opacity 140ms ease,
-    transform 180ms var(--ease-spring);
+    opacity 200ms ease,
+    filter 200ms ease,
+    transform 220ms var(--ease-spring);
 }
 
 .attachment-chip-enter-from,
 .attachment-chip-leave-to {
   opacity: 0;
-  transform: translateY(5px) scale(0.96);
+  transform: translateY(5px) scale(0.98);
+  filter: blur(4px);
 }
 
 .attachment-chip-leave-active {
@@ -723,6 +757,56 @@ defineExpose({
   .attachment-chip-enter-active,
   .attachment-chip-leave-active,
   .attachment-chip-move {
+    transition: none;
+  }
+}
+.input-panel {
+  grid-template-rows: 1fr;
+}
+
+.input-panel-enter-active,
+.input-panel-leave-active {
+  transition:
+    grid-template-rows 240ms var(--ease-spring),
+    opacity 200ms ease,
+    filter 200ms ease;
+}
+
+.input-panel-enter-from,
+.input-panel-leave-to {
+  grid-template-rows: 0fr;
+  opacity: 0;
+  filter: blur(4px);
+}
+
+.input-change-enter-active,
+.input-change-leave-active,
+.input-change-move {
+  transition:
+    opacity 200ms ease,
+    filter 200ms ease,
+    transform 240ms var(--ease-spring);
+}
+
+.input-change-enter-from,
+.input-change-leave-to {
+  opacity: 0;
+  filter: blur(4px);
+  transform: translateY(4px);
+}
+
+.input-change-leave-active {
+  position: absolute;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .input-panel-enter-active,
+  .input-panel-leave-active,
+  .input-change-enter-active,
+  .input-change-leave-active,
+  .input-change-move,
+  .fade-up-enter-active,
+  .fade-up-leave-active {
     transition: none;
   }
 }

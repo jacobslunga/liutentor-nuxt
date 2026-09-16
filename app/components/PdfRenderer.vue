@@ -42,8 +42,6 @@ const { engine, isLoading } = usePdfiumEngine();
 const { trackWhile } = usePageLoading();
 trackWhile(() => isLoading.value || !engine.value);
 
-const selectionColor = "color-mix(in oklch, var(--primary) 35%, transparent)";
-
 const darkPageStyle = {
   filter: "invert(1) hue-rotate(180deg) brightness(0.92)",
   mixBlendMode: "screen",
@@ -303,7 +301,6 @@ const plugins = computed(() => {
                               <SelectionLayer
                                 :document-id="activeDocumentId"
                                 :page-index="page.pageIndex"
-                                :text-style="{ background: selectionColor }"
                               >
                                 <template
                                   v-if="props.explainEnabled"
@@ -374,7 +371,6 @@ const plugins = computed(() => {
                                   <SelectionLayer
                                     :document-id="activeDocumentId"
                                     :page-index="page.pageIndex"
-                                    :text-style="{ background: selectionColor }"
                                   >
                                     <template
                                       v-if="props.explainEnabled"
@@ -430,6 +426,7 @@ const plugins = computed(() => {
    translucent highlight keeps that canvas text crisp in either color mode. */
 :deep(.pdf-selection-surface > div[style*="mix-blend-mode"]) {
   mix-blend-mode: normal !important;
+  opacity: 0.35;
 }
 
 /* EmbedPDF defaults pointer surfaces to touch-action: none. Keep vertical page

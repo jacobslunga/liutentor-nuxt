@@ -338,107 +338,57 @@ function confirmLockIn() {
 </script>
 
 <template>
-  <div
-    class="pointer-events-none relative isolate hidden h-12 w-full items-center justify-between px-3 lg:flex"
-  >
+  <div class="pointer-events-none relative isolate hidden h-12 w-full items-center justify-between px-3 lg:flex">
     <UFieldGroup class="pointer-events-auto overflow-hidden rounded-md">
-      <UButton
-        color="neutral"
-        variant="soft"
-        size="lg"
-        aria-label="Tillbaka till kursen"
-        @click="router.push(`/search/${courseCode}`)"
-      >
+      <UButton color="neutral" variant="outline" size="lg" aria-label="Tillbaka till kursen"
+        @click="router.push(`/search/${courseCode}`)">
         <UIcon name="i-lucide-arrow-left" />
       </UButton>
 
-      <UPopover
-        v-if="selectedExam"
-        v-model:open="isDropdownOpen"
-        :content="{ align: 'start', sideOffset: 8 }"
-        :ui="{ content: 'overflow-hidden' }"
-      >
-        <UButton color="neutral" variant="soft" size="lg" class="gap-1.5">
+      <UPopover v-if="selectedExam" v-model:open="isDropdownOpen" :content="{ align: 'start', sideOffset: 8 }"
+        :ui="{ content: 'overflow-hidden' }">
+        <UButton color="neutral" variant="outline" size="lg" class="gap-1.5">
           <div class="flex flex-row items-baseline gap-1.5 leading-none">
             <span class="font-bold">{{ selectedExam.exam_date }}</span>
           </div>
-          <UIcon
-            name="i-lucide-chevron-down"
-            class="size-4 text-muted transition-transform duration-200"
-            :class="{ 'rotate-180': isDropdownOpen }"
-          />
+          <UIcon name="i-lucide-chevron-down" class="size-4 text-muted transition-transform duration-200"
+            :class="{ 'rotate-180': isDropdownOpen }" />
         </UButton>
 
         <template #content>
-          <div
-            class="px-3 py-2 flex items-center justify-between gap-3 border-b"
-          >
-            <span class="text-xs font-semibold text-highlighted"
-              >Alla tentor</span
-            >
+          <div class="px-3 py-2 flex items-center justify-between gap-3 border-b">
+            <span class="text-xs font-semibold text-highlighted">Alla tentor</span>
             <div class="flex items-center gap-1.5">
               <UDropdownMenu v-model:open="isSortMenuOpen" :items="sortItems">
-                <UButton
-                  color="neutral"
-                  variant="outline"
-                  size="xs"
-                  :icon="
-                    sortDirection === 'desc'
-                      ? 'i-lucide-arrow-down'
-                      : 'i-lucide-arrow-up'
-                  "
-                  :label="sortLabel"
-                  aria-label="Sortera tentor"
-                />
+                <UButton color="neutral" variant="outline" size="xs" :icon="sortDirection === 'desc'
+                  ? 'i-lucide-arrow-down'
+                  : 'i-lucide-arrow-up'
+                  " :label="sortLabel" aria-label="Sortera tentor" />
               </UDropdownMenu>
-              <span
-                class="text-xs font-mono px-2 py-0.5 rounded-sm bg-muted text-muted font-medium"
-              >
+              <span class="text-xs font-mono px-2 py-0.5 rounded-sm bg-muted text-muted font-medium">
                 {{ sortedExams.length }} st
               </span>
             </div>
           </div>
-          <div
-            ref="scrollRef"
-            class="max-h-80 overflow-y-auto p-1.5 space-y-0.5 custom-scrollbar"
-          >
-            <button
-              v-for="e in sortedExams"
-              :key="e.id"
-              :data-current="e.id.toString() === examId"
+          <div ref="scrollRef" class="max-h-80 overflow-y-auto p-1.5 space-y-0.5 custom-scrollbar">
+            <button v-for="e in sortedExams" :key="e.id" :data-current="e.id.toString() === examId"
               class="grid w-full grid-cols-[3.25rem_6.75rem_3.75rem_3.5rem_1rem] items-center gap-x-2 rounded-sm px-3 py-2 text-left transition-colors duration-150 cursor-pointer group"
-              :class="
-                e.id.toString() === examId
-                  ? 'bg-accented font-semibold text-highlighted'
-                  : 'hover:bg-inverted/5 text-highlighted/90 hover:text-highlighted'
-              "
-              @click="changeExam(e)"
-            >
+              :class="e.id.toString() === examId
+                ? 'bg-accented font-semibold text-highlighted'
+                : 'hover:bg-inverted/5 text-highlighted/90 hover:text-highlighted'
+                " @click="changeExam(e)">
               <span class="truncate text-sm font-normal text-highlighted">
                 {{ getExamPrefix(e) }}
               </span>
               <span class="text-sm font-semibold tabular-nums">
                 {{ e.exam_date }}
               </span>
-              <UBadge
-                v-if="e.has_solution"
-                color="success"
-                variant="subtle"
-                size="sm"
-                label="Facit"
-                class="col-start-3 justify-self-start"
-              />
-              <span
-                class="col-start-4 justify-self-end font-mono text-xs tabular-nums"
-                :class="passColor(e)"
-              >
+              <UBadge v-if="e.has_solution" color="success" variant="subtle" size="sm" label="Facit"
+                class="col-start-3 justify-self-start" />
+              <span class="col-start-4 justify-self-end font-mono text-xs tabular-nums" :class="passColor(e)">
                 {{ formatPassRate(e) }}
               </span>
-              <UIcon
-                name="i-lucide-check"
-                v-if="e.id.toString() === examId"
-                class="col-start-5 size-4 text-primary"
-              />
+              <UIcon name="i-lucide-check" v-if="e.id.toString() === examId" class="col-start-5 size-4 text-primary" />
               <span v-else class="col-start-5 size-4" aria-hidden="true" />
             </button>
           </div>
@@ -448,49 +398,22 @@ function confirmLockIn() {
 
     <div class="pointer-events-auto flex items-center gap-2">
       <UButton @click="chatStore.toggle()">
-        <UIcon
-          name="i-lucide-loader-circle"
-          v-if="chatStore.isLoading"
-          class="animate-spin"
-        />
+        <UIcon name="i-lucide-loader-circle" v-if="chatStore.isLoading" class="animate-spin" />
         <UIcon name="i-lucide-message-circle" v-else />
         <span>{{ chatStore.isOpen ? "Stäng" : "Chatt" }}</span>
       </UButton>
 
-      <div
-        class="flex items-center gap-1.5 transition-opacity duration-200 hover:opacity-100 focus-within:opacity-100"
-      >
-        <UTabs
-          color="neutral"
-          :model-value="layoutMode"
-          :items="layoutTabs"
-          :content="false"
-          size="lg"
-          class="w-auto"
-          @update:model-value="switchLayout"
-        >
+      <div class="flex items-center gap-1.5 transition-opacity duration-200 hover:opacity-100 focus-within:opacity-100">
+        <UTabs color="neutral" :model-value="layoutMode" :items="layoutTabs" :content="false" size="lg" class="w-auto"
+          :ui="{ list: '!rounded-xl', indicator: '!rounded-xl', trigger: '!rounded-xl' }"
+          @update:model-value="switchLayout">
           <template #leading="{ item }">
-            <UIcon
-              :name="item.icon"
-              :aria-label="item.ariaLabel"
-              :title="item.ariaLabel"
-              class="size-4 shrink-0"
-            />
+            <UIcon :name="item.icon" :aria-label="item.ariaLabel" :title="item.ariaLabel" class="size-4 shrink-0" />
           </template>
         </UTabs>
 
-        <UDropdownMenu
-          v-model:open="isActionsOpen"
-          :items="actionItems"
-          :content="{ align: 'end', sideOffset: 8 }"
-        >
-          <UButton
-            color="neutral"
-            variant="ghost"
-            size="sm"
-            icon="i-lucide-ellipsis"
-            aria-label="Fler åtgärder"
-          />
+        <UDropdownMenu v-model:open="isActionsOpen" :items="actionItems" :content="{ align: 'end', sideOffset: 8 }">
+          <UButton color="neutral" variant="ghost" size="sm" icon="i-lucide-ellipsis" aria-label="Fler åtgärder" />
         </UDropdownMenu>
       </div>
     </div>
@@ -498,20 +421,11 @@ function confirmLockIn() {
 
   <SettingsDialog v-model:open="isSettingsOpen" hide-trigger />
 
-  <UModal
-    :open="showLockInConfirm"
-    :dismissible="false"
-    :close="false"
-    title="Är du säker på att du vill locka in?"
+  <UModal :open="showLockInConfirm" :dismissible="false" :close="false" title="Är du säker på att du vill locka in?"
     :description="`Du startar en session på ${selectedDurationLabel}. Du kommer inte kunna se lösningar under denna tid.`"
-    @update:open="showLockInConfirm = $event"
-  >
+    @update:open="showLockInConfirm = $event">
     <template #footer>
-      <UButton
-        color="neutral"
-        variant="outline"
-        @click="showLockInConfirm = false"
-      >
+      <UButton color="neutral" variant="outline" @click="showLockInConfirm = false">
         Avbryt
       </UButton>
       <UButton color="error" @click="confirmLockIn">Starta timer</UButton>

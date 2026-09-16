@@ -11,25 +11,17 @@ const emit = defineEmits<{
 <template>
   <div
     class="absolute top-0 bottom-0 left-0 z-20 flex w-5 -translate-x-1/2 cursor-col-resize touch-none select-none items-center justify-center outline-none group"
-    @mousedown.prevent="emit('startResize')"
-  >
+    @mousedown.prevent="emit('startResize')">
+    <div class="absolute inset-y-0 w-px group-hover:w-0.5 transition-colors duration-200"
+      :class="isResizing ? 'bg-primary' : 'bg-border group-hover:bg-primary/50'" />
     <div
-      class="absolute inset-y-0 w-px group-hover:w-0.5 transition-colors duration-200"
-      :class="isResizing ? 'bg-primary' : 'bg-border group-hover:bg-primary/50'"
-    />
-    <div
-      class="relative flex shadow-md h-8 w-4 items-center justify-center rounded-[6px] border transition-colors duration-200 ease-spring bg-default dark:bg-elevated"
-      :class="
-        isResizing
+      class="relative flex shadow-md h-8 w-4 items-center justify-center rounded-sm border transition-colors duration-200 ease-spring bg-default dark:bg-elevated"
+      :class="isResizing
           ? 'border-primary scale-110'
           : 'border-default group-hover:border-primary/50'
-      "
-    >
-      <UIcon
-        name="i-lucide-grip-vertical"
-        class="size-3.5 transition-colors"
-        :class="isResizing ? 'text-primary' : 'text-muted'"
-      />
+        ">
+      <UIcon name="i-lucide-grip-vertical" class="size-3.5 transition-colors"
+        :class="isResizing ? 'text-primary' : 'text-muted'" />
     </div>
   </div>
 </template>

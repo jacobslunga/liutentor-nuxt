@@ -183,7 +183,7 @@ async function handleSignup() {
 </script>
 
 <template>
-  <div class="w-full max-w-sm flex flex-col items-center space-y-8">
+  <div class="w-full max-w-sm lg:max-w-md flex flex-col items-center space-y-8">
     <div class="flex flex-col items-center space-y-1 text-center">
       <NuxtLink to="/" class="flex items-center space-x-2 mb-1">
         <LogoIcon class="w-8 h-8" />
@@ -270,7 +270,11 @@ async function handleSignup() {
             {{ loginGeneralError }}
           </p>
 
-          <UButton type="submit" block :disabled="loginLoading">
+          <UButton
+            type="submit"
+            block
+            :disabled="loginLoading"
+          >
             <UIcon
               name="i-lucide-loader-circle"
               v-if="loginLoading"
@@ -442,7 +446,11 @@ async function handleSignup() {
             {{ signupGeneralError }}
           </p>
 
-          <UButton type="submit" block :disabled="signupLoading">
+          <UButton
+            type="submit"
+            block
+            :disabled="signupLoading"
+          >
             <UIcon
               name="i-lucide-loader-circle"
               v-if="signupLoading"

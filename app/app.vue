@@ -7,6 +7,7 @@
       :hide-delay="150"
     />
     <UApp
+      :scroll-body="false"
       :tooltip="{ delayDuration: 200, ignoreNonKeyboardFocus: true }"
       :toaster="{ position: 'top-center', duration: 4000 }"
     >

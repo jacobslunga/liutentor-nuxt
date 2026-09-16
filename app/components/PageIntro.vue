@@ -15,7 +15,7 @@ defineProps<{
       </p>
 
       <h1
-        class="mt-5 max-w-3xl font-serif text-[2.25rem] font-medium leading-[1.1] tracking-[-0.015em] text-highlighted sm:text-5xl lg:text-6xl"
+        class="mt-5 max-w-3xl font-serif text-[2.25rem] font-bold leading-[1.1] tracking-[-0.015em] text-highlighted sm:text-5xl lg:text-6xl"
       >
         {{ title }}
       </h1>

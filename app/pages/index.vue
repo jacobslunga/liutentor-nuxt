@@ -21,7 +21,7 @@ const { open: openUploadModal } = useUploadModal();
     <div
       class="flex flex-row items-center justify-center gap-2 absolute top-5 right-5"
     >
-      <AuthActions />
+      <AuthActions larger-on-desktop />
     </div>
 
     <div class="w-full max-w-150 flex flex-col items-center gap-6 mb-20">
