@@ -269,7 +269,7 @@ function passColor(rate: number) {
 </script>
 
 <template>
-  <div class="container mx-auto max-w-3xl px-4 pb-8 pt-2 md:py-8">
+  <div class="container mx-auto max-w-5xl px-4 pb-8 pt-2 sm:px-8 md:py-10 lg:px-10">
     <div class="sticky top-0 z-30 bg-default h-12 pt-2 mb-4 md:hidden">
       <CourseSearchDropdown size="md" class="mx-auto w-full max-w-xl" />
     </div>

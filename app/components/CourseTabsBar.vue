@@ -12,7 +12,7 @@ const tabs: TabsItem[] = [
 
 <template>
   <div
-    class="sticky top-12 z-30 flex flex-col gap-3 border-b border-default/60 bg-default pt-2 pb-2.5 sm:flex-row sm:items-center sm:justify-between md:top-0 dark:border-default/60">
+    class="sticky top-12 z-30 flex flex-col gap-3 border-b border-default/60 bg-default pt-2 pb-2.5 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between md:top-0 dark:border-default/60">
     <div class="flex flex-wrap items-center gap-2">
       <UTabs color="neutral" v-model="model" :items="tabs" :content="false" />
 

@@ -112,7 +112,7 @@ function toggleFilter(p: string) {
           v-for="exam in filteredExams"
           :key="exam.id"
           :class="gridCols"
-          class="cursor-pointer py-2.5 border-b border-default/60 last:border-0 hover:bg-muted/20 transition-colors group"
+          class="cursor-pointer min-h-16 py-3 border-b border-default/60 last:border-0 hover:bg-muted/20 transition-colors group"
           @mouseenter="prefetchExamRoute(exam.id)"
           @focusin="prefetchExamRoute(exam.id)"
           @click="navigateTo(examRoutePath(exam.id))"

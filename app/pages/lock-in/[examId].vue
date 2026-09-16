@@ -113,7 +113,7 @@ function formatTime(ms: number): string {
 
 <template>
   <div
-    class="relative h-screen w-screen overflow-hidden bg-default flex flex-col"
+    class="relative h-dvh w-full overflow-hidden bg-default flex flex-col"
   >
     <div
       class="absolute top-0 left-0 right-0 z-40 px-4 py-2 flex items-center justify-center pointer-events-none"

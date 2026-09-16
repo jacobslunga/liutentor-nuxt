@@ -13,7 +13,7 @@ const hideFooter = computed(
 </script>
 
 <template>
-  <div class="flex flex-col min-h-screen w-full">
+  <div class="flex flex-col min-h-dvh w-full">
     <SearchHeader v-if="!isExamViewUrl" />
     <main class="flex grow flex-col max-w-full w-full relative">
       <slot />

@@ -15,8 +15,8 @@ watch(
 </script>
 
 <template>
-  <div class="flex flex-col max-w-full min-h-screen bg-default">
-    <main class="grow flex items-start justify-center py-5 px-4">
+  <div class="flex flex-col max-w-full min-h-dvh bg-default">
+    <main class="grow flex items-start justify-center pt-20 pb-8 px-4 sm:pt-24 sm:px-8">
       <UButton
         @click="router.go(-1)"
         class="absolute top-5 left-5"

@@ -18,8 +18,6 @@ const searchTerm = ref("");
 const selected = ref<CourseItem | undefined>(undefined);
 const inputMenuRef = useTemplateRef("inputMenuRef");
 
-// Keep the homepage input lightweight, while using the same result rows as
-// CourseSearchDropdown (course code plus course name).
 const items = computed<CourseItem[]>(() => {
   const q = searchTerm.value.trim().toUpperCase();
   if (!q) return [];
@@ -50,8 +48,6 @@ function onSelect(item: CourseItem | undefined) {
   if (item?.label) goToCourse(item.label);
 }
 
-// A selected menu item triggers onSelect first; defer free-text search so it
-// only runs when Enter was pressed without choosing a result.
 function onEnter() {
   setTimeout(() => {
     if (searchTerm.value.trim()) goToCourse(searchTerm.value);
@@ -122,41 +118,18 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <UInputMenu
-    ref="inputMenuRef"
-    v-model="selected"
-    v-model:search-term="searchTerm"
-    :items="items"
-    :placeholder="`Sök efter ${typed}`"
-    icon="i-lucide-search"
-    variant="none"
-    trailing-icon=""
-    ignore-filter
-    :ui="{
+  <UInputMenu ref="inputMenuRef" v-model="selected" v-model:search-term="searchTerm" :items="items"
+    :placeholder="`Sök efter ${typed}`" icon="i-lucide-search" variant="none" trailing-icon="" ignore-filter :ui="{
       root: 'w-full',
       base: 'min-w-0 w-full py-4 ps-14 pe-12 border-none bg-transparent text-md text-highlighted/80 outline-none uppercase placeholder:normal-case',
       leading: 'pl-5',
       leadingIcon: 'size-6 text-muted',
       trailing: 'pr-2',
-    }"
-    @focus="emit('update:focusInput', true)"
-    @blur="emit('update:focusInput', false)"
-    @update:model-value="onSelect"
-    @keydown.enter="onEnter"
-  >
+    }" @focus="emit('update:focusInput', true)" @blur="emit('update:focusInput', false)" @update:model-value="onSelect"
+    @keydown.enter="onEnter">
     <template #trailing>
-      <UButton
-        as="span"
-        class="shrink-0"
-        color="neutral"
-        variant="outline"
-        size="sm"
-        square
-        :disabled="!searchTerm"
-        aria-label="Search"
-        @mousedown.prevent
-        @click.prevent="goToCourse(searchTerm)"
-      >
+      <UButton class="shrink-0" color="neutral" variant="outline" square :disabled="!searchTerm" aria-label="Search"
+        @mousedown.prevent @click.prevent="goToCourse(searchTerm)">
         <UIcon name="i-lucide-arrow-up" class="size-5" />
       </UButton>
     </template>
@@ -170,10 +143,7 @@ onUnmounted(() => {
           {{ (item as CourseItem).name }}
         </span>
       </span>
-      <UIcon
-        name="i-lucide-corner-down-left"
-        class="size-3.5 shrink-0 text-dimmed"
-      />
+      <UIcon name="i-lucide-corner-down-left" class="size-3.5 shrink-0 text-dimmed" />
     </template>
 
     <template #empty>

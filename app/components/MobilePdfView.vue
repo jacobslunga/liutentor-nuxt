@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from "@nuxt/ui";
+import type { Exam } from "~/types/exam";
 
 const props = defineProps<{
+  exams: Exam[];
+  examId: string;
   examPdfUrl: string;
   solutionPdfUrl: string | null;
   courseCode: string;
@@ -17,6 +20,38 @@ const pdfBoxStyle = {
   paddingTop: `calc(${HEADER_HEIGHT}px + env(safe-area-inset-top, 0px))`,
   paddingBottom: "0px",
 };
+
+const isExamPickerOpen = ref(false);
+const examList = useTemplateRef("examList");
+const { sortBy, sortDirection } = useExamSortPreference("exam-picker");
+const sortedExams = computed(() => [...props.exams].sort((a, b) => {
+  if (sortBy.value === "pass-rate") {
+    const aHasRate = Number.isFinite(Number(a.pass_rate)) && Number(a.pass_rate) > 0;
+    const bHasRate = Number.isFinite(Number(b.pass_rate)) && Number(b.pass_rate) > 0;
+    if (aHasRate !== bHasRate) return aHasRate ? -1 : 1;
+    if (aHasRate && bHasRate) {
+      const difference = Number(a.pass_rate) - Number(b.pass_rate);
+      if (difference) return sortDirection.value === "asc" ? difference : -difference;
+    }
+  } else {
+    const difference = a.exam_date.localeCompare(b.exam_date);
+    if (difference) return sortDirection.value === "asc" ? difference : -difference;
+  }
+  return b.exam_date.localeCompare(a.exam_date) || a.exam_name.localeCompare(b.exam_name);
+}));
+
+watch(isExamPickerOpen, async (open) => {
+  if (!open) return;
+  await nextTick();
+  examList.value?.querySelector('[aria-current="page"]')?.scrollIntoView({ block: "nearest" });
+});
+
+function changeExam(exam: Exam) {
+  isExamPickerOpen.value = false;
+  if (String(exam.id) !== props.examId) {
+    navigateTo(`/search/${props.courseCode}/${exam.id}`);
+  }
+}
 
 const showSolution = ref(false);
 const isDownloadOpen = ref(false);
@@ -124,6 +159,36 @@ const downloadItems = computed<DropdownMenuItem[]>(() => [
           <p class="text-xs text-muted truncate leading-tight">
             {{ examDate }}
           </p>
+        </div>
+        <div v-if="exams.length" class="hidden shrink-0 md:block">
+        <UPopover v-model:open="isExamPickerOpen"
+          :content="{ align: 'start', sideOffset: 8 }">
+          <UButton color="neutral" variant="outline" size="sm" aria-label="Byt tenta">
+            {{ examDate }}
+            <UIcon name="i-lucide-chevron-down" class="size-4 text-muted" />
+          </UButton>
+          <template #content>
+            <div class="flex items-center justify-between gap-3 border-b px-3 py-2">
+              <span class="text-xs font-semibold">Alla tentor</span>
+              <span class="text-xs text-muted">{{ exams.length }} st</span>
+            </div>
+            <div ref="examList" class="max-h-[min(20rem,60dvh)] w-96 max-w-[calc(100vw-2rem)] overflow-y-auto p-1.5 custom-scrollbar">
+              <button v-for="item in sortedExams" :key="item.id"
+                :aria-current="String(item.id) === examId ? 'page' : undefined"
+                class="flex w-full items-center gap-3 rounded-sm px-3 py-2 text-left"
+                :class="String(item.id) === examId ? 'bg-accented' : 'hover:bg-muted'"
+                @click="changeExam(item)">
+                <span class="min-w-0 flex-1 truncate text-sm font-semibold">{{ item.exam_name }}</span>
+                <UBadge v-if="item.has_solution" color="success" variant="subtle" size="sm" label="Facit" />
+                <span v-if="Number(item.pass_rate) > 0" class="text-xs tabular-nums"
+                  :class="item.pass_rate >= 50 ? 'text-success' : item.pass_rate >= 30 ? 'text-warning' : 'text-error'">
+                  {{ Number(item.pass_rate).toFixed(1) }}%
+                </span>
+                <UIcon v-if="String(item.id) === examId" name="i-lucide-check" class="size-4 shrink-0 text-primary" />
+              </button>
+            </div>
+          </template>
+        </UPopover>
         </div>
         <UDropdownMenu v-model:open="isDownloadOpen" :items="downloadItems" :content="{ align: 'end', sideOffset: 8 }">
           <UButton color="neutral" variant="outline" size="sm" square :disabled="!hasDownload" aria-label="Ladda ned">

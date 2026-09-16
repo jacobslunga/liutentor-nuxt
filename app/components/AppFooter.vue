@@ -31,8 +31,8 @@ const groupedLinks = [
 <template>
   <footer class="relative z-10 mt-24 w-full border-t bg-default">
     <div class="mx-auto max-w-6xl px-5 py-14 sm:px-8 sm:py-16">
-      <div class="grid grid-cols-1 gap-12 md:grid-cols-4">
-        <div class="space-y-4 md:col-span-1">
+      <div class="grid grid-cols-1 gap-12 lg:grid-cols-4">
+        <div class="space-y-4 lg:col-span-1">
           <NuxtLink
             to="/"
             class="flex items-center gap-2 transition-opacity duration-150 ease-spring hover:opacity-70"
@@ -47,7 +47,7 @@ const groupedLinks = [
           </p>
         </div>
 
-        <div class="grid grid-cols-2 gap-8 sm:grid-cols-3 md:col-span-3">
+        <div class="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:col-span-3">
           <div v-for="section in groupedLinks" :key="section.title">
             <h4 class="text-sm font-medium text-highlighted">
               {{ section.title }}

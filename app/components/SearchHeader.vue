@@ -1,31 +1,20 @@
-<script setup lang="ts"></script>
 <template>
-  <header class="w-full bg-default">
-    <div
-      class="container h-16 max-w-full flex items-center justify-center px-4 md:px-10 lg:px-20 relative"
-    >
+  <header class="w-full bg-default pt-[env(safe-area-inset-top,0px)]">
+    <div class="mx-auto flex min-h-16 w-full max-w-7xl items-center gap-4 px-4 sm:px-8 lg:px-10">
       <NuxtLink
         to="/"
-        class="absolute left-4 md:left-10 lg:left-20 flex items-center hover:opacity-80 transition-opacity gap-2 shrink-0"
+        class="flex shrink-0 items-center gap-2 transition-opacity hover:opacity-80"
         aria-label="LiU Tentor"
       >
-        <LogoIcon class="w-10 h-10" />
-        <h1
-          class="text-xl hidden xl:flex font-medium font-logo tracking-tighter"
-        >
-          LiU Tentor
-        </h1>
+        <LogoIcon class="size-10" />
+        <span class="hidden font-logo text-xl font-medium tracking-tighter xl:inline">LiU Tentor</span>
       </NuxtLink>
 
-      <div
-        class="container max-w-3xl px-4 hidden md:flex flex-row items-start justify-start"
-      >
-        <CourseSearchDropdown size="lg" class="min-w-md" />
+      <div class="hidden min-w-0 flex-1 md:block">
+        <CourseSearchDropdown size="lg" class="w-full max-w-xl" />
       </div>
 
-      <div
-        class="absolute right-4 md:right-10 lg:right-20 flex items-center gap-2"
-      >
+      <div class="ml-auto shrink-0">
         <AuthActions show-settings />
       </div>
     </div>

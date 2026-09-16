@@ -58,7 +58,11 @@ useSeoMeta({
 
 const isExamOnly = computed(() => layoutMode.value === "exam-only");
 
-const isMobile = ref(import.meta.client ? window.innerWidth < 1024 : false);
+// Touch tablets use the full-width viewer in either orientation.
+const touchViewerQuery = "(max-width: 1023px), (pointer: coarse)";
+const isMobile = ref(
+  import.meta.client ? window.matchMedia(touchViewerQuery).matches : false,
+);
 
 const SPLIT_MIN = 20;
 const SPLIT_MAX = 80;
@@ -300,7 +304,7 @@ onBeforeRouteLeave(() => {
 });
 
 function handleResize() {
-  isMobile.value = window.innerWidth < 1024;
+  isMobile.value = window.matchMedia(touchViewerQuery).matches;
 }
 
 onMounted(() => {
@@ -328,11 +332,11 @@ onUnmounted(() => {
 
 <template>
   <ClientOnly>
-    <div class="relative flex h-screen w-full flex-col overflow-hidden bg-default">
+    <div class="relative flex h-dvh w-full flex-col overflow-hidden bg-default">
       <Transition enter-active-class="transition-all duration-200 ease-spring"
         enter-from-class="-translate-y-2 opacity-0" leave-active-class="transition-all duration-150 ease-spring"
         leave-to-class="-translate-y-2 opacity-0">
-        <div v-if="exam && isHeaderMounted" class="absolute inset-x-0 top-0 z-30 hidden lg:block">
+        <div v-if="exam && isHeaderMounted && !isMobile" class="absolute inset-x-0 top-0 z-30 hidden lg:block">
           <ExamHeader :exams="exams" :exam-id="examId" :course-code="courseCode" :solution-pdf-url="solutionPdfUrl"
             :active="isHeaderActive" :focus-mode="focusMode" @toggle-focus-mode="toggleFocusMode" />
         </div>
@@ -353,7 +357,7 @@ onUnmounted(() => {
         </div>
 
         <template v-else-if="exam">
-          <MobilePdfView v-if="isMobile" class="bg-default" :exam-pdf-url="exam.pdf_url"
+          <MobilePdfView v-if="isMobile" :exams="exams" :exam-id="examId" class="bg-default" :exam-pdf-url="exam.pdf_url"
             :solution-pdf-url="solutionPdfUrl" :course-code="courseCode" :exam-date="exam.exam_date"
             :explain-enabled="false" />
 
@@ -431,7 +435,7 @@ onUnmounted(() => {
               leave-active-class="transition-all duration-200 ease-spring"
               leave-from-class="translate-x-0 opacity-100 blur-0" leave-to-class="translate-x-full opacity-0 blur-sm">
               <div v-if="!isMobile && isExamOnly && hasFacit" v-show="isFacitVisible && !chatStore.isOpen"
-                class="fixed right-0 bottom-0 z-30 flex h-screen border-l border-default bg-default shadow-xl dark:shadow-none"
+                class="fixed right-0 bottom-0 z-30 flex h-dvh border-l border-default bg-default shadow-xl dark:shadow-none"
                 :class="{ 'select-none': isOverlayResizing }" :style="{ width: `${overlayWidth}px` }">
                 <div class="relative z-10 w-0 shrink-0">
                   <ResizeHandle :is-resizing="isOverlayResizing" @start-resize="startOverlayResize" />
@@ -448,7 +452,7 @@ onUnmounted(() => {
               leave-active-class="transition-all duration-200 ease-spring"
               leave-from-class="translate-x-0 opacity-100 blur-0" leave-to-class="translate-x-full opacity-0 blur-sm">
               <div v-if="!isMobile && chatHasBeenOpened" v-show="chatStore.isOpen"
-                class="fixed right-0 bottom-0 z-40 flex h-screen border-l border-default bg-default shadow-xl dark:shadow-none"
+                class="fixed right-0 bottom-0 z-40 flex h-dvh border-l border-default bg-default shadow-xl dark:shadow-none"
                 :class="{ 'select-none': isOverlayResizing }" :style="{ width: `${overlayWidth}px` }">
                 <div class="relative z-10 w-0 shrink-0">
                   <ResizeHandle :is-resizing="isOverlayResizing" @start-resize="startOverlayResize" />

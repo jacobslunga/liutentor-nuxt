@@ -12,7 +12,7 @@ const { open: openUploadModal } = useUploadModal();
 
 <template>
   <div
-    class="relative flex flex-col items-center justify-start w-full min-h-screen p-4 pt-[20vh] bg-default"
+    class="relative flex flex-col items-center justify-start w-full min-h-dvh p-4 pt-[20dvh] bg-default"
   >
     <div class="absolute top-5 left-5">
       <DailyCourseButton />

@@ -8,7 +8,7 @@ const scrolled = computed(() => y.value > 8);
 </script>
 
 <template>
-  <div class="flex min-h-screen flex-col bg-default">
+  <div class="flex min-h-dvh flex-col bg-default">
     <header
       class="sticky top-0 z-30 h-14 shrink-0 border-b bg-default transition-colors duration-200 ease-spring"
       :class="scrolled ? 'border-default' : 'border-transparent'"

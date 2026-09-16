@@ -12,13 +12,13 @@ watch(
 </script>
 
 <template>
-  <div class="flex flex-col min-h-screen bg-default">
+  <div class="flex flex-col min-h-dvh bg-default">
     <header class="sticky top-0 z-40 w-full">
       <div
         class="absolute inset-0 bg-default/80 backdrop-blur-sm -z-10 mask-[linear-gradient(to_bottom,black,transparent)]"
       />
       <div
-        class="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between"
+        class="max-w-3xl mx-auto px-4 sm:px-8 h-16 flex items-center justify-between"
       >
         <UButton
           @click="router.go(-1)"
@@ -42,7 +42,7 @@ watch(
       </div>
     </header>
 
-    <main class="flex-1 max-w-3xl mx-auto w-full px-4 py-10">
+    <main class="flex-1 max-w-3xl mx-auto w-full px-4 py-10 sm:px-8">
       <slot />
     </main>
   </div>

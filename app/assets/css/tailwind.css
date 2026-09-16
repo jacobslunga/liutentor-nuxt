@@ -430,3 +430,10 @@ body > [data-slot="overlay"],
 body > [data-slot="content"] {
   z-index: 50;
 }
+
+/* Keep tablet type consistent when rotating across the desktop breakpoint. */
+@media (pointer: coarse) and (min-width: 768px) and (max-width: 1366px) {
+  :root {
+    font-size: 17px;
+  }
+}
