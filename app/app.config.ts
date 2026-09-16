@@ -3,7 +3,7 @@ export default defineAppConfig({
     colors: { primary: "emerald", neutral: "neutral" },
     button: {
       slots: {
-        base: "rounded-full lg:font-bold",
+        base: "rounded-full font-bold",
       },
       variants: {
         square: {

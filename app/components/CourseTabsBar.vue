@@ -12,17 +12,14 @@ const tabs: TabsItem[] = [
 
 <template>
   <div
-    class="sticky top-12 z-30 flex flex-col gap-3 border-b border-default/60 bg-default pt-2 pb-2.5 sm:flex-row sm:items-center sm:justify-between md:top-0 dark:border-default/60"
-  >
+    class="sticky top-12 z-30 flex flex-col gap-3 border-b border-default/60 bg-default pt-2 pb-2.5 sm:flex-row sm:items-center sm:justify-between md:top-0 dark:border-default/60">
     <div class="flex flex-wrap items-center gap-2">
-      <!-- Panelerna ligger kvar hos sidan bakom en egen v-if, så listan
-           renderas utan innehållsytor. -->
       <UTabs color="neutral" v-model="model" :items="tabs" :content="false" />
 
-      <slot name="controls" />
     </div>
 
     <div class="flex items-center gap-2">
+      <slot name="controls" />
       <slot name="actions" />
     </div>
   </div>

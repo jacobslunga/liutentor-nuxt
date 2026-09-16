@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { useRotate } from "@embedpdf/plugin-rotate/vue";
 import { useZoom } from "@embedpdf/plugin-zoom/vue";
 
-const props = defineProps<{ documentId: string }>();
+const props = defineProps<{ documentId: string; isMobile: boolean }>();
 
 const { state, provides: zoom } = useZoom(() => props.documentId);
+
+const { provides: rotate } = useRotate(() => props.documentId);
 
 const MIN_ZOOM = 0.25;
 const MAX_ZOOM = 10;
@@ -17,7 +20,7 @@ const canZoomOut = computed(() => currentZoom.value > MIN_ZOOM + EPSILON);
 
 <template>
   <div
-    class="flex flex-col overflow-hidden rounded-l-full border border-r-0 border-default bg-default/95 backdrop-blur-sm shadow-sm"
+    class="flex items-center overflow-hidden rounded-xl border border-default bg-default/95 backdrop-blur-sm shadow-sm"
   >
     <button
       type="button"
@@ -28,7 +31,7 @@ const canZoomOut = computed(() => currentZoom.value > MIN_ZOOM + EPSILON);
     >
       <UIcon name="i-lucide-plus" class="size-4" />
     </button>
-    <div class="h-px bg-border" />
+    <div class="h-5 w-px bg-border" />
     <button
       type="button"
       aria-label="Zooma ut"
@@ -37,6 +40,16 @@ const canZoomOut = computed(() => currentZoom.value > MIN_ZOOM + EPSILON);
       @click="zoom?.zoomOut()"
     >
       <UIcon name="i-lucide-minus" class="size-4" />
+    </button>
+    <div class="h-5 w-px bg-border" />
+    <button
+      type="button"
+      aria-label="Rotera medurs"
+      :disabled="!rotate"
+      class="flex size-10 items-center justify-center text-muted transition-colors active:bg-elevated disabled:opacity-35"
+      @click="rotate?.rotateForward()"
+    >
+      <UIcon name="i-lucide-rotate-cw" class="size-4" />
     </button>
   </div>
 </template>
