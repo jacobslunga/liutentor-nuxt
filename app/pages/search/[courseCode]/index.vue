@@ -269,19 +269,31 @@ function passColor(rate: number) {
 </script>
 
 <template>
-  <div class="container mx-auto max-w-5xl px-4 pb-8 pt-2 sm:px-8 md:py-10 lg:px-10">
+  <div
+    class="container mx-auto max-w-3xl px-4 pb-8 pt-2 md:px-8 md:py-8 lg:px-4"
+  >
     <div class="sticky top-0 z-30 bg-default h-12 pt-2 mb-4 md:hidden">
       <CourseSearchDropdown size="md" class="mx-auto w-full max-w-xl" />
     </div>
 
-    <div v-if="status === 'pending'" class="flex items-center justify-center min-h-[60vh]">
-      <UIcon name="i-lucide-loader-circle" class="w-6 h-6 animate-spin text-muted" />
+    <div
+      v-if="status === 'pending'"
+      class="flex items-center justify-center min-h-[60vh]"
+    >
+      <UIcon
+        name="i-lucide-loader-circle"
+        class="w-6 h-6 animate-spin text-muted"
+      />
     </div>
 
-    <div v-else-if="status === 'success' && !courseData"
-      class="mx-auto flex min-h-[60vh] w-full max-w-2xl flex-col items-center justify-center gap-8 py-8">
+    <div
+      v-else-if="status === 'success' && !courseData"
+      class="mx-auto flex min-h-[60vh] w-full max-w-2xl flex-col items-center justify-center gap-8 py-8"
+    >
       <div class="max-w-xl text-center">
-        <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+        <div
+          class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted"
+        >
           <UIcon name="i-lucide-inbox" class="h-6 w-6 text-muted" />
         </div>
         <h1 class="text-2xl font-medium text-highlighted">
@@ -292,38 +304,47 @@ function passColor(rate: number) {
           nästa student som söker på {{ courseCode }} hjälpt direkt.
         </p>
       </div>
-      <ExamUploadForm :initial-course-code="courseCode" fixed-course-code :show-heading="false" />
+      <ExamUploadForm
+        :initial-course-code="courseCode"
+        fixed-course-code
+        :show-heading="false"
+      />
     </div>
 
     <template v-else-if="courseData">
       <div class="flex justify-center">
         <div class="flex flex-col items-start w-full max-w-4xl gap-8">
           <div class="w-full">
-            <h1 class="text-3xl sm:text-4xl font-semibold text-highlighted leading-tight w-full wrap-break-word">
+            <h1
+              class="text-3xl sm:text-4xl font-bold text-highlighted leading-tight w-full wrap-break-word"
+            >
               {{ courseData.courseName }}
             </h1>
 
-            <p class="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted">
-              <span class="font-sans text-sm text-muted">{{ courseCode }}
+            <p
+              class="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted"
+            >
+              <span class="font-sans font-medium text-sm"
+                >{{ courseCode }}
               </span>
-              <span aria-hidden="true">·</span>
+              <span aria-hidden="true" class="font-bold">·</span>
               <span>
-                <span class="font-medium text-highlighted">{{
+                <span class="font-bold text-highlighted">{{
                   exams.length
-                  }}</span>
+                }}</span>
                 tentor
               </span>
-              <span aria-hidden="true">·</span>
+              <span aria-hidden="true" class="font-bold">·</span>
               <span>
-                <span class="font-medium text-highlighted">{{
+                <span class="font-bold text-highlighted">{{
                   examsWithSolutions
-                  }}</span>
+                }}</span>
                 med facit
               </span>
               <template v-if="avgPassRate !== null">
-                <span aria-hidden="true">·</span>
+                <span aria-hidden="true" class="font-bold">·</span>
                 <span>
-                  <span class="font-medium" :class="passColor(avgPassRate)">
+                  <span class="font-bold" :class="passColor(avgPassRate)">
                     {{ avgPassRate }}%
                   </span>
                   godkända i snitt
@@ -335,12 +356,28 @@ function passColor(rate: number) {
           <div class="flex flex-col gap-2 w-full -mt-4">
             <CourseTabsBar v-model="activeTab">
               <template #controls>
-                <UDropdownMenu v-if="activeTab === 'exams'" :items="sortItems" :content="{ align: 'start' }">
-                  <UButton color="neutral" variant="outline" aria-label="Sortera tentor">
+                <UDropdownMenu
+                  v-if="activeTab === 'exams'"
+                  :items="sortItems"
+                  :content="{ align: 'start' }"
+                >
+                  <UButton
+                    color="neutral"
+                    variant="outline"
+                    aria-label="Sortera tentor"
+                  >
                     <UIcon name="i-lucide-arrow-left-right" class="size-4" />
                     {{ examSortLabel }}
-                    <UIcon name="i-lucide-arrow-down" v-if="examSortDirection === 'desc'" class="size-3.5 text-muted" />
-                    <UIcon name="i-lucide-arrow-up" v-else class="size-3.5 text-muted" />
+                    <UIcon
+                      name="i-lucide-arrow-down"
+                      v-if="examSortDirection === 'desc'"
+                      class="size-3.5 text-muted"
+                    />
+                    <UIcon
+                      name="i-lucide-arrow-up"
+                      v-else
+                      class="size-3.5 text-muted"
+                    />
                   </UButton>
                 </UDropdownMenu>
               </template>
@@ -354,8 +391,12 @@ function passColor(rate: number) {
 
             <Transition name="tab-panel" mode="out-in">
               <div v-if="activeTab === 'exams'" key="exams" class="mt-5">
-                <CourseExamsTable :course-code="courseCode" :exams="exams" :sort-by="examSortBy"
-                  :sort-direction="examSortDirection" />
+                <CourseExamsTable
+                  :course-code="courseCode"
+                  :exams="exams"
+                  :sort-by="examSortBy"
+                  :sort-direction="examSortDirection"
+                />
               </div>
 
               <div v-else-if="activeTab === 'stats'" key="stats" class="mt-5">

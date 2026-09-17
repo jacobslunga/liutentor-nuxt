@@ -12,7 +12,6 @@ const { latest } = useRecentSearches();
       v-for="s in latest"
       :key="s.courseCode"
       :to="`/search/${s.courseCode}`"
-      size="sm"
       color="neutral"
       variant="ghost"
     >

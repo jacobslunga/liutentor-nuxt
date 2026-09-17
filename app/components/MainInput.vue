@@ -118,22 +118,28 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <UInputMenu ref="inputMenuRef" v-model="selected" v-model:search-term="searchTerm" :items="items"
-    :placeholder="`Sök efter ${typed}`" icon="i-lucide-search" variant="none" trailing-icon="" ignore-filter :ui="{
+  <UInputMenu
+    ref="inputMenuRef"
+    v-model="selected"
+    v-model:search-term="searchTerm"
+    :items="items"
+    :placeholder="`Sök efter ${typed}`"
+    icon="i-lucide-search"
+    variant="none"
+    trailing-icon=""
+    ignore-filter
+    :ui="{
       root: 'w-full',
       base: 'min-w-0 w-full py-4 ps-14 pe-12 border-none bg-transparent text-md text-highlighted/80 outline-none uppercase placeholder:normal-case',
       leading: 'pl-5',
       leadingIcon: 'size-6 text-muted',
       trailing: 'pr-2',
-    }" @focus="emit('update:focusInput', true)" @blur="emit('update:focusInput', false)" @update:model-value="onSelect"
-    @keydown.enter="onEnter">
-    <template #trailing>
-      <UButton class="shrink-0" color="neutral" variant="outline" square :disabled="!searchTerm" aria-label="Search"
-        @mousedown.prevent @click.prevent="goToCourse(searchTerm)">
-        <UIcon name="i-lucide-arrow-up" class="size-5" />
-      </UButton>
-    </template>
-
+    }"
+    @focus="emit('update:focusInput', true)"
+    @blur="emit('update:focusInput', false)"
+    @update:model-value="onSelect"
+    @keydown.enter="onEnter"
+  >
     <template #item="{ item }">
       <span class="flex min-w-0 flex-1 items-baseline gap-2">
         <span class="shrink-0 font-medium text-highlighted">
@@ -143,7 +149,10 @@ onUnmounted(() => {
           {{ (item as CourseItem).name }}
         </span>
       </span>
-      <UIcon name="i-lucide-corner-down-left" class="size-3.5 shrink-0 text-dimmed" />
+      <UIcon
+        name="i-lucide-corner-down-left"
+        class="size-3.5 shrink-0 text-dimmed"
+      />
     </template>
 
     <template #empty>
