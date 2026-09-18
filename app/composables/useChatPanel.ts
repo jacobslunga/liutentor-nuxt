@@ -20,8 +20,6 @@ export interface ChatInputApi {
   getShellTop: () => number | null;
   getText: () => string;
   setText: (value: string) => void;
-  getSkill: () => string | null;
-  setSkill: (id: string | null) => void;
   getAttachments: () => ChatAttachment[];
   setAttachments: (value: ChatAttachment[]) => void;
   clearAttachments: () => void;
@@ -55,7 +53,6 @@ export function useChatPanel(opts: ChatPanelOptions) {
     storeToRefs(chatStore);
 
   const { selectedModelId } = useSelectedModel();
-  const { webSearch } = useWebSearch();
 
   const { send, cancelGeneration } = useChat({
     examId: opts.examId,
@@ -85,15 +82,12 @@ export function useChatPanel(opts: ChatPanelOptions) {
     text: string,
     context?: string,
     attachments: ChatAttachment[] = [],
-    skill?: string | null,
   ) {
     nextTick(() => opts.transcript.value?.scrollUserMessageToTop?.());
 
     await send(text, attachments, {
       modelId: opts.fixedModelId ?? selectedModelId.value,
       selectionContext: context,
-      webSearch: webSearch.value,
-      skill,
     });
   }
 
@@ -102,13 +96,11 @@ export function useChatPanel(opts: ChatPanelOptions) {
     const attachments = opts.input.value?.getAttachments() ?? [];
     if ((!text.trim() && attachments.length === 0) || isLoading.value) return;
     const context = selectionContext.value || undefined;
-    const skill = opts.input.value?.getSkill() ?? null;
     opts.input.value?.setText("");
     opts.input.value?.clearAttachments();
-    opts.input.value?.setSkill(null);
     selectionContext.value = "";
 
-    await submit(text, context, attachments, skill);
+    await submit(text, context, attachments);
   }
 
   function handleCancel() {
@@ -116,7 +108,6 @@ export function useChatPanel(opts: ChatPanelOptions) {
     if (cancelled) {
       opts.input.value?.setText(cancelled.content);
       opts.input.value?.setAttachments(cancelled.attachments);
-      opts.input.value?.setSkill(cancelled.skill);
       opts.input.value?.focus();
     }
   }
@@ -155,7 +146,7 @@ export function useChatPanel(opts: ChatPanelOptions) {
     opts.input.value?.discardAttachments();
     chatStore.currentConversationId = null;
     chatStore.currentConversationTitle = null;
-    chatStore.savedScrollPosition = 0;
+    chatStore.savedScrollPosition = null;
     opts.transcript.value?.resetScrollState();
     chatStore.setLoading(false);
     isHistoryOpen.value = false;
@@ -221,7 +212,6 @@ export function useChatPanel(opts: ChatPanelOptions) {
     selectionContext,
     chatHeaderTitle,
     selectedModelId,
-    webSearch,
     submit,
     handleSend,
     handleCancel,

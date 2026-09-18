@@ -38,7 +38,6 @@ const {
   toggleHistory,
   startNewChat,
   selectedModelId,
-  webSearch,
 } = useChatPanel({
   examId: props.examId,
   examUrl: props.examUrl,
@@ -99,9 +98,10 @@ function scrollToBottomRightAway() {
   scrollToBottomImmediate();
 
   nextTick(() => {
+    if (!isPinningBottom) return;
     scrollToBottomImmediate();
     requestAnimationFrame(() => {
-      scrollToBottomImmediate();
+      if (isPinningBottom) scrollToBottomImmediate();
     });
   });
 
@@ -158,22 +158,19 @@ watch(isOpen, (open) => {
   if (!open) {
     isHistoryOpen.value = false;
     stopPinning();
+    transcriptRef.value?.persistScrollPosition();
     return;
   }
 
-  if (hasMessages.value && !chatStore.isLoading) {
-    scrollToBottomRightAway();
-  } else {
-    nextTick(() => {
-      transcriptRef.value?.restoreScroll();
-    });
-  }
-});
+  nextTick(() => {
+    transcriptRef.value?.restoreScroll();
+  });
+}, { flush: "sync" });
 
 watch(transcriptRef, (transcript) => {
   if (
     transcript &&
-    chatStore.savedScrollPosition === 0 &&
+    chatStore.savedScrollPosition === null &&
     !chatStore.isLoading
   ) {
     scrollToBottomRightAway();
@@ -236,7 +233,7 @@ onUnmounted(() => {
             <UButton
               color="neutral"
               variant="ghost"
-              icon="i-tabler-x"
+              icon="i-openai-x"
               class="shrink-0"
               aria-label="Stäng chatten"
               @click="closeChat"
@@ -251,14 +248,14 @@ onUnmounted(() => {
             <UButton
               color="neutral"
               variant="ghost"
-              icon="i-tabler-plus"
+              icon="i-openai-plus"
               aria-label="Ny chatt"
               @click="startNewChat"
             />
             <UButton
               color="neutral"
               variant="ghost"
-              icon="i-tabler-history"
+              icon="i-openai-history"
               aria-label="Historik"
               @click="toggleHistory"
             />
@@ -290,7 +287,7 @@ onUnmounted(() => {
               <Transition name="fade-up">
                 <UButton
                   v-if="showScrollBottom"
-                  icon="i-tabler-arrow-down"
+                  icon="i-openai-arrow-down"
                   class="pointer-events-auto mb-2 size-10 p-0 shadow-md"
                   aria-label="Rulla till senaste"
                   @click="scrollToBottom"
@@ -304,7 +301,6 @@ onUnmounted(() => {
                 :initial-attachments="chatStore.draftAttachments"
                 :is-loading="isLoading"
                 :selected-model-id="selectedModelId"
-                :web-search="webSearch"
                 :course-code="courseCode"
                 :has-solution="hasSolution"
                 :selection-context="selectionContext"
@@ -314,7 +310,6 @@ onUnmounted(() => {
                 @cancel="handleCancel"
                 @clear-selection-context="selectionContext = ''"
                 @update:selected-model-id="selectedModelId = $event"
-                @update:web-search="webSearch = $event"
               />
             </div>
           </template>

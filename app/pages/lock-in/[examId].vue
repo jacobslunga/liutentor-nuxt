@@ -123,7 +123,7 @@ function formatTime(ms: number): string {
       >
         <div class="flex items-center gap-3 min-w-30 justify-center">
           <UIcon
-            name="i-tabler-stopwatch"
+            name="i-openai-stopwatch"
             class="w-5 h-5"
             :class="
               timeRemaining < 300000
@@ -147,11 +147,11 @@ function formatTime(ms: number): string {
             @click="toggleFullscreen"
           >
             <UIcon
-              name="i-tabler-minimize"
+              name="i-openai-minimize"
               v-if="isFullscreen"
               class="w-4 h-4"
             />
-            <UIcon name="i-tabler-maximize" v-else class="w-4 h-4" />
+            <UIcon name="i-openai-maximize" v-else class="w-4 h-4" />
           </UButton>
 
           <UButton
@@ -162,8 +162,8 @@ function formatTime(ms: number): string {
             :class="paused ? 'text-warning bg-warning/10' : ''"
             @click="handlePauseResume"
           >
-            <UIcon name="i-tabler-player-play" v-if="paused" class="w-4 h-4" />
-            <UIcon name="i-tabler-player-pause" v-else class="w-4 h-4" />
+            <UIcon name="i-openai-player-play" v-if="paused" class="w-4 h-4" />
+            <UIcon name="i-openai-player-pause" v-else class="w-4 h-4" />
           </UButton>
 
           <UButton
@@ -199,7 +199,7 @@ function formatTime(ms: number): string {
         class="absolute inset-0 z-40 bg-default/60 backdrop-blur-sm flex flex-col items-center justify-center gap-6"
       >
         <div class="p-4 rounded-md bg-warning/10 mb-2">
-          <UIcon name="i-tabler-player-pause" class="w-16 h-16 text-warning" />
+          <UIcon name="i-openai-player-pause" class="w-16 h-16 text-warning" />
         </div>
         <h2 class="text-4xl font-medium">PAUSAD</h2>
         <div class="flex flex-col items-center gap-2">
@@ -213,7 +213,7 @@ function formatTime(ms: number): string {
           class="px-8 h-12 text-lg gap-2 mt-4"
           @click="handlePauseResume"
         >
-          <UIcon name="i-tabler-player-play" class="w-5 h-5" />
+          <UIcon name="i-openai-player-play" class="w-5 h-5" />
           Återuppta
         </UButton>
       </div>

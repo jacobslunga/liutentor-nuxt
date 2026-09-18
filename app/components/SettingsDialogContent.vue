@@ -104,16 +104,16 @@ function handleClearRecentSearches() {
         <SettingsSelect v-model="theme" :options="THEME_OPTIONS">
           <template #icon>
             <UIcon
-              name="i-tabler-sun"
+              name="i-openai-sun"
               v-if="theme === 'light'"
               class="size-3.5"
             />
             <UIcon
-              name="i-tabler-moon"
+              name="i-openai-moon"
               v-else-if="theme === 'dark'"
               class="size-3.5"
             />
-            <UIcon name="i-tabler-device-desktop" v-else class="size-3.5" />
+            <UIcon name="i-openai-device-desktop" v-else class="size-3.5" />
           </template>
         </SettingsSelect>
       </SettingsRow>

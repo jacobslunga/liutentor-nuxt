@@ -114,7 +114,7 @@ const sections: DocSection[] = [
             variant="outline"
             @click="openMail"
           >
-            <UIcon name="i-tabler-mail" class="size-3.5" />
+            <UIcon name="i-openai-mail" class="size-3.5" />
             liutentor@gmail.com
           </UButton>
         </DocContact>

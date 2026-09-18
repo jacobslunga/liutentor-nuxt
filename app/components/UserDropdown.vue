@@ -76,11 +76,11 @@ const gotoProfile = () => {
 };
 
 const menuItems = computed<DropdownMenuItem[][]>(() => [
-  [{ label: "Profil", icon: "i-tabler-user", onSelect: gotoProfile }],
+  [{ label: "Profil", icon: "i-openai-user", onSelect: gotoProfile }],
   [
     {
       label: "Logga ut",
-      icon: "i-tabler-logout",
+      icon: "i-openai-logout",
       color: "error",
       onSelect: signOut,
     },
@@ -98,7 +98,7 @@ const menuItems = computed<DropdownMenuItem[][]>(() => [
       ]"
     >
       <UIcon
-        name="i-tabler-loader-2"
+        name="i-openai-spinner"
         v-if="isPending || (avatarUrl && isImageLoading)"
         class="w-4 h-4 animate-spin absolute z-10"
       />

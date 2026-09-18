@@ -98,19 +98,19 @@ export default defineNuxtConfig({
   },
 
   icon: {
-    // Tabler för appens ikoner; Nuxt UI:s interna ikoner
-    // mappas om i app.config.ts. Lucide behålls som reserv.
-    collections: ["tabler", "lucide"],
-    serverBundle: { collections: ["tabler", "lucide"] },
+    customCollections: [{ prefix: "openai", dir: "./app/assets/icons/openai" }],
+    // OpenAI SVGs are bundled locally; Lucide supports library defaults.
+    collections: ["lucide"],
+    serverBundle: { collections: ["lucide"] },
     clientBundle: {
       scan: true,
-      // Skill-ikonerna i ChatInput slås upp dynamiskt och hittas inte av scannern.
       icons: [
-        "tabler:school",
-        "tabler:book",
-        "tabler:list-check",
-        "tabler:bulb",
-        "tabler:list",
+        "openai:plus",
+        "openai:globe",
+        "openai:chevron-down",
+        "openai:arrow-up",
+        "openai:stop",
+        "openai:check",
       ],
     },
   },

@@ -42,7 +42,7 @@ async function explain() {
       class="pointer-events-auto absolute left-1/2 -translate-x-1/2 select-none whitespace-nowrap shadow-sm"
       :class="above ? 'bottom-full mb-2' : 'top-full mt-2'" @click.stop="explain">
       Förklara
-      <UIcon name="i-tabler-arrow-up-right" class="w-3.5 h-3.5" />
+      <UIcon name="i-openai-arrow-up-right" class="w-3.5 h-3.5" />
     </UButton>
   </Transition>
 </template>

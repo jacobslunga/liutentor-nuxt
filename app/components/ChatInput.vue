@@ -1,13 +1,7 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from "@nuxt/ui";
 import { useChatStore, type ChatAttachment } from "@/stores/chat";
-import {
-  matchSkills,
-  getSkillById,
-  type ChatSkill,
-  type ChatSkillId,
-} from "@/lib/chat-skills";
-import { onClickOutside, useResizeObserver } from "@vueuse/core";
+import { useResizeObserver } from "@vueuse/core";
 
 const { availableModels } = useSelectedModel();
 const toast = useToast();
@@ -38,7 +32,6 @@ const props = withDefaults(
     initialAttachments?: ChatAttachment[];
     isLoading: boolean;
     selectedModelId: string;
-    webSearch?: boolean;
     courseCode?: string;
     hasSolution?: boolean;
     selectionContext?: string;
@@ -56,7 +49,6 @@ const props = withDefaults(
     submitOnEnter: true,
     autoResize: true,
     showDisclaimer: false,
-    webSearch: false,
   },
 );
 
@@ -64,7 +56,6 @@ const emit = defineEmits<{
   send: [];
   cancel: [];
   "update:selectedModelId": [value: string];
-  "update:webSearch": [value: boolean];
   clearSelectionContext: [];
 }>();
 
@@ -77,23 +68,55 @@ const pendingAttachments = ref<ChatAttachment[]>([...props.initialAttachments]);
 const chatStore = useChatStore();
 const MAX_LENGTH = 4000;
 
-// Fältet börjar på en rad och växer med innehållet upp till ett tak.
-const MIN_ROWS = 1;
-const MAX_HEIGHT = 220;
+const leftControlsRef = ref<HTMLElement | null>(null);
+const rightControlsRef = ref<HTMLElement | null>(null);
+const measurementRef = ref<HTMLTextAreaElement | null>(null);
+const compactTextWidth = ref(1);
+const leftControlsWidth = ref(64);
+const rightControlsWidth = ref(120);
+const textHeight = ref(24);
+const animateLayout = ref(false);
+let measuredExpanded = false;
+const isMultiline = ref(false);
+const isExpanded = computed(() => isMultiline.value);
+const hasHeader = computed(
+  () => !!props.selectionContext || pendingAttachments.value.length > 0,
+);
 
-function autoResize() {
-  const el = textareaRef.value;
-  if (!el || !props.autoResize) return;
-  el.style.height = "auto";
-  const height = Math.min(el.scrollHeight, MAX_HEIGHT);
-  el.style.height = `${height}px`;
-  el.style.overflowY = el.scrollHeight > MAX_HEIGHT ? "auto" : "hidden";
+function measurePrompt() {
+  const shell = shellRef.value;
+  const measurement = measurementRef.value;
+  if (!shell || !measurement) return;
+  leftControlsWidth.value = leftControlsRef.value?.offsetWidth ?? 64;
+  rightControlsWidth.value = rightControlsRef.value?.offsetWidth ?? 120;
+  compactTextWidth.value = Math.max(
+    1,
+    shell.clientWidth - leftControlsWidth.value - rightControlsWidth.value - 40,
+  );
+  measurement.style.width = `${compactTextWidth.value}px`;
+  isMultiline.value =
+    text.value.includes("\n") || measurement.scrollHeight > 24;
+  measurement.style.width = `${isExpanded.value ? shell.clientWidth - 40 : compactTextWidth.value}px`;
+  const nextHeight = props.autoResize
+    ? Math.min(192, Math.max(24, measurement.scrollHeight))
+    : 24;
+  if (
+    isExpanded.value !== measuredExpanded ||
+    nextHeight !== textHeight.value
+  ) {
+    animateLayout.value = isExpanded.value !== measuredExpanded;
+  }
+  measuredExpanded = isExpanded.value;
+  textHeight.value = nextHeight;
 }
 
-watch(
-  () => text.value,
-  () => nextTick(autoResize),
-);
+useResizeObserver([shellRef, leftControlsRef, rightControlsRef], measurePrompt);
+watch([text, isExpanded], () => nextTick(measurePrompt), { flush: "post" });
+onMounted(() => {
+  measurePrompt();
+  if (props.autofocus) textareaRef.value?.focus({ preventScroll: true });
+});
+
 const canSend = computed(
   () =>
     (!!text.value.trim() || pendingAttachments.value.length > 0) &&
@@ -124,13 +147,11 @@ const selectedModelLabel = computed(
 
 const modelMenuOpen = ref(false);
 
-// Kryssposter markerar den valda nivån; hint blir postens description.
+// Markera den valda tankenivån.
 const modelItems = computed<DropdownMenuItem[][]>(() => [
   [
-    { label: "Tankenivå", type: "label" },
     ...availableModels.value.map((model) => ({
       label: model.label,
-      description: model.hint,
       type: "checkbox" as const,
       checked: model.id === props.selectedModelId,
       onSelect: () => {
@@ -141,101 +162,25 @@ const modelItems = computed<DropdownMenuItem[][]>(() => [
   ],
 ]);
 
-const activeSkill = ref<ChatSkill | null>(null);
-const menuOpen = ref(false);
-const menuQuery = ref("");
-const highlightedIndex = ref(0);
-const skillPillRef = ref<HTMLElement | null>(null);
-const skillMenuRef = ref<HTMLElement | null>(null);
-
-const filteredSkills = computed(() => matchSkills(menuQuery.value));
-
-onClickOutside(skillMenuRef, () => {
-  menuOpen.value = false;
-});
-
-useResizeObserver(skillPillRef, () => {
-  const width = skillPillRef.value?.offsetWidth ?? 0;
-  const el = textareaRef.value;
-  if (el) el.style.textIndent = width ? `${width + 8}px` : "";
-});
-
-function syncSlashMenu(value: string) {
-  const match = activeSkill.value ? null : /^\/(\S*)$/.exec(value);
-  menuQuery.value = match?.[1] ?? "";
-  menuOpen.value = !!match && filteredSkills.value.length > 0;
-  if (menuOpen.value) highlightedIndex.value = 0;
-}
-
-function selectSkill(skill: ChatSkill | undefined) {
-  if (!skill) return;
-  activeSkill.value = skill;
-  menuOpen.value = false;
-  menuQuery.value = "";
-  setText("");
-  nextTick(() => textareaRef.value?.focus());
-}
-
-const SKILL_ICONS: Record<ChatSkillId, string> = {
-  explain: "i-tabler-school",
-  theory: "i-tabler-book",
-  solution: "i-tabler-list-check",
-  hint: "i-tabler-bulb",
-  summary: "i-tabler-list",
-};
-
-function clearSkill() {
-  activeSkill.value = null;
-  if (textareaRef.value) textareaRef.value.style.textIndent = "";
-  nextTick(() => textareaRef.value?.focus());
-}
-
 const handleInput = (event: Event) => {
   const el = event.target as HTMLTextAreaElement;
   text.value = el.value;
-  syncSlashMenu(el.value);
-  autoResize();
 };
 
+function handleSubmit() {
+  if (canSend.value && !props.isLoading) emit("send");
+}
+
 const handleKeyDown = (e: KeyboardEvent) => {
-  if (menuOpen.value) {
-    const count = filteredSkills.value.length;
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      highlightedIndex.value = (highlightedIndex.value + 1) % count;
-      return;
-    }
-    if (e.key === "ArrowUp") {
-      e.preventDefault();
-      highlightedIndex.value = (highlightedIndex.value - 1 + count) % count;
-      return;
-    }
-    if (e.key === "Enter" || e.key === "Tab") {
-      e.preventDefault();
-      selectSkill(filteredSkills.value[highlightedIndex.value]);
-      return;
-    }
-    if (e.key === "Escape") {
-      e.preventDefault();
-      menuOpen.value = false;
-      return;
-    }
-  }
-
-  // Backsteg längst till vänster äter pillen istället för ett tecken.
-  if (e.key === "Backspace" && activeSkill.value) {
-    const el = e.target as HTMLTextAreaElement;
-    if (el.selectionStart === 0 && el.selectionEnd === 0) {
-      e.preventDefault();
-      clearSkill();
-      return;
-    }
-  }
-
-  if (!props.submitOnEnter) return;
-  if (e.key === "Enter" && !e.shiftKey) {
+  if (e.isComposing || e.keyCode === 229) return;
+  // Enter submits text or attachments; Shift+Enter keeps a newline.
+  const submits = props.submitOnEnter
+    ? !e.shiftKey && !e.ctrlKey && !e.metaKey && !e.altKey
+    : e.ctrlKey || e.metaKey;
+  if (e.key === "Enter" && submits) {
     e.preventDefault();
-    if (canSend.value && !props.isLoading) emit("send");
+    e.stopPropagation();
+    handleSubmit();
   }
 };
 
@@ -347,26 +292,11 @@ function removePendingAttachment(id: string) {
   );
 }
 
-onMounted(() => {
-  autoResize();
-  if (props.autofocus) textareaRef.value?.focus();
-});
-
 defineExpose({
   focus: () => textareaRef.value?.focus(),
   getShellTop: () => shellRef.value?.getBoundingClientRect().top ?? null,
   getText: () => text.value,
   setText,
-  getSkill: () => activeSkill.value?.id ?? null,
-  setSkill: (id: string | null) => {
-    const skill = getSkillById(id);
-    if (skill) {
-      activeSkill.value = skill;
-    } else {
-      activeSkill.value = null;
-      if (textareaRef.value) textareaRef.value.style.textIndent = "";
-    }
-  },
   getAttachments: () => [...pendingAttachments.value],
   setAttachments: (value: ChatAttachment[]) => {
     pendingAttachments.value = value.filter(
@@ -388,254 +318,200 @@ defineExpose({
 
 <template>
   <div class="pointer-events-auto w-full px-3 sm:px-4">
-    <div
-      ref="shellRef"
-      class="chat-shell relative mx-auto max-w-2xl cursor-text rounded-xl border bg-default 3xl:max-w-3xl"
-      @click="textareaRef?.focus()"
-    >
-      <Transition name="fade-up">
-        <div
-          v-if="menuOpen"
-          id="chat-skill-menu"
-          ref="skillMenuRef"
-          role="listbox"
-          aria-label="Skills"
-          class="absolute inset-x-0 bottom-full z-30 mb-2 overflow-hidden rounded-lg bg-default p-1 shadow-lg ring ring-default"
-        >
-          <p class="px-2 pb-1 pt-1 text-2xs text-muted">Skills</p>
-          <button
-            v-for="(skill, index) in filteredSkills"
-            :id="`chat-skill-${skill.id}`"
-            :key="skill.id"
-            type="button"
-            role="option"
-            :aria-selected="index === highlightedIndex"
-            class="flex w-full cursor-pointer items-start gap-2.5 rounded-md px-2 py-1.5 text-left"
-            :class="index === highlightedIndex ? 'bg-elevated' : ''"
-            @mouseenter="highlightedIndex = index"
-            @mousedown.prevent="selectSkill(skill)"
-          >
-            <UIcon
-              :name="SKILL_ICONS[skill.id]"
-              class="mt-0.5 size-3.5 shrink-0 text-muted"
-            />
-            <span class="flex min-w-0 flex-col gap-0.5">
-              <span class="flex items-baseline gap-1.5">
-                <span class="text-xs font-medium text-highlighted">{{
-                  skill.label
-                }}</span>
-                <span class="text-2xs text-muted">/{{ skill.command }}</span>
-              </span>
-              <span class="text-2xs leading-snug text-muted">{{
-                skill.description
-              }}</span>
-            </span>
-          </button>
-        </div>
-      </Transition>
-
-      <Transition name="input-panel">
-        <div
-          v-if="selectionContext || pendingAttachments.length || activeSkill"
-          class="input-panel grid"
-        >
-          <div class="min-h-0 overflow-hidden">
-            <TransitionGroup
-              name="input-change"
-              tag="div"
-              class="relative flex min-w-0 flex-col gap-2 border-b border-default px-3 py-2.5"
-            >
-              <div
-                v-if="selectionContext"
-                :key="`context-${selectionContext}`"
-                class="flex w-full items-center gap-2"
-              >
-                <UIcon
-                  name="i-tabler-arrow-back-up"
-                  class="size-3.5 shrink-0 text-muted"
-                />
-                <span class="min-w-0 flex-1 truncate text-sm italic text-muted"
-                  >"{{ selectionContext }}"</span
+    <div ref="shellRef" class="relative mx-auto max-w-2xl 3xl:max-w-3xl">
+      <form
+        class="chat-prompt bg-default"
+        :class="{
+          'is-expanded': isExpanded,
+          'animate-layout': animateLayout,
+        }"
+        @submit.prevent="handleSubmit"
+      >
+        <div class="chat-prompt-header" v-if="hasHeader">
+          <Transition name="input-panel">
+            <div v-if="hasHeader" class="input-panel grid">
+              <div class="min-h-0 overflow-hidden">
+                <TransitionGroup
+                  name="input-change"
+                  tag="div"
+                  class="relative flex min-w-0 flex-col gap-2 border-b border-default bg-elevated/50 px-4 pt-3 pb-2.5"
                 >
+                  <div
+                    v-if="selectionContext"
+                    :key="`context-${selectionContext}`"
+                    class="flex w-full items-start gap-3"
+                  >
+                    <UIcon
+                      name="i-openai-corner-down-left"
+                      class="mt-0.5 size-4 shrink-0 -scale-x-100 text-muted"
+                    />
+                    <span
+                      class="min-w-0 flex-1 line-clamp-3 text-sm leading-relaxed text-default"
+                      >"<SelectionQuote :text="selectionContext" />"</span
+                    >
+                    <UButton
+                      color="neutral"
+                      variant="ghost"
+                      size="xs"
+                      icon="i-openai-x"
+                      aria-label="Ta bort citatet"
+                      @click.prevent="emit('clearSelectionContext')"
+                    />
+                  </div>
+
+                  <TransitionGroup
+                    v-if="pendingAttachments.length"
+                    key="attachments"
+                    name="attachment-chip"
+                    tag="div"
+                    appear
+                    class="flex flex-wrap gap-2"
+                  >
+                    <div
+                      v-for="attachment in pendingAttachments"
+                      :key="attachment.id"
+                      class="flex min-w-0 max-w-full items-center gap-2 rounded-xl bg-elevated px-2.5 py-1.5 text-xs"
+                    >
+                      <UIcon
+                        v-if="attachment.mediaType === 'application/pdf'"
+                        name="i-openai-file-text"
+                        class="size-3.5 shrink-0 text-muted"
+                      />
+                      <img
+                        v-else-if="attachment.previewUrl"
+                        :src="attachment.previewUrl"
+                        alt=""
+                        class="size-10 shrink-0 rounded-lg object-cover"
+                      />
+                      <UIcon
+                        v-else
+                        name="i-openai-photo"
+                        class="size-3.5 shrink-0 text-muted"
+                      />
+                      <span
+                        class="max-w-20 truncate"
+                        :title="attachment.name"
+                        >{{ attachment.name }}</span
+                      >
+                      <span class="shrink-0 text-muted">{{
+                        formatFileSize(attachment.size)
+                      }}</span>
+                      <UButton
+                        color="neutral"
+                        variant="link"
+                        size="xs"
+                        icon="i-openai-x"
+                        :aria-label="`Ta bort ${attachment.name}`"
+                        @click="removePendingAttachment(attachment.id)"
+                      />
+                    </div>
+                  </TransitionGroup>
+                </TransitionGroup>
+              </div>
+            </div>
+          </Transition>
+        </div>
+
+        <textarea
+          ref="textareaRef"
+          v-model="text"
+          rows="1"
+          class="chat-prompt-body chat-prompt-textarea"
+          :style="{
+            height: `${textHeight + 8}px`,
+            paddingLeft: isExpanded ? '8px' : `${leftControlsWidth + 8}px`,
+            paddingRight: isExpanded ? '8px' : `${rightControlsWidth + 8}px`,
+          }"
+          placeholder="Fråga vad som helst"
+          aria-label="Meddelande"
+          @input="handleInput"
+          @keydown="handleKeyDown"
+        />
+
+        <div class="chat-prompt-footer">
+          <div class="contents">
+            <div
+              ref="leftControlsRef"
+              class="chat-controls-left flex items-center gap-0.5"
+            >
+              <input
+                ref="fileInputRef"
+                type="file"
+                multiple
+                class="hidden"
+                :accept="FILE_INPUT_ACCEPT"
+                @change="handleFileInput"
+              />
+              <UTooltip text="Bifoga filer">
                 <UButton
                   color="neutral"
                   variant="ghost"
-                  size="xs"
-                  icon="i-tabler-x"
-                  aria-label="Ta bort citatet"
-                  @click.prevent="emit('clearSelectionContext')"
+                  icon="i-openai-plus"
+                  aria-label="Bifoga filer"
+                  :disabled="isLoading || attachmentCapacityReached"
+                  @click="fileInputRef?.click()"
                 />
-              </div>
-
-              <div
-                v-if="activeSkill"
-                :key="`skill-${activeSkill.id}`"
-                class="flex"
+              </UTooltip>
+            </div>
+            <div
+              ref="rightControlsRef"
+              class="chat-controls-right flex shrink-0 items-center gap-1"
+            >
+              <UDropdownMenu
+                v-model:open="modelMenuOpen"
+                :items="modelItems"
+                :content="{ align: 'end', side: 'top' }"
+                checked-icon="i-openai-check"
+                :ui="{
+                  content: 'min-w-24 w-28',
+                  item: 'py-1',
+                  itemLabel: 'text-xs font-normal',
+                }"
               >
-                <UBadge
-                  :label="activeSkill.label"
-                  color="primary"
-                  variant="solid"
+                <UButton
+                  color="neutral"
+                  variant="ghost"
                   size="sm"
-                  trailing-icon="i-tabler-x"
-                  class="cursor-pointer"
-                  :aria-label="`Ta bort ${activeSkill.label}`"
-                  @mousedown.prevent="clearSkill()"
+                  :label="`${selectedModelLabel}`"
+                  class="min-w-0"
+                  trailing-icon="i-openai-chevron-down"
                 />
-              </div>
-
-              <TransitionGroup
-                v-if="pendingAttachments.length"
-                key="attachments"
-                name="attachment-chip"
-                tag="div"
-                appear
-                class="flex flex-wrap gap-2"
+              </UDropdownMenu>
+              <p
+                v-if="text.length > MAX_LENGTH * 0.8"
+                class="text-2xs"
+                :class="
+                  text.length > MAX_LENGTH
+                    ? 'font-medium text-error'
+                    : 'text-muted'
+                "
               >
-                <div
-                  v-for="attachment in pendingAttachments"
-                  :key="attachment.id"
-                  class="flex min-w-0 max-w-full items-center gap-2 rounded-xl bg-elevated px-2.5 py-1.5 text-xs"
-                >
-                  <UIcon
-                    v-if="attachment.mediaType === 'application/pdf'"
-                    name="i-tabler-file-text"
-                    class="size-3.5 shrink-0 text-muted"
-                  />
-                  <img
-                    v-else-if="attachment.previewUrl"
-                    :src="attachment.previewUrl"
-                    alt=""
-                    class="size-10 shrink-0 rounded-lg object-cover"
-                  />
-                  <UIcon
-                    v-else
-                    name="i-tabler-photo"
-                    class="size-3.5 shrink-0 text-muted"
-                  />
-                  <span class="max-w-20 truncate" :title="attachment.name">{{
-                    attachment.name
-                  }}</span>
-                  <span class="shrink-0 text-muted">{{
-                    formatFileSize(attachment.size)
-                  }}</span>
-                  <UButton
-                    color="neutral"
-                    variant="link"
-                    size="xs"
-                    icon="i-tabler-x"
-                    :aria-label="`Ta bort ${attachment.name}`"
-                    @click="removePendingAttachment(attachment.id)"
-                  />
-                </div>
-              </TransitionGroup>
-            </TransitionGroup>
+                {{ text.length }} / {{ MAX_LENGTH }}
+              </p>
+              <button
+                type="button"
+                class="chat-send flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-inverted disabled:opacity-45"
+                :aria-label="isLoading ? 'Avbryt svar' : 'Skicka meddelande'"
+                :disabled="!isLoading && !canSend"
+                @click="isLoading ? emit('cancel') : handleSubmit()"
+              >
+                <UIcon
+                  :name="isLoading ? 'i-openai-stop' : 'i-openai-arrow-up'"
+                  class="size-5"
+                />
+              </button>
+            </div>
           </div>
         </div>
-      </Transition>
-
+      </form>
       <textarea
-        ref="textareaRef"
-        v-model="text"
-        :rows="MIN_ROWS"
-        :placeholder="
-          activeSkill
-            ? 'Fråga vad som helst'
-            : 'Fråga vad som helst, skriv / för skills'
-        "
-        role="combobox"
-        :aria-expanded="menuOpen"
-        aria-controls="chat-skill-menu"
-        :aria-activedescendant="
-          menuOpen
-            ? `chat-skill-${filteredSkills[highlightedIndex]?.id}`
-            : undefined
-        "
-        class="chat-textarea block w-full resize-none bg-transparent px-4 py-2.5 text-[0.9375rem] leading-6 text-highlighted outline-none placeholder:text-muted sm:py-3"
-        @input="handleInput"
-        @keydown="handleKeyDown"
+        ref="measurementRef"
+        :value="text"
+        aria-hidden="true"
+        tabindex="-1"
+        rows="1"
+        class="prompt-measurement"
       />
-
-      <div class="flex min-w-0 items-center justify-between gap-2 px-2 pb-2">
-        <div class="flex min-w-0 items-center gap-1">
-          <input
-            ref="fileInputRef"
-            type="file"
-            multiple
-            class="hidden"
-            :accept="FILE_INPUT_ACCEPT"
-            @change="handleFileInput"
-          />
-          <UTooltip text="Bifoga filer">
-            <UButton
-              color="neutral"
-              variant="ghost"
-              icon="i-tabler-plus"
-              aria-label="Bifoga filer"
-              :disabled="isLoading || attachmentCapacityReached"
-              @click="fileInputRef?.click()"
-            />
-          </UTooltip>
-          <UTooltip :text="webSearch ? 'Webbsökning på' : 'Sök på webben'">
-            <UButton
-              :color="webSearch ? 'primary' : 'neutral'"
-              :variant="webSearch ? 'soft' : 'ghost'"
-              icon="i-tabler-world"
-              :label="webSearch ? 'Webb' : undefined"
-              aria-label="Sök på webben"
-              :aria-pressed="webSearch"
-              @click="emit('update:webSearch', !webSearch)"
-            />
-          </UTooltip>
-          <UDropdownMenu
-            v-model:open="modelMenuOpen"
-            :items="modelItems"
-            :content="{ align: 'start' }"
-          >
-            <UButton
-              color="neutral"
-              variant="ghost"
-              :label="`${selectedModelLabel}`"
-              class="min-w-0"
-            />
-          </UDropdownMenu>
-        </div>
-        <div class="flex shrink-0 items-center gap-2">
-          <p
-            v-if="text.length > MAX_LENGTH * 0.8"
-            class="text-2xs"
-            :class="
-              text.length > MAX_LENGTH ? 'font-medium text-error' : 'text-muted'
-            "
-          >
-            {{ text.length }} / {{ MAX_LENGTH }}
-          </p>
-          <UButton
-            v-if="isLoading"
-            color="neutral"
-            variant="soft"
-            icon="i-tabler-player-stop"
-            class="size-10 p-0"
-            aria-label="Avbryt svar"
-            @click="emit('cancel')"
-          />
-          <UButton
-            v-else
-            color="primary"
-            square
-            class="size-8 items-center justify-center gap-0 p-0"
-            aria-label="Skicka meddelande"
-            :disabled="!canSend"
-            @click="emit('send')"
-          >
-            <UIcon
-              name="i-tabler-arrow-up"
-              mode="svg"
-              class="block size-5 shrink-0"
-            />
-          </UButton>
-        </div>
-      </div>
     </div>
     <p
       v-if="showDisclaimer"
@@ -647,44 +523,105 @@ defineExpose({
 </template>
 
 <style scoped>
-.chat-shell {
-  border-color: color-mix(in srgb, var(--ui-text-highlighted) 9%, transparent);
-  box-shadow:
-    0 1px 2px rgb(0 0 0 / 0.025),
-    0 4px 14px rgb(0 0 0 / 0.035);
+.prompt-measurement {
+  position: absolute;
+  visibility: hidden;
+  pointer-events: none;
+  height: 0;
+  padding: 0;
+  border: 0;
+  font: inherit;
+  font-size: 0.9375rem;
+  line-height: 24px;
+  overflow: hidden;
+}
+
+.chat-prompt {
+  position: relative;
+  padding: 8px;
+  border: 1px solid
+    color-mix(in srgb, var(--ui-text-highlighted) 10%, transparent);
+  box-shadow: 0 2px 10px rgb(0 0 0 / 0.035);
+  border-radius: 26px;
   transition:
-    border-color var(--duration-fast) ease,
-    box-shadow var(--duration-fast) ease;
+    border-radius 200ms ease,
+    padding-bottom 200ms ease;
 }
-
-.chat-shell:has(.chat-textarea:focus) {
-  border-color: color-mix(in srgb, var(--ui-text-highlighted) 14%, transparent);
-  box-shadow:
-    0 1px 2px rgb(0 0 0 / 0.03),
-    0 5px 16px rgb(0 0 0 / 0.045);
+.chat-prompt-header {
+  display: block;
+  /* Pull the header out to the shell edge so its background meets the border. */
+  margin: -8px -8px 8px;
+  border-radius: 25px 25px 0 0;
+  overflow: hidden;
 }
-
-:global(.dark) .chat-shell,
-:global(.dim) .chat-shell {
-  box-shadow:
-    0 1px 2px rgb(0 0 0 / 0.12),
-    0 5px 18px rgb(0 0 0 / 0.12);
+.chat-prompt.is-expanded .chat-prompt-header {
+  border-radius: 19px 19px 0 0;
 }
-
-.chat-textarea {
-  transition: height 130ms var(--ease-spring);
-  scrollbar-width: none;
-  -ms-overflow-style: none;
+.chat-prompt-textarea {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 32px;
+  resize: none;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--ui-text-highlighted);
+  font-size: 0.9375rem;
+  line-height: 24px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  overflow-y: auto;
+  scrollbar-width: thin;
 }
-
+.animate-layout .chat-prompt-textarea {
+  transition:
+    height 200ms ease,
+    min-height 200ms ease,
+    padding 200ms ease;
+}
+.chat-prompt-textarea::placeholder {
+  color: var(--ui-text-muted);
+}
+.chat-prompt-footer {
+  display: contents;
+}
+.chat-controls-left,
+.chat-controls-right {
+  position: absolute;
+  bottom: 8px;
+  height: 32px;
+}
+.chat-controls-left {
+  left: 8px;
+}
+.chat-controls-right {
+  right: 8px;
+}
+.chat-prompt.is-expanded {
+  border-radius: 20px;
+  padding-bottom: 48px;
+}
+.is-expanded .chat-prompt-textarea {
+  min-height: 64px;
+}
+.chat-send {
+  cursor: pointer;
+  transition: opacity 150ms ease;
+}
+.chat-send:disabled {
+  cursor: default;
+}
+.chat-send:focus-visible {
+  outline: 2px solid var(--ui-primary);
+  outline-offset: 3px;
+}
 @media (prefers-reduced-motion: reduce) {
-  .chat-textarea {
+  .chat-prompt,
+  .chat-prompt-textarea,
+  .animate-layout .chat-prompt-textarea {
     transition: none;
   }
-}
-
-.chat-textarea::-webkit-scrollbar {
-  display: none;
 }
 
 .fade-up-enter-active,

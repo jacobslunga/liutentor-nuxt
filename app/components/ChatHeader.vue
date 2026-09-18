@@ -11,7 +11,7 @@
         <UButton
           color="neutral"
           variant="ghost"
-          icon="i-tabler-chevron-right"
+          icon="i-openai-chevron-right"
           aria-label="Stäng chatten"
           @click="emit('close')"
         />
@@ -23,7 +23,7 @@
         <UButton
           color="neutral"
           variant="ghost"
-          icon="i-tabler-plus"
+          icon="i-openai-plus"
           aria-label="Ny chatt"
           @click="emit('newChat')"
         />
@@ -32,7 +32,7 @@
         <UButton
           color="neutral"
           variant="ghost"
-          icon="i-tabler-history"
+          icon="i-openai-history"
           aria-label="Historik"
           @click="emit('openHistory')"
         />

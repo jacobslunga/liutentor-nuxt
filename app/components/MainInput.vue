@@ -124,7 +124,7 @@ onUnmounted(() => {
     v-model:search-term="searchTerm"
     :items="items"
     :placeholder="`Sök efter ${typed}`"
-    icon="i-tabler-search"
+    icon="i-openai-search"
     variant="none"
     trailing-icon=""
     ignore-filter
@@ -150,7 +150,7 @@ onUnmounted(() => {
         </span>
       </span>
       <UIcon
-        name="i-tabler-corner-down-left"
+        name="i-openai-corner-down-left"
         class="size-3.5 shrink-0 text-dimmed"
       />
     </template>

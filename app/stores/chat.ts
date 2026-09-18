@@ -47,7 +47,7 @@ export interface PendingSelection {
 export const useChatStore = defineStore("chat", () => {
   const isOpen = ref(false);
   const isLoading = ref(false);
-  const savedScrollPosition = ref(0);
+  const savedScrollPosition = ref<number | null>(null);
   const messages = ref<Message[]>([]);
   const draftInput = ref("");
   const draftAttachments = ref<ChatAttachment[]>([]);
@@ -124,7 +124,7 @@ export const useChatStore = defineStore("chat", () => {
     for (const url of previewUrls) URL.revokeObjectURL(url);
     messages.value = [];
     isLoading.value = false;
-    savedScrollPosition.value = 0;
+    savedScrollPosition.value = null;
     draftInput.value = "";
     draftAttachments.value = [];
     currentExamId.value = null;

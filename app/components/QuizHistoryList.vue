@@ -103,7 +103,7 @@ function confirmDelete() {
             <span v-if="item.sourceCount">· {{ item.sourceCount }} tentor</span>
           </span>
           <UIcon
-            name="i-tabler-check"
+            name="i-openai-check"
             v-if="item.id === activeQuizId"
             class="h-4 w-4 shrink-0 text-primary"
           />
@@ -117,7 +117,7 @@ function confirmDelete() {
           :aria-label="`Ta bort quiz från ${item.label}`"
           @click="requestDelete(item.id)"
         >
-          <UIcon name="i-tabler-trash" class="h-4 w-4" />
+          <UIcon name="i-openai-trash" class="h-4 w-4" />
         </UButton>
       </div>
     </div>

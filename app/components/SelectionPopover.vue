@@ -26,7 +26,7 @@ const emit = defineEmits<{ reply: [] }>();
           @mousedown.prevent.stop="emit('reply')"
         >
           Svara
-          <UIcon name="i-tabler-arrow-back-up" class="w-3.5 h-3.5" />
+          <UIcon name="i-openai-arrow-back-up" class="w-3.5 h-3.5" />
         </UButton>
       </div>
     </Transition>

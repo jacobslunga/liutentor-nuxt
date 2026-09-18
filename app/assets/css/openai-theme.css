@@ -1,0 +1,112 @@
+/* Adapted from OpenAI Apps SDK UI (MIT). See ../icons/OPENAI-LICENSE. */
+@theme {
+  /* OpenAI's neutral ramp, also used by explicit bg-neutral/text-neutral utilities. */
+  --color-neutral-50: #f9f9f9;
+  --color-neutral-100: #ededed;
+  --color-neutral-200: #cdcdcd;
+  --color-neutral-300: #afafaf;
+  --color-neutral-400: #8f8f8f;
+  --color-neutral-500: #5d5d5d;
+  --color-neutral-600: #414141;
+  --color-neutral-700: #303030;
+  --color-neutral-800: #212121;
+  --color-neutral-900: #181818;
+  --color-neutral-950: #0d0d0d;
+  --font-sans:
+    ui-sans-serif, -apple-system, system-ui, "Segoe UI", "Noto Sans", Helvetica,
+    Arial, sans-serif;
+}
+
+/* Scale component corners from the single --ui-radius setting in tailwind.css. */
+@theme inline {
+  --radius-xs: calc(var(--ui-radius) / 3);
+  --radius-sm: calc(var(--ui-radius) / 2);
+  --radius-md: calc(var(--ui-radius) * 2 / 3);
+  --radius-lg: calc(var(--ui-radius) * 5 / 6);
+  --radius-xl: var(--ui-radius);
+  --radius-2xl: calc(var(--ui-radius) * 4 / 3);
+  --radius-3xl: calc(var(--ui-radius) * 5 / 3);
+  --radius-4xl: calc(var(--ui-radius) * 2);
+}
+
+:root {
+  color-scheme: light;
+  --openai-gray-0: light-dark(#ffffff, #0d0d0d);
+  --openai-gray-25: light-dark(#fcfcfc, #101010);
+  --openai-gray-50: light-dark(#f9f9f9, #131313);
+  --openai-gray-75: light-dark(#f3f3f3, #161616);
+  --openai-gray-100: light-dark(#ededed, #181818);
+  --openai-gray-150: light-dark(#dfdfdf, #1c1c1c);
+  --openai-gray-200: light-dark(#cdcdcd, #212121);
+  --openai-gray-250: light-dark(#b9b9b9, #282828);
+  --openai-gray-300: light-dark(#afafaf, #303030);
+  --openai-gray-350: light-dark(#9f9f9f, #393939);
+  --openai-gray-400: light-dark(#8f8f8f, #414141);
+  --openai-gray-450: light-dark(#767676, #4f4f4f);
+  --openai-gray-500: #5d5d5d;
+  --openai-gray-550: light-dark(#4f4f4f, #767676);
+  --openai-gray-600: light-dark(#414141, #8f8f8f);
+  --openai-gray-650: light-dark(#393939, #9f9f9f);
+  --openai-gray-700: light-dark(#303030, #afafaf);
+  --openai-gray-750: light-dark(#282828, #b9b9b9);
+  --openai-gray-800: light-dark(#212121, #cdcdcd);
+  --openai-gray-850: light-dark(#1c1c1c, #dcdcdc);
+  --openai-gray-900: light-dark(#181818, #ededed);
+  --openai-gray-925: light-dark(#161616, #f3f3f3);
+  --openai-gray-950: light-dark(#131313, #f3f3f3);
+  --openai-gray-975: light-dark(#101010, #f9f9f9);
+  --openai-gray-1000: light-dark(#0d0d0d, #ffffff);
+}
+
+.dark,
+.dim {
+  color-scheme: dark;
+}
+
+:root,
+.dark,
+.dim {
+  --ui-bg: light-dark(var(--openai-gray-0), var(--openai-gray-200));
+  --ui-bg-muted: light-dark(var(--openai-gray-50), var(--openai-gray-100));
+  --ui-bg-elevated: light-dark(var(--openai-gray-75), var(--openai-gray-300));
+  /* Two steps above elevated so soft/subtle hover states are visible. */
+  --ui-bg-accented: light-dark(var(--openai-gray-150), var(--openai-gray-350));
+  --ui-bg-inverted: var(--openai-gray-1000);
+  --ui-secondary: var(--openai-gray-1000);
+  --ui-text: var(--openai-gray-1000);
+  --ui-text-highlighted: var(--openai-gray-1000);
+  --ui-text-toned: var(--openai-gray-700);
+  --ui-text-muted: light-dark(var(--openai-gray-500), var(--openai-gray-700));
+  --ui-text-dimmed: light-dark(var(--openai-gray-400), var(--openai-gray-600));
+  --ui-text-inverted: var(--openai-gray-0);
+  --ui-border: light-dark(rgb(13 13 13 / 12%), rgb(255 255 255 / 12%));
+  --ui-border-muted: light-dark(rgb(13 13 13 / 7%), rgb(255 255 255 / 6%));
+  --ui-border-accented: light-dark(rgb(13 13 13 / 18%), rgb(255 255 255 / 20%));
+}
+
+/*
+ * Dark mode: near-black canvas with clearly stepped surfaces, like ChatGPT.
+ * Values are the OpenAI dark ramp (gray-0 … gray-350 in dark) as literal hex so
+ * they do not depend on light-dark() support.
+ */
+.dark,
+.dim {
+  --ui-bg: #0d0d0d;
+  --ui-bg-muted: #161616;
+  --ui-bg-elevated: #212121;
+  --ui-bg-accented: #303030;
+  --ui-bg-inverted: #ffffff;
+  --ui-secondary: #ffffff;
+
+  --ui-text-highlighted: #ffffff;
+  --ui-text: #ededed;
+  --ui-text-toned: #cdcdcd;
+  --ui-text-muted: #afafaf;
+  --ui-text-dimmed: #8f8f8f;
+  --ui-text-inverted: #0d0d0d;
+
+  --ui-border: rgb(255 255 255 / 12%);
+  --ui-border-muted: rgb(255 255 255 / 7%);
+  --ui-border-accented: rgb(255 255 255 / 20%);
+  --ui-border-inverted: #ffffff;
+}

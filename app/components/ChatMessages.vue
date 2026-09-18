@@ -5,8 +5,8 @@ import {
   isChatMarkdownReady,
   renderChatMarkdown,
   renderCachedChatMarkdown,
+  selectionToMarkdown,
 } from "@/lib/chat-markdown";
-import { getSkillById } from "@/lib/chat-skills";
 
 const props = withDefaults(
   defineProps<{
@@ -35,11 +35,10 @@ initChatMarkdown()
     // the raw message text, which beats leaving every reply blank.
     mdReady.value = true;
     if (
-      chatStore.savedScrollPosition === 0 &&
       props.messages.length > 0 &&
-      !props.isLoading
+      (chatStore.savedScrollPosition !== null || !props.isLoading)
     ) {
-      nextTick(() => scrollToBottom("auto"));
+      nextTick(() => restoreScroll());
     }
   });
 
@@ -197,9 +196,10 @@ function handleSelectionChange() {
 }
 
 function handleReplyToSelection() {
-  const text = window.getSelection()?.toString().trim();
+  const selection = window.getSelection();
+  const text = selection ? selectionToMarkdown(selection) : "";
   if (!text) return;
-  window.getSelection()?.removeAllRanges();
+  selection?.removeAllRanges();
   selectionPopover.value.visible = false;
   emit("replyToSelection", text);
 }
@@ -232,7 +232,8 @@ function scrollToBottom(behavior: ScrollBehavior = "smooth") {
 }
 
 function persistScrollPosition() {
-  chatStore.savedScrollPosition = scrollParent()?.scrollTop ?? 0;
+  const el = scrollParent();
+  if (el) chatStore.savedScrollPosition = el.scrollTop;
 }
 
 function handleScroll() {
@@ -247,7 +248,7 @@ function handleScroll() {
 function restoreScroll() {
   const el = scrollParent();
   if (!el) return;
-  if (chatStore.savedScrollPosition > 0) {
+  if (chatStore.savedScrollPosition !== null) {
     el.scrollTop = chatStore.savedScrollPosition;
   } else {
     scrollToBottom("auto");
@@ -256,7 +257,7 @@ function restoreScroll() {
 }
 
 function resetScrollState() {
-  chatStore.savedScrollPosition = 0;
+  chatStore.savedScrollPosition = null;
 }
 
 watch(
@@ -327,7 +328,9 @@ onMounted(() => {
     isMounted.value = true;
   });
 
-  if (props.isLoading) {
+  if (chatStore.savedScrollPosition !== null) {
+    nextTick(() => restoreScroll());
+  } else if (props.isLoading) {
     nextTick(() => {
       scrollUserMessageToTop();
     });
@@ -336,7 +339,7 @@ onMounted(() => {
   }
 });
 
-onUnmounted(() => {
+onBeforeUnmount(() => {
   if (props.enableSelectionPopover) {
     document.removeEventListener("selectionchange", handleSelectionChange);
   }
@@ -354,7 +357,18 @@ defineExpose({
 </script>
 
 <template>
+  <div
+    v-if="!mdReady && messages.length > 0"
+    role="status"
+    class="flex flex-1 items-center justify-center gap-2 px-4 py-20 text-sm text-muted"
+    :class="contentClass"
+  >
+    <UIcon name="i-openai-spinner" class="size-5 animate-spin" />
+    <span>Laddar konversation...</span>
+  </div>
+
   <UChatMessages
+    v-show="mdReady || messages.length === 0"
     ref="rootRef"
     :messages="uiMessages"
     :status="status"
@@ -394,9 +408,9 @@ defineExpose({
       >
         <div
           v-if="message.original.selectionContext"
-          class="border-l-2 border-inverted/30 pl-3 text-sm italic text-muted line-clamp-3"
+          class="border-l-2 border-inverted/30 pl-3 text-sm text-muted line-clamp-3"
         >
-          "{{ message.original.selectionContext }}"
+          "<SelectionQuote :text="message.original.selectionContext" />"
         </div>
 
         <div
@@ -411,7 +425,7 @@ defineExpose({
           >
             <UIcon
               v-if="attachment.mediaType === 'application/pdf'"
-              name="i-tabler-file-text"
+              name="i-openai-file-text"
               class="size-3.5 shrink-0 text-muted"
             />
             <img
@@ -422,7 +436,7 @@ defineExpose({
             />
             <UIcon
               v-else
-              name="i-tabler-photo"
+              name="i-openai-photo"
               class="size-3.5 shrink-0 text-muted"
             />
             <span class="max-w-28 truncate" :title="attachment.name">
@@ -433,14 +447,6 @@ defineExpose({
             </span>
           </div>
         </div>
-
-        <UBadge
-          v-if="message.original.skill"
-          color="primary"
-          variant="solid"
-          size="sm"
-          :label="getSkillById(message.original.skill)?.label"
-        />
 
         <p
           v-if="message.original.content"
@@ -461,7 +467,7 @@ defineExpose({
           class="mb-2 flex h-6 items-center gap-2"
         >
           <UIcon
-            name="i-tabler-loader-2"
+            name="i-openai-spinner"
             class="variable-spin size-4 text-muted"
           />
           <span class="shimmer-text text-sm">
@@ -489,7 +495,7 @@ defineExpose({
             color="neutral"
             variant="outline"
             size="xs"
-            icon="i-tabler-world"
+            icon="i-openai-world"
             :label="sourceLabel(source)"
             class="max-w-56"
           />
@@ -500,7 +506,7 @@ defineExpose({
     <template #indicator>
       <div class="flex h-6 items-center gap-2">
         <UIcon
-          name="i-tabler-loader-2"
+          name="i-openai-spinner"
           class="variable-spin size-4 text-muted"
         />
         <span class="shimmer-text text-sm">

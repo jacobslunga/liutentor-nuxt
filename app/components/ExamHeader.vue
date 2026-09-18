@@ -186,12 +186,12 @@ const selectedDurationLabel = computed(
 const layoutTabs = [
   {
     value: "exam-with-facit",
-    icon: "i-tabler-columns-2",
+    icon: "i-lucide-columns-2",
     ariaLabel: "Visa tenta och facit",
   },
   {
     value: "exam-only",
-    icon: "i-tabler-layout-sidebar-left-collapse",
+    icon: "i-lucide-panel-right",
     ariaLabel: "Visa endast tentan",
   },
 ] satisfies TabsItem[];
@@ -250,7 +250,7 @@ const actionItems = computed<DropdownMenuItem[][]>(() => [
   [
     {
       label: props.focusMode ? "Avsluta fokusläge" : "Fokusläge",
-      icon: props.focusMode ? "i-tabler-minimize" : "i-tabler-maximize",
+      icon: props.focusMode ? "i-openai-minimize" : "i-openai-maximize",
       kbds: ["F"],
       onSelect: () => emit("toggleFocusMode"),
     },
@@ -258,10 +258,10 @@ const actionItems = computed<DropdownMenuItem[][]>(() => [
       label: "Tema",
       icon:
         theme.value === "light"
-          ? "i-tabler-sun"
+          ? "i-openai-sun"
           : theme.value === "dark"
-            ? "i-tabler-moon"
-            : "i-tabler-device-desktop",
+            ? "i-openai-moon"
+            : "i-openai-device-desktop",
       children: THEME_OPTIONS.map((option) => ({
         label: option.label,
         type: "checkbox" as const,
@@ -274,24 +274,24 @@ const actionItems = computed<DropdownMenuItem[][]>(() => [
     },
     {
       label: "Inställningar",
-      icon: "i-tabler-settings",
+      icon: "i-openai-settings",
       onSelect: () => (isSettingsOpen.value = true),
     },
     {
       label: "Ladda upp tenta/facit",
-      icon: "i-tabler-upload",
+      icon: "i-openai-upload",
       onSelect: () => openUploadModal(props.courseCode),
     },
   ],
   [
     {
       label: "Ladda ned",
-      icon: "i-tabler-download",
+      icon: "i-openai-download",
       disabled: !hasDownload.value,
       children: [
         {
           label: "Tenta",
-          icon: "i-tabler-file-text",
+          icon: "i-openai-file-text",
           disabled: !selectedExam.value?.pdf_url,
           onSelect: () =>
             downloadFile(
@@ -301,7 +301,7 @@ const actionItems = computed<DropdownMenuItem[][]>(() => [
         },
         {
           label: "Facit",
-          icon: "i-tabler-file-check",
+          icon: "i-openai-file-check",
           disabled: !props.solutionPdfUrl,
           onSelect: () =>
             downloadFile(
@@ -313,11 +313,11 @@ const actionItems = computed<DropdownMenuItem[][]>(() => [
     },
     {
       label: "Lock in",
-      icon: "i-tabler-lock",
+      icon: "i-openai-lock",
       disabled: !selectedExam.value,
       children: TIME_OPTIONS.map((opt) => ({
         label: opt.label,
-        icon: "i-tabler-stopwatch",
+        icon: "i-openai-stopwatch",
         onSelect: () => selectLockInDuration(opt.value),
       })),
     },
@@ -344,12 +344,11 @@ function confirmLockIn() {
     <UFieldGroup class="pointer-events-auto overflow-hidden rounded-md">
       <UButton
         color="neutral"
-        variant="subtle"
+        variant="soft"
+        icon="i-openai-arrow-left"
         aria-label="Tillbaka till kursen"
         @click="router.push(`/search/${courseCode}`)"
-      >
-        <UIcon name="i-tabler-arrow-left" />
-      </UButton>
+      />
 
       <UPopover
         v-if="selectedExam"
@@ -357,12 +356,12 @@ function confirmLockIn() {
         :content="{ align: 'start', sideOffset: 8 }"
         :ui="{ content: 'overflow-hidden' }"
       >
-        <UButton color="neutral" variant="subtle" class="gap-1.5">
+        <UButton color="neutral" variant="soft" class="gap-1.5">
           <div class="flex flex-row items-baseline gap-1.5 leading-none">
             <span class="font-semibold">{{ selectedExam.exam_date }}</span>
           </div>
           <UIcon
-            name="i-tabler-chevron-down"
+            name="i-openai-chevron-down"
             class="size-4 text-muted transition-transform duration-200"
             :class="{ 'rotate-180': isDropdownOpen }"
           />
@@ -383,8 +382,8 @@ function confirmLockIn() {
                   size="xs"
                   :icon="
                     sortDirection === 'desc'
-                      ? 'i-tabler-arrow-down'
-                      : 'i-tabler-arrow-up'
+                      ? 'i-openai-arrow-down'
+                      : 'i-openai-arrow-up'
                   "
                   :label="sortLabel"
                   aria-label="Sortera tentor"
@@ -434,7 +433,7 @@ function confirmLockIn() {
                 {{ formatPassRate(e) }}
               </span>
               <UIcon
-                name="i-tabler-check"
+                name="i-openai-check"
                 v-if="e.id.toString() === examId"
                 class="col-start-5 size-4 text-primary"
               />
@@ -446,13 +445,13 @@ function confirmLockIn() {
     </UFieldGroup>
 
     <div class="pointer-events-auto flex items-center gap-2">
-      <UButton @click="chatStore.toggle()" size="sm">
+      <UButton @click="chatStore.toggle()">
         <UIcon
-          name="i-tabler-loader-2"
+          name="i-openai-spinner"
           v-if="chatStore.isLoading"
           class="animate-spin"
         />
-        <UIcon name="i-tabler-message-circle" v-else />
+        <UIcon name="i-openai-chat" v-else />
         <span>{{ chatStore.isOpen ? "Stäng" : "Chatt" }}</span>
       </UButton>
 
@@ -461,16 +460,11 @@ function confirmLockIn() {
       >
         <UTabs
           color="neutral"
+          size="sm"
+          :content="false"
           :model-value="layoutMode"
           :items="layoutTabs"
-          :content="false"
-          size="xs"
-          class="w-auto"
-          :ui="{
-            list: '!rounded-md',
-            indicator: '!rounded-sm',
-            trigger: '!rounded-sm px-3',
-          }"
+          :ui="{ trigger: 'h-8 w-11 justify-center gap-0 px-0' }"
           @update:model-value="switchLayout"
         >
           <template #leading="{ item }">
@@ -492,7 +486,7 @@ function confirmLockIn() {
             color="neutral"
             variant="ghost"
             size="sm"
-            icon="i-tabler-dots"
+            icon="i-openai-dots"
             aria-label="Fler åtgärder"
           />
         </UDropdownMenu>

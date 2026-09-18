@@ -305,7 +305,7 @@ async function handleSignOut() {
               class="absolute inset-0 flex items-center justify-center z-10"
             >
               <UIcon
-                name="i-tabler-loader-2"
+                name="i-openai-spinner"
                 class="h-7 w-7 text-white animate-spin"
               />
             </div>
@@ -314,12 +314,12 @@ async function handleSignOut() {
               class="absolute bottom-1 right-1 h-8 w-8 rounded-full bg-default border border-default flex items-center justify-center z-10"
             >
               <UIcon
-                name="i-tabler-loader-2"
+                name="i-openai-spinner"
                 v-if="avatarUploading"
                 class="h-4 w-4 animate-spin text-muted"
               />
               <UIcon
-                name="i-tabler-plus"
+                name="i-openai-plus"
                 v-else
                 class="h-4 w-4 text-highlighted"
               />
@@ -416,12 +416,12 @@ async function handleSignOut() {
                 @click="saveProfile"
               >
                 <UIcon
-                  name="i-tabler-loader-2"
+                  name="i-openai-spinner"
                   v-if="profileSaving"
                   class="w-4 h-4 animate-spin"
                 />
                 <UIcon
-                  name="i-tabler-check"
+                  name="i-openai-check"
                   v-else-if="profileSaved"
                   class="w-4 h-4"
                 />
@@ -487,11 +487,11 @@ async function handleSignOut() {
                 @click="handleSignOut"
               >
                 <UIcon
-                  name="i-tabler-loader-2"
+                  name="i-openai-spinner"
                   v-if="signOutLoading"
                   class="w-4 h-4 animate-spin"
                 />
-                <UIcon name="i-tabler-logout" v-else class="w-4 h-4" />
+                <UIcon name="i-openai-logout" v-else class="w-4 h-4" />
                 <span v-if="!signOutLoading">Logga ut</span>
               </UButton>
             </div>

@@ -12,7 +12,7 @@ defineProps<{
     <div
       class="flex size-10 items-center justify-center rounded-full bg-muted/60"
     >
-      <UIcon name="i-tabler-chart-bar" class="size-5 text-muted" />
+      <UIcon name="i-openai-chart-bar" class="size-5 text-muted" />
     </div>
     <div>
       <p class="text-sm font-medium text-highlighted">{{ title }}</p>

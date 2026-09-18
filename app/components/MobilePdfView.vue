@@ -122,7 +122,7 @@ const downloadFile = async (url: string, filename: string) => {
 const downloadItems = computed<DropdownMenuItem[]>(() => [
   {
     label: "Ladda ned tenta",
-    icon: "i-tabler-download",
+    icon: "i-openai-download",
     disabled: !props.examPdfUrl,
     onSelect: () =>
       downloadFile(
@@ -132,7 +132,7 @@ const downloadItems = computed<DropdownMenuItem[]>(() => [
   },
   {
     label: "Ladda ned facit",
-    icon: "i-tabler-download",
+    icon: "i-openai-download",
     disabled: !props.solutionPdfUrl,
     onSelect: () =>
       downloadFile(
@@ -149,7 +149,7 @@ const downloadItems = computed<DropdownMenuItem[]>(() => [
       <div class="flex h-14 shrink-0 items-center gap-3 px-3">
         <NuxtLink :to="`/search/${courseCode}`">
           <UButton aria-label="Gå tillbaka" color="neutral" variant="outline" square>
-            <UIcon name="i-tabler-arrow-left" class="w-4 h-4" />
+            <UIcon name="i-openai-arrow-left" class="w-4 h-4" />
           </UButton>
         </NuxtLink>
         <div class="min-w-0 flex-1">
@@ -165,7 +165,7 @@ const downloadItems = computed<DropdownMenuItem[]>(() => [
           :content="{ align: 'start', sideOffset: 8 }">
           <UButton color="neutral" variant="outline" size="sm" aria-label="Byt tenta">
             {{ examDate }}
-            <UIcon name="i-tabler-chevron-down" class="size-4 text-muted" />
+            <UIcon name="i-openai-chevron-down" class="size-4 text-muted" />
           </UButton>
           <template #content>
             <div class="flex items-center justify-between gap-3 border-b px-3 py-2">
@@ -184,7 +184,7 @@ const downloadItems = computed<DropdownMenuItem[]>(() => [
                   :class="item.pass_rate >= 50 ? 'text-success' : item.pass_rate >= 30 ? 'text-warning' : 'text-error'">
                   {{ Number(item.pass_rate).toFixed(1) }}%
                 </span>
-                <UIcon v-if="String(item.id) === examId" name="i-tabler-check" class="size-4 shrink-0 text-primary" />
+                <UIcon v-if="String(item.id) === examId" name="i-openai-check" class="size-4 shrink-0 text-primary" />
               </button>
             </div>
           </template>
@@ -192,11 +192,11 @@ const downloadItems = computed<DropdownMenuItem[]>(() => [
         </div>
         <UDropdownMenu v-model:open="isDownloadOpen" :items="downloadItems" :content="{ align: 'end', sideOffset: 8 }">
           <UButton color="neutral" variant="outline" size="sm" square :disabled="!hasDownload" aria-label="Ladda ned">
-            <UIcon name="i-tabler-download" class="w-4 h-4" />
+            <UIcon name="i-openai-download" class="w-4 h-4" />
           </UButton>
         </UDropdownMenu>
         <UButton v-if="hasSolution" color="neutral" variant="outline" size="sm" @click="showSolution = true">
-          <UIcon name="i-tabler-book" class="w-3.5 h-3.5 text-primary" />
+          <UIcon name="i-openai-book" class="w-3.5 h-3.5 text-primary" />
           Facit
         </UButton>
       </div>
@@ -226,7 +226,7 @@ const downloadItems = computed<DropdownMenuItem[]>(() => [
             </div>
             <UButton color="neutral" variant="outline" size="sm" square aria-label="Stäng"
               @click="showSolution = false">
-              <UIcon name="i-tabler-x" class="w-4 h-4" />
+              <UIcon name="i-openai-x" class="w-4 h-4" />
             </UButton>
           </div>
         </div>

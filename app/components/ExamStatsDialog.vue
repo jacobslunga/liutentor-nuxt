@@ -43,7 +43,7 @@ function passColor(rate: number) {
 
 <template>
   <UIcon
-    name="i-tabler-minus"
+    name="i-openai-minus"
     v-if="total === 0"
     class="w-4 h-4 text-muted/30"
   />

@@ -119,7 +119,7 @@ const maxInDistribution = computed(() =>
         {{ countdown }}
       </p>
       <UButton class="mt-1 w-full" @click="emit('share')">
-        <UIcon name="i-tabler-share" />
+        <UIcon name="i-openai-share" />
         Dela resultat
       </UButton>
       <p class="text-2xs text-muted">

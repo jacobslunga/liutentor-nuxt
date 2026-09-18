@@ -36,7 +36,6 @@ const {
   selectionContext,
   chatHeaderTitle,
   selectedModelId,
-  webSearch,
   handleSend,
   handleCancel,
   handleReplyToSelection,
@@ -55,15 +54,16 @@ const hasMessages = computed(() => messages.value.length > 0);
 
 watch(isOpen, (open) => {
   if (open) {
-    nextTick(() => chatInputRef.value?.focus());
-    if (hasMessages.value && !chatStore.isLoading) {
-      scrollToBottomRightAway();
-    }
+    nextTick(() => {
+      transcriptRef.value?.restoreScroll();
+      chatInputRef.value?.focus();
+    });
   } else {
     isHistoryOpen.value = false;
     stopPinning();
+    transcriptRef.value?.persistScrollPosition();
   }
-});
+}, { flush: "sync" });
 
 function handleKeyDown(e: KeyboardEvent) {
   if (e.repeat) return;
@@ -128,9 +128,10 @@ function scrollToBottomRightAway() {
   scrollToBottomImmediate();
 
   nextTick(() => {
+    if (!isPinningBottom) return;
     scrollToBottomImmediate();
     requestAnimationFrame(() => {
-      scrollToBottomImmediate();
+      if (isPinningBottom) scrollToBottomImmediate();
     });
   });
 
@@ -158,7 +159,7 @@ watch(
 watch(transcriptRef, (transcript) => {
   if (
     transcript &&
-    chatStore.savedScrollPosition === 0 &&
+    chatStore.savedScrollPosition === null &&
     !chatStore.isLoading
   ) {
     scrollToBottomRightAway();
@@ -254,17 +255,17 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
         <div
           class="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex flex-col items-center bg-linear-to-t from-default via-default/85 to-transparent pt-10 pb-3 sm:pb-4">
           <Transition name="fade-up">
-            <UButton v-if="showScrollBottom" variant="outline" color="neutral" icon="i-tabler-arrow-down"
+            <UButton v-if="showScrollBottom" variant="outline" color="neutral" icon="i-openai-arrow-down"
               class="pointer-events-auto mb-2.5 size-8 p-0 shadow-md" aria-label="Rulla till senaste"
               @click="scrollToBottom" />
           </Transition>
 
           <ChatInput ref="chatInputRef" class="pointer-events-auto mx-auto w-full max-w-2xl 3xl:max-w-3xl"
             :initial-text="chatStore.draftInput" :initial-attachments="chatStore.draftAttachments"
-            :is-loading="isLoading" :selected-model-id="selectedModelId" :web-search="webSearch"
+            :is-loading="isLoading" :selected-model-id="selectedModelId"
             :course-code="courseCode" :has-solution="hasSolution" :selection-context="selectionContext" show-disclaimer
             @send="handleSend" @cancel="handleCancel" @update:selected-model-id="selectedModelId = $event"
-            @update:web-search="webSearch = $event" @clear-selection-context="selectionContext = ''" />
+            @clear-selection-context="selectionContext = ''" />
         </div>
       </template>
     </UChatPalette>

@@ -33,7 +33,7 @@ const activeLabel = computed(
     <UButton
       color="neutral"
       variant="outline"
-      trailing-icon="i-tabler-chevron-down"
+      trailing-icon="i-openai-chevron-down"
       :label="activeLabel"
     >
       <template v-if="$slots.icon" #leading>

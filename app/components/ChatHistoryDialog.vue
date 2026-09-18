@@ -40,7 +40,8 @@ const conversationMeta = useState<Record<string, ConversationMeta>>(
 const searchQuery = ref("");
 const searchInputRef = useTemplateRef("searchInputRef");
 const isLoading = ref(false);
-const isOpeningConversation = ref(false);
+const openingConversationId = ref<string | null>(null);
+const isOpeningConversation = computed(() => openingConversationId.value !== null);
 const isDeletingConversation = ref(false);
 const isDeletingAll = ref(false);
 const loadError = ref<string | null>(null);
@@ -233,7 +234,7 @@ async function loadConversationMeta(ids: string[]) {
 async function openConversation(item: ConversationItem) {
   if (isOpeningConversation.value) return;
 
-  isOpeningConversation.value = true;
+  openingConversationId.value = item.id;
   loadError.value = null;
 
   try {
@@ -276,13 +277,13 @@ async function openConversation(item: ConversationItem) {
     chatStore.messages = [...loadedMessages];
     chatStore.currentConversationId = item.id;
     chatStore.currentConversationTitle = item.title;
-    chatStore.savedScrollPosition = 0;
+    chatStore.savedScrollPosition = null;
     emit("update:open", false);
     emit("select", item.id);
   } catch {
     loadError.value = "Kunde inte öppna konversationen.";
   } finally {
-    isOpeningConversation.value = false;
+    openingConversationId.value = null;
   }
 }
 
@@ -321,7 +322,7 @@ async function confirmDeleteConversation() {
       chatStore.messages = [];
       chatStore.currentConversationId = null;
       chatStore.currentConversationTitle = null;
-      chatStore.savedScrollPosition = 0;
+      chatStore.savedScrollPosition = null;
       chatStore.setLoading(false);
     }
 
@@ -367,7 +368,7 @@ async function confirmDeleteAllConversations() {
     chatStore.messages = [];
     chatStore.currentConversationId = null;
     chatStore.currentConversationTitle = null;
-    chatStore.savedScrollPosition = 0;
+    chatStore.savedScrollPosition = null;
     chatStore.setLoading(false);
 
     toast.add({ title: "Alla chattar raderades", color: "success" });
@@ -414,7 +415,7 @@ function focusSearch() {
         <UInput
           ref="searchInputRef"
           v-model="searchQuery"
-          icon="i-tabler-search"
+          icon="i-openai-search"
           placeholder="Sök bland chattar..."
           class="flex-1"
         />
@@ -422,7 +423,7 @@ function focusSearch() {
           v-if="conversations.length > 0"
           color="error"
           variant="ghost"
-          icon="i-tabler-trash"
+          icon="i-openai-trash"
           :disabled="isDeletingAll || isDeletingConversation"
           aria-label="Radera alla chattar"
           @click="showDeleteAllConfirm = true"
@@ -479,6 +480,7 @@ function focusSearch() {
                   type="button"
                   class="min-w-0 flex-1 cursor-pointer text-left px-2 py-1.5"
                   :disabled="isOpeningConversation || isDeletingConversation"
+                  :aria-busy="openingConversationId === item.id"
                   @click="openConversation(item)"
                 >
                   <p
@@ -499,6 +501,15 @@ function focusSearch() {
                   </p>
                 </button>
 
+                <span
+                  v-if="openingConversationId === item.id"
+                  role="status"
+                  class="flex size-7 shrink-0 items-center justify-center text-muted"
+                >
+                  <UIcon name="i-openai-spinner" class="size-4 animate-spin" />
+                  <span class="sr-only">Laddar konversation...</span>
+                </span>
+
                 <UButton
                   color="neutral"
                   variant="ghost"
@@ -509,7 +520,7 @@ function focusSearch() {
                   @click="askDeleteConversation(item)"
                 >
                   <UIcon
-                    name="i-tabler-trash"
+                    name="i-openai-trash"
                     class="w-3.5 h-3.5 text-muted/60 hover:text-error"
                   />
                 </UButton>

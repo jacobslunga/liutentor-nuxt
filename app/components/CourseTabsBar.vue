@@ -4,9 +4,9 @@ import type { TabsItem } from "@nuxt/ui";
 const model = defineModel<string>({ required: true });
 
 const tabs: TabsItem[] = [
-  { value: "exams", label: "Tentor", icon: "i-tabler-file-text" },
-  { value: "stats", label: "Statistik", icon: "i-tabler-chart-line" },
-  { value: "quiz", label: "Quiz", icon: "i-tabler-stack-2" },
+  { value: "exams", label: "Tentor", icon: "i-openai-file-text" },
+  { value: "stats", label: "Statistik", icon: "i-openai-chart-line" },
+  { value: "quiz", label: "Quiz", icon: "i-openai-stack-2" },
 ];
 </script>
 
