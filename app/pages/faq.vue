@@ -121,7 +121,7 @@ const groups = [
               variant="outline"
               @click="openUploadModal()"
             >
-              <UIcon name="i-lucide-upload" class="size-3.5" />
+              <UIcon name="i-tabler-upload" class="size-3.5" />
               Ladda upp tenta
             </UButton>
           </div>

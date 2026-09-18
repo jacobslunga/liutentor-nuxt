@@ -281,7 +281,7 @@ function passColor(rate: number) {
       class="flex items-center justify-center min-h-[60vh]"
     >
       <UIcon
-        name="i-lucide-loader-circle"
+        name="i-tabler-loader-2"
         class="w-6 h-6 animate-spin text-muted"
       />
     </div>
@@ -294,7 +294,7 @@ function passColor(rate: number) {
         <div
           class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted"
         >
-          <UIcon name="i-lucide-inbox" class="h-6 w-6 text-muted" />
+          <UIcon name="i-tabler-inbox" class="h-6 w-6 text-muted" />
         </div>
         <h1 class="text-2xl font-medium text-highlighted">
           Vi saknar tentor för {{ courseCode }}
@@ -316,7 +316,7 @@ function passColor(rate: number) {
         <div class="flex flex-col items-start w-full max-w-4xl gap-8">
           <div class="w-full">
             <h1
-              class="text-3xl sm:text-4xl font-bold text-highlighted leading-tight w-full wrap-break-word"
+              class="text-3xl sm:text-4xl font-semibold text-highlighted leading-tight w-full wrap-break-word"
             >
               {{ courseData.courseName }}
             </h1>
@@ -366,15 +366,15 @@ function passColor(rate: number) {
                     variant="outline"
                     aria-label="Sortera tentor"
                   >
-                    <UIcon name="i-lucide-arrow-left-right" class="size-4" />
+                    <UIcon name="i-tabler-arrows-left-right" class="size-4" />
                     {{ examSortLabel }}
                     <UIcon
-                      name="i-lucide-arrow-down"
+                      name="i-tabler-arrow-down"
                       v-if="examSortDirection === 'desc'"
                       class="size-3.5 text-muted"
                     />
                     <UIcon
-                      name="i-lucide-arrow-up"
+                      name="i-tabler-arrow-up"
                       v-else
                       class="size-3.5 text-muted"
                     />
@@ -383,7 +383,7 @@ function passColor(rate: number) {
               </template>
               <template #actions>
                 <UButton @click="openUploadModal(courseCode)">
-                  <UIcon name="i-lucide-upload" class="w-4 h-4" />
+                  <UIcon name="i-tabler-upload" class="w-4 h-4" />
                   Ladda upp
                 </UButton>
               </template>

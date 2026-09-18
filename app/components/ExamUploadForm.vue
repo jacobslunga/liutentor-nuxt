@@ -228,7 +228,7 @@ onUnmounted(() => {
         <div
           class="flex items-center justify-center gap-2 rounded-md border border-default/60 bg-muted/30 px-4 py-3"
         >
-          <UIcon name="i-lucide-book-open" class="h-4 w-4 text-muted" />
+          <UIcon name="i-tabler-book" class="h-4 w-4 text-muted" />
           <span class="font-mono text-lg font-medium tracking-wide">
             {{ kurskod }}
           </span>
@@ -268,7 +268,7 @@ onUnmounted(() => {
           @change="handleFileInput"
         />
         <div class="flex flex-col items-center justify-center gap-2 text-muted">
-          <UIcon name="i-lucide-upload" class="h-8 w-8" />
+          <UIcon name="i-tabler-upload" class="h-8 w-8" />
           <p class="font-medium">
             Dra och släpp PDF-filer här, eller klicka för att välja
           </p>
@@ -284,7 +284,7 @@ onUnmounted(() => {
           >
             <div class="flex items-center gap-2 overflow-hidden">
               <UIcon
-                name="i-lucide-file-text"
+                name="i-tabler-file-text"
                 class="h-4 w-4 shrink-0 text-muted"
               />
               <span class="truncate">{{ file.name }}</span>
@@ -296,7 +296,7 @@ onUnmounted(() => {
               class="h-6 w-6"
               @click.stop="removeFile(index)"
             >
-              <UIcon name="i-lucide-x" class="h-4 w-4" />
+              <UIcon name="i-tabler-x" class="h-4 w-4" />
             </UButton>
           </div>
         </div>
@@ -307,7 +307,7 @@ onUnmounted(() => {
           @click="handleUpload"
         >
           <UIcon
-            name="i-lucide-loader-circle"
+            name="i-tabler-loader-2"
             v-if="loading"
             class="h-5 w-5 animate-spin"
           />
@@ -318,7 +318,7 @@ onUnmounted(() => {
       <div
         class="p-4 bg-muted/50 border rounded-md flex items-start gap-2 text-left"
       >
-        <UIcon name="i-lucide-info" class="h-4 w-4 text-muted shrink-0" />
+        <UIcon name="i-tabler-info-circle" class="h-4 w-4 text-muted shrink-0" />
         <p class="text-xs text-muted">
           Uppladdade tentor granskas innan de blir tillgängliga för andra
           studenter.

@@ -139,11 +139,11 @@ function toggleFilter(p: string) {
 
           <div class="flex justify-center">
             <UIcon
-              name="i-lucide-check"
+              name="i-tabler-check"
               v-if="exam.has_solution"
               class="w-4 h-4 text-success"
             />
-            <UIcon name="i-lucide-minus" v-else class="w-4 h-4 text-muted/30" />
+            <UIcon name="i-tabler-minus" v-else class="w-4 h-4 text-muted/30" />
           </div>
 
           <div class="text-right flex flex-col items-end gap-1">

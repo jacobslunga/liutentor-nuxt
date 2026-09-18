@@ -177,11 +177,11 @@ function selectSkill(skill: ChatSkill | undefined) {
 }
 
 const SKILL_ICONS: Record<ChatSkillId, string> = {
-  explain: "i-lucide-graduation-cap",
-  theory: "i-lucide-book-open",
-  solution: "i-lucide-list-checks",
-  hint: "i-lucide-lightbulb",
-  summary: "i-lucide-list",
+  explain: "i-tabler-school",
+  theory: "i-tabler-book",
+  solution: "i-tabler-list-check",
+  hint: "i-tabler-bulb",
+  summary: "i-tabler-list",
 };
 
 function clearSkill() {
@@ -390,7 +390,7 @@ defineExpose({
   <div class="pointer-events-auto w-full px-3 sm:px-4">
     <div
       ref="shellRef"
-      class="chat-shell relative mx-auto max-w-2xl cursor-text rounded-[1.625rem] border bg-default 3xl:max-w-3xl"
+      class="chat-shell relative mx-auto max-w-2xl cursor-text rounded-xl border bg-default 3xl:max-w-3xl"
       @click="textareaRef?.focus()"
     >
       <Transition name="fade-up">
@@ -451,7 +451,7 @@ defineExpose({
                 class="flex w-full items-center gap-2"
               >
                 <UIcon
-                  name="i-lucide-reply"
+                  name="i-tabler-arrow-back-up"
                   class="size-3.5 shrink-0 text-muted"
                 />
                 <span class="min-w-0 flex-1 truncate text-sm italic text-muted"
@@ -461,7 +461,7 @@ defineExpose({
                   color="neutral"
                   variant="ghost"
                   size="xs"
-                  icon="i-lucide-x"
+                  icon="i-tabler-x"
                   aria-label="Ta bort citatet"
                   @click.prevent="emit('clearSelectionContext')"
                 />
@@ -477,7 +477,7 @@ defineExpose({
                   color="primary"
                   variant="solid"
                   size="sm"
-                  trailing-icon="i-lucide-x"
+                  trailing-icon="i-tabler-x"
                   class="cursor-pointer"
                   :aria-label="`Ta bort ${activeSkill.label}`"
                   @mousedown.prevent="clearSkill()"
@@ -499,7 +499,7 @@ defineExpose({
                 >
                   <UIcon
                     v-if="attachment.mediaType === 'application/pdf'"
-                    name="i-lucide-file-text"
+                    name="i-tabler-file-text"
                     class="size-3.5 shrink-0 text-muted"
                   />
                   <img
@@ -510,7 +510,7 @@ defineExpose({
                   />
                   <UIcon
                     v-else
-                    name="i-lucide-image"
+                    name="i-tabler-photo"
                     class="size-3.5 shrink-0 text-muted"
                   />
                   <span class="max-w-20 truncate" :title="attachment.name">{{
@@ -523,7 +523,7 @@ defineExpose({
                     color="neutral"
                     variant="link"
                     size="xs"
-                    icon="i-lucide-x"
+                    icon="i-tabler-x"
                     :aria-label="`Ta bort ${attachment.name}`"
                     @click="removePendingAttachment(attachment.id)"
                   />
@@ -570,7 +570,7 @@ defineExpose({
             <UButton
               color="neutral"
               variant="ghost"
-              icon="i-lucide-plus"
+              icon="i-tabler-plus"
               aria-label="Bifoga filer"
               :disabled="isLoading || attachmentCapacityReached"
               @click="fileInputRef?.click()"
@@ -580,7 +580,7 @@ defineExpose({
             <UButton
               :color="webSearch ? 'primary' : 'neutral'"
               :variant="webSearch ? 'soft' : 'ghost'"
-              icon="i-lucide-globe"
+              icon="i-tabler-world"
               :label="webSearch ? 'Webb' : undefined"
               aria-label="Sök på webben"
               :aria-pressed="webSearch"
@@ -614,7 +614,7 @@ defineExpose({
             v-if="isLoading"
             color="neutral"
             variant="soft"
-            icon="i-lucide-square"
+            icon="i-tabler-player-stop"
             class="size-10 p-0"
             aria-label="Avbryt svar"
             @click="emit('cancel')"
@@ -629,7 +629,7 @@ defineExpose({
             @click="emit('send')"
           >
             <UIcon
-              name="i-lucide-arrow-up"
+              name="i-tabler-arrow-up"
               mode="svg"
               class="block size-5 shrink-0"
             />

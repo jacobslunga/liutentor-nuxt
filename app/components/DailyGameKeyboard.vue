@@ -93,7 +93,7 @@ onUnmounted(() => window.removeEventListener("keydown", onKeydown));
         :style="{ height: 'var(--key)' }"
         @click="emit('backspace')"
       >
-        <UIcon name="i-lucide-delete" class="size-5" />
+        <UIcon name="i-tabler-backspace" class="size-5" />
       </button>
     </div>
   </div>

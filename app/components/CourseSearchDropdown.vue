@@ -79,7 +79,7 @@ defineShortcuts({
     :items="items"
     :size="size"
     :class="props.class"
-    icon="i-lucide-search"
+    icon="i-tabler-search"
     placeholder="Sök kurskod..."
     ignore-filter
     trailing-icon=""
@@ -101,7 +101,7 @@ defineShortcuts({
         }}</span>
       </span>
       <UIcon
-        name="i-lucide-corner-down-left"
+        name="i-tabler-corner-down-left"
         class="size-3.5 shrink-0 text-dimmed"
       />
     </template>

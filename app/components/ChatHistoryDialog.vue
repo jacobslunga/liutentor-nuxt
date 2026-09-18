@@ -414,7 +414,7 @@ function focusSearch() {
         <UInput
           ref="searchInputRef"
           v-model="searchQuery"
-          icon="i-lucide-search"
+          icon="i-tabler-search"
           placeholder="Sök bland chattar..."
           class="flex-1"
         />
@@ -422,7 +422,7 @@ function focusSearch() {
           v-if="conversations.length > 0"
           color="error"
           variant="ghost"
-          icon="i-lucide-trash-2"
+          icon="i-tabler-trash"
           :disabled="isDeletingAll || isDeletingConversation"
           aria-label="Radera alla chattar"
           @click="showDeleteAllConfirm = true"
@@ -509,7 +509,7 @@ function focusSearch() {
                   @click="askDeleteConversation(item)"
                 >
                   <UIcon
-                    name="i-lucide-trash-2"
+                    name="i-tabler-trash"
                     class="w-3.5 h-3.5 text-muted/60 hover:text-error"
                   />
                 </UButton>

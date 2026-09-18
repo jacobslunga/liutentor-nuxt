@@ -50,7 +50,7 @@ const currentStepIndex = computed(() =>
         class="gap-1.5 text-muted"
         @click="emit('cancel')"
       >
-        <UIcon name="i-lucide-x" class="h-3.5 w-3.5" />
+        <UIcon name="i-tabler-x" class="h-3.5 w-3.5" />
         Avbryt
       </UButton>
 
@@ -69,7 +69,7 @@ const currentStepIndex = computed(() =>
             class="mt-3 gap-1.5"
             @click="emit('retry')"
           >
-            <UIcon name="i-lucide-loader-circle" class="h-3.5 w-3.5" />
+            <UIcon name="i-tabler-loader-2" class="h-3.5 w-3.5" />
             Försök igen
           </UButton>
         </div>

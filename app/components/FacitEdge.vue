@@ -77,7 +77,7 @@ onUnmounted(() => {
       class="absolute right-0 top-1/2 flex h-10 items-center gap-2 whitespace-nowrap pr-4 will-change-[transform,opacity]"
       :style="tabStyle">
       <template v-if="facitPdfUrl">
-        <UIcon name="i-lucide-chevron-left" class="size-4 shrink-0 text-primary will-change-transform"
+        <UIcon name="i-tabler-chevron-left" class="size-4 shrink-0 text-primary will-change-transform"
           :style="iconStyle" />
         <span class="text-xs font-semibold text-primary">
           {{ label ?? "Facit" }}

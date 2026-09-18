@@ -70,7 +70,7 @@ const courseCodeLabel = computed(() => {
           class="gap-1.5 border-default"
           @click="emit('retake')"
         >
-          <UIcon name="i-lucide-rotate-ccw" class="h-3.5 w-3.5" />
+          <UIcon name="i-tabler-rotate-clockwise" class="h-3.5 w-3.5" />
           Gör om
         </UButton>
         <UButton size="sm" class="gap-1.5 ml-auto" @click="emit('newQuiz')">

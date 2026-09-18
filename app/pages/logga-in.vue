@@ -206,14 +206,14 @@ async function handleSignup() {
           <div
             class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center"
           >
-            <UIcon name="i-lucide-check" class="w-6 h-6 text-primary" />
+            <UIcon name="i-tabler-check" class="w-6 h-6 text-primary" />
           </div>
           <p class="font-medium">Inloggad!</p>
           <p class="text-sm text-muted">
             Loggar in dig, tar dig till första sidan...
           </p>
           <UIcon
-            name="i-lucide-loader-circle"
+            name="i-tabler-loader-2"
             class="w-4 h-4 animate-spin text-muted mt-1"
           />
         </div>
@@ -252,7 +252,7 @@ async function handleSignup() {
                   variant="link"
                   size="sm"
                   :icon="
-                    showLoginPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'
+                    showLoginPassword ? 'i-tabler-eye-off' : 'i-tabler-eye'
                   "
                   :aria-label="
                     showLoginPassword ? 'Dölj lösenord' : 'Visa lösenord'
@@ -276,7 +276,7 @@ async function handleSignup() {
             :disabled="loginLoading"
           >
             <UIcon
-              name="i-lucide-loader-circle"
+              name="i-tabler-loader-2"
               v-if="loginLoading"
               class="w-4 h-4 animate-spin"
             />
@@ -305,7 +305,7 @@ async function handleSignup() {
           <div
             class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center"
           >
-            <UIcon name="i-lucide-mail" class="w-6 h-6 text-primary" />
+            <UIcon name="i-tabler-mail" class="w-6 h-6 text-primary" />
           </div>
           <p class="font-medium">Konto skapat!</p>
           <p class="text-sm text-muted">
@@ -398,7 +398,7 @@ async function handleSignup() {
                   variant="link"
                   size="sm"
                   :icon="
-                    showSignupPassword ? 'i-lucide-eye-off' : 'i-lucide-eye'
+                    showSignupPassword ? 'i-tabler-eye-off' : 'i-tabler-eye'
                   "
                   :aria-label="
                     showSignupPassword ? 'Dölj lösenord' : 'Visa lösenord'
@@ -428,7 +428,7 @@ async function handleSignup() {
                   variant="link"
                   size="sm"
                   :icon="
-                    showSignupConfirm ? 'i-lucide-eye-off' : 'i-lucide-eye'
+                    showSignupConfirm ? 'i-tabler-eye-off' : 'i-tabler-eye'
                   "
                   :aria-label="
                     showSignupConfirm ? 'Dölj lösenord' : 'Visa lösenord'
@@ -452,7 +452,7 @@ async function handleSignup() {
             :disabled="signupLoading"
           >
             <UIcon
-              name="i-lucide-loader-circle"
+              name="i-tabler-loader-2"
               v-if="signupLoading"
               class="w-4 h-4 animate-spin"
             />

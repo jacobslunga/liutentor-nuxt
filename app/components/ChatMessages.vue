@@ -411,7 +411,7 @@ defineExpose({
           >
             <UIcon
               v-if="attachment.mediaType === 'application/pdf'"
-              name="i-lucide-file-text"
+              name="i-tabler-file-text"
               class="size-3.5 shrink-0 text-muted"
             />
             <img
@@ -422,7 +422,7 @@ defineExpose({
             />
             <UIcon
               v-else
-              name="i-lucide-image"
+              name="i-tabler-photo"
               class="size-3.5 shrink-0 text-muted"
             />
             <span class="max-w-28 truncate" :title="attachment.name">
@@ -461,7 +461,7 @@ defineExpose({
           class="mb-2 flex h-6 items-center gap-2"
         >
           <UIcon
-            name="i-lucide-loader-circle"
+            name="i-tabler-loader-2"
             class="variable-spin size-4 text-muted"
           />
           <span class="shimmer-text text-sm">
@@ -489,7 +489,7 @@ defineExpose({
             color="neutral"
             variant="outline"
             size="xs"
-            icon="i-lucide-globe"
+            icon="i-tabler-world"
             :label="sourceLabel(source)"
             class="max-w-56"
           />
@@ -500,7 +500,7 @@ defineExpose({
     <template #indicator>
       <div class="flex h-6 items-center gap-2">
         <UIcon
-          name="i-lucide-loader-circle"
+          name="i-tabler-loader-2"
           class="variable-spin size-4 text-muted"
         />
         <span class="shimmer-text text-sm">

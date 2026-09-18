@@ -11,17 +11,17 @@
         <div
           class="drop-tile-back absolute left-4 top-3 flex size-14 -rotate-12 items-center justify-center rounded-2xl text-inverted shadow-lg"
         >
-          <UIcon name="i-lucide-image" class="size-7" />
+          <UIcon name="i-tabler-photo" class="size-7" />
         </div>
         <div
           class="drop-tile-middle absolute right-4 top-1 flex size-14 rotate-12 items-center justify-center rounded-2xl text-inverted shadow-lg"
         >
-          <UIcon name="i-lucide-file-text" class="size-7" />
+          <UIcon name="i-tabler-file-text" class="size-7" />
         </div>
         <div
           class="absolute bottom-0 left-1/2 flex size-14 -translate-x-1/2 items-center justify-center rounded-2xl bg-primary text-inverted shadow-xl"
         >
-          <UIcon name="i-lucide-image" class="size-7" />
+          <UIcon name="i-tabler-photo" class="size-7" />
         </div>
       </div>
       <p class="text-2xl font-semibold tracking-tight text-highlighted">

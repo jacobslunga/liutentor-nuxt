@@ -361,7 +361,7 @@ onUnmounted(() => {
           class="flex h-full items-center justify-center flex-col gap-2"
         >
           <UIcon
-            name="i-lucide-loader-circle"
+            name="i-tabler-loader-2"
             class="w-8 h-8 animate-spin text-muted"
           />
           <p class="text-sm text-muted">Laddar tenta...</p>
@@ -456,7 +456,7 @@ onUnmounted(() => {
                           Håll muspekaren för att visa facit
                         </p>
                         <UIcon
-                          name="i-lucide-mouse-pointer-click"
+                          name="i-tabler-pointer"
                           class="size-6 text-muted animate-in"
                         />
                       </div>
@@ -478,7 +478,7 @@ onUnmounted(() => {
                             class="flex size-12 items-center justify-center rounded-md bg-muted/60 group-hover:bg-primary/10 transition-colors"
                           >
                             <UIcon
-                              name="i-lucide-upload"
+                              name="i-tabler-upload"
                               class="size-6 text-muted group-hover:text-primary transition-colors"
                             />
                           </div>
@@ -499,7 +499,7 @@ onUnmounted(() => {
                               color="neutral"
                               variant="outline"
                             >
-                              <UIcon name="i-lucide-upload" class="size-3.5" />
+                              <UIcon name="i-tabler-upload" class="size-3.5" />
                               Ladda upp
                             </UButton>
                           </NuxtLink>

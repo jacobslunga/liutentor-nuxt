@@ -76,11 +76,11 @@ const gotoProfile = () => {
 };
 
 const menuItems = computed<DropdownMenuItem[][]>(() => [
-  [{ label: "Profil", icon: "i-lucide-user", onSelect: gotoProfile }],
+  [{ label: "Profil", icon: "i-tabler-user", onSelect: gotoProfile }],
   [
     {
       label: "Logga ut",
-      icon: "i-lucide-log-out",
+      icon: "i-tabler-logout",
       color: "error",
       onSelect: signOut,
     },
@@ -98,7 +98,7 @@ const menuItems = computed<DropdownMenuItem[][]>(() => [
       ]"
     >
       <UIcon
-        name="i-lucide-loader-circle"
+        name="i-tabler-loader-2"
         v-if="isPending || (avatarUrl && isImageLoading)"
         class="w-4 h-4 animate-spin absolute z-10"
       />

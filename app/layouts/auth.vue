@@ -24,7 +24,7 @@ watch(
         variant="ghost"
         size="sm"
       >
-        <UIcon name="i-lucide-arrow-left" class="w-4 h-4" />
+        <UIcon name="i-tabler-arrow-left" class="w-4 h-4" />
         Tillbaka
       </UButton>
       <slot />

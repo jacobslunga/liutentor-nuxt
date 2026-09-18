@@ -98,19 +98,19 @@ export default defineNuxtConfig({
   },
 
   icon: {
-    // Lucide är Nuxt UI:s standarduppsättning, så biblioteket och appens egna
-    // ikoner kommer från samma familj.
-    collections: ["lucide"],
-    serverBundle: { collections: ["lucide"] },
+    // Tabler för appens ikoner; Nuxt UI:s interna ikoner
+    // mappas om i app.config.ts. Lucide behålls som reserv.
+    collections: ["tabler", "lucide"],
+    serverBundle: { collections: ["tabler", "lucide"] },
     clientBundle: {
       scan: true,
       // Skill-ikonerna i ChatInput slås upp dynamiskt och hittas inte av scannern.
       icons: [
-        "lucide:graduation-cap",
-        "lucide:book-open",
-        "lucide:list-checks",
-        "lucide:lightbulb",
-        "lucide:list",
+        "tabler:school",
+        "tabler:book",
+        "tabler:list-check",
+        "tabler:bulb",
+        "tabler:list",
       ],
     },
   },

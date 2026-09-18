@@ -305,7 +305,7 @@ async function handleSignOut() {
               class="absolute inset-0 flex items-center justify-center z-10"
             >
               <UIcon
-                name="i-lucide-loader-circle"
+                name="i-tabler-loader-2"
                 class="h-7 w-7 text-white animate-spin"
               />
             </div>
@@ -314,12 +314,12 @@ async function handleSignOut() {
               class="absolute bottom-1 right-1 h-8 w-8 rounded-full bg-default border border-default flex items-center justify-center z-10"
             >
               <UIcon
-                name="i-lucide-loader-circle"
+                name="i-tabler-loader-2"
                 v-if="avatarUploading"
                 class="h-4 w-4 animate-spin text-muted"
               />
               <UIcon
-                name="i-lucide-plus"
+                name="i-tabler-plus"
                 v-else
                 class="h-4 w-4 text-highlighted"
               />
@@ -416,12 +416,12 @@ async function handleSignOut() {
                 @click="saveProfile"
               >
                 <UIcon
-                  name="i-lucide-loader-circle"
+                  name="i-tabler-loader-2"
                   v-if="profileSaving"
                   class="w-4 h-4 animate-spin"
                 />
                 <UIcon
-                  name="i-lucide-check"
+                  name="i-tabler-check"
                   v-else-if="profileSaved"
                   class="w-4 h-4"
                 />
@@ -487,11 +487,11 @@ async function handleSignOut() {
                 @click="handleSignOut"
               >
                 <UIcon
-                  name="i-lucide-loader-circle"
+                  name="i-tabler-loader-2"
                   v-if="signOutLoading"
                   class="w-4 h-4 animate-spin"
                 />
-                <UIcon name="i-lucide-log-out" v-else class="w-4 h-4" />
+                <UIcon name="i-tabler-logout" v-else class="w-4 h-4" />
                 <span v-if="!signOutLoading">Logga ut</span>
               </UButton>
             </div>

@@ -48,7 +48,7 @@ const { open: openUploadModal } = useUploadModal();
       <RecentSearches />
 
       <UButton color="neutral" variant="outline" @click="openUploadModal()">
-        <UIcon name="i-lucide-upload" />
+        <UIcon name="i-tabler-upload" />
         Ladda upp fler tentor
       </UButton>
     </div>

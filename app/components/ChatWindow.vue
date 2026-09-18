@@ -254,7 +254,7 @@ defineExpose({ focusInput: () => chatInputRef.value?.focus() });
         <div
           class="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex flex-col items-center bg-linear-to-t from-default via-default/85 to-transparent pt-10 pb-3 sm:pb-4">
           <Transition name="fade-up">
-            <UButton v-if="showScrollBottom" variant="outline" color="neutral" icon="i-lucide-arrow-down"
+            <UButton v-if="showScrollBottom" variant="outline" color="neutral" icon="i-tabler-arrow-down"
               class="pointer-events-auto mb-2.5 size-8 p-0 shadow-md" aria-label="Rulla till senaste"
               @click="scrollToBottom" />
           </Transition>

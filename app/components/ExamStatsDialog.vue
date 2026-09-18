@@ -43,7 +43,7 @@ function passColor(rate: number) {
 
 <template>
   <UIcon
-    name="i-lucide-minus"
+    name="i-tabler-minus"
     v-if="total === 0"
     class="w-4 h-4 text-muted/30"
   />

@@ -32,7 +32,7 @@ const scrolled = computed(() => y.value > 8);
           size="sm"
           @click="openUploadModal()"
         >
-          <UIcon name="i-lucide-upload" class="size-3.5" />
+          <UIcon name="i-tabler-upload" class="size-3.5" />
           <span class="hidden sm:inline">Ladda upp tenta</span>
           <span class="sm:hidden">Ladda upp</span>
         </UButton>

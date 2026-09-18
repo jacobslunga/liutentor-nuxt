@@ -70,7 +70,7 @@ function cancel() {
     <button type="button" aria-label="Zooma ut" :disabled="!canZoomOut"
       class="flex size-8 cursor-pointer items-center justify-center rounded-full text-muted transition-colors hover:bg-elevated hover:text-highlighted disabled:cursor-default disabled:opacity-35 disabled:hover:bg-transparent"
       @click="zoom?.zoomOut()">
-      <UIcon name="i-lucide-minus" class="size-3.5" />
+      <UIcon name="i-tabler-minus" class="size-3.5" />
     </button>
 
     <input ref="inputEl" :value="displayValue" type="text" inputmode="numeric" aria-label="Zoomnivå i procent"
@@ -81,7 +81,7 @@ function cancel() {
     <button type="button" aria-label="Zooma in" :disabled="!canZoomIn"
       class="flex size-8 cursor-pointer items-center justify-center rounded-full text-muted transition-colors hover:bg-elevated hover:text-highlighted disabled:cursor-default disabled:opacity-35 disabled:hover:bg-transparent"
       @click="zoom?.zoomIn()">
-      <UIcon name="i-lucide-plus" class="size-3.5" />
+      <UIcon name="i-tabler-plus" class="size-3.5" />
     </button>
 
     <div class="mx-0.5 h-5 w-px bg-border" />
@@ -89,7 +89,7 @@ function cancel() {
     <button type="button" aria-label="Rotera medurs"
       class="flex size-8 cursor-pointer items-center justify-center rounded-full text-muted transition-colors hover:bg-elevated hover:text-highlighted"
       @click="rotate?.rotateForward()">
-      <UIcon name="i-lucide-rotate-cw" class="size-3.5" />
+      <UIcon name="i-tabler-rotate-clockwise" class="size-3.5" />
     </button>
   </div>
 </template>

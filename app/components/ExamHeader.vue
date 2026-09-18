@@ -186,12 +186,12 @@ const selectedDurationLabel = computed(
 const layoutTabs = [
   {
     value: "exam-with-facit",
-    icon: "i-lucide-columns-2",
+    icon: "i-tabler-columns-2",
     ariaLabel: "Visa tenta och facit",
   },
   {
     value: "exam-only",
-    icon: "i-lucide-panel-left-close",
+    icon: "i-tabler-layout-sidebar-left-collapse",
     ariaLabel: "Visa endast tentan",
   },
 ] satisfies TabsItem[];
@@ -250,7 +250,7 @@ const actionItems = computed<DropdownMenuItem[][]>(() => [
   [
     {
       label: props.focusMode ? "Avsluta fokusläge" : "Fokusläge",
-      icon: props.focusMode ? "i-lucide-minimize" : "i-lucide-maximize",
+      icon: props.focusMode ? "i-tabler-minimize" : "i-tabler-maximize",
       kbds: ["F"],
       onSelect: () => emit("toggleFocusMode"),
     },
@@ -258,10 +258,10 @@ const actionItems = computed<DropdownMenuItem[][]>(() => [
       label: "Tema",
       icon:
         theme.value === "light"
-          ? "i-lucide-sun"
+          ? "i-tabler-sun"
           : theme.value === "dark"
-            ? "i-lucide-moon"
-            : "i-lucide-monitor",
+            ? "i-tabler-moon"
+            : "i-tabler-device-desktop",
       children: THEME_OPTIONS.map((option) => ({
         label: option.label,
         type: "checkbox" as const,
@@ -274,24 +274,24 @@ const actionItems = computed<DropdownMenuItem[][]>(() => [
     },
     {
       label: "Inställningar",
-      icon: "i-lucide-settings",
+      icon: "i-tabler-settings",
       onSelect: () => (isSettingsOpen.value = true),
     },
     {
       label: "Ladda upp tenta/facit",
-      icon: "i-lucide-upload",
+      icon: "i-tabler-upload",
       onSelect: () => openUploadModal(props.courseCode),
     },
   ],
   [
     {
       label: "Ladda ned",
-      icon: "i-lucide-download",
+      icon: "i-tabler-download",
       disabled: !hasDownload.value,
       children: [
         {
           label: "Tenta",
-          icon: "i-lucide-file-text",
+          icon: "i-tabler-file-text",
           disabled: !selectedExam.value?.pdf_url,
           onSelect: () =>
             downloadFile(
@@ -301,7 +301,7 @@ const actionItems = computed<DropdownMenuItem[][]>(() => [
         },
         {
           label: "Facit",
-          icon: "i-lucide-file-check",
+          icon: "i-tabler-file-check",
           disabled: !props.solutionPdfUrl,
           onSelect: () =>
             downloadFile(
@@ -313,11 +313,11 @@ const actionItems = computed<DropdownMenuItem[][]>(() => [
     },
     {
       label: "Lock in",
-      icon: "i-lucide-lock",
+      icon: "i-tabler-lock",
       disabled: !selectedExam.value,
       children: TIME_OPTIONS.map((opt) => ({
         label: opt.label,
-        icon: "i-lucide-timer",
+        icon: "i-tabler-stopwatch",
         onSelect: () => selectLockInDuration(opt.value),
       })),
     },
@@ -344,12 +344,11 @@ function confirmLockIn() {
     <UFieldGroup class="pointer-events-auto overflow-hidden rounded-md">
       <UButton
         color="neutral"
-        variant="outline"
-        size="lg"
+        variant="subtle"
         aria-label="Tillbaka till kursen"
         @click="router.push(`/search/${courseCode}`)"
       >
-        <UIcon name="i-lucide-arrow-left" />
+        <UIcon name="i-tabler-arrow-left" />
       </UButton>
 
       <UPopover
@@ -358,12 +357,12 @@ function confirmLockIn() {
         :content="{ align: 'start', sideOffset: 8 }"
         :ui="{ content: 'overflow-hidden' }"
       >
-        <UButton color="neutral" variant="outline" size="lg" class="gap-1.5">
+        <UButton color="neutral" variant="subtle" class="gap-1.5">
           <div class="flex flex-row items-baseline gap-1.5 leading-none">
-            <span class="font-bold">{{ selectedExam.exam_date }}</span>
+            <span class="font-semibold">{{ selectedExam.exam_date }}</span>
           </div>
           <UIcon
-            name="i-lucide-chevron-down"
+            name="i-tabler-chevron-down"
             class="size-4 text-muted transition-transform duration-200"
             :class="{ 'rotate-180': isDropdownOpen }"
           />
@@ -384,8 +383,8 @@ function confirmLockIn() {
                   size="xs"
                   :icon="
                     sortDirection === 'desc'
-                      ? 'i-lucide-arrow-down'
-                      : 'i-lucide-arrow-up'
+                      ? 'i-tabler-arrow-down'
+                      : 'i-tabler-arrow-up'
                   "
                   :label="sortLabel"
                   aria-label="Sortera tentor"
@@ -435,7 +434,7 @@ function confirmLockIn() {
                 {{ formatPassRate(e) }}
               </span>
               <UIcon
-                name="i-lucide-check"
+                name="i-tabler-check"
                 v-if="e.id.toString() === examId"
                 class="col-start-5 size-4 text-primary"
               />
@@ -447,13 +446,13 @@ function confirmLockIn() {
     </UFieldGroup>
 
     <div class="pointer-events-auto flex items-center gap-2">
-      <UButton @click="chatStore.toggle()">
+      <UButton @click="chatStore.toggle()" size="sm">
         <UIcon
-          name="i-lucide-loader-circle"
+          name="i-tabler-loader-2"
           v-if="chatStore.isLoading"
           class="animate-spin"
         />
-        <UIcon name="i-lucide-message-circle" v-else />
+        <UIcon name="i-tabler-message-circle" v-else />
         <span>{{ chatStore.isOpen ? "Stäng" : "Chatt" }}</span>
       </UButton>
 
@@ -465,12 +464,12 @@ function confirmLockIn() {
           :model-value="layoutMode"
           :items="layoutTabs"
           :content="false"
-          size="lg"
+          size="xs"
           class="w-auto"
           :ui="{
-            list: '!rounded-xl',
-            indicator: '!rounded-xl',
-            trigger: '!rounded-xl',
+            list: '!rounded-md',
+            indicator: '!rounded-sm',
+            trigger: '!rounded-sm px-3',
           }"
           @update:model-value="switchLayout"
         >
@@ -493,7 +492,7 @@ function confirmLockIn() {
             color="neutral"
             variant="ghost"
             size="sm"
-            icon="i-lucide-ellipsis"
+            icon="i-tabler-dots"
             aria-label="Fler åtgärder"
           />
         </UDropdownMenu>
