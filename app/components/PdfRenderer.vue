@@ -211,7 +211,7 @@ const plugins = computed(() => {
 <template>
   <div class="group/pdf relative isolate h-full w-full overflow-hidden bg-white dark:bg-default">
     <div v-if="isLoading || !engine" class="flex h-full w-full items-center justify-center">
-      <UIcon name="i-openai-spinner" class="h-5 w-5 animate-spin text-muted" />
+      <UIcon name="i-lucide-loader-circle" class="h-5 w-5 animate-spin text-muted" />
     </div>
 
     <EmbedPDF v-else :engine="engine" :plugins="plugins">
@@ -229,7 +229,7 @@ const plugins = computed(() => {
             <template #default="{ isLoaded }">
               <PageLoadingTask :pending="!isLoaded" />
               <div v-if="!isLoaded" class="flex h-full w-full items-center justify-center">
-                <UIcon name="i-openai-spinner" class="h-5 w-5 animate-spin text-muted" />
+                <UIcon name="i-lucide-loader-circle" class="h-5 w-5 animate-spin text-muted" />
               </div>
 
               <Viewport v-else :document-id="activeDocumentId"
@@ -341,7 +341,7 @@ const plugins = computed(() => {
 .pdf-viewport::-webkit-scrollbar-thumb {
   background: var(--ui-text-muted);
   border: 3px solid var(--ui-bg-elevated);
-  border-radius: 999px;
+  border-radius: var(--radius-full);
 }
 
 .pdf-viewport::-webkit-scrollbar-thumb:hover {

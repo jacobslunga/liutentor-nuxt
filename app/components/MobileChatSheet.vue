@@ -233,7 +233,7 @@ onUnmounted(() => {
             <UButton
               color="neutral"
               variant="ghost"
-              icon="i-openai-x"
+              icon="i-lucide-x"
               class="shrink-0"
               aria-label="Stäng chatten"
               @click="closeChat"
@@ -248,14 +248,14 @@ onUnmounted(() => {
             <UButton
               color="neutral"
               variant="ghost"
-              icon="i-openai-plus"
+              icon="i-lucide-plus"
               aria-label="Ny chatt"
               @click="startNewChat"
             />
             <UButton
               color="neutral"
               variant="ghost"
-              icon="i-openai-history"
+              icon="i-lucide-rotate-ccw-clock"
               aria-label="Historik"
               @click="toggleHistory"
             />
@@ -287,7 +287,7 @@ onUnmounted(() => {
               <Transition name="fade-up">
                 <UButton
                   v-if="showScrollBottom"
-                  icon="i-openai-arrow-down"
+                  icon="i-lucide-arrow-down"
                   class="pointer-events-auto mb-2 size-10 p-0 shadow-md"
                   aria-label="Rulla till senaste"
                   @click="scrollToBottom"

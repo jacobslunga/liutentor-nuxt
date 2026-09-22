@@ -16,7 +16,7 @@ const { latest } = useRecentSearches();
       variant="ghost"
     >
       {{ s.courseCode }}
-      <UIcon name="i-openai-arrow-up-right" class="w-3.5 h-3.5 ml-1" />
+      <UIcon name="i-lucide-arrow-up-right" class="w-3.5 h-3.5 ml-1" />
     </UButton>
   </div>
 </template>

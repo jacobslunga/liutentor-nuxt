@@ -98,19 +98,17 @@ export default defineNuxtConfig({
   },
 
   icon: {
-    customCollections: [{ prefix: "openai", dir: "./app/assets/icons/openai" }],
-    // OpenAI SVGs are bundled locally; Lucide supports library defaults.
     collections: ["lucide"],
     serverBundle: { collections: ["lucide"] },
     clientBundle: {
       scan: true,
       icons: [
-        "openai:plus",
-        "openai:globe",
-        "openai:chevron-down",
-        "openai:arrow-up",
-        "openai:stop",
-        "openai:check",
+        "lucide:plus",
+        "lucide:globe",
+        "lucide:chevron-down",
+        "lucide:arrow-up",
+        "lucide:square",
+        "lucide:check",
       ],
     },
   },

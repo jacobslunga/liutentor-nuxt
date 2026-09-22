@@ -52,7 +52,7 @@ const TILE_CLASSES: Record<TileState, string> = {
       <span
         v-for="(tile, i) in tiles"
         :key="i"
-        class="size-2 rounded-[2px] transition-colors duration-150 ease-spring"
+        class="size-2 rounded-xs transition-colors duration-150 ease-spring"
         :class="isMounted && tile ? TILE_CLASSES[tile] : 'bg-inverted/15'"
       />
     </span>

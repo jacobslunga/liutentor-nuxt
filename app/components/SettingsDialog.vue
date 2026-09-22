@@ -64,7 +64,7 @@ onUnmounted(() => {
       <UButton
         color="neutral"
         variant="ghost"
-        icon="i-openai-settings"
+        icon="i-lucide-settings"
         aria-label="Inställningar"
       />
     </template>

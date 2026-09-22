@@ -323,6 +323,7 @@ defineExpose({
         class="chat-prompt bg-default"
         :class="{
           'is-expanded': isExpanded,
+          'is-generating': isLoading,
           'animate-layout': animateLayout,
         }"
         @submit.prevent="handleSubmit"
@@ -342,7 +343,7 @@ defineExpose({
                     class="flex w-full items-start gap-3"
                   >
                     <UIcon
-                      name="i-openai-corner-down-left"
+                      name="i-lucide-corner-down-left"
                       class="mt-0.5 size-4 shrink-0 -scale-x-100 text-muted"
                     />
                     <span
@@ -353,7 +354,7 @@ defineExpose({
                       color="neutral"
                       variant="ghost"
                       size="xs"
-                      icon="i-openai-x"
+                      icon="i-lucide-x"
                       aria-label="Ta bort citatet"
                       @click.prevent="emit('clearSelectionContext')"
                     />
@@ -374,7 +375,7 @@ defineExpose({
                     >
                       <UIcon
                         v-if="attachment.mediaType === 'application/pdf'"
-                        name="i-openai-file-text"
+                        name="i-lucide-file-text"
                         class="size-3.5 shrink-0 text-muted"
                       />
                       <img
@@ -385,7 +386,7 @@ defineExpose({
                       />
                       <UIcon
                         v-else
-                        name="i-openai-photo"
+                        name="i-lucide-image"
                         class="size-3.5 shrink-0 text-muted"
                       />
                       <span
@@ -400,7 +401,7 @@ defineExpose({
                         color="neutral"
                         variant="link"
                         size="xs"
-                        icon="i-openai-x"
+                        icon="i-lucide-x"
                         :aria-label="`Ta bort ${attachment.name}`"
                         @click="removePendingAttachment(attachment.id)"
                       />
@@ -446,7 +447,7 @@ defineExpose({
                 <UButton
                   color="neutral"
                   variant="ghost"
-                  icon="i-openai-plus"
+                  icon="i-lucide-plus"
                   aria-label="Bifoga filer"
                   :disabled="isLoading || attachmentCapacityReached"
                   @click="fileInputRef?.click()"
@@ -461,7 +462,7 @@ defineExpose({
                 v-model:open="modelMenuOpen"
                 :items="modelItems"
                 :content="{ align: 'end', side: 'top' }"
-                checked-icon="i-openai-check"
+                checked-icon="i-lucide-check"
                 :ui="{
                   content: 'min-w-24 w-28',
                   item: 'py-1',
@@ -474,7 +475,7 @@ defineExpose({
                   size="sm"
                   :label="`${selectedModelLabel}`"
                   class="min-w-0"
-                  trailing-icon="i-openai-chevron-down"
+                  trailing-icon="i-lucide-chevron-down"
                 />
               </UDropdownMenu>
               <p
@@ -488,18 +489,22 @@ defineExpose({
               >
                 {{ text.length }} / {{ MAX_LENGTH }}
               </p>
-              <button
+              <UButton
                 type="button"
-                class="chat-send flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-inverted disabled:opacity-45"
+                color="primary"
+                square
+                class="chat-send size-8 shrink-0 p-0 disabled:opacity-45"
                 :aria-label="isLoading ? 'Avbryt svar' : 'Skicka meddelande'"
                 :disabled="!isLoading && !canSend"
                 @click="isLoading ? emit('cancel') : handleSubmit()"
               >
-                <UIcon
-                  :name="isLoading ? 'i-openai-stop' : 'i-openai-arrow-up'"
-                  class="size-5"
+                <span
+                  v-if="isLoading"
+                  class="size-3 rounded-xs bg-current"
+                  aria-hidden="true"
                 />
-              </button>
+                <UIcon v-else name="i-lucide-arrow-up" class="size-5" />
+              </UButton>
             </div>
           </div>
         </div>
@@ -513,12 +518,6 @@ defineExpose({
         class="prompt-measurement"
       />
     </div>
-    <p
-      v-if="showDisclaimer"
-      class="pointer-events-auto px-4 pb-2 pt-1 text-center text-2xs text-dimmed"
-    >
-      AI kan göra misstag. Kontrollera svaren.
-    </p>
   </div>
 </template>
 
@@ -541,8 +540,8 @@ defineExpose({
   padding: 8px;
   border: 1px solid
     color-mix(in srgb, var(--ui-text-highlighted) 10%, transparent);
+  border-radius: var(--radius-xl);
   box-shadow: 0 2px 10px rgb(0 0 0 / 0.035);
-  border-radius: 26px;
   transition:
     border-radius 200ms ease,
     padding-bottom 200ms ease;
@@ -551,11 +550,13 @@ defineExpose({
   display: block;
   /* Pull the header out to the shell edge so its background meets the border. */
   margin: -8px -8px 8px;
-  border-radius: 25px 25px 0 0;
+  border-start-start-radius: var(--radius-xl);
+  border-start-end-radius: var(--radius-xl);
   overflow: hidden;
 }
 .chat-prompt.is-expanded .chat-prompt-header {
-  border-radius: 19px 19px 0 0;
+  border-start-start-radius: var(--radius-2xl);
+  border-start-end-radius: var(--radius-2xl);
 }
 .chat-prompt-textarea {
   display: block;
@@ -599,8 +600,32 @@ defineExpose({
   right: 8px;
 }
 .chat-prompt.is-expanded {
-  border-radius: 20px;
+  border-radius: var(--radius-2xl);
   padding-bottom: 48px;
+}
+.chat-prompt.is-generating {
+  border-color: transparent;
+  background:
+    linear-gradient(var(--ui-bg), var(--ui-bg)) padding-box,
+    linear-gradient(
+        110deg,
+        color-mix(in srgb, var(--ui-text-highlighted) 18%, transparent),
+        color-mix(in srgb, var(--ui-text-highlighted) 65%, transparent),
+        color-mix(in srgb, var(--ui-text-highlighted) 30%, transparent),
+        color-mix(in srgb, var(--ui-text-highlighted) 18%, transparent)
+      )
+      border-box;
+  background-size:
+    100% 100%,
+    200% 100%;
+  animation: chat-prompt-border-flow 2.4s linear infinite;
+}
+@keyframes chat-prompt-border-flow {
+  to {
+    background-position:
+      0 0,
+      -200% 0;
+  }
 }
 .is-expanded .chat-prompt-textarea {
   min-height: 64px;
@@ -621,6 +646,9 @@ defineExpose({
   .chat-prompt-textarea,
   .animate-layout .chat-prompt-textarea {
     transition: none;
+  }
+  .chat-prompt.is-generating {
+    animation: none;
   }
 }
 

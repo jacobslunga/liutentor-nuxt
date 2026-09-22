@@ -27,7 +27,7 @@ watch(
           size="sm"
           class="text-muted"
         >
-          <UIcon name="i-openai-arrow-left" class="w-4 h-4" />
+          <UIcon name="i-lucide-arrow-left" class="w-4 h-4" />
           Tillbaka
         </UButton>
         <NuxtLink

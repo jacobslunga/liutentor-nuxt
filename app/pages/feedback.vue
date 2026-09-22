@@ -95,7 +95,7 @@ async function handleSubmit() {
             <div
               class="flex size-10 items-center justify-center rounded-full bg-success/10 dark:bg-success/15"
             >
-              <UIcon name="i-openai-check" class="size-5 text-success" />
+              <UIcon name="i-lucide-check" class="size-5 text-success" />
             </div>
             <div>
               <h2 class="text-xl font-medium">Tack!</h2>
@@ -115,7 +115,7 @@ async function handleSubmit() {
             <div
               class="flex size-10 items-center justify-center rounded-full bg-error/10 dark:bg-error/15"
             >
-              <UIcon name="i-openai-alert-triangle" class="size-5 text-error" />
+              <UIcon name="i-lucide-triangle-alert" class="size-5 text-error" />
             </div>
             <div>
               <h2 class="text-xl font-medium">Något gick fel</h2>
@@ -209,7 +209,7 @@ async function handleSubmit() {
               </p>
               <UButton type="submit" size="sm" :disabled="isSubmitting">
                 <UIcon
-                  name="i-openai-spinner"
+                  name="i-lucide-loader-circle"
                   v-if="isSubmitting"
                   class="size-3.5 animate-spin"
                 />

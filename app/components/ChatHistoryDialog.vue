@@ -415,7 +415,7 @@ function focusSearch() {
         <UInput
           ref="searchInputRef"
           v-model="searchQuery"
-          icon="i-openai-search"
+          icon="i-lucide-search"
           placeholder="Sök bland chattar..."
           class="flex-1"
         />
@@ -423,7 +423,7 @@ function focusSearch() {
           v-if="conversations.length > 0"
           color="error"
           variant="ghost"
-          icon="i-openai-trash"
+          icon="i-lucide-trash"
           :disabled="isDeletingAll || isDeletingConversation"
           aria-label="Radera alla chattar"
           @click="showDeleteAllConfirm = true"
@@ -506,7 +506,7 @@ function focusSearch() {
                   role="status"
                   class="flex size-7 shrink-0 items-center justify-center text-muted"
                 >
-                  <UIcon name="i-openai-spinner" class="size-4 animate-spin" />
+                  <UIcon name="i-lucide-loader-circle" class="size-4 animate-spin" />
                   <span class="sr-only">Laddar konversation...</span>
                 </span>
 
@@ -520,7 +520,7 @@ function focusSearch() {
                   @click="askDeleteConversation(item)"
                 >
                   <UIcon
-                    name="i-openai-trash"
+                    name="i-lucide-trash"
                     class="w-3.5 h-3.5 text-muted/60 hover:text-error"
                   />
                 </UButton>

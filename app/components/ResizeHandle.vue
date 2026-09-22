@@ -20,7 +20,7 @@ const emit = defineEmits<{
           ? 'border-primary scale-110'
           : 'border-default group-hover:border-primary/50'
         ">
-      <UIcon name="i-openai-grip-vertical-2" class="size-3.5 transition-colors"
+      <UIcon name="i-lucide-grip-vertical" class="size-3.5 transition-colors"
         :class="isResizing ? 'text-primary' : 'text-muted'" />
     </div>
   </div>

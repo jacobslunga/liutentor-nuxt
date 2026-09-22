@@ -50,7 +50,7 @@ export async function sendUploadNotification(files: UploadedDocument[]) {
     <div style="display:none;max-height:0;overflow:hidden">${subject} i LiU Tentor.</div>
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f3f4f6;padding:32px 12px">
       <tr><td align="center">
-        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:680px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 8px 24px rgba(17,24,39,.08)">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:680px;background:#ffffff;overflow:hidden;box-shadow:0 8px 24px rgba(17,24,39,.08)">
           <tr><td style="padding:28px 32px;background:#111827;color:#ffffff">
             <div style="font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#93c5fd">LiU Tentor</div>
             <h1 style="margin:8px 0 0;font-size:26px;line-height:1.25">Nytt material att granska</h1>
@@ -59,7 +59,7 @@ export async function sendUploadNotification(files: UploadedDocument[]) {
             <p style="margin:0;font-size:16px;line-height:1.6;color:#374151">Någon har laddat upp <strong>${count} ${count === 1 ? "fil" : "filer"}</strong>. Här är en snabb sammanställning:</p>
           </td></tr>
           <tr><td style="padding:12px 32px 24px;overflow-x:auto">
-            <table width="100%" cellspacing="0" cellpadding="0" style="border:1px solid #e5e7eb;border-radius:10px;border-collapse:separate;border-spacing:0;font-size:14px">
+            <table width="100%" cellspacing="0" cellpadding="0" style="border:1px solid #e5e7eb;border-collapse:separate;border-spacing:0;font-size:14px">
               <thead><tr style="background:#f9fafb;text-align:left">
                 <th style="padding:11px 16px">Kurs</th><th style="padding:11px 16px">Datum</th><th style="padding:11px 16px">Typ</th><th style="padding:11px 16px">Filnamn</th>
               </tr></thead>
@@ -67,7 +67,7 @@ export async function sendUploadNotification(files: UploadedDocument[]) {
             </table>
           </td></tr>
           <tr><td style="padding:0 32px 32px">
-            <a href="${escapeHtml(config.uploadReviewUrl)}" style="display:inline-block;background:#2563eb;color:#ffffff;text-decoration:none;font-weight:700;padding:13px 20px;border-radius:9px">Öppna granskningssidan →</a>
+            <a href="${escapeHtml(config.uploadReviewUrl)}" style="display:inline-block;background:#2563eb;color:#ffffff;text-decoration:none;font-weight:700;padding:13px 20px">Öppna granskningssidan →</a>
           </td></tr>
         </table>
       </td></tr>

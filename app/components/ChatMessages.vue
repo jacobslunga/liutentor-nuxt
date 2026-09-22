@@ -363,7 +363,7 @@ defineExpose({
     class="flex flex-1 items-center justify-center gap-2 px-4 py-20 text-sm text-muted"
     :class="contentClass"
   >
-    <UIcon name="i-openai-spinner" class="size-5 animate-spin" />
+    <UIcon name="i-lucide-loader-circle" class="size-5 animate-spin" />
     <span>Laddar konversation...</span>
   </div>
 
@@ -425,7 +425,7 @@ defineExpose({
           >
             <UIcon
               v-if="attachment.mediaType === 'application/pdf'"
-              name="i-openai-file-text"
+              name="i-lucide-file-text"
               class="size-3.5 shrink-0 text-muted"
             />
             <img
@@ -436,7 +436,7 @@ defineExpose({
             />
             <UIcon
               v-else
-              name="i-openai-photo"
+              name="i-lucide-image"
               class="size-3.5 shrink-0 text-muted"
             />
             <span class="max-w-28 truncate" :title="attachment.name">
@@ -467,7 +467,7 @@ defineExpose({
           class="mb-2 flex h-6 items-center gap-2"
         >
           <UIcon
-            name="i-openai-spinner"
+            name="i-lucide-loader-circle"
             class="variable-spin size-4 text-muted"
           />
           <span class="shimmer-text text-sm">
@@ -495,7 +495,7 @@ defineExpose({
             color="neutral"
             variant="outline"
             size="xs"
-            icon="i-openai-world"
+            icon="i-lucide-globe"
             :label="sourceLabel(source)"
             class="max-w-56"
           />
@@ -506,7 +506,7 @@ defineExpose({
     <template #indicator>
       <div class="flex h-6 items-center gap-2">
         <UIcon
-          name="i-openai-spinner"
+          name="i-lucide-loader-circle"
           class="variable-spin size-4 text-muted"
         />
         <span class="shimmer-text text-sm">
@@ -662,7 +662,7 @@ defineExpose({
 
 .prose :deep(.table-scroll)::-webkit-scrollbar-thumb {
   background: color-mix(in oklch, var(--ui-text-muted) 30%, transparent);
-  border-radius: 2px;
+  border-radius: var(--radius-xs);
 }
 
 .prose :deep(.table-scroll)::-webkit-scrollbar-track {
@@ -682,7 +682,7 @@ defineExpose({
 
 .prose :deep(.katex-display)::-webkit-scrollbar-thumb {
   background: color-mix(in oklch, var(--ui-text-muted) 30%, transparent);
-  border-radius: 2px;
+  border-radius: var(--radius-xs);
 }
 
 .prose :deep(.katex-display)::-webkit-scrollbar-track {
@@ -692,7 +692,7 @@ defineExpose({
 .prose :deep(.code-block) {
   margin: 1.25rem 0;
   border: 1px solid var(--ui-border);
-  border-radius: 1.25rem;
+  border-radius: var(--radius-2xl);
   overflow: hidden;
 }
 
@@ -724,7 +724,7 @@ defineExpose({
 .prose :deep(.code-block pre.shiki) {
   margin: 0;
   border: none;
-  border-radius: 0;
+  border-radius: initial;
   padding: 1rem 1.25rem;
   overflow-x: auto;
   line-height: 1.6;
@@ -770,7 +770,7 @@ defineExpose({
   font-family: var(--font-mono);
   font-size: 0.72rem;
   padding: 0.2rem 0.55rem;
-  border-radius: 99px;
+  border-radius: var(--radius-full);
   color: var(--ui-text-muted);
   background: transparent;
   border: 1px solid transparent;

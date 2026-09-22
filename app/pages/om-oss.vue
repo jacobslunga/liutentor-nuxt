@@ -110,7 +110,7 @@ const principles = [
           </p>
           <div class="mt-7 flex flex-wrap items-center gap-3">
             <UButton size="sm" @click="openUploadModal()">
-              <UIcon name="i-openai-upload" class="size-3.5" />
+              <UIcon name="i-lucide-upload" class="size-3.5" />
               Ladda upp tenta
             </UButton>
             <UButton to="/feedback" size="sm" color="neutral" variant="outline">

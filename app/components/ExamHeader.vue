@@ -191,7 +191,7 @@ const layoutTabs = [
   },
   {
     value: "exam-only",
-    icon: "i-lucide-panel-right",
+    icon: "i-lucide-panel-right-open",
     ariaLabel: "Visa endast tentan",
   },
 ] satisfies TabsItem[];
@@ -250,7 +250,7 @@ const actionItems = computed<DropdownMenuItem[][]>(() => [
   [
     {
       label: props.focusMode ? "Avsluta fokusläge" : "Fokusläge",
-      icon: props.focusMode ? "i-openai-minimize" : "i-openai-maximize",
+      icon: props.focusMode ? "i-lucide-minimize" : "i-lucide-maximize",
       kbds: ["F"],
       onSelect: () => emit("toggleFocusMode"),
     },
@@ -258,10 +258,10 @@ const actionItems = computed<DropdownMenuItem[][]>(() => [
       label: "Tema",
       icon:
         theme.value === "light"
-          ? "i-openai-sun"
+          ? "i-lucide-sun"
           : theme.value === "dark"
-            ? "i-openai-moon"
-            : "i-openai-device-desktop",
+            ? "i-lucide-moon"
+            : "i-lucide-monitor",
       children: THEME_OPTIONS.map((option) => ({
         label: option.label,
         type: "checkbox" as const,
@@ -274,24 +274,24 @@ const actionItems = computed<DropdownMenuItem[][]>(() => [
     },
     {
       label: "Inställningar",
-      icon: "i-openai-settings",
+      icon: "i-lucide-settings",
       onSelect: () => (isSettingsOpen.value = true),
     },
     {
       label: "Ladda upp tenta/facit",
-      icon: "i-openai-upload",
+      icon: "i-lucide-upload",
       onSelect: () => openUploadModal(props.courseCode),
     },
   ],
   [
     {
       label: "Ladda ned",
-      icon: "i-openai-download",
+      icon: "i-lucide-download",
       disabled: !hasDownload.value,
       children: [
         {
           label: "Tenta",
-          icon: "i-openai-file-text",
+          icon: "i-lucide-file-text",
           disabled: !selectedExam.value?.pdf_url,
           onSelect: () =>
             downloadFile(
@@ -301,7 +301,7 @@ const actionItems = computed<DropdownMenuItem[][]>(() => [
         },
         {
           label: "Facit",
-          icon: "i-openai-file-check",
+          icon: "i-lucide-book-open-check",
           disabled: !props.solutionPdfUrl,
           onSelect: () =>
             downloadFile(
@@ -313,11 +313,11 @@ const actionItems = computed<DropdownMenuItem[][]>(() => [
     },
     {
       label: "Lock in",
-      icon: "i-openai-lock",
+      icon: "i-lucide-lock",
       disabled: !selectedExam.value,
       children: TIME_OPTIONS.map((opt) => ({
         label: opt.label,
-        icon: "i-openai-stopwatch",
+        icon: "i-lucide-timer",
         onSelect: () => selectLockInDuration(opt.value),
       })),
     },
@@ -345,7 +345,8 @@ function confirmLockIn() {
       <UButton
         color="neutral"
         variant="soft"
-        icon="i-openai-arrow-left"
+        icon="i-lucide-arrow-left"
+        size="sm"
         aria-label="Tillbaka till kursen"
         @click="router.push(`/search/${courseCode}`)"
       />
@@ -361,7 +362,7 @@ function confirmLockIn() {
             <span class="font-semibold">{{ selectedExam.exam_date }}</span>
           </div>
           <UIcon
-            name="i-openai-chevron-down"
+            name="i-lucide-chevron-down"
             class="size-4 text-muted transition-transform duration-200"
             :class="{ 'rotate-180': isDropdownOpen }"
           />
@@ -382,8 +383,8 @@ function confirmLockIn() {
                   size="xs"
                   :icon="
                     sortDirection === 'desc'
-                      ? 'i-openai-arrow-down'
-                      : 'i-openai-arrow-up'
+                      ? 'i-lucide-arrow-down'
+                      : 'i-lucide-arrow-up'
                   "
                   :label="sortLabel"
                   aria-label="Sortera tentor"
@@ -433,7 +434,7 @@ function confirmLockIn() {
                 {{ formatPassRate(e) }}
               </span>
               <UIcon
-                name="i-openai-check"
+                name="i-lucide-check"
                 v-if="e.id.toString() === examId"
                 class="col-start-5 size-4 text-primary"
               />
@@ -445,13 +446,13 @@ function confirmLockIn() {
     </UFieldGroup>
 
     <div class="pointer-events-auto flex items-center gap-2">
-      <UButton @click="chatStore.toggle()">
+      <UButton @click="chatStore.toggle()" size="sm">
         <UIcon
-          name="i-openai-spinner"
+          name="i-lucide-loader-circle"
           v-if="chatStore.isLoading"
           class="animate-spin"
         />
-        <UIcon name="i-openai-chat" v-else />
+        <UIcon name="i-lucide-message-square-reply" v-else />
         <span>{{ chatStore.isOpen ? "Stäng" : "Chatt" }}</span>
       </UButton>
 
@@ -460,7 +461,7 @@ function confirmLockIn() {
       >
         <UTabs
           color="neutral"
-          size="sm"
+          size="xs"
           :content="false"
           :model-value="layoutMode"
           :items="layoutTabs"
@@ -486,7 +487,7 @@ function confirmLockIn() {
             color="neutral"
             variant="ghost"
             size="sm"
-            icon="i-openai-dots"
+            icon="i-lucide-ellipsis"
             aria-label="Fler åtgärder"
           />
         </UDropdownMenu>

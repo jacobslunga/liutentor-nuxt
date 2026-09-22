@@ -29,7 +29,7 @@ const canZoomOut = computed(() => currentZoom.value > MIN_ZOOM + EPSILON);
       class="flex size-10 items-center justify-center text-muted transition-colors active:bg-elevated disabled:opacity-35 disabled:active:bg-transparent"
       @click="zoom?.zoomIn()"
     >
-      <UIcon name="i-openai-plus" class="size-4" />
+      <UIcon name="i-lucide-plus" class="size-4" />
     </button>
     <div class="h-5 w-px bg-border" />
     <button
@@ -39,7 +39,7 @@ const canZoomOut = computed(() => currentZoom.value > MIN_ZOOM + EPSILON);
       class="flex size-10 items-center justify-center text-muted transition-colors active:bg-elevated disabled:opacity-35 disabled:active:bg-transparent"
       @click="zoom?.zoomOut()"
     >
-      <UIcon name="i-openai-minus" class="size-4" />
+      <UIcon name="i-lucide-minus" class="size-4" />
     </button>
     <div class="h-5 w-px bg-border" />
     <button
@@ -49,7 +49,7 @@ const canZoomOut = computed(() => currentZoom.value > MIN_ZOOM + EPSILON);
       class="flex size-10 items-center justify-center text-muted transition-colors active:bg-elevated disabled:opacity-35"
       @click="rotate?.rotateForward()"
     >
-      <UIcon name="i-openai-rotate-clockwise" class="size-4" />
+      <UIcon name="i-lucide-rotate-cw" class="size-4" />
     </button>
   </div>
 </template>

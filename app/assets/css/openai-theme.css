@@ -1,4 +1,4 @@
-/* Adapted from OpenAI Apps SDK UI (MIT). See ../icons/OPENAI-LICENSE. */
+/* Adapted from OpenAI Apps SDK UI (MIT). See ../OPENAI-LICENSE. */
 @theme {
   /* OpenAI's neutral ramp, also used by explicit bg-neutral/text-neutral utilities. */
   --color-neutral-50: #f9f9f9;
@@ -15,18 +15,6 @@
   --font-sans:
     ui-sans-serif, -apple-system, system-ui, "Segoe UI", "Noto Sans", Helvetica,
     Arial, sans-serif;
-}
-
-/* Scale component corners from the single --ui-radius setting in tailwind.css. */
-@theme inline {
-  --radius-xs: calc(var(--ui-radius) / 3);
-  --radius-sm: calc(var(--ui-radius) / 2);
-  --radius-md: calc(var(--ui-radius) * 2 / 3);
-  --radius-lg: calc(var(--ui-radius) * 5 / 6);
-  --radius-xl: var(--ui-radius);
-  --radius-2xl: calc(var(--ui-radius) * 4 / 3);
-  --radius-3xl: calc(var(--ui-radius) * 5 / 3);
-  --radius-4xl: calc(var(--ui-radius) * 2);
 }
 
 :root {

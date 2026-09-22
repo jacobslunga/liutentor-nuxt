@@ -77,7 +77,7 @@ function confirmExit() {
         class="shrink-0 gap-1.5 text-muted"
         @click="requestExit"
       >
-        <UIcon name="i-openai-arrow-left" class="h-3.5 w-3.5" />
+        <UIcon name="i-lucide-arrow-left" class="h-3.5 w-3.5" />
         Avsluta
       </UButton>
     </div>
@@ -130,7 +130,7 @@ function confirmExit() {
             class="gap-1.5 border-default"
             @click="emit('previous')"
           >
-            <UIcon name="i-openai-arrow-left" class="h-3.5 w-3.5" />
+            <UIcon name="i-lucide-arrow-left" class="h-3.5 w-3.5" />
             Förra
           </UButton>
           <UButton
@@ -143,7 +143,7 @@ function confirmExit() {
             @click="emit('next', hasAnsweredCurrent)"
           >
             Nästa
-            <UIcon name="i-openai-arrow-right" class="h-3.5 w-3.5" />
+            <UIcon name="i-lucide-arrow-right" class="h-3.5 w-3.5" />
           </UButton>
           <UButton
             v-else
@@ -152,7 +152,7 @@ function confirmExit() {
             class="gap-1.5"
             @click="submit"
           >
-            <UIcon name="i-openai-circle-check" class="h-3.5 w-3.5" />
+            <UIcon name="i-lucide-circle-check" class="h-3.5 w-3.5" />
             Rätta quiz
           </UButton>
         </UFieldGroup>

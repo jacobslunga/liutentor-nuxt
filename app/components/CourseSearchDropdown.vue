@@ -79,14 +79,12 @@ defineShortcuts({
     :items="items"
     :size="size"
     :class="props.class"
-    icon="i-openai-search"
+    icon="i-lucide-search"
     placeholder="Sök kurskod..."
     ignore-filter
     trailing-icon=""
     :ui="{
-      base: 'rounded-full uppercase placeholder:normal-case',
-      content: 'rounded-[16px]',
-      item: 'rounded-[8px] before:rounded-[8px]',
+      base: 'uppercase placeholder:normal-case',
     }"
     @update:model-value="onSelect"
     @keydown.enter="onEnter"
@@ -105,7 +103,7 @@ defineShortcuts({
         }}</span>
       </span>
       <UIcon
-        name="i-openai-corner-down-left"
+        name="i-lucide-corner-down-left"
         class="size-3.5 shrink-0 text-dimmed"
       />
     </template>

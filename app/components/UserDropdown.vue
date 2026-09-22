@@ -76,11 +76,11 @@ const gotoProfile = () => {
 };
 
 const menuItems = computed<DropdownMenuItem[][]>(() => [
-  [{ label: "Profil", icon: "i-openai-user", onSelect: gotoProfile }],
+  [{ label: "Profil", icon: "i-lucide-user", onSelect: gotoProfile }],
   [
     {
       label: "Logga ut",
-      icon: "i-openai-logout",
+      icon: "i-lucide-log-out",
       color: "error",
       onSelect: signOut,
     },
@@ -98,7 +98,7 @@ const menuItems = computed<DropdownMenuItem[][]>(() => [
       ]"
     >
       <UIcon
-        name="i-openai-spinner"
+        name="i-lucide-loader-circle"
         v-if="isPending || (avatarUrl && isImageLoading)"
         class="w-4 h-4 animate-spin absolute z-10"
       />

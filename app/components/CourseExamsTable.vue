@@ -96,8 +96,8 @@ function toggleFilter(p: string) {
       </UButton>
     </div>
 
-    <div class="w-full overflow-x-auto rounded-2xl border border-default">
-      <div class="w-max min-w-full sm:w-full rounded-2xl overflow-hidden">
+    <div class="w-full overflow-x-auto rounded-lg border border-default">
+      <div class="w-max min-w-full sm:w-full rounded-lg overflow-hidden">
         <div
           :class="gridCols"
           class="py-3 border-b border-default/60 bg-muted/30"
@@ -139,11 +139,11 @@ function toggleFilter(p: string) {
 
           <div class="flex justify-center">
             <UIcon
-              name="i-openai-check"
+              name="i-lucide-check"
               v-if="exam.has_solution"
               class="w-4 h-4 text-success"
             />
-            <UIcon name="i-openai-minus" v-else class="w-4 h-4 text-muted/30" />
+            <UIcon name="i-lucide-minus" v-else class="w-4 h-4 text-muted/30" />
           </div>
 
           <div class="text-right flex flex-col items-end gap-1">

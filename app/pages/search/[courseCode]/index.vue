@@ -281,7 +281,7 @@ function passColor(rate: number) {
       class="flex items-center justify-center min-h-[60vh]"
     >
       <UIcon
-        name="i-openai-spinner"
+        name="i-lucide-loader-circle"
         class="w-6 h-6 animate-spin text-muted"
       />
     </div>
@@ -294,7 +294,7 @@ function passColor(rate: number) {
         <div
           class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted"
         >
-          <UIcon name="i-openai-inbox" class="h-6 w-6 text-muted" />
+          <UIcon name="i-lucide-inbox" class="h-6 w-6 text-muted" />
         </div>
         <h1 class="text-2xl font-medium text-highlighted">
           Vi saknar tentor för {{ courseCode }}
@@ -366,15 +366,15 @@ function passColor(rate: number) {
                     variant="outline"
                     aria-label="Sortera tentor"
                   >
-                    <UIcon name="i-openai-arrows-left-right" class="size-4" />
+                    <UIcon name="i-lucide-arrow-left-right" class="size-4" />
                     {{ examSortLabel }}
                     <UIcon
-                      name="i-openai-arrow-down"
+                      name="i-lucide-arrow-down"
                       v-if="examSortDirection === 'desc'"
                       class="size-3.5 text-muted"
                     />
                     <UIcon
-                      name="i-openai-arrow-up"
+                      name="i-lucide-arrow-up"
                       v-else
                       class="size-3.5 text-muted"
                     />
@@ -383,7 +383,7 @@ function passColor(rate: number) {
               </template>
               <template #actions>
                 <UButton @click="openUploadModal(courseCode)">
-                  <UIcon name="i-openai-upload" class="w-4 h-4" />
+                  <UIcon name="i-lucide-upload" class="w-4 h-4" />
                   Ladda upp
                 </UButton>
               </template>
