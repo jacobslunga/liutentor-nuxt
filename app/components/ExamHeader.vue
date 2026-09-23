@@ -452,7 +452,7 @@ function confirmLockIn() {
           v-if="chatStore.isLoading"
           class="animate-spin"
         />
-        <UIcon name="i-lucide-message-square-reply" v-else />
+        <UIcon name="i-lucide-message-circle" v-else />
         <span>{{ chatStore.isOpen ? "Stäng" : "Chatt" }}</span>
       </UButton>
 

@@ -47,6 +47,9 @@ export default defineAppConfig({
       warning: "i-lucide-triangle-alert",
     },
     button: {
+      slots: {
+        base: "font-semibold",
+      },
       variants: {
         square: {
           true: "aspect-square justify-center gap-0",
@@ -58,23 +61,6 @@ export default defineAppConfig({
         content:
           "h-auto bg-neutral-900 text-white dark:bg-neutral-50 dark:text-black ring-0 px-2 py-1 text-xs font-semibold shadow-lg",
         arrow: "fill-neutral-900 stroke-neutral-900",
-      },
-    },
-    chatPalette: {
-      slots: {
-        prompt: "border-t-0",
-      },
-    },
-    modal: {
-      slots: {
-        footer: "justify-end",
-      },
-      variants: {
-        fullscreen: {
-          false: {
-            content: "rounded-xl shadow-xl",
-          },
-        },
       },
     },
     tabs: {

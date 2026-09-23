@@ -25,8 +25,8 @@ const emit = defineEmits<{ reply: [] }>();
           variant="outline"
           @mousedown.prevent.stop="emit('reply')"
         >
-          Svara
-          <UIcon name="i-lucide-undo-2" class="w-3.5 h-3.5" />
+          <UIcon name="i-lucide-quote" class="w-3.5 h-3.5" />
+          Fråga
         </UButton>
       </div>
     </Transition>

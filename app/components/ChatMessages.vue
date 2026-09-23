@@ -31,8 +31,6 @@ initChatMarkdown()
     console.error("[chat] markdown failed to initialise", error);
   })
   .finally(() => {
-    // Unblock rendering either way: on failure renderChatMarkdown falls back to
-    // the raw message text, which beats leaving every reply blank.
     mdReady.value = true;
     if (
       props.messages.length > 0 &&
@@ -64,11 +62,6 @@ const loadingPhrase = ref(loadingPhrases[0]);
 
 const isMounted = ref(false);
 
-/**
- * UChatMessages arbetar med AI SDK:ns meddelandeform. Butiken har en egen, så
- * varje meddelande får ett stabilt id och en text-part — resten av innehållet
- * ritas i slottarna nedan och läses direkt från originalmeddelandet.
- */
 const uiMessages = computed(() =>
   props.messages
     .map((message, index) => ({
@@ -83,13 +76,9 @@ const uiMessages = computed(() =>
       original: message,
       index,
     }))
-    // useChat lägger till ett tomt assistentsvar redan när turen startar. Tas
-    // det med blir det sista meddelandet aldrig användarens, och UChatMessages
-    // hoppar då över rullningen som ger plats åt svaret.
     .filter((message, i, all) => message.parts.length || i !== all.length - 1),
 );
 
-/** Status i AI SDK:ns termer, vilket styr autoscroll och skrivindikatorn. */
 const status = computed(() => {
   if (!isMounted.value || !props.isLoading) return "ready" as const;
   const last = props.messages.at(-1);
@@ -99,12 +88,6 @@ const status = computed(() => {
   return "streaming" as const;
 });
 
-/**
- * A bare hostname reads better in a chip than a page title that will be clipped
- * anyway — the title stays available on hover. Gemini is the exception: it hands
- * back an opaque grounding-redirect URL whose host says nothing, and puts the
- * real domain in the title instead.
- */
 const OPAQUE_SOURCE_HOSTS = ["vertexaisearch.cloud.google.com"];
 
 function sourceLabel(source: MessageSource): string {
@@ -477,7 +460,7 @@ defineExpose({
 
         <div
           v-if="renderedAssistantHtml[message.index]"
-          class="prose 3xl:prose-lg min-w-0 max-w-none w-full prose-headings:font-semibold prose-strong:font-semibold dark:prose-invert marker:font-semibold marker:text-highlighted"
+          class="prose min-w-0 max-w-none w-full dark:prose-invert marker:text-highlighted"
           v-html="renderedAssistantHtml[message.index]"
         />
 
@@ -531,6 +514,8 @@ defineExpose({
 
 <style scoped>
 .prose {
+  font-weight: 450;
+
   --tw-prose-body: var(--ui-text);
   --tw-prose-headings: var(--ui-text-highlighted);
   --tw-prose-lead: var(--ui-text-toned);
@@ -590,12 +575,6 @@ defineExpose({
   white-space: nowrap;
 }
 
-/*
- * Inline math (`$…$`) lands in an <eq> inside the paragraph. KaTeX never wraps
- * it, so a long expression would push the whole chat sideways. inline-flex
- * keeps the text baseline (inline-block would drop it to the bottom edge once
- * overflow is set) while giving the expression its own horizontal scroll.
- */
 .prose :deep(eq) {
   display: inline-flex;
   max-width: 100%;
